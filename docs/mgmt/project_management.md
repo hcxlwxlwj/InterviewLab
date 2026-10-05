@@ -6,9 +6,9 @@
 
 - [第一周里程碑](https://github.com/hcxlwxlwj/InterviewLab/milestone/1)：任务 #2～#7 已创建，成员和截止日期待确认。
 - [全部任务](https://github.com/hcxlwxlwj/InterviewLab/issues?q=is%3Aissue+label%3Aweek1)、[缺陷列表](https://github.com/hcxlwxlwj/InterviewLab/issues?q=is%3Aissue+label%3Abug)、[课程反馈 #7](https://github.com/hcxlwxlwj/InterviewLab/issues/7)。这些 Issues 页面可用于当前跟踪，不能代替课程要求的 Projects 视图。
-- Projects 尚未配置或核验。现有凭据查询返回 `INSUFFICIENT_SCOPES`，需用户完成 `project` 授权或在已登录网页中设置；阻塞与验收条件记录在[任务 #4](https://github.com/hcxlwxlwj/InterviewLab/issues/4)。
+- [InterviewLab Project](https://github.com/users/hcxlwxlwj/projects/2) 已设为私有并关联本仓库，任务 #2～#7 已加入。用户完成 Projects 授权后已核验布局、字段、筛选和状态，证据见[任务 #4](https://github.com/hcxlwxlwj/InterviewLab/issues/4)。
 
-授权后创建或复用私有 InterviewLab Project，关联本仓库，加入任务 #2～#7；再按下表建立三个视图并补真实链接。不要公开仓库或项目来绕过权限问题。
+三个视图共用同一批 Issues，成员和日期未确认前保持空值。项目私有状态不等同于已给老师或协作者授权，访问核验见[提交任务 #6](https://github.com/hcxlwxlwj/InterviewLab/issues/6)。
 
 ## 三个协作入口
 
@@ -16,9 +16,9 @@ GitHub Issues 是任务、缺陷和反馈的记录来源；Projects 展示这些
 
 | 入口 | 展示方式与范围 | 用途 |
 | --- | --- | --- |
-| Kanban | 看板，按 Status 分组，包含本项目工作项 | 查看待办、进行中、待检查、完成与阻塞情况 |
-| Team planning | 表格，显示 Assignees、Priority、Target date、Status | 分配负责人，确认依赖与课程截止时间 |
-| Bug tracker | 表格或看板，筛选带 `bug` 标签的 Issues | 记录可复现问题、影响、修复与复验结果 |
+| [Kanban](https://github.com/users/hcxlwxlwj/projects/2/views/2) | Board，按 Status 分列，包含本项目工作项 | 查看待办、进行中、待检查、完成与阻塞情况 |
+| [Team planning](https://github.com/users/hcxlwxlwj/projects/2/views/3) | Table，显示 Assignees、Priority、Target date、Status | 分配负责人，确认依赖与课程截止时间 |
+| [Bug tracker](https://github.com/users/hcxlwxlwj/projects/2/views/4) | Table，筛选 `label:bug` | 记录可复现问题、影响、修复与复验结果 |
 
 具体可用字段和视图以实际 GitHub 配置为准。Project 描述应链接仓库；README 和提交清单应链接上述入口。仓库为私有时，还需确认老师与协作者能访问仓库、Issues 和 Projects。
 
@@ -26,14 +26,14 @@ GitHub Issues 是任务、缺陷和反馈的记录来源；Projects 展示这些
 
 | 字段 | 约定 |
 | --- | --- |
-| Status | `Backlog` 待拆分；`Todo` 已明确待执行；`In progress` 处理中；`In review` 待检查；`Done` 已验收；`Blocked` 有明确阻塞 |
+| Status | `Todo` 待执行；`In Progress` 处理中；`In review` 待检查；`Done` 已验收；`Blocked` 有明确阻塞 |
 | Priority | `P0` 本周交付必需或阻止关键流程；`P1` 重要但有替代路径；`P2` 后续改进 |
 | Assignees | 一名主要负责人；成员未接受邀请或分工未确认时先保持未指派，并在 Issue 中注明待绑定角色 |
 | Target date | 实际约定的截止日期；课程日期未明确前不填写假日期 |
 | Labels | `task` 任务、`bug` 缺陷、`feedback` 外部反馈；可按需要增加 `documentation` 等领域标签 |
 | 验收条件 | Issue 正文中列出可观察结果和证据位置 |
 
-状态转换：明确需求后从 Backlog 进入 Todo；开始处理后进入 In progress；交付 PR 或验证证据后进入 In review；检查人确认验收条件后进入 Done。受阻时注明原因、需要谁处理及解除条件，再进入 Blocked；未收到老师反馈的反馈任务不能提前标为已获得反馈。
+状态转换：明确需求后进入 Todo；开始处理后进入 In Progress；交付 PR 或验证证据后进入 In review；检查人确认验收条件后进入 Done。受阻时注明原因、需要谁处理及解除条件，再进入 Blocked；未收到老师反馈的反馈任务不能提前标为已获得反馈。
 
 ## 建立与完成一项任务
 

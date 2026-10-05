@@ -18,8 +18,11 @@
 | [GitHub Issues](https://github.com/hcxlwxlwj/InterviewLab/issues) | 开发任务、缺陷和课程反馈 |
 | [第一周里程碑](https://github.com/hcxlwxlwj/InterviewLab/milestone/1) | 本周任务 #2～#7，负责人和课程截止日期待确认 |
 | [第一轮反馈 Issue](https://github.com/hcxlwxlwj/InterviewLab/issues/7) | 已建立评阅入口，等待老师实际反馈 |
+| [Kanban](https://github.com/users/hcxlwxlwj/projects/2/views/2) | 按 Status 分列跟踪本周任务 |
+| [Team planning](https://github.com/users/hcxlwxlwj/projects/2/views/3) | 负责人、优先级、目标日期与任务状态 |
+| [Bug tracker](https://github.com/users/hcxlwxlwj/projects/2/views/4) | 筛选带 `bug` 标签的缺陷 |
 
-Projects 看板配置因缺少授权暂时受阻，状态与完成条件见[看板任务 #4](https://github.com/hcxlwxlwj/InterviewLab/issues/4)。
+三个视图属于同一个私有 [InterviewLab Project](https://github.com/users/hcxlwxlwj/projects/2)，已关联本仓库并加入本周任务 #2～#7。设置与验收记录见[看板任务 #4](https://github.com/hcxlwxlwj/InterviewLab/issues/4)。老师与协作者的访问权限须由团队按实际账号确认。
 
 协作者已发出邀请，尚未接受；具体成员分工待团队确认。课程第一周截止日期尚未提供，按“第一周结束前”组织交付。日常开发使用 `develop`，课程提交和已验收版本进入 `main`；流程见 [协作操作须知](COLLABORATION.md)。
 

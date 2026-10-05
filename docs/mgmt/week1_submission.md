@@ -7,27 +7,29 @@
 | 要求 | 交付 / 检查位置 | 当前记录 |
 | --- | --- | --- |
 | 在 GitHub / Gitee 建立项目仓库 | [InterviewLab 仓库](https://github.com/hcxlwxlwj/InterviewLab) | GitHub 仓库已建立；当前为私有仓库，提交前核验老师访问权限 |
-| 提交规范的 README | [README](../../README.md) | 已有项目定位与方案，本次补齐第一周交付导航；合并后检查远端展示 |
-| 5W1H 报告和产品描述 | [问题定义报告](../requirements/problem_definition.md) | 本次补齐指定路径，合并后核验六项内容与产品边界 |
+| 提交规范的 README | [README](../../README.md) | 已通过 [PR #8](https://github.com/hcxlwxlwj/InterviewLab/pull/8) 合并到 `main`，包含第一周导航 |
+| 5W1H 报告和产品描述 | [问题定义报告](../requirements/problem_definition.md) | 指定文件已进入 `main`，六项内容与产品边界已核验 |
 | 规范目录结构 | [文档导航](../README.md)、`code/`、`tests/`、`.github/workflows/` | 本次建立课件目录骨架；占位目录不代表功能或测试已实现 |
 | 分支管理示例 | 远端 `main`、`develop`；[协作说明](../../COLLABORATION.md) | 两个远端分支已存在，已通过 `git ls-remote` 核验；团队使用约定见协作说明 |
-| Kanban | [看板配置任务 #4](https://github.com/hcxlwxlwj/InterviewLab/issues/4) | 待 Projects 授权；查询明确返回 `INSUFFICIENT_SCOPES` |
-| Team planning | [看板配置任务 #4](https://github.com/hcxlwxlwj/InterviewLab/issues/4)、[团队计划](team_plan.md) | 本周任务已登记为 Issues；成员绑定、课程截止日期及 Project 视图待定 |
-| Bug tracker | [看板配置任务 #4](https://github.com/hcxlwxlwj/InterviewLab/issues/4) | 缺陷表单已准备；实际 Project 视图待授权配置 |
+| Kanban | [Kanban 视图](https://github.com/users/hcxlwxlwj/projects/2/views/2)、[任务 #4](https://github.com/hcxlwxlwj/InterviewLab/issues/4) | Board 已按 Status 分列；本周任务 #2～#7 已加入 |
+| Team planning | [团队计划视图](https://github.com/users/hcxlwxlwj/projects/2/views/3)、[团队计划](team_plan.md) | 已配置状态、优先级、负责人和日期字段；成员绑定及课程截止日期待定 |
+| Bug tracker | [缺陷视图](https://github.com/users/hcxlwxlwj/projects/2/views/4) | 已配置 `label:bug` 筛选及缺陷表单；当前未登记真实缺陷 |
 | 第一周结束前提交仓库链接 | 课程指定渠道的提交记录 | 待实际提交；课程截止日期尚未提供 |
 | 通过 GitHub Issues 获得第一轮反馈 | [第一轮反馈入口 #7](https://github.com/hcxlwxlwj/InterviewLab/issues/7)、[反馈记录](feedback.md) | 反馈 Issue 已创建，等待老师实际回复；尚未获得反馈 |
 
 协作者邀请已发出，协作者尚未接受（用户确认）。接受后绑定各任务负责人，确认仓库与 Projects 权限。私有仓库链接本身不授予老师访问权限。
 
-GitHub 已建立[第一周里程碑](https://github.com/hcxlwxlwj/InterviewLab/milestone/1)，包含任务 #2～#7；没有未经确认的负责人或截止日期。Projects v2 查询已在 2026-10-05 返回权限不足：读取需要 `read:project`，创建需要 `project`。现有仓库权限支持 Issues、分支和 PR，不能代替看板权限；该阻塞记录在 #4。
+GitHub 已建立[第一周里程碑](https://github.com/hcxlwxlwj/InterviewLab/milestone/1)，包含任务 #2～#7；没有未经确认的负责人或截止日期。初始 Projects 权限阻塞已由用户完成授权后解除；私有 Project、三个视图、状态选项、优先级、日期字段和任务关联均已核验，证据记录在 #4。
+
+仓库文件已通过 PR #8 交付，问题定义任务 #2、工程配置任务 #3 已关闭。`main` 和 `develop` 的结构与文档[自动检查通过](https://github.com/hcxlwxlwj/InterviewLab/actions/runs/37270730469)，本地检查覆盖 28 份 Markdown 与 170 个文件链接；尚未实现应用功能，不以该检查代替应用测试。
 
 ## 提交前检查
 
-- [ ] 本次文档、目录和工作流已合并到远端 `main`，所有 README 内部链接可打开。
+- [x] 第一周文档、目录和工作流已合并到远端 `main`，README 文件链接检查通过。
 - [x] `problem_definition.md` 的 What、Why、Who、When、Where、How 与产品描述、首版范围一致，已完成独立内容检查。
 - [x] 远端 `develop` 可见，分支与 PR 流程已记录。
 - [ ] 协作者接受邀请后阅读并确认团队协作约定。
-- [ ] 三个协作入口的真实链接已补齐，本周任务已纳入看板。
+- [x] 三个协作入口的真实链接已补齐，本周任务已纳入看板。
 - [ ] 协作者接受邀请；分工和课程截止日期确认后补入看板。
 - [ ] 老师拥有访问仓库、Projects 和 Issues 的权限。
 - [x] 第一轮反馈 Issue 已建立，明确希望老师评价的问题。

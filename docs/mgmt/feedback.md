@@ -6,6 +6,8 @@
 
 已建立[第一周评阅 Issue #7](https://github.com/hcxlwxlwj/InterviewLab/issues/7)，当前状态为等待老师反馈。Issue 创建日期为 2026-10-05，尚无老师首次回复日期。
 
+仓库配置和看板已准备好，评阅入口包括 [5W1H 报告](../requirements/problem_definition.md)、[Kanban](https://github.com/users/hcxlwxlwj/projects/2/views/2)、[Team planning](https://github.com/users/hcxlwxlwj/projects/2/views/3)、[Bug tracker](https://github.com/users/hcxlwxlwj/projects/2/views/4)。老师的访问权限和课程渠道提交仍需团队确认。
+
 ## 建议请老师确认的问题
 
 1. “应届生难以把真实经历讲清楚、缺少针对性追问与反馈”的问题定义是否明确，需要补充哪些用户证据？
