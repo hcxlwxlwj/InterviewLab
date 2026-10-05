@@ -4,6 +4,15 @@
 
 这套中文文档用于立项和团队讨论，说明学生自主面试教学系统的需求、功能边界、技术路线与验证方法。仓库当前只有规划资料，本文中的能力、接口与指标均为待实现设计。
 
+## 第一周课程交付
+
+- [5W1H 报告与产品描述](requirements/problem_definition.md)：老师指定的项目定义文件。
+- [团队计划](mgmt/team_plan.md)、[项目管理](mgmt/project_management.md)：第一周任务、协作和看板说明。
+- [提交检查清单](mgmt/week1_submission.md)、[第一轮反馈记录](mgmt/feedback.md)：交付证据与反馈跟进。
+- 分类入口：[需求](requirements/README.md)、[算法](algorithm/README.md)、[软件](software/README.md)、[管理](mgmt/README.md)、[复盘](retrospection/README.md)。
+
+以下详细设计仍保留原路径，避免已有链接失效。
+
 ## 推荐阅读顺序
 
 先读需求确认产品目标，再读架构理解模块关系；讨论某个功能时进入对应技术文档；开发前统一阅读知识/智能体和数据接口；最后按评测与迭代安排验证。

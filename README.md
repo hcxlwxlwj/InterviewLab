@@ -6,6 +6,23 @@
 
 需求与技术设计文档已整理，阅读入口见 [文档导航](docs/README.md)，产品定位见 [需求分析](docs/requirements.md)，组件与智能体分工见 [总体技术架构](docs/architecture.md)。
 
+## 第一周交付与协作
+
+| 入口 | 内容 |
+| --- | --- |
+| [5W1H 与产品描述](docs/requirements/problem_definition.md) | 项目问题、目标用户、使用场景、首版范围和验证方法 |
+| [团队计划](docs/mgmt/team_plan.md) | 角色职责、第一周任务和验收条件；成员分工待定 |
+| [项目管理](docs/mgmt/project_management.md) | Kanban、Team planning、Bug tracker 和 Issues 工作方式 |
+| [第一周提交清单](docs/mgmt/week1_submission.md) | 课程要求、交付证据和提交信息 |
+| [反馈记录](docs/mgmt/feedback.md) | 老师第一轮反馈及后续处理记录 |
+| [GitHub Issues](https://github.com/hcxlwxlwj/InterviewLab/issues) | 开发任务、缺陷和课程反馈 |
+| [第一周里程碑](https://github.com/hcxlwxlwj/InterviewLab/milestone/1) | 本周任务 #2～#7，负责人和课程截止日期待确认 |
+| [第一轮反馈 Issue](https://github.com/hcxlwxlwj/InterviewLab/issues/7) | 已建立评阅入口，等待老师实际反馈 |
+
+Projects 看板配置因缺少授权暂时受阻，状态与完成条件见[看板任务 #4](https://github.com/hcxlwxlwj/InterviewLab/issues/4)。
+
+协作者已发出邀请，尚未接受；具体成员分工待团队确认。课程第一周截止日期尚未提供，按“第一周结束前”组织交付。日常开发使用 `develop`，课程提交和已验收版本进入 `main`；流程见 [协作操作须知](COLLABORATION.md)。
+
 ## 我们希望解决的问题
 
 面试准备不仅是背答案。学生和初级求职者常常难以说明自己的职责、关键行动和结果，也缺少能够根据回答继续追问、提供具体改进建议的练习对象。
@@ -54,23 +71,34 @@ InterviewLab 首版聚焦中文、跨专业通用面试，覆盖自我介绍、�
 
 先验证中文识别、延迟、打断、弱网表现与完整会话费用，再确定服务商。角色在浏览器渲染，首版使用克制的动作与音频驱动嘴型。
 
-## 建议工程结构
+## 工程目录
 
-以下工程目录将在开发时按需建立；`docs/` 已包含本版需求与技术设计文档：
+第一周先建立以下目录骨架。代码与测试目录使用占位文件保留，具体应用尚未实现；既有详细设计文档继续保留在 `docs/` 原位置。
 
 ```text
 InterviewLab/
-├── apps/web/              # 页面、接口、语音与数字人交互
-├── packages/agent/        # 会话状态机、追问与评估
-├── packages/providers/    # LLM、ASR、TTS 适配
-├── packages/schemas/      # 数据结构与输出校验
-├── content/               # 训练场景、题库与评分标准
-├── evals/                 # 评测样本、执行脚本与结果
-├── tests/                 # 关键流程测试
-├── docs/                  # 产品、架构、部署与评测文档
+├── docs/
+│   ├── requirements/      # 5W1H 与产品定义
+│   ├── algorithm/         # AI、检索与评测文档导航
+│   ├── software/          # 架构、数据与模块设计导航
+│   ├── mgmt/              # 团队计划、项目管理与提交记录
+│   └── retrospection/     # 复盘与改进记录
+├── code/
+│   ├── backend/           # 后端业务、数据和服务适配
+│   ├── frontend/          # Web 页面、语音与 3D 交互
+│   └── core_engine/       # 会话编排、检索、追问与评价
+├── tests/
+│   ├── unit/              # 单元测试
+│   └── integration/       # 集成测试
+├── .github/
+│   ├── ISSUE_TEMPLATE/    # 任务、缺陷和课程反馈表单
+│   └── workflows/         # 仓库结构与文档链接检查
+├── .gitignore
 ├── README.md
 └── COLLABORATION.md
 ```
+
+目录表示代码职责边界，不要求将 Next.js 页面与服务端路由拆成两个部署服务。实际包组织在代码阶段确定，并同步更新目录说明；当前不建立应用依赖或宣称可运行。
 
 ## 开发阶段
 
