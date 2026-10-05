@@ -1,0 +1,27 @@
+name: 课程反馈
+description: 记录老师建议和团队处理结果
+title: "[Feedback] "
+labels: [feedback, documentation]
+body:
+  - type: input
+    id: target
+    attributes:
+      label: 周次与交付项
+      placeholder: 第一周；5W1H、README、仓库或项目管理
+    validations:
+      required: true
+  - type: textarea
+    id: feedback
+    attributes:
+      label: 反馈内容
+      description: 区分原始反馈与团队理解；没有收到反馈时不要填入假设意见。
+    validations:
+      required: true
+  - type: textarea
+    id: action
+    attributes:
+      label: 建议的修改与验收条件
+  - type: input
+    id: related
+    attributes:
+      label: 关联 Issue 或 Pull Request

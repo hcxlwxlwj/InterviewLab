@@ -1,0 +1,33 @@
+name: 开发或文档任务
+description: 记录目标、依赖和验收条件
+title: "[Task] "
+labels: [task]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: 目标与背景
+      description: 关联需求编号、课程交付项或用户场景。
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 验收条件
+      description: 写明可以检查的文件、行为或结果，使用任务清单。
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: 负责人
+      placeholder: GitHub 账号；未分工时填待定
+  - type: input
+    id: deadline
+    attributes:
+      label: 目标日期或里程碑
+      placeholder: 课程第一周结束前；具体日期待确认
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: 依赖与关联文档
