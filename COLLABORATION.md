@@ -1,5 +1,7 @@
 # InterviewLab 协作操作须知
 
+版本：v0.2 · 更新日期：2026-10-15。当前产品与文档范围见[文档导航](docs/README.md)。
+
 ## 分支约定
 
 | 分支 | 用途 | 合并方向 |
@@ -14,7 +16,7 @@
 
 接受仓库邀请后，在准备存放项目的父目录执行：
 
-当前协作者已发出邀请但尚未接受，具体分工见 [团队计划](docs/mgmt/team_plan.md)。
+2026-10-05 的记录为协作者邀请已发出但尚未接受；本轮未重新核验邀请状态。具体分工见 [团队计划](docs/mgmt/team_plan.md)。
 
 ```bash
 git clone https://github.com/hcxlwxlwj/InterviewLab.git
@@ -50,7 +52,7 @@ git push -u origin feature/your-task
 
 ## Issues 与项目看板
 
-使用仓库中的任务、缺陷和课程反馈表单，注明目标、负责人、验收条件和依赖。分工未定时保持未指派。Kanban、Team planning 和 Bug tracker 的配置与工作方式见 [项目管理](docs/mgmt/project_management.md)。只有验收通过的任务才标记 Done；老师尚未回复时保持“待反馈”。
+使用仓库中的任务、缺陷和课程反馈表单，注明目标、负责人、验收条件和依赖。分工未定时保持未指派。Kanban、Team planning 和 Bug tracker 的配置与工作方式见 [项目管理](docs/mgmt/project_management.md)。只有验收通过的任务才标记 Done；用户转述的教师意见注明来源，不等同于 Issue 已回复或课程已验收。
 
 ## 提交约定
 
@@ -58,6 +60,7 @@ git push -u origin feature/your-task
 - 提交前检查 `.gitignore`；不上传密钥、真实用户数据、依赖目录或构建产物。
 - 问题与需求记录在 Issues 中，注明预期结果与验收条件。
 - 新增文档使用 UTF-8，同步更新目录导航和相对链接；空代码或测试目录用 `.gitkeep` 保留。
+- 当前正文按需求、算法、软件、管理和复盘五类目录维护，旧路径仅作兼容导航。变更状态、评分或删除约定时同步需求、原型、接口、Agent 和验收，不维护两份合同。
 - Actions 的结构与文档链接检查不代替应用测试，占位目录不表示功能已实现。
 - 遇到冲突或推送被拒绝，先查看原因并与成员协调，不使用强制推送覆盖他人提交。
 
