@@ -1,56 +1,44 @@
 # InterviewLab 文档导航
 
-版本：v0.1 · 日期：2026-10-03。
+版本：v0.2 · 日期：2026-10-15 · 状态：当前需求与设计基线，尚未实现。
 
-这套中文文档用于立项和团队讨论，说明学生自主面试教学系统的需求、功能边界、技术路线与验证方法。仓库当前只有规划资料，本文中的能力、接口与指标均为待实现设计。
+目标是帮助实习经历有限、主要拥有项目、比赛、科研或毕设经历的高校学生，完成实时口头模拟面试、面后分析和针对性重练。围绕学生项目开展即时追问，将回答证据、语音节奏与可选镜头表现关联到具体片段；文字作为明确标注的降级路径。取消教学模式及 3D 必需交付；历史资料中的旧要求只描述当时状态。
 
-## 第一周课程交付
+## 课程结构与推荐阅读顺序
 
-- [5W1H 报告与产品描述](requirements/problem_definition.md)：老师指定的项目定义文件。
-- [团队计划](mgmt/team_plan.md)、[项目管理](mgmt/project_management.md)：第一周任务、协作和看板说明。
-- [提交检查清单](mgmt/week1_submission.md)、[第一轮反馈记录](mgmt/feedback.md)：交付证据与反馈跟进。
-- 分类入口：[需求](requirements/README.md)、[算法](algorithm/README.md)、[软件](software/README.md)、[管理](mgmt/README.md)、[复盘](retrospection/README.md)。
+按[课程成果结构](https://github.com/bettermorn/IntelligentSWEPractice#课程成果)把当前正文归入五类目录。先读问题定义与需求，再读页面、架构和接口，最后读 Agent、评测及过程记录。
 
-以下详细设计仍保留原路径，避免已有链接失效。
-
-## 推荐阅读顺序
-
-先读需求确认产品目标，再读架构理解模块关系；讨论某个功能时进入对应技术文档；开发前统一阅读知识/智能体和数据接口；最后按评测与迭代安排验证。
-
-| 顺序 | 文档 | 回答的问题 |
+| 顺序 | 入口 | 内容 |
 | --- | --- | --- |
-| 1 | [需求分析](requirements.md) | 为谁解决什么问题，学生怎样使用，首版如何取舍？ |
-| 2 | [总体技术架构](architecture.md) | 各组件如何协作，为什么这样选型，LLM/RAG/Tools/MCP各做什么？ |
-| 3 | [知识库与智能体设计](knowledge-and-agent.md) | 知识从哪里来，怎样检索，智能体有哪些职责和工具权限？ |
-| 4 | [数据与接口概要](data-and-interfaces.md) | 哪些数据要保存，模块怎样交互，状态和删除如何处理？ |
-| 5 | [评测与迭代计划](evaluation-and-roadmap.md) | 如何验证功能、AI质量、语音和教学效果，如何估算成本？ |
+| 1 | [需求目录](requirements/README.md) | 教师六行产品描述、5W1H、功能、非功能、用户故事和验收 |
+| 2 | [原型说明](software/prototype/README.md) | 六界面单元、设备配置、实时双栏会话、片段复盘与个人中心 |
+| 3 | [软件设计](software/README.md) | 架构、数据接口、模块和异常处理 |
+| 4 | [算法资料](algorithm/README.md) | 知识、Agent、竞品证据与评测 |
+| 5 | [项目管理](mgmt/README.md) | 分工、沟通、风险、反馈及历史提交 |
+| 6 | [复盘记录](retrospection/README.md) | 初始化记录和本次范围修订 |
 
-## 九个功能技术文档
+## 当前功能技术文档
 
-| 模块 | 技术文档 | 核心交付 |
-| --- | --- | --- |
-| 岗位理解 | [01 岗位理解](modules/01-job-understanding.md) | JD/模板解读、工作任务说明、岗位问答与来源 |
-| 个人材料 | [02 个人材料](modules/02-personal-materials.md) | 简历提取与确认、真实经历整理 |
-| 准备重点 | [03 准备重点](modules/03-preparation-plan.md) | 岗位能力与经历关联、材料缺口与训练主题 |
-| 教学练习 | [04 教学练习](modules/04-guided-practice.md) | 分步提示、即时反馈和专项表达练习 |
-| 模拟面试 | [05 模拟面试](modules/05-mock-interview.md) | 有时长与目标控制的提问和追问 |
-| 语音与3D | [06 语音与3D](modules/06-voice-and-avatar.md) | 实时转写、TTS、打断、字幕与角色状态 |
-| 反馈报告 | [07 反馈报告](modules/07-feedback-report.md) | 三维观察、原文证据与可执行改进建议 |
-| 重练与进展 | [08 重练与进展](modules/08-retry-and-progress.md) | 单题重练、前后对比、历史回顾 |
-| 内容与运行维护 | [09 内容与运行维护](modules/09-content-and-operations.md) | 知识发布、版本管理、日志、费用与故障监测 |
+| 功能 | 当前正文 |
+| --- | --- |
+| 岗位与 JD | [01 岗位理解](software/modules/01-job-understanding.md) |
+| 多简历与确认经历 | [02 个人材料](software/modules/02-personal-materials.md) |
+| 配置及重点经历 | [03 面试配置](software/modules/03-interview-configuration.md) |
+| 实时模拟与动态追问 | [05 模拟面试](software/modules/05-mock-interview.md) |
+| 语音、镜头与表达观测 | [06 语音与镜头表现](software/modules/06-voice-and-speech.md) |
+| 结束后分析与 PDF | [07 分析报告](software/modules/07-feedback-report.md) |
+| 同题重练及对比 | [08 重练与进展](software/modules/08-retry-and-progress.md) |
+| 内容与运维 | [09 内容与运行维护](software/modules/09-content-and-operations.md) |
+| 可选代码考核 | [10 代码考核](software/modules/10-code-assessment.md) |
+| 记录、简历与偏好 | [11 个人中心](software/modules/11-personal-center.md) |
 
-每个功能文档采用相同结构：目标与用户需求、首版范围与交互流程、输入输出与数据、处理逻辑与技术方案、接口与模块依赖、异常与边界、贯穿示例、验收条件、优先级与后续扩展。
+原 04 教学模块已退出当前范围，仅保留[取消说明](modules/04-guided-practice.md)。旧模块编号保留追溯，不按数字重排已有需求编号。
 
-## 如何使用这套文档
+## 共用定义与维护
 
-- 产品讨论以需求编号 FR-01～FR-12 和非功能需求 NFR-01～NFR-07 为入口；这些编号可用于后续 Issues 的追溯。
-- 模块开发任务应包含用户场景、输入输出、依赖和对应验收项，不能只写“接入一个Agent”或“搭建RAG”。
-- 状态名、数据对象、接口路径和删除规则以[数据与接口概要](data-and-interfaces.md)为共用定义；模式和知识权限以[知识库与智能体](knowledge-and-agent.md)为准。
-- 性能目标、试用样本量、成本算例都是验证基线或假设，不是已上线服务承诺。云服务商与依赖版本在实现前按官方资料和统一样例复核。
-- 发生设计变更时同步需求、模块、数据和评测文档，记录版本；不要通过单个模块新增互相冲突的状态或评分口径。
-
-## 统一示例与确定的边界
-
-全部文档使用合成学生“小林”：应届生，目标初级产品运营；校园读书活动负责报名表、签到和群提醒，60人报名、45人到场，无独立SQL分析或增长贡献证据。该例演示岗位理解到重练的数据衔接，不代表真实用户调查或教学实验结果。
-
-首版中文、跨专业通用面试；岗位模板与自带JD；简历上传与经历填写；云服务API；模块化单体。教师端、实时招聘搜索、专业能力认证和录用概率不在首版范围。代码尚未开发，接口文档不应被当成可调用的服务说明。
+- [功能需求](requirements/functional_spec.md)维护 FR 编号、优先级和功能边界；[非功能需求](requirements/nonfunctional_spec.md)维护 NFR。
+- 状态、字段、接口、删除和评分汇总口径以[数据与接口](software/data_and_interfaces.md)为准；Agent 权限以[知识与 Agent](algorithm/knowledge_and_agent.md)为准。
+- [调研](algorithm/research.md)区分官方功能、用户自述、机会假设，不把公开评价当真实访谈或代表性统计。
+- [评测](algorithm/evaluation.md)定义合成案例、同材料对照和阶段门槛；模型自评分不证明招聘或学习成效。
+- 当前设计版本统一为 v0.2 / 2026-10-15。过程文档保留历史日期与证据，追加变更，不倒写已发生记录。
+- 旧 docs 根文档和 docs/modules 路径是兼容导航；不在两处维护相同正文。改动时检查文件链接、重要章节链接和跨文档合同一致性。
