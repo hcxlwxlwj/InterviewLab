@@ -1,8 +1,8 @@
 # 项目看板与 Issue 管理
 
-更新日期：2026-10-05。本文规定团队的工作方式，远端项目是否建成与具体链接见[第一周提交清单](week1_submission.md)。
+版本：v0.2 · 更新日期：2026-10-15。本文维护当前工作方式；下方远端配置描述是 2026-10-05 的核验记录，本轮未重新核验权限或任务状态。历史证据见[第一周提交清单](week1_submission.md)。
 
-## 当前入口与配置状态
+## 入口与配置的历史核验记录（2026-10-05）
 
 - [第一周里程碑](https://github.com/hcxlwxlwj/InterviewLab/milestone/1)：任务 #2～#7 已创建，成员和截止日期待确认。
 - [全部任务](https://github.com/hcxlwxlwj/InterviewLab/issues?q=is%3Aissue+label%3Aweek1)、[缺陷列表](https://github.com/hcxlwxlwj/InterviewLab/issues?q=is%3Aissue+label%3Abug)、[课程反馈 #7](https://github.com/hcxlwxlwj/InterviewLab/issues/7)。这些 Issues 页面可用于当前跟踪，不能代替课程要求的 Projects 视图。
@@ -33,7 +33,7 @@ GitHub Issues 是任务、缺陷和反馈的记录来源；Projects 展示这些
 | Labels | `task` 任务、`bug` 缺陷、`feedback` 外部反馈；可按需要增加 `documentation` 等领域标签 |
 | 验收条件 | Issue 正文中列出可观察结果和证据位置 |
 
-状态转换：明确需求后进入 Todo；开始处理后进入 In Progress；交付 PR 或验证证据后进入 In review；检查人确认验收条件后进入 Done。受阻时注明原因、需要谁处理及解除条件，再进入 Blocked；未收到老师反馈的反馈任务不能提前标为已获得反馈。
+状态转换：明确需求后进入 Todo；开始处理后进入 In Progress；交付 PR 或验证证据后进入 In review；检查人确认验收条件后进入 Done。受阻时注明原因、需要谁处理及解除条件，再进入 Blocked；收到用户转述的教师反馈时记录来源，不伪造 Issue 评论或提前标为课程已验收。
 
 ## 建立与完成一项任务
 
@@ -41,6 +41,8 @@ GitHub Issues 是任务、缺陷和反馈的记录来源；Projects 展示这些
 2. 将 Issue 加入 Projects，设置状态和优先级。成员与日期确定后补 Assignees 和 Target date。
 3. 按[协作操作须知](../../COLLABORATION.md)在任务分支修改；PR 链接相关 Issue，写明验证方法与尚未完成的部分。
 4. 检查人复核文档、运行结果或其他证据；通过后合并并关闭已完成的 Issue，将状态改为 Done。
-5. 老师反馈使用 `feedback` 标签；按[反馈记录](feedback.md)保存链接并拆分后续任务。缺陷只有复验通过才关闭。
+5. 老师反馈使用 `feedback` 标签；按[反馈记录](feedback.md)保存实际来源与链接并拆分后续任务。若仅从聊天收到转述，明确注明且不声称已同步到 GitHub。缺陷只有复验通过才关闭。
 
 本周任务编号与验收条件见[团队计划](team_plan.md)。Project 中的任务状态作为日常跟踪依据，提交时再根据真实证据更新提交清单。
+
+当前文档按 v0.2 维护，沟通与决策见[沟通管理计划](communication_mgmt_plan.md)，风险触发与措施见[风险管理计划](risk_mgmt_plan.md)。
