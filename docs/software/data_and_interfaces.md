@@ -1,187 +1,241 @@
-# 数据与接口概要
+# 数据与接口合同
 
-版本：v0.3 · 更新：2026-10-19 · 状态：逻辑合同与部分接口骨架；真实身份和持久化待接入，不是完整 OpenAPI。
+版本：v0.4 · 更新：2026-10-19 · 状态：独立后端目标合同；本轮只改文档，尚无生成的 OpenAPI 或真实私有服务。
 
-## 当前实现位置
+## 0. 当前接口与目标合同
 
-类型在 `code/core_engine/src/domain`，适配接口在 `src/ports.ts`；HTTP 清单、Zod 校验、响应和路由分别位于 `code/backend/src/http`。岗位注册表从公开内容包读取，浏览器个人资料由统一演示客户端管理。详见[工程目录](repository_structure.md)。
+当前代码仍是 Next.js Route Handlers 转发给 `code/backend/src/http` 的骨架。公开岗位列表、详情、来源和分类可读；其他已支持读取是合成样例，真实写入在已覆盖校验后返回 `501 capability_unavailable`。浏览器使用同步演示客户端，尚未调用真实持久化服务。当前演示删除简历会移除所属经历和未来选择，但保留旧面试快照；这不是下文生产级私有事实清理已验收的证明。
 
-`GET /api/v1/job-templates`、岗位详情、来源、分类返回整理的公开资料；其他已支持读取仅为合成样例。写操作尚无真实服务，通过已覆盖的校验后返回 `501 capability_unavailable`。清单中的路由不保证都有读取实现；以接口测试及实际响应为准。同步 `DataClient` 是演示合同，真实 HTTP 客户端需要另建异步边界。以下持久化、身份、媒体与异步任务字段属于目标合同。
+本文第 1–9 节是后续 Fastify 服务的正式设计方向，不表示这些路径已经可用。当前 `API_CONTRACT`、Zod 和共享 `Session`/`ResumeDocument` 等仍是旧原型合同，本轮没有同步改代码。目标 API schema 实现后生成 OpenAPI，作为联调依据；不得把本文当作已可执行的接口说明。
 
-## 1. 公共边界
+### 旧草案迁移
 
-前缀统一为 `/api/v1`。ID 为服务端生成的不透明标识，时间存 UTC、界面按用户时区显示。`owner_id` 只取已验证身份，不能由客户端或模型指定。每次读取、预览、下载、修改、实时连接和比较均检查归属；维护权限单独授予。
-
-个人资料不进入共享知识向量库。原始文件、提取候选、已确认经历、会话快照、原始作答轨迹、识别纠错、音视频观测、复盘媒体和报告为不同对象；模型提取不自动变成个人事实。学生确认仅表示认可记录，不代表系统核验其真实性。版本字段用于乐观并发控制与引用追溯，不允许新任务覆盖较新的人工修改。
-
-## 2. 逻辑实体与最小接口字段
-
-| 实体 | 必要字段/关系 | 行为约定 |
+| 当前原型/草案 | 新目标 | 迁移说明 |
 | --- | --- | --- |
-| User/Profile | `id,display_name,locale,timezone` | 不强制采集学号、身份证、住址 |
-| UserPreferences | `interaction_mode,editor_theme,default_job_direction,version` | 默认 realtime_voice、编辑器跟随系统、岗位未指定；偏好不是麦克风/摄像头授权，不自动采集 |
-| JobTarget | `id,title,jd_text/template_id,source_refs,requirements,confirmed,version` | 明文要求、知识补充、推断分开；模板标通用参考 |
-| ResumeDocument | `id,name,version,is_default,storage_scope,parse_status,file_type,private_locator,created_at,expires_at?,extraction_revision` | `storage_scope=library\|temporary`；同一逻辑简历的文件替换产生新版本，不能改写旧会话依据 |
-| Experience | `id,title,kind,personal_role,actions,technical_decisions,results,evidence_refs,confirmed,version,resume_document_id?,resume_document_version?` | `kind=course_project\|competition\|research\|graduation_project\|internship\|other`；结果可定性或缺失，不补造指标 |
-| EvidenceRef | 来源对象/版本、页/段/代码位置、必要摘录、来源类型 | 原文引用精确可定位；已清理源文件标“原文件不可用”，确认摘要仍可追溯 |
-| KnowledgeDocument/Chunk | 来源、适用岗位、授权、获取/审核时间、发布与文本版本、片段定位、嵌入配置 | 仅发布内容进入新检索，学生材料不混入 |
-| Question/Rubric | 题意、目标维度、难度、追问方向、0～100 锚点、证据规则、版本 | 内容与标准在会话开始时冻结，`not_observed` 不等于零分 |
-| Session | `id,mode,interview_type,status,job_target_id,resume_document_id?,focus_experience_ids,material_snapshot,configuration,version,parent_session_id?,parent_turn_id?` | `mode` 仅 `mock`；材料快照含具体版本，重练来源单独关联 |
-| Turn | `id,session_id,main_question_index,follow_up_index,parent_turn_id?,question_text,generation_id,presented_text_range,playback_progress,input_mode,answer_segments,asr_revision,answer_text,revision,submission_id` | 主问题与追问分开；answer_text 来源于自动封存的原转写或标明模式的文本回答，不能润色覆盖口头作答 |
-| AnswerSegment | `id,turn_id,seq,started_at,ended_at,source,raw_asr_text?,text?,capture_status,endpoint_event_id?,append_to_segment_id?` | source 为 audio 或 text；保存原识别/文本、时间轨迹、误截追加与采集缺口，媒体删除后仍不伪称可回放 |
-| AsrRevision | `id,turn_id,base_revision,revision,segment_id,text_range,original_text,corrected_text,reason,created_at` | 仅面后更正识别错误；保留原识别和更正原因，不补充观点、事实或润色成新回答 |
-| SpeechObservation | `id,turn_id,answer_revision,version,status,metrics,alignment,quality,algorithm_version,asr_version` | 语速、停顿、疑似口头语、音量/音高变化独立保存，原始作答与识别纠错均可追溯 |
-| VisionObservation | `id,turn_id,answer_revision,version,status,intervals,observations,quality,algorithm_version,media_id?` | 仅描述画面质量、头部朝向、面部动作；低质量/低置信为 unavailable，不推断情绪、诚实、人格或技术能力 |
-| ReviewMedia | `id,session_id,turn_id?,kind,version,status,consent_version,authorized_at,captured_at,private_locator?,expires_at,deleted_at?` | kind 为 audio/video；默认不保存，仅显式开启后私有保留自采集起最长 24 小时，删除/到期立即撤销访问 |
-| CodeTask/Submission | 题目与用例版本、所属回合、`language,source_code,revision` | 语言 `cpp\|python\|java`，代码和执行输入受大小限制 |
-| CodeExecution | `id,submission_id,submission_revision,status,execution_mode,test_results,resource_usage,limits_version,error?` | `execution_mode=real\|simulated`；真实执行状态与 Agent 点评分离 |
-| CodeReview | 提交版本、执行结果版本、问题定位、推理点评、引用、标准版本 | 不能把静态点评说成通过用例，迟到结果不能覆盖新代码 |
-| Report | `id,session_id,status,answer_version_digest,observation_version_digest,dimensions,overall_score,coverage,evidence,advantages,gaps,retry_targets,versions,is_partial` | 异步、多版本，引用回答/观测版本及片段时间；时间定位不保证原媒体仍可回放 |
-| RetryComparison | 来源/重练会话、明确两份 turn/revision/片段、input_modes、目标缺口、共同标准、原新引用、变化、不可比原因、状态 | 不覆盖原回答；输入模式、设备/质量或口径不同的语音变化不能直接比较 |
-| ExportJob | 报告 ID/版本、状态、私有 PDF 定位、到期时间 | 导出固定版本并标部分/过期/观察范围，下载检查归属 |
-| Job/Invocation/Audit | 唯一任务键、输入版本、状态、尝试次数、脱敏请求、耗时/用量/错误 | 默认无个人材料全文、原音频、完整提示和密钥 |
+| `/resume-documents` | `/resumes` | 文本与文件统一为简历资源，前端页面 URL 不变 |
+| `/resume-documents/{id}/set-default` | `PUT /me/default-resume` | 设置/清空指针，不保留第二套默认设置逻辑 |
+| `/resume-documents/{id}/save-to-library` | `PATCH /resumes/{id}` | 显式修改保存范围，不自动入库 |
+| `/resume-documents/{id}/confirm` | `/resumes/{id}/confirmations` | 保留每次候选确认依据 |
+| `/sessions`、`/history` | `/interviews` | 同一列表负责状态、岗位、简历和时间筛选；登录会话与面试资源区分 |
+| `/sessions/{id}/turns` 的混合提交 | 当前回合的 `/answer`、`/actions` | 作答与澄清/重复/跳过分开；问题回合先于答案存在 |
+| 面后 `PATCH` 原回合 | `/corrections` | 追加纠错记录，保留原识别及原因 |
+| `/sessions/{id}/report/retry` | `POST /interviews/{id}/report` | 同一输入复用有效结果/任务，失败或过期才重建 |
+| `/retry-comparisons` | `/comparisons` | 固定两份回答 revision 和比较标准 |
+| `POST/PATCH /me/bookmarks` | `PUT /me/bookmarks/{template_id}` | 收藏键直接使用模板 ID，设置目标状态，避免不确定的 toggle |
+| `/job-templates/{id}/sources` | 模板详情内的来源 | 正式客户端读取详情即可；现有来源路由仅属于原型 |
+| 预先约定的一组 `/admin` 路径 | 首轮授权命令与内部服务 | 不先设计通用内容 CRUD 或管理页面；后续按明确内容类型开放 |
 
-`Session.interview_type=technical_qa|project_deep_dive|hr|mixed`，分别表示技术问答、项目深挖、HR 面和综合模拟。`configuration` 包括难度、`duration_minutes=5|10`（默认 10）、面试官风格、`code_assessment_enabled`、`interaction_mode=realtime_voice|text_fallback`（默认 realtime_voice）、`camera_enabled=false`、`review_media_enabled=false`。实时语音采用端点确认后的自动提交，不提供“编辑转写后发送”流程。摄像头、私有媒体保存均须分别显式开启并当场授权；关闭不影响四维专业评分。可在故障时切换 text_fallback，并在各 AnswerSegment/Turn 保留实际输入模式与切换事件。不提供实时评分配置；评分在面后集中展示。首版“综合”不承诺每场都包含代码题，代码考核由独立开关控制。
+真实服务与新异步客户端在同一阶段迁移，不维护两套私有业务实现。保留显式演示模式，旧浏览器 schema=2 的资料不自动上传，也不伪造为真实账号数据。旧页面链接与四类历史岗位 ID 保留兼容；HTTP 草案允许调整，不承诺尚未实现接口的别名。
 
-### 简历与经历选择规则
+## 1. 公共协议与权限
 
-- `parse_status=uploaded|parsing|needs_confirmation|confirmed|failed`。`confirmed` 指学生审阅并保存认可的候选；未认可候选不进入事实视图。
-- 只有 `library` 且 `confirmed` 的当前版本可设默认；每位用户至多一个默认。删除默认简历后置空，不自动切换到其他版本。临时文件即使确认也不会自动入库。
-- 选择简历只自动提供该版本下已确认的经历。独立手填或其他简历经历须明确选择；不能在切换简历后偷偷保留不相关选择。
-- 手填记录可无 `resume_document_id`，以明确确认状态进入会话；无简历、无经历也可开始通用问答，并说明个性化有限。
-- 文件替换产生新 `ResumeDocument.version`，候选重新确认；名称/默认设置等元数据变更亦做并发检查。开始前检测所选版本变化，要求重新确认，不静默替换。
+- HTTP 前缀统一 `/api/v1`，时间使用 UTC。ID 是服务端生成的不透明标识，用户身份仅取已验证登录会话。
+- 浏览器经统一入口同源访问，认证组件管理 Cookie。所有私有列表、详情、任务、预览、下载及 WebSocket 都检查归属；对他人和不存在的资源统一返回不可读结果，不能通过模型提供的 ID 绕过。
+- 列表接收 `limit/cursor`，默认 20、上限 50，返回 `{items,next_cursor}`。游标不透明，绑定稳定排序与筛选条件，不接受客户端 SQL 偏移表达式。
+- 已有对象写入携带 `version` 或明确的来源 revision；不匹配返回 `409 version_conflict`。新对象不要求伪造 version。
+- 创建、复制、确认、开始/结束、作答、分析及生成任务使用 `Idempotency-Key`；同一用户、操作与键的同输入复用结果，不同输入冲突。PATCH/DELETE 仍执行版本及权限检查。
+- 普通资源保存同步返回。耗时处理返回 `202`，带领域对象状态和 `task_id`；查询读取领域接口或 `GET /tasks/{id}`。不把普通请求一直挂到面试或报告结束。
+- 错误体沿用 `{code,message,retryable,request_id}`。至少区分 `unauthorized/forbidden/not_found/unsupported_input/version_conflict/invalid_state/insufficient_material/provider_timeout/budget_exceeded/capability_unavailable/task_failed`。401 未登录，404 不可读，400 输入错误，409 状态/版本冲突，501 未接入能力。
+- 面试进行中不得返回面后评分、参考要点或表达反馈；限制在服务端执行。岗位库中的公开准备资料与当前面试的私有分析是不同读取边界。
 
-### 报告分数合同
+## 2. 数据模型与业务归属
 
-`dimensions` 固定四键：`technical_knowledge`（专业知识）、`project_communication`（项目表达）、`coding_ability`（代码能力）、`logical_expression`（逻辑表达）。每项为 `{status: observed|not_observed, score: 0..100|null, evidence_refs, explanation}`。有足够相关回答才设 `observed`，其分数为整数；未观察项 score 必须为 null。
+普通列表、过滤和关联使用可查询字段与关系表，不把所有数据塞进一个用户 JSON。冻结输入和结构化模型输出可用 JSONB，但保留对象 ID、版本摘要、状态和归属等索引字段。下列名称是目标逻辑实体，不代表数据库迁移已经建立。
 
-`overall_score = round(sum(observed.score) / observed_count)`，非负数的 .5 向上取整；同时展示已观察维度、题目覆盖与局限。零有效回答或零已观察维度时 `overall_score=null`。跳过、未选代码考核、提前结束与 ASR 故障不得自动记零分。语音、语调变化与镜头观测独立展示，不进入四维专业总分；该规则属于待人工校准设计，不代表职业资格或录用判断。
-
-## 3. 状态、版本与竞态
-
-| 对象 | 状态及规则 |
-| --- | --- |
-| 材料解析 | `uploaded → parsing → needs_confirmation → confirmed`，解析失败为 `failed`；手填无需伪造解析任务 |
-| 知识内容 | `draft → reviewed → published → retired`；发布版本只读，撤回阻止新检索但旧出处附撤回说明 |
-| Session | `draft → ready → in_progress → ending → completed`；`in_progress ↔ paused`，不可恢复故障进入 `failed`；开始前可回 draft，完成/失败不重开 |
-| Report/Comparison/Export | `pending → generating → ready\|failed`，重试先回 pending，来源删除/过期则取消或作废，不发布结果 |
-| CodeExecution | `queued → running → succeeded\|failed\|timed_out\|cancelled`；succeeded 仅表示任务执行结束，用例是否通过另列 |
-| SpeechObservation | `pending → processing → ready\|unavailable\|failed`；质量不足为 unavailable，不填虚构指标 |
-| VisionObservation | `pending → processing → ready\|unavailable\|failed`；摄像头未开、低质量/低置信为 unavailable，不生成负面评分 |
-| ReviewMedia | `capturing → available → expired\|deleted`，采集失败为 failed；处理或上传未完成不提供假回放 |
-
-`ready` 表示配置可开始，不代表已经冻结全部材料；`start` 事务再次验证材料归属、确认和版本后冻结。默认 10 分钟、可选 5 分钟，目标时间提示收尾；最多 6 主问题、各最多 2 追问，12 分钟总经过时间（含暂停与断线）强制取消生成/音视频采集并结束，封存已保存回答与带缺口标记的可用片段。未完成片段只用于带覆盖说明的有限分析，不静默当完整有效回答评分；无足够可判断内容仍未观察。用户离开不等于已完成，恢复先读服务端状态和剩余预算。
-
-`completed` 只表示会话封存，报告可仍 pending/generating。`failed` 保持终态；有已保存回答可请求 `is_partial=true` 的报告，没有有效回答仅给记录与再开始入口。回答修订使旧报告、比较和文本对齐标过期；新任务按明确输入 revision 生成，提交前检查版本摘要，不覆盖较新结果。
-
-ASR `partial` 只作临时字幕，`final` 是保留的原识别。端点检测先记录候选，结合静音、识别稳定性及显式“回答完毕”信号自动提交；短暂停顿不能立即判定答完。学生可思考、口头自纠、请求澄清或打断 AI；误截后追加口头片段，关联原回合并取消未完成的后续代，保留误截与恢复事件。AI 主动打断仅属于明确选择的风格，不得成为默认催答或频繁截断。
-
-自动封存后不开放会话中的转写润色；面后 PATCH 仅处理 ASR 识别纠错并保留 AsrRevision。文本替代模式可独立完成，并保存其输入方式，不伪装成实时口语。暂停/取消/断线先保存已收妥片段与缺口，再停止采集，不把未收妥音频或迟到数据补成完整答案。问题全文、实际展示范围与语音已播放部分分开；从未展示且未播放的问题不计作已问。`generation_id` 失效后迟到的文本和音频不能重返正式显示或播放。
-
-## 4. HTTP 接口
-
-表中路径均加 `/api/v1`。异步请求返回对象状态与任务 ID（通常 202），不能把普通 HTTP 请求挂至整场面试结束。列表使用游标分页，响应 `{items,next_cursor}`；会话记录筛选字段为状态、岗位、时间，比较及报告仅返回当前用户可读对象。
-
-| 方法与路径 | 主要输入 → 输出/约束 |
-| --- | --- |
-| `GET /job-templates` | 岗位/难度筛选 → 发布模板、版本及通用参考标记 |
-| `POST /job-targets` | JD 或模板 ID/版本 → 岗位草稿、分析任务 |
-| `GET/PATCH /job-targets/{id}` | 查看或确认/修订、version → 原文、解释、版本；不改变历史快照 |
-| `POST /job-targets/{id}/questions` | 问题、目标版本 → JD/知识引用与依据不足说明 |
-| `GET /resume-documents` | scope/解析状态/游标 → 简历卡片、名称、版本、默认与过期时间 |
-| `POST /resume-documents` | PDF/DOCX、name、storage_scope → 文档、解析任务；配置页默认 temporary |
-| `GET/PATCH /resume-documents/{id}` | 获取解析/元数据；name、version 或替换文件 → 当前信息/新文件版本 |
-| `POST /resume-documents/{id}/confirm` | 候选 revision、认可/修订项 → 确认经历 IDs 与版本；不批量认可未选项 |
-| `POST /resume-documents/{id}/save-to-library` | 文档版本、名称、幂等键 → 显式转入库；已过期不可恢复 |
-| `POST /resume-documents/{id}/set-default` | 文档版本 → 原子切换默认；仅 library+confirmed |
-| `GET /resume-documents/{id}/preview`、`/download` | 当前归属 → 限时私有预览/原文件响应；过期文件明确不可用 |
-| `DELETE /resume-documents/{id}` | version → 文件/草稿清理任务；先说明独立确认经历保留 |
-| `GET/POST /experiences` | 简历来源筛选/手填事实与 confirmed → 经历列表/新经历版本 |
-| `PATCH/DELETE /experiences/{id}` | version、修订/确认，或级联影响确认 → 更新或删除任务 |
-| `GET/PATCH /me/preferences` | 当前偏好/局部修改与 version → 新偏好；不改变已开始会话 |
-| `POST /sessions` | mode=mock、岗位/简历/重点经历、配置、幂等键 → draft/ready 会话 |
-| `PATCH /sessions/{id}` | 未开始配置、version → 更新选择；不允许进行中换材料或面试类型 |
-| `PATCH /sessions/{id}/interaction-settings` | 进行中/暂停的interaction_mode、camera_enabled、review_media_enabled、version、分别授权/撤回及reason → 权威设置版本与事件日志；与WS共用服务 |
-| `GET /sessions/{id}` | 会话 ID → 权威状态、配置、已封存回合、题号、时间预算、报告状态 |
-| `POST /sessions/{id}/start` | version、选定材料版本、幂等键 → 冻结快照、in_progress、首题任务 |
-| `POST /sessions/{id}/pause`、`/resume` | version → 新状态；暂停取消活动代，恢复核对预算 |
-| `POST /sessions/{id}/turns` | question/turn ID、action、实际输入模式、片段/文本、revision/幂等键 → 保存结果与后续任务；语音端点自动提交与其共用服务 |
-| `PATCH /sessions/{id}/turns/{turn_id}` | 仅已结束会话：旧 revision、识别错误区间、原文/更正、reason → AsrRevision 与新 revision；拒绝润色和新增回答事实，依赖结果过期 |
-| `POST /sessions/{id}/turns/{turn_id}/append` | 原自动提交 revision、误截事件、口头片段 → 追加轨迹与新 revision；仅活动回合允许，不能覆盖原片段 |
-| `POST /sessions/{id}/finish` | reason、version、幂等键 → ending/completed、报告任务状态 |
-| `GET /sessions/{id}/report` | 当前状态 → pending/generating/ready/failed 或未请求说明，不假装同步返回完整报告 |
-| `POST /sessions/{id}/report/retry` | 当前输入版本 → 缺失/失败/过期或中断部分报告任务；零回答不评分 |
-| `POST /reports/{id}/exports` | report version、format=pdf → 导出任务 |
-| `GET /exports/{id}`、`/download` | 任务 ID → 状态或私有 PDF；下载再次鉴权 |
-| `POST /sessions/{id}/retries` | 原turn ID/revision、目标时间片段?、report version?、目标缺口 → 新mock会话及parent IDs，保存来源片段 |
-| `POST /retry-comparisons` | 原/新turn IDs、两份revisions、原/新片段、实际input_modes、重练会话、共同标准 → 比较任务及可比性限制 |
-| `GET /retry-comparisons/{id}` | 比较 ID → 状态、并列引用、变化及可比性限制 |
-| `GET /history` | status/job/time/cursor → 自动保存的记录；未完成继续、完成看报告 |
-| `DELETE /sessions/{id}` | version、删除影响确认 → 会话及派生清理任务 |
-| `DELETE /me/data` | 显式确认 → 当前用户全部私有材料与记录清理；账号注销另行说明 |
-
-会话 action 为 `answer|clarify_question|repeat_question|skip`，解释仅澄清题意；`request_hint`、`request_explanation` 和 `guided` 均不在当前模式中提供。跳过经同一服务保存标记，不伪造空回答参与评分。
-
-运行设置变更只允许切换交互模式、关闭/分别重新授权镜头与媒体保存，不改变材料、题意、评分标准和时间预算；保存配置初始快照与逐次变更事件。关闭立即停对应采集/写入并使旧capture generation失效，迟到帧丢弃；关闭复盘保存不等于关闭临时识别/观测，已有媒体可另行删除。重新授权仅保存后续片段，不补录之前内容、不延长已有媒体expires_at。变更共享归属、version、幂等及事务检查，终态不能重新启动采集。
-
-### 语音与代码补充接口
-
-| 方法与路径 | 主要输入 → 输出/约束 |
-| --- | --- |
-| `GET /sessions/{id}/turns/{turn_id}/speech-observations` | 进行中仅处理状态/采集质量；结束后按回答版本返回指标、quality、alignment和过期标记，无录音明确 unavailable |
-| `POST /sessions/{id}/turns/{turn_id}/speech-observations/retry` | 观测版本 → 仅在仍有临时缓冲或已授权未过期原音频时重算；无音频不可假装重算，可复核文本口头语标记 |
-| `GET /sessions/{id}/turns/{turn_id}/vision-observations` | 进行中仅处理状态/采集质量；结束后按回答版本返回画面/动作描述、区间、质量和不可用原因 |
-| `POST /sessions/{id}/turns/{turn_id}/vision-observations/retry` | 观测版本 → 仅在仍有已授权未过期原视频时重算；否则 capability_unavailable |
-| `GET /sessions/{id}/review-media` | 媒体元数据、授权/版本/到期状态 → 不因元数据仍在而返回已过期播放地址 |
-| `GET /review-media/{id}/playback` | 当前归属、有效授权与未过期版本 → 限时私有播放；到期/删除/缺失明确不可用 |
-| `DELETE /review-media/{id}` | version → 立即撤销访问并清理媒体；保留已产生派生观测须在入口说明，可另行删除整会话 |
-| `GET /sessions/{id}/code-tasks/{task_id}` | 当前会话/题目 → 题干、语言、用例说明、资源限额与能力状态 |
-| `POST /code-tasks/{task_id}/submissions` | language、代码、revision/幂等键 → 保存提交；任务必须属于当前会话 |
-| `POST /code-submissions/{id}/runs` | 提交版本、可选自定义输入 → 独立执行任务；未接真实服务返回 unavailable |
-| `GET /code-executions/{id}` | 执行 ID → 状态、逐例输入/期望/实际/错误与用量；模拟结果显式标记 |
-| `POST /code-submissions/{id}/submit` | 提交版本、execution ID? → 正式提交及异步评审任务，不要求先运行 |
-| `GET /code-submissions/{id}/review` | 进行中仅返回评审状态；所属会话结束后返回对应版本的定位、建议与可用执行依据 |
-
-代码编译/运行结果不等同 Agent 对思路的判断；未经真实运行只可给静态评审。进行中的内部静态分析仅用于选择不泄露答案的追问；详细点评、漏洞提示、改进建议与正式评分只在所属会话 completed/failed 后开放，读取接口同样执行这一时机限制。语音/镜头观测的完整指标、表达点评也仅面后开放，HTTP与WS均在服务端限制，进行中只给设备质量/采集及处理状态。自定义输入、题干及标准输出均视为不可信文本，不执行其中的工具指令。
-
-## 5. 实时接口与多模态观测
-
-WSS `/api/v1/sessions/{id}/stream` 使用同源认证或短时会话凭证，长期密钥不得放 URL。事件信封为 `{type,session_id,turn_id?,generation_id?,seq,payload}`；seq 仅定义当前连接顺序，重连以服务端已封存回合和版本为准，不推定所有帧已重放。编码、采样率、分段格式由适配器协商，实施前核验。
-
-| 方向 | 事件 | 规则 |
+| 模块/实体 | 最小数据与关系 | 约束 |
 | --- | --- | --- |
-| 客户端 → 服务端 | `user.answer.commit` | 文本替代提交或口头“回答完毕”信号；与端点自动提交共用鉴权、状态、幂等逻辑 |
-| 客户端 → 服务端 | `audio.input`、`audio.input.end` | 带 segment/序号的音频及采集结束；单个ASR final不直接触发下一题 |
-| 客户端 → 服务端 | `user.answer.append` | 误截后的口头续答，关联原提交/片段，取消依赖旧revision的活动代 |
-| 客户端 → 服务端 | `video.input`、`video.input.end` | 仅 camera_enabled 且当场授权后采集；带片段/时间/质量，不影响是否能完成面试 |
-| 客户端 → 服务端 | `user.interrupt` | 先停播放再取消活动代；区分打断AI与正式回答，不自动合并噪声 |
-| 客户端 → 服务端 | `audio.playback.progress` | 已播放分段及文本边界，与生成全文分别保存 |
-| 客户端 → 服务端 | `session.finish` | 复用 HTTP finish 服务，竞态时以终态为准 |
-| 客户端 → 服务端 | `session.interaction.settings` | 运行模式/镜头/媒体授权或撤回，与HTTP interaction-settings共享事务、版本和事件日志 |
-| 服务端 → 客户端 | `transcript.partial`、`transcript.final` | 临时/原始最终识别；字幕可见但不提供润色发送 |
-| 服务端 → 客户端 | `answer.endpoint.candidate`、`answer.committed` | 候选端点与权威自动提交事件，包含 segment/submission/revision；短停顿候选可撤销 |
-| 服务端 → 客户端 | `answer.appended`、`input.gap` | 误截恢复后的新revision或设备/断线缺口，不伪装连续流 |
-| 服务端 → 客户端 | `assistant.text.delta`、`audio.chunk` | 仅当前有效 generation 可展示/播放 |
-| 服务端 → 客户端 | `assistant.cancelled`、`session.state` | 清队列、同步权威状态与回合 revision |
-| 服务端 → 客户端 | `session.interaction.updated` | 同步设置与capture generation，关闭立即停对应采集/写入，丢弃旧代迟到帧 |
-| 服务端 → 客户端 | `speech.observation.updated`、`vision.observation.updated`、`media.state`、`report.ready` | 通知后重新读取；会话中仅状态与采集质量，完整观测在面后展示，不推送能力分；轮询仍须可用 |
-| 服务端 → 客户端 | `error` | 业务错误、可否重试及文本降级入口 |
+| Auth/User/Profile | 认证组件的用户/凭证/登录会话；display_name、locale、timezone、profile version | 认证表与面试表分开，授权命令创建受邀账号 |
+| Preferences/DefaultResume | 交互、播报、编辑器、岗位偏好及 version；默认简历指针 | 每人至多一份默认；仅本人 library 且 confirmed 的当前版本可设默认 |
+| Resume/ResumeVersion | id、owner、name、current_version、scope、时间；每版正文、方向、文件和经历顺序 | 文本字段含基本信息、教育、技能、自我介绍和原始文本；历史内容版本独立 |
+| Experience/ExperienceVersion | kind、个人职责、行动、技术决策、结果、确认、来源简历及版本、证据 | 可独立手填；复制生成新经历 ID；结果可缺失，不补造数字 |
+| PrivateFile/ExtractionCandidate | 私有定位、实际类型、大小、scope、到期；提取来源、候选 revision、确认记录 | 原文件、候选与确认事实不同；文件替换重新确认 |
+| JobTemplate/Category | 稳定 id/slug、分类、阶段、职责/要求/加分、主题、问题和来源版本 | 模板只读发布版本；岗位模块查询，知识模块维护 |
+| JobTarget/JobAnalysis | 企业、标题、JD 原文、链接、备注、常用简历、模板来源、version；独立分析状态与输入摘要 | 保存不自动触发模型；JD 明文、知识说明、推断分开 |
+| Bookmark | owner、template_id、notes、preferred_resume_id、version、时间 | `(owner,template_id)` 唯一，重复设置不重复收藏 |
+| Interview | id、owner、mode、配置、状态、version、开始/结束时间、快照、问题生成状态、重练父引用 | 业务状态只由面试服务写；首次创建不计时 |
+| MaterialSnapshot | 指定简历/经历/JD、知识/题库/标准/提示版本、必要正文和来源引用 | start 时冻结；编辑不改历史，事实删除按关联清理 |
+| InterviewTurn | interview_id、题干、主问题/追问序号、父回合、目标、来源、generation、展示/播放范围、回答状态 | 未回答问题也有记录；澄清和重复不伪造已完成答案 |
+| AnswerSegment/AnswerRevision | turn、实际 input_mode、片段序号与时间、原 ASR/text、缺口、提交标识、revision、误截追加关联 | 原轨迹不覆盖；跳过独立标记，不以空答案评分 |
+| AsrCorrection | turn、base/new revision、片段/字符区间、原文、更正、原因、时间 | 仅面后纠正识别，不补答；派生结果标过期 |
+| Report/ReportVersion | interview、输入/观测摘要、状态、引用、逐题分析、四维、覆盖、重练目标、版本、is_partial | 同输入版本任务去重；发布前校验引用及删除状态 |
+| RetryRelation/Comparison | 原面试/题目/回答版本、重练面试、两份片段与模式、目标、共同标准、状态和限制 | 创建重练调用面试服务，不更新原答案 |
+| Export | report/version、状态、私有文件、到期、task_id | 固定版本导出，来源删除立即撤销访问 |
+| Knowledge/Question/Rubric/Source | 明确内容类型、岗位/主题/阶段/难度、版本、来源、审核与复核日、发布状态 | 不是无类型的通用 content；来源与题目/标准引用可核查 |
+| KnowledgeChunk/Embedding | 正文版本、定位、来源、嵌入提供商/模型/维度、索引版本 | 只对已发布公共知识检索，个人材料不进入共享向量库 |
+| Task/Outbox/Idempotency | 对象与输入摘要、唯一键、状态、租约/尝试、投递、结果引用 | 业务变更与 outbox 同事务；队列重复交付不重复写业务结果 |
+| Invocation/Audit/Deletion | 调用标识、模型/提示版本、耗时、用量、错误；操作人与结果；删除范围和清理状态 | 日志无私有正文和密钥，删除阻止在途任务重建数据 |
+| 可选观测/媒体/代码 | 回答/提交版本、质量、授权、期限、执行限额与运行依据 | 单独生命周期，不能替代专业事实证据 |
 
-语速记录计算单位（首版中文有效字符/分钟）、有效时长及排除规则；停顿记录区间、阈值配置及检出置信；疑似口头语标记文本区间。音量和音高变化只描述可观测趋势，注明设备增益、噪声、清浊音及算法限制，不推断情绪或自信。视觉仅记录画面质量、头部朝向、面部动作等候选描述，缺脸、遮挡、光线差或置信不足标 unavailable，不评判眼神动机、诚实或人格。
+`Interview.mode=mock`；面试类型为 `technical_qa/project_deep_dive/hr/mixed`。配置包括岗位或个人 JD 及其版本、可选简历/经历版本、难度、时长 5/10 分钟（默认 10）、风格、代码开关、实际交互模式。目标支持实时语音，第一阶段真实入口明确使用 `text_fallback`，不得仅改标签宣称实时可用。摄像头及复盘媒体初始均关闭，启用须核对能力和当场授权。
 
-阈值和效果待阶段 B 样本校准，不能写成诊断标准。观测携带原 ASR、识别纠错对齐、音视频时间区间、噪声/断线和覆盖信息；纠错后无可靠映射的指标标 unavailable。原音视频默认临时处理后清除；显式开启私有复盘保存也自采集起最长 24 小时，分片各自记录captured_at并计算expires_at。片段时间定位可以保留，但到期后不能伪造可回放或重新计算。媒体失败仅标该片段质量，不记为学生表现不足。
+简历切换清除不属于新版本且未明确补充的经历；只选择当前用户已确认材料。删除默认简历置空，不自动另选。临时文件过期不能转入库；确认经历不代表系统核实真实性。
 
-## 6. 幂等、错误与资源预算
+### 报告分数与证据
 
-创建、确认、回答、开始/结束、代码提交/运行和异步任务均使用用户作用域幂等键。重复相同键与输入返回原结果，键与不同输入冲突返回错误；任务唯一键为“对象 ID + 输入版本摘要 + 任务类型”。写操作校验归属、当前状态、version 和限额；比较的两份回答都须属于当前用户。
+四维固定为 `technical_knowledge/project_communication/coding_ability/logical_expression`。维度携带 `status=observed|not_observed`、`score`、解释和回答引用。`not_observed` 必须 `score=null`；零有效回答不评分。
 
-错误体 `{code,message,retryable,request_id}`，至少区分 `unauthorized/forbidden/not_found/unsupported_input/version_conflict/invalid_state/insufficient_material/provider_timeout/budget_exceeded/capability_unavailable/task_failed`。不泄露密钥、堆栈或他人资源是否存在。资料不足可以是正常内容结果，不强制作为网络故障。外部调用仅在预算允许且无成功结果时至多有界重试一次，失败保留用户已封存回答与确认材料。
+目标报告增加 `scoring_status=uncalibrated|calibrated`，区分有证据的分析与数值评分：未经人工校准时可分析已观察回答，但四维分数及总分均为空，不把 `observed` 解释为评分已校准。标准校准后，已观察维度分数为 0–100 整数，总分为其等权平均四舍五入；未观察维度不进入分母。该字段尚未进入原型共享类型。
 
-代码限额、文件大小、上下文、任务领取超时和费用预算由受控服务端配置版本化。客户端和模型不能放宽执行限制；执行取消后隔离服务终止任务且迟到结果不得触发新追问或覆盖新版代码。HTTP/WS、后台作业、受控 Tools 使用同一权限/事务服务。
+引用包含对象/回答 ID、明确 revision、片段/字符范围和必要摘录；发布前核对原文存在及结论支持。语音/视觉独立展示，不参与专业总分。
+
+## 3. 状态与任务一致性
+
+| 对象 | 状态与规则 |
+| --- | --- |
+| 材料解析 | uploaded → parsing → needs_confirmation → confirmed；失败为 failed；手填不伪造解析任务 |
+| 知识 | draft → reviewed → published → retired；发布版本只读，撤回不进入新检索，历史出处保留撤回标记 |
+| 面试 | draft → ready → in_progress → ending → completed；in_progress ↔ paused；不可恢复进入 failed，终态不重开 |
+| 问题生成 | idle/pending/generating/ready/failed/cancelled，独立于面试及已保存回答 |
+| 回合回答 | awaiting/answered/skipped，原始作答、误截追加和面后纠错分别留痕 |
+| 报告/比较/导出/JD 分析 | pending → generating → ready 或 failed，输入变更标 stale；有效同版本复用，重建保留旧版本 |
+| 通用任务 | queued/running/succeeded/failed/cancelled，任务成功不代表代码用例通过或内容可直接发布 |
+| 语音/视觉观测 | pending/processing/ready/unavailable/failed；质量不足不补零 |
+| 复盘媒体 | capturing/available/expired/deleted/failed；到期立即停止访问 |
+| 代码执行 | queued/running/succeeded/failed/timed_out/cancelled，逐例通过情况另列 |
+
+`ready` 不表示已冻结材料。start 再检查版本和确认状态；计时从服务端 start 成功起计算。最多 6 主问题、每题 2 次追问；目标 5/10 分钟提示收尾，含暂停/断线到 12 分钟强制封存。重连不重置预算。
+
+保存回答、更新回合/面试版本和 outbox 同事务；随后投递 pg-boss。任务键绑定对象、任务类型及输入版本摘要，投递和执行都允许恢复。LLM/语音/文件处理在事务外进行；完成时重新验证归属、版本、generation、状态和删除标记。取消、修订、结束后的旧结果不得覆盖新记录。
+
+结束先封存后生成报告；completed 与 report pending/failed 可以同时存在。failed 面试保持终态，有有效回答可出 is_partial 报告；无可判断回答不评分。ASR 纠错使相关分析/比较/文本对齐过期，不能静默改写旧结果。
+
+## 4. HTTP 业务接口
+
+表中都是目标路径，实际接入阶段见[架构](architecture.md)。阶段列中的 1 为真实闭环、2 为材料/内容、3 为语音、4 为可选能力，不是需求优先级 P1，也不是当前完成状态。
+
+### 4.1 账号与个人设置
+
+| 方法与路径 | 功能/输入输出 | 阶段 |
+| --- | --- | --- |
+| `/auth/*` | Better Auth 原生协议：POST /auth/sign-in/email、POST /auth/sign-out、GET /auth/get-session；关闭公开 sign-up 及邮件找回，授权命令创建账号 | 1 |
+| `GET/PATCH /me` | 本人基本信息与 version；不通过此接口修改凭证或维护权限 | 1 |
+| `GET /me/overview` | 最近面试、常用简历、收藏和实际计数，组合只读查询 | 1 |
+| `GET/PATCH /me/preferences` | 交互/播报/编辑器/岗位偏好与 version，不影响已开始面试 | 1 |
+| `PUT /me/default-resume` | resume_id 或 null、偏好 version；校验本人 library+confirmed 当前版本后原子切换 | 1 |
+| `DELETE /me/data` | 显式确认、版本依据 → 私有数据清理任务；不等同账号注销 | 1 |
+
+### 4.2 简历与经历
+
+| 方法与路径 | 功能/输入输出 | 阶段 |
+| --- | --- | --- |
+| `GET /resumes` | search/target_job/scope/parse_status/cursor → 卡片、版本、默认与到期信息 | 1 |
+| `POST /resumes` | JSON 文本内容或 阶段 2 multipart PDF/DOCX；保存正文/文件；文件返回解析任务 | 1/2 |
+| `GET /resumes/{id}` | 内容、经历顺序、版本、解析候选与状态；不包含未经授权文件地址 | 1 |
+| `PATCH /resumes/{id}` | version、名称/正文/方向/经历顺序；阶段 2 支持替换文件及 temporary 显式转 library；校验经历归属 | 1/2 |
+| `DELETE /resumes/{id}` | version、删除影响确认 → 撤销访问、清理文件/候选及未来配置引用；经历事实删除另行确认 | 1 |
+| `POST /resumes/{id}/copies` | 来源版本、新名称 → 新简历及新经历 ID；副本不引用可变原经历 | 1 |
+| `POST /resumes/{id}/confirmations` | 文档 version、候选 revision、逐项认可/修订 → 已确认经历及确认记录 | 2 |
+| `POST /resumes/{id}/parsing/retry` | 文档与输入版本 → 解析任务；不覆盖人工编辑 | 2 |
+| `GET /resumes/{id}/preview`、`/download` | 本人有效文件 → 私有预览/原文件；文本简历预览取真实正文，不伪造 PDF | 2 |
+| `GET/POST /experiences` | 简历/确认状态筛选，或 kind、职责、行动、决策、结果、来源与确认 → 经历 | 1 |
+| `PATCH/DELETE /experiences/{id}` | version、编辑/确认或级联影响确认 → 新版本或清理任务 | 1 |
+
+### 4.3 岗位与收藏
+
+| 方法与路径 | 功能/输入输出 | 阶段 |
+| --- | --- | --- |
+| `GET /job-categories` | 方向分类注册表 | 1 |
+| `GET /job-templates` | search/category/stage/limit/cursor → 已发布模板；未知岗位不回退前端 | 1 |
+| `GET /job-templates/{id}` | 通用 JD、职责/要求/加分、主题、平台题、来源、内容与复核版本 | 1 |
+| `GET/POST /job-targets` | 查询个人目标；创建原文或模板副本，保存企业/岗位/JD/链接/备注/常用简历及来源版本，不自动分析 | 1 |
+| `GET/PATCH/DELETE /job-targets/{id}` | 本人目标详情；version 编辑/删除，不改变模板或历史快照；修改 JD 使旧分析 stale | 1 |
+| `POST /job-targets/{id}/analysis` | 当前目标 version → JD 分析任务；相同有效输入复用 | 1 |
+| `GET /job-targets/{id}/analysis` | 当前输入对应状态、职责/要求、引用和未知项 | 1 |
+| `POST /job-targets/{id}/questions` | 目标 version、用户问题 → 岗位顾问任务与带来源回答；不泄露进行中面试的参考要点 | 1 |
+| `GET /me/bookmarks` | search/category/cursor → 收藏、备注和常用简历 | 1 |
+| `PUT /me/bookmarks/{template_id}` | notes、preferred_resume_id，已有收藏带 version → 创建或更新确定目标状态，不使用 toggle | 1 |
+| `DELETE /me/bookmarks/{template_id}` | version → 取消收藏，不删除平台模板 | 1 |
+
+### 4.4 面试与回答
+
+| 方法与路径 | 功能/输入输出 | 阶段 |
+| --- | --- | --- |
+| `GET /interviews` | status/job/resume_id/from/to/cursor → 自动保存记录及报告/重练关联，代替 /history | 1 |
+| `POST /interviews` | 配置与材料版本 → draft/ready；无材料可创建通用面试，不计时 | 1 |
+| `GET /interviews/{id}` | 权威配置、状态、version、预算、快照摘要、当前回合与生成/报告状态 | 1 |
+| `PATCH /interviews/{id}` | 未开始配置、version → 更新选择；进行中不换材料/题意/标准 | 1 |
+| `POST /interviews/{id}/start` | version、所选材料版本 → 冻结快照、in_progress、首题任务 | 1 |
+| `POST /interviews/{id}/pause`、`/resume` | version → 状态和预算；暂停取消活动代，恢复重新校验预算 | 1 |
+| `POST /interviews/{id}/finish` | reason、version → ending/completed 及报告任务；幂等封存，failed 不改为 completed | 1 |
+| `DELETE /interviews/{id}` | version、影响确认 → 面试及派生清理任务 | 1 |
+| `GET /interviews/{id}/turns` | cursor → 问题、回答状态、原回答/纠错 revision 与输入方式，不返回面后反馈 | 1 |
+| `POST /interviews/{id}/turns/{turn_id}/answer` | version、文本/片段与实际 input_mode → 已保存回答、revision、下一题 task_id；语音自动提交复用服务 | 1/3 |
+| `POST /interviews/{id}/turns/{turn_id}/actions` | version、clarify_question/repeat_question/skip → 记录动作、状态和必要任务；澄清只解释题意，不给答案 | 1 |
+| `POST /interviews/{id}/turns/{turn_id}/append` | 原 revision、误截事件、口头片段 → 追加轨迹、新 revision，取消依赖旧输入的生成 | 3 |
+| `POST /interviews/{id}/turns/{turn_id}/corrections` | 面后 base_revision、识别错误范围、原文/更正/reason → 追加纠错、新 revision；不润色或补答 | 3 |
+| `PATCH /interviews/{id}/interaction-settings` | version、实际模式、分别授权/撤回、reason → 权威设置和采集代；阶段 3 切换语音/文字，阶段 4 开启可选能力 | 3/4 |
+
+澄清、重复不占新的主问题或追问位置；跳过保存 skipped 并安排下一题，不作为答错。任务失败后可用相同幂等键查询原结果，通过通用任务重试入口有界恢复，不重提已经保存的回答。
+
+### 4.5 报告、重练、比较与导出
+
+| 方法与路径 | 功能/输入输出 | 阶段 |
+| --- | --- | --- |
+| `GET /interviews/{id}/report` | pending/generating/ready/failed/stale 与可读结果；未请求明确说明 | 1 |
+| `POST /interviews/{id}/report` | 封存输入版本 → 创建、失败重试或过期重建；相同有效任务/结果复用，零回答不调用专业评分 | 1 |
+| `POST /interviews/{id}/retries` | 原 turn/revision、目标片段、目标缺口、报告版本可选 → 关联新 mock 面试，由面试服务创建 | 1 |
+| `POST /comparisons` | 原/新 turn、两份 revision/片段、input_modes、重练面试和共同标准 → 比较任务 | 1 |
+| `GET /comparisons/{id}` | 状态、两份原文引用、变化、目标覆盖及不可比说明 | 1 |
+| `POST /comparisons/{id}/retry` | 明确输入版本 → 失败或过期重建，不自动改取最新回答 | 1 |
+| `POST /reports/{id}/exports` | report version、format=pdf → 导出任务，标清部分/过期/观察范围 | 2 |
+| `GET /exports/{id}`、`/download` | 任务状态或限时私有 PDF；下载再次核对本人及来源未删除 | 2 |
+
+### 4.6 任务、健康及可选能力
+
+| 方法与路径 | 功能/输入输出 | 阶段 |
+| --- | --- | --- |
+| `GET /tasks/{id}` | 本人任务状态、结果资源引用、retryable 和脱敏错误；不返回内部提示/队列载荷 | 1 |
+| `POST /tasks/{id}/retry` | 仅允许本人、可重试的失败任务；校验来源版本/状态/预算，复用业务服务 | 1 |
+| `GET /health` | 最小存活信息；内部就绪检查覆盖数据库及 worker，不公开私有配置或合同全文 | 1 |
+| `GET /interviews/{id}/turns/{turn_id}/speech-observations` | 进行中仅处理状态/质量，面后返回对应回答版本的语音指标/对齐/覆盖/原因 | 3 |
+| `POST /interviews/{id}/turns/{turn_id}/speech-observations/retry` | 观测及回答版本 → 仅有必要音频且授权有效时重算 | 3 |
+| `GET /interviews/{id}/turns/{turn_id}/vision-observations` | 进行中仅质量/状态，面后返回可定位的画面/动作描述 | 4 |
+| `POST /interviews/{id}/turns/{turn_id}/vision-observations/retry` | 有必要授权原视频才重算，否则明确 unavailable | 4 |
+| `GET /interviews/{id}/review-media` | 媒体元数据、授权、版本与到期状态 | 4 |
+| `GET /review-media/{id}/playback`、`DELETE /review-media/{id}` | 私有限时播放或立即撤销访问并清理；到期不能返回可用地址 | 4 |
+| `GET /interviews/{id}/code-tasks/{task_id}` | 题干、语言、用例说明、资源限额和能力状态 | 4 |
+| `POST /code-tasks/{task_id}/submissions` | language、source、revision → 保存提交；题目须属本人当前面试 | 4 |
+| `POST /code-submissions/{id}/runs` | 提交版本、可选输入 → 隔离执行任务 | 4 |
+| `GET /code-executions/{id}` | 状态、逐例期望/实际/错误/用量与 real/simulated 标记 | 4 |
+| `POST /code-submissions/{id}/submit` | 提交版本、execution_id 可选 → 正式提交和评审任务，无须先运行 | 4 |
+| `GET /code-submissions/{id}/review` | 进行中仅状态；结束后开放指定版本的定位、建议和运行依据 | 4 |
+
+## 5. 实时事件合同
+
+入口 `WSS /api/v1/interviews/{id}/stream`，同源登录或短时面试凭证鉴权。长期密钥不放 URL。目标信封为 `{type,interview_id,turn_id?,generation_id?,seq,payload}`；与原型 `StreamEvent.session_id` 的差异在后续客户端一并迁移。
+
+seq 只表示本连接顺序，不作为跨重连持久事件游标。重连先读取面试与已封存回合，再协商新采集代；不重传全部音频。音频编码、采样率和分段格式由适配器协商。
+
+| 方向 | 事件 | 行为 |
+| --- | --- | --- |
+| 客户端 → 服务端 | audio.input / audio.input.end | 带片段/顺序/时间的音频输入；ASR final 不等于答完 |
+| 客户端 → 服务端 | user.answer.commit / user.answer.append | 明确答完或误截续答，复用 HTTP 归属、状态、幂等及事务服务 |
+| 客户端 → 服务端 | user.interrupt / audio.playback.progress | 先停浏览器播放再取消活动代，保存实际播放边界 |
+| 客户端 → 服务端 | interview.finish / interview.interaction.settings | 复用结束和授权设置服务，不允许实时层另写业务状态 |
+| 客户端 → 服务端 | video.input / video.input.end | 阶段 4，当场授权且启用镜头才接收 |
+| 服务端 → 客户端 | transcript.partial / transcript.final | 临时字幕与原始最终识别，不提供润色后发送 |
+| 服务端 → 客户端 | answer.endpoint.candidate / answer.committed | 候选端点可撤销，正式提交带 submission/revision |
+| 服务端 → 客户端 | answer.appended / input.gap | 新 revision 或采集缺口，不能伪装连续流 |
+| 服务端 → 客户端 | assistant.text.delta / audio.chunk | 仅当前有效且校验通过的面试官内容，保存生成全文和实际展示/播放范围 |
+| 服务端 → 客户端 | assistant.cancelled / interview.state | 清旧队列并同步权威状态 |
+| 服务端 → 客户端 | interview.interaction.updated | 同步授权设置及 capture generation，关闭立即停止对应采集/写入 |
+| 服务端 → 客户端 | speech.observation.updated / vision.observation.updated / media.state / report.ready | 更新通知后重新读取；进行中不推反馈正文或能力分，轮询仍可用 |
+| 服务端 → 客户端 | error | 错误、可否重试和降级信息 |
+
+关闭、暂停、断线、结束后丢弃无效采集代和生成代的迟到帧。重新授权仅处理后续片段，不补录之前内容或延长已有期限。语速、停顿等定义见[观测口径](../algorithm/knowledge_and_agent.md#speech-metrics)。
+
+## 6. 内部服务、维护与运行接口
+
+Agent 不是浏览器可任意调用的总入口。简历提取、JD 分析、岗位顾问、面试规划、面试官、报告评估和比较都通过内部类型化能力传入必要上下文、材料/回答版本、允许来源与取消信号，返回结构化内容、引用、用量和错误。检索由 KnowledgeService 过滤发布内容后执行；模型不直接写库、shell 或任意访问 URL。
+
+知识维护第一轮使用授权命令，分别处理分类/模板、来源、知识正文/片段、题目、标准，支持导入/校验/预览/审核/发布/撤回/回滚/复核及索引任务。内容类型有各自 schema，不建立无类型的 `/admin/content` 大入口。未来管理页面调用同一服务，再定义维护端 HTTP 合同。
+
+最小角色为学生、内容维护者和运行维护者。维护角色只能管理共享内容或脱敏运行信息，不默认获得个人简历/回答读取权限；操作记录人、时间、对象与版本、结果。账号初始化、任务诊断/重试和指标第一轮通过受控命令，不公开队列管理 HTTP API。协议适配或 MCP 不自动授予权限。
 
 ## 7. 保存、权限与删除
 
-身份采用成熟认证组件、服务端会话、生产 HttpOnly/Secure cookie，写接口检查同源/CSRF，退出与过期立即失效。文件默认上限 10 MiB，仅可提取文本 PDF/DOCX，检查扩展名、实际类型与结构；拒绝密码文件、损坏文件、异常压缩，禁宏/脚本/外链加载，解析任务受资源限制。OCR 后续扩展，失败给手填入口。预览转换在受限进程进行。
+
+身份采用 Better Auth 的受邀账号与服务端登录会话，生产使用 HttpOnly/Secure Cookie；写接口检查同源/CSRF，退出与过期立即失效。文件默认上限 10 MiB，仅可提取文本 PDF/DOCX，检查扩展名、实际类型与结构；拒绝密码文件、损坏文件、异常压缩，禁宏/脚本/外链加载，解析任务受资源限制。OCR 后续扩展，失败给手填入口。预览转换在受限进程进行。
 
 | 数据 | 默认保存 | 删除/到期 |
 | --- | --- | --- |
@@ -193,43 +247,29 @@ WSS `/api/v1/sessions/{id}/stream` 使用同源认证或短时会话凭证，长
 | PDF 导出 | 私有临时文件，生成起最长 24 小时 | 到期可重建；来源报告/会话删除立即撤销访问 |
 | 运行日志/备份 | 脱敏日志 30 天，限权备份轮换最长 30 天 | 日志不保留全文；备份恢复须重放删除清单 |
 
-上述期限为可配置设计默认值，尚未实现，不作为法律承诺。`save-to-library` 在有效期内执行，显式改变 scope 并清除过期时间；不能对已清理文件承诺恢复。
+上述期限为可配置设计默认值，尚未实现，不作为法律承诺。`PATCH /resumes/{id}` 在有效期内显式设置 `storage_scope=library`，并清除过期时间；不能对已清理文件承诺恢复。
 
 删除简历文件不同于删除独立确认经历：前者解除经历的源文件引用并保留已确认内容，历史快照照常解释当时输入；入口说明这一点。若用户要求删除相关事实，应展示经历关联的会话/报告/比较等影响并确认级联。删除经历覆盖相关私有快照与派生记录；删除会话覆盖回合、原作答与纠错、代码、音视频观测、复盘媒体、报告、导出、比较、私有快照、关联任务和缓存。其他关联重练保留其独立回答，但移除被删来源原文和关系；包含被删经历事实者也按经历级联删除。所有在途任务提交前复查删除标记，不得复活数据。
 
 删除后即时禁止访问，清理状态可查；不能宣称备份立即抹除。真实用户材料不进入 Git、默认评测集或公共日志；服务商只接收必要字段，其数据处理条件在试用前核验。
 
-## 8. 合同验收
+## 8. 合同与迁移验收
 
-- 重复确认/提交/start/finish/代码运行只产生一个对应业务结果，跨用户资源及实时流均不可访问。
-- 切换简历不携带未选择的其他版本经历；取消确认与版本改变阻止静默开始；手填和无材料能正常进入通用模拟。
-- library 不受 temporary 的 24 小时清理误伤；过期临时文件不能下载或偷偷转入库；删除默认文件不自动另选。
-- 主问题/追问编号及 12 分钟含暂停上限一致；已完成会话与 pending/failed 报告分开显示。
-- failed 部分报告保持失败终态，零有效回答总分为空；未考查代码维度 not_observed，四维均分只计观察项。
-- 默认实时口头回答由端点确认自动提交，短暂停顿、澄清、口头自纠及误截续答不丢失；不能编辑润色替换口头原话。
-- 面后识别纠错保留原识别/原因/revision，令报告/比较/对齐过期，旧任务不覆盖；原媒体已丢弃时不伪造回放或重算。
-- 摄像头默认关闭，低质量/低置信标不可用；音量/音高和视觉描述不推情绪/人格/诚实，不进入四维总分。
-- 可选复盘媒体分别授权、私有鉴权、版本和24小时到期/删除生效；报告时间定位与可回放状态分开。
-- 原新回答比较固定具体 revision；新增事实不等于能力提升；引用必须逐字定位。
-- 取消迟到音频不播、断线不重放全部帧；代码超限终止，模拟结果不标真实运行。
-- 删除与备份恢复演练覆盖源文件、私有快照和派生数据，后台任务不重新写回。
+- 当前 Next.js 演示命令和页面 URL 不因文档修改而变化；真实 HTTP 客户端上线时一并替换旧私有路径，无自动上传或假联调。
+- OpenAPI 与实现路由一致；列表分页、版本冲突、任务状态及错误体有合同测试，实时事件另测共享类型。
+- 两账号覆盖列表、详情、预览、下载、任务、实时流和比较；维护角色不能读取私有材料。
+- 两份简历的创建/复制/默认/经历切换、收藏去重、个人 JD 保存及配置携带可完成；开始前版本变化须重新确认。
+- 提交成功后模拟模型断开、worker 重启及 outbox 重投，原回答只保存一次，下一题和报告不重复生效。
+- 暂停、结束、追加、纠错与生成并发时，旧 generation/输入版本结果无效；12 分钟含暂停预算不因恢复而重置。
+- 报告只在面后可读，未校准/零回答不填专业分数，not_observed 始终为空；校准后只对已观察维度平均。
+- 原题重练与比较固定两份 revision，部分报告、模式差异、失效引用和媒体不可用有明确标记。
+- 临时文件/媒体/PDF 期限、授权撤回、删除级联与备份恢复清单实际验证；任务不能复活已删材料。
+- 代码真执行与模拟、执行完成与用例通过、静态点评与运行证据分别展示。
 
-关联：[总体架构](architecture.md) · [功能需求](../requirements/functional_spec.md) · [知识库与智能体](../algorithm/knowledge_and_agent.md) · [评测计划](../algorithm/evaluation.md)。
+## 9. 实现顺序与未决接入条件
 
-## 2026-10-19 原型合同扩展
+第一阶段落地身份、文本材料、岗位、面试、报告/重练、任务与数据库；第二阶段接文件、PDF、内容维护/混合检索及评分校准；第三阶段接实时语音/观测；第四阶段接可选代码、镜头、复盘媒体和管理页面。每阶段保留前阶段回归，具体门槛见[评测计划](../algorithm/evaluation.md)。
 
-新增JobCategory、版本化JobTemplate、KnowledgeQuestion、ContentSource、JobTarget、JobBookmark。ResumeDocument增加文本content、target_job、updated_at、is_sample及file_type=text；Experience支持毕设、实习和其他类型。Configuration保留job字符串并通过共享岗位注册表校验，增加模板/目标/简历版本、JD来源及实习/校招阶段。历史四个job ID仍有效。
+Fastify、Zod/OpenAPI、Drizzle/PostgreSQL/pgvector、Better Auth、pg-boss 和独立 worker 的组织已经确定；模型/语音/嵌入提供商、凭证与部署资源仍待实际接入核验。没有凭证返回能力不可用，不用合成结果冒充服务成功。本文不承诺尚未生成的 OpenAPI 文件、迁移脚本或未来命令已经存在。
 
-公开读取增加 GET /job-categories、GET /job-templates/{id} 及 /sources；列表接受 search/category/stage/limit/cursor，沿用items/next_cursor。收藏合同为GET/POST /me/bookmarks、PATCH/DELETE /me/bookmarks/{id}；个人JD复用job-targets，文本简历POST /resume-documents使用source_type=text及结构内容。骨架写入仍返回capability_unavailable，当前无真实用户鉴权及私有服务。
-
-Session.material_snapshot增加job_template、job_target及knowledge_sources，保留实际使用的题目来源和版本。改动材料或撤回模板不静默重写旧快照；重新练习使用原题和原快照。公开知识与个人材料分别由内容目录与演示状态维护，不相互混入检索。
-
-演示状态schema=2，由统一客户端处理v1迁移、CRUD、版本冲突与失效关联；容量不足时保留最新内存状态并明确临时保存。当前删除库内文本简历会移除所属经历并解除未来选择，旧面试快照保留；这与未来全量清除私有材料的生产流程不同，不能把原型删除当作生产隐私清理已验收。
-
-## 9. 内容维护接口与权限
-
-内部 `/api/v1/admin` 覆盖内容草稿/预览、审核发布/撤回/回滚、索引任务、脱敏运行指标和失败任务重试，不作为学生公开 API。首版授权脚本和未来页面调用同一服务逻辑；学生/面试 Agent Tools 不能调用发布或运行维护动作。
-
-最小角色为学生（自己的数据）、内容维护者（共享内容）、运行维护者（脱敏指标/任务）；操作审计记录人、时间、对象与版本、动作和结果。协议适配或 MCP 连接不自动授予权限，未来接入仍需审核工具和来源。
-
-保存与删除窗口以本文第 7 节为准；上述维护角色不获得额外的私有材料读取权限。
+关联：[总体架构](architecture.md) · [功能需求](../requirements/functional_spec.md) · [知识与 Agent](../algorithm/knowledge_and_agent.md) · [工程目录](repository_structure.md)。

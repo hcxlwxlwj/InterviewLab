@@ -34,4 +34,6 @@
 
 当前有可运行的文字交互原型、公开岗位内容和接口骨架；真实身份、数据库、模型、音视频和代码执行待接入。已实现范围和截图以[个人中心/岗位库扩展](software/prototype/library-expansion.md)为准，不能将目标需求当作验收结论。
 
+新版后端设计以[架构](software/architecture.md)的六个业务模块和四阶段为主线，[接口合同](software/data_and_interfaces.md)区分当前骨架与未来独立 API，并列出旧路径迁移；本轮仅修订文档，不改变代码、依赖或运行命令。
+
 需求维护预期行为，软件文档维护实现合同，算法文档维护方法与评测。历史记录保持发生日期；旧路径的迁移对应见[本次复盘](retrospection/2026-10-19-docs-consolidation.md)，旧版本正文可从 Git 历史追溯。启动入口见[根 README](../README.md)。
