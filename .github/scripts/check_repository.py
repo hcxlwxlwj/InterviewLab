@@ -14,20 +14,10 @@ REQUIRED = (
     "docs/algorithm/knowledge_and_agent.md", "docs/algorithm/research.md",
     "docs/algorithm/evaluation.md", "docs/software/architecture.md",
     "docs/software/data_and_interfaces.md", "docs/software/prototype/README.md",
-    "docs/software/modules/01-job-understanding.md",
-    "docs/software/modules/02-personal-materials.md",
-    "docs/software/modules/03-interview-configuration.md",
-    "docs/software/modules/05-mock-interview.md",
-    "docs/software/modules/06-voice-and-speech.md",
-    "docs/software/modules/07-feedback-report.md",
-    "docs/software/modules/08-retry-and-progress.md",
-    "docs/software/modules/09-content-and-operations.md",
-    "docs/software/modules/10-code-assessment.md",
-    "docs/software/modules/11-personal-center.md",
     "docs/mgmt/team_plan.md", "docs/mgmt/communication_mgmt_plan.md",
     "docs/mgmt/risk_mgmt_plan.md", "docs/retrospection/2026-10-15-scope-revision.md",
-    "docs/mgmt/project_management.md", "docs/mgmt/week1_submission.md",
-    "docs/mgmt/feedback.md", "docs/algorithm/README.md",
+    "docs/mgmt/project_management.md", "docs/retrospection/week1_submission.md",
+    "docs/retrospection/teacher_feedback.md", "docs/algorithm/README.md",
     "docs/software/README.md", "docs/retrospection/README.md",
     "code/backend", "code/frontend", "code/core_engine",
     "tests/unit", "tests/integration", ".github/workflows/repository-check.yml",
@@ -36,6 +26,13 @@ REQUIRED = (
 
 def main():
     errors = [f"Missing course artifact: {name}" for name in REQUIRED if not (ROOT / name).exists()]
+    allowed = {"requirements", "algorithm", "software", "mgmt", "retrospection"}
+    for entry in (ROOT / "docs").iterdir():
+        if (entry.is_dir() and entry.name not in allowed) or (entry.is_file() and entry.name != "README.md"):
+            errors.append(f"Unexpected top-level documentation: {entry.relative_to(ROOT)}")
+    for old_directory in ("docs/modules", "docs/software/modules"):
+        if (ROOT / old_directory).exists():
+            errors.append(f"Module documents must be consolidated into requirements: {old_directory}")
     result = subprocess.run(
         ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
         cwd=ROOT, check=True, stdout=subprocess.PIPE,
@@ -59,6 +56,11 @@ def main():
             links_checked += 1
             if not destination.exists():
                 errors.append(f"{path.relative_to(ROOT)}: broken local link {target}")
+            elif destination.is_file() and destination.suffix == ".md" and (parsed.fragment.startswith("feature-") or parsed.fragment == "speech-metrics"):
+                anchor = unquote(parsed.fragment)
+                contents = destination.read_text(encoding="utf-8-sig")
+                if f'id="{anchor}"' not in contents:
+                    errors.append(f"{path.relative_to(ROOT)}: missing explicit documentation anchor {target}")
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1

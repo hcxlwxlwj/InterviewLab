@@ -57,11 +57,11 @@ tests/             unit / integration
 | --- | --- |
 | 需求 | [问题定义与 5W1H](docs/requirements/problem_definition.md)、[功能](docs/requirements/functional_spec.md)、[非功能](docs/requirements/nonfunctional_spec.md)、[用户故事](docs/requirements/user_stories.md) |
 | 算法与研究 | [技术/竞品调研](docs/algorithm/research.md)、[知识与 Agent](docs/algorithm/knowledge_and_agent.md)、[评测](docs/algorithm/evaluation.md) |
-| 软件设计 | [架构](docs/software/architecture.md)、[数据与接口](docs/software/data_and_interfaces.md)、[原型](docs/software/prototype/README.md)、[模块导航](docs/software/README.md) |
-| 项目管理 | [团队计划](docs/mgmt/team_plan.md)、[沟通](docs/mgmt/communication_mgmt_plan.md)、[风险](docs/mgmt/risk_mgmt_plan.md)、[教师反馈](docs/mgmt/feedback.md) |
+| 软件设计 | [架构](docs/software/architecture.md)、[数据与接口](docs/software/data_and_interfaces.md)、[原型](docs/software/prototype/README.md)、[软件设计索引](docs/software/README.md) |
+| 项目管理 | [团队计划](docs/mgmt/team_plan.md)、[沟通](docs/mgmt/communication_mgmt_plan.md)、[风险](docs/mgmt/risk_mgmt_plan.md)、[教师反馈](docs/retrospection/teacher_feedback.md) |
 | 复盘 | [日期索引与历史记录](docs/retrospection/README.md) |
 
-总入口为[文档导航](docs/README.md)。设计正文持续修订，过程与复盘保留发生日期；旧文档路径仅作兼容导航。文档中的目标服务不等于当前已验收能力。
+总入口为[文档导航](docs/README.md)。设计正文持续修订，过程与复盘保留发生日期；功能行为与验收统一维护在 requirements，旧模块与重复导航文件已移除。文档中的目标服务不等于当前已验收能力。
 
 ## 检查与生产启动
 
@@ -79,6 +79,6 @@ npm start
 
 接下来先建立异步客户端、真实身份和数据库仓储，再通过核心适配接口接入知识检索与 Agent；其后实现实时语音与基础表达观测，最后开展对照评测和小规模试用。语音是目标主线，当前文字原型用于先验证流程。材料归属、快照、删除和媒体保留规则见[数据合同](docs/software/data_and_interfaces.md)。
 
-任务分支经 PR 合入 `develop`，阶段验收后再合入 `main`；操作及检查见[协作须知](docs/mgmt/COLLABORATION.md)。[第一周提交记录](docs/mgmt/week1_submission.md)保留此前交付证据，不倒写为本次结果。
+任务分支经 PR 合入 `develop`，阶段验收后再合入 `main`；操作及检查见[协作须知](docs/mgmt/COLLABORATION.md)。[第一周提交记录](docs/retrospection/week1_submission.md)保留此前交付证据，不倒写为本次结果。
 
 不提交密钥、真实简历、录音和用户记录。公开岗位属于平台原创整理的通用参考，题目不标为企业真实面试题；来源与素材使用依据在内容和原型文档维护。
