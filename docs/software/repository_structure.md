@@ -1,6 +1,6 @@
 # 工程目录与职责
 
-更新：2026-10-19。适用于当前可运行原型；产品目标仍见[总体架构](architecture.md)。
+更新：2026-10-19。区分当前可运行原型与独立后端目标；本轮只更新文档，未调整目录、代码或依赖。产品架构见[总体架构](architecture.md)。
 
 ## 与课程模板的对应
 
@@ -70,8 +70,30 @@ backend/src/content/demo.ts → 合成样例与演示报告
 - 原型设计提示、参考图与实测截图仍在 `software/prototype`；首轮实现记录标注为阶段记录，当前范围指向后续扩展说明。
 - `requirements` 的四份正文分别维护问题、功能、非功能和验收；原 `modules` 内容已按职责并入，不保留重复文件。
 
-## 接入数据库与 Agent 前的剩余工作
+## 独立后端的目标组织（尚未建立）
 
-本次完成职责拆分，不提前生成空仓储或供应商实现。下一阶段先给真实服务建立异步客户端和身份合同，再实现仓储、材料权限、事务及删除测试；之后通过 `KnowledgeRetriever`、`ModelAdapter` 接入已发布知识与模型。
+后续仍使用三个工作区，不新增顶层应用目录或恢复 modules 文档目录。下表是未来代码位置约定，不代表本轮已创建这些目录、类或命令。
 
-同步 `DataClient`、浏览器存储和固定合成评分都属于演示。接口清单不等于已实现业务服务。样式当前仍按原有四份全局文件顺序加载，后续迁移按页面核对视觉，不在此次目录整理中改版。
+| 位置 | 后续职责 |
+| --- | --- |
+| `code/backend/src/modules` | account、materials、jobs、interviews、reports、knowledge 六个业务模块；各自路由、服务、仓储 |
+| `code/backend/src/infrastructure` | Drizzle schema/仓储、认证适配、私有存储、pg-boss/outbox、供应商与日志 |
+| `code/backend/src` 的进程入口 | Fastify API 与独立 worker；授权账号初始化、内容导入/审核/发布等命令复用服务，不另建业务实现 |
+| `code/core_engine/src` | 公共 DTO/协议 schema、纯会话/预算/分数规则、任务输入输出和适配端口 |
+| `code/frontend` | 页面与组件、异步 HTTP/实时客户端、明确标记的演示客户端；页面 URL 不变 |
+| `tests/unit`、`tests/integration` | 纯规则、模块服务、HTTP/OpenAPI、数据库权限/事务及任务恢复；浏览器主路径验证在集成范围 |
+
+模块调用方向为“路由 → 应用/业务服务 → 仓储或适配器”。跨模块读取使用显式服务，事务需要时传递同一事务上下文，不从路由相互调用，也不直接更新其他模块拥有的表。Agent 和 worker 都复用业务规则。
+
+Fastify API 和 worker 是同一个 backend 工作区的两个运行入口。前端经统一入口访问 `/api/v1`，WebSocket 直接转发 Fastify；Next.js 不再承载正式业务 HTTP 实现。API/worker 的启动命令、环境示例和部署文件在后续实现时再添加，当前仍只使用根 README 已存在的 Next.js 命令。
+
+### 依赖与客户端迁移
+
+- 共享核心可以在实现阶段容纳公共 DTO 的 Zod schema，禁止数据库、文件、框架、SDK 及供应商 I/O；现有依赖检查只允许纯类型/规则，届时须同步调整精确允许项，不能直接放开所有外部包。
+- 后端实现依赖核心；前端正式客户端只依赖核心 DTO 和 HTTP/实时协议，不导入 backend 运行入口、Drizzle、Better Auth 配置或模型适配器。
+- 当前 `/content` 与 `/content/demo` 是已验证的公开静态过渡入口，本轮保留。真实模式通过岗位 API 获取内容，演示样例继续单独标记；私有服务不得通过公开子入口泄漏到浏览器。
+- 同步 `DataClient` 保留为演示合同，不强行将真实请求伪装成同步接口。新建异步客户端，页面显式处理加载、错误、任务轮询和版本冲突，再整体迁移旧 `/sessions`、`/resume-documents` 等路径。
+- 现有 `Session`、`ResumeDocument` 和 `StreamEvent.session_id` 是原型类型；目标 HTTP 使用 Interview、Resume 及 interview_id，迁移时显式映射，不能只改字段名称却遗漏状态语义。
+- 保留演示入口与当前标签页资料，不将资料自动上传到受邀账号。真实模式不读取演示固定分数，未接入能力返回明确状态。
+
+数据库迁移、生成 OpenAPI、内容初次导入、依赖锁定、前端代理和边界检查必须随代码实现同步交付；不能引用尚不存在的脚本或文件作为当前操作说明。完整接口及旧路径映射见[数据与接口](data_and_interfaces.md)，阶段门槛见[评测](../algorithm/evaluation.md)。

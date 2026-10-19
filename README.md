@@ -77,7 +77,9 @@ npm start
 
 ## 后续接入与协作
 
-接下来先建立异步客户端、真实身份和数据库仓储，再通过核心适配接口接入知识检索与 Agent；其后实现实时语音与基础表达观测，最后开展对照评测和小规模试用。语音是目标主线，当前文字原型用于先验证流程。材料归属、快照、删除和媒体保留规则见[数据合同](docs/software/data_and_interfaces.md)。
+目标后端改为独立 TypeScript/Node 模块化单体：Fastify + Zod/OpenAPI、Drizzle/PostgreSQL/pgvector、Better Auth 受邀账号、pg-boss 独立 worker，六个业务模块共享服务与数据合同。**这些是已确定的设计，尚未安装或实现；当前仍只启动 Next.js。**
+
+后续按四阶段实施：1 真实文字闭环，2 文件/内容/检索及评分校准，3 实时语音与独立语音观测，4 可选代码/镜头/复盘媒体/管理页面；各阶段回归，稳定后做对照与试用。保留显式演示入口，个人材料不自动上传。模块职责见[架构](docs/software/architecture.md)，新 HTTP 及旧路径迁移、材料快照和删除规则见[数据合同](docs/software/data_and_interfaces.md)。本轮仅更新文档，没有修改代码、启动命令或依赖。
 
 任务分支经 PR 合入 `develop`，阶段验收后再合入 `main`；操作及检查见[协作须知](docs/mgmt/COLLABORATION.md)。[第一周提交记录](docs/retrospection/week1_submission.md)保留此前交付证据，不倒写为本次结果。
 
