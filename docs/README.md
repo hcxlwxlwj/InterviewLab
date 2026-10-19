@@ -15,6 +15,7 @@
 | software | [架构](software/architecture.md)、[数据与接口](software/data_and_interfaces.md) | 系统结构、数据模型、API、状态与版本 |
 | software | [原型](software/prototype/README.md)、[工程目录](software/repository_structure.md) | 页面、交互、代码边界与实现证据 |
 | mgmt | [沟通计划](mgmt/communication_mgmt_plan.md)、[风险计划](mgmt/risk_mgmt_plan.md)、[团队计划](mgmt/team_plan.md) | 协作、分工、决策与风险 |
+| mgmt | [后端功能分工](mgmt/backend_work_allocation.md) | 工作包、接口、依赖、验收及负责人填写表 |
 | retrospection | [复盘索引](retrospection/README.md) | 迭代、教师反馈、历史提交与经验 |
 
 ## 功能查阅

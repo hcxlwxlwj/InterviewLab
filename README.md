@@ -58,7 +58,7 @@ tests/             unit / integration
 | 需求 | [问题定义与 5W1H](docs/requirements/problem_definition.md)、[功能](docs/requirements/functional_spec.md)、[非功能](docs/requirements/nonfunctional_spec.md)、[用户故事](docs/requirements/user_stories.md) |
 | 算法与研究 | [技术/竞品调研](docs/algorithm/research.md)、[知识与 Agent](docs/algorithm/knowledge_and_agent.md)、[评测](docs/algorithm/evaluation.md) |
 | 软件设计 | [架构](docs/software/architecture.md)、[数据与接口](docs/software/data_and_interfaces.md)、[原型](docs/software/prototype/README.md)、[软件设计索引](docs/software/README.md) |
-| 项目管理 | [团队计划](docs/mgmt/team_plan.md)、[沟通](docs/mgmt/communication_mgmt_plan.md)、[风险](docs/mgmt/risk_mgmt_plan.md)、[教师反馈](docs/retrospection/teacher_feedback.md) |
+| 项目管理 | [后端功能分工](docs/mgmt/backend_work_allocation.md)、[团队计划](docs/mgmt/team_plan.md)、[沟通](docs/mgmt/communication_mgmt_plan.md)、[风险](docs/mgmt/risk_mgmt_plan.md)、[教师反馈](docs/retrospection/teacher_feedback.md) |
 | 复盘 | [日期索引与历史记录](docs/retrospection/README.md) |
 
 总入口为[文档导航](docs/README.md)。设计正文持续修订，过程与复盘保留发生日期；功能行为与验收统一维护在 requirements，旧模块与重复导航文件已移除。文档中的目标服务不等于当前已验收能力。
