@@ -1,0 +1,362 @@
+[
+  {
+    "id": "frontend-boss",
+    "title": "「阿里巴巴校招前端开发招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/e0f6df2d28fa0d091HJ82t66GA~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "frontend-official",
+    "url": "https://developer.mozilla.org/zh-CN/docs/Learn_web_development"
+  },
+  {
+    "id": "backend-boss",
+    "title": "安全验证 - BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/a05a8f15280defa31HN-0tm-/",
+    "verification": "search_index"
+  },
+  {
+    "id": "backend-official",
+    "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction.html"
+  },
+  {
+    "id": "python-boss",
+    "title": "「python后端校招招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/ffb764c03bfae13c1nJy29m_GQ~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "python-official",
+    "url": "https://docs.python.org/3/library/asyncio.html"
+  },
+  {
+    "id": "golang-boss",
+    "title": "「杭州go语言开发实习生招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/39481b897da2f3790nd93N-0GQ~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "golang-official",
+    "url": "https://go.dev/doc/effective_go"
+  },
+  {
+    "id": "cpp-boss",
+    "title": "「工商银行校招C++招聘信息」-BOSS直聘",
+    "url": "https://m.zhipin.com/zhaopin/e29b1014a65beaf303R82tS-GA~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "cpp-official",
+    "url": "https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines"
+  },
+  {
+    "id": "fullstack-boss",
+    "title": "「全栈开发实习生招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/b72358bed4e5aed33n1-290~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "fullstack-official",
+    "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/First_steps"
+  },
+  {
+    "id": "android-boss",
+    "title": "「知乎校招Android招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/4f578d09f58dd6220nV-39W6EQ~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "android-official",
+    "url": "https://developer.android.com/guide/components/activities/activity-lifecycle"
+  },
+  {
+    "id": "ios-boss",
+    "title": "「iOS开发实习招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/7b651b3711b8aa4403B529i5/",
+    "verification": "page_read"
+  },
+  {
+    "id": "ios-official",
+    "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting/"
+  },
+  {
+    "id": "llm-app-boss",
+    "title": "「阿里巴巴算法实习招聘信息」-BOSS直聘",
+    "url": "https://m.zhipin.com/zhaopin/e820fb028e56ea1f1nV-0tW5Fw~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "llm-app-official",
+    "url": "https://docs.langchain.com/oss/python/langchain/retrieval"
+  },
+  {
+    "id": "llm-training-boss",
+    "title": "「北京智谱华章科技有限公司招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/4ec5411eac795e171nB72Nm_EQ~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "llm-training-official",
+    "url": "https://huggingface.co/docs/peft/conceptual_guides/lora"
+  },
+  {
+    "id": "algorithm-boss",
+    "title": "「百度机器学习实习生招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/e60719cfe87014641nd-2925Eg~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "algorithm-official",
+    "url": "https://scikit-learn.org/stable/common_pitfalls.html"
+  },
+  {
+    "id": "nlp-boss",
+    "title": "「自然语言处理NLP招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/f081cbbd3e0a6a4303J-0t-_/",
+    "verification": "page_read"
+  },
+  {
+    "id": "nlp-official",
+    "url": "https://huggingface.co/docs/transformers/tasks/token_classification"
+  },
+  {
+    "id": "cv-boss",
+    "title": "「计算机工程师华为招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/ab3bd10fa33d145b1nN-3du9Fg~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "cv-official",
+    "url": "https://docs.pytorch.org/tutorials/intermediate/torchvision_tutorial.html"
+  },
+  {
+    "id": "speech-boss",
+    "title": "「语音识别实习生招聘信息」-BOSS直聘",
+    "url": "https://m.zhipin.com/zhaopin/9cdbc8c12d37b6d633Z40t-0/",
+    "verification": "page_read"
+  },
+  {
+    "id": "speech-official",
+    "url": "https://huggingface.co/docs/transformers/tasks/asr"
+  },
+  {
+    "id": "recommendation-boss",
+    "title": "「推荐算法校招招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/4bafe80faa937cf333Zz09m-/",
+    "verification": "page_read"
+  },
+  {
+    "id": "recommendation-official",
+    "url": "https://www.tensorflow.org/recommenders/examples/basic_retrieval"
+  },
+  {
+    "id": "ai-infra-boss",
+    "title": "「阿里巴巴实习生深圳招聘信息」-BOSS直聘",
+    "url": "https://m.zhipin.com/zhaopin/fa952394dc0eaae83nBz3N67/",
+    "verification": "page_read"
+  },
+  {
+    "id": "ai-infra-official",
+    "url": "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_configuration.html"
+  },
+  {
+    "id": "data-analysis-boss",
+    "title": "「数据分析校招招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/e5633341db1458c01nFz3d68Fg~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "data-analysis-official",
+    "url": "https://pandas.pydata.org/docs/user_guide/groupby.html"
+  },
+  {
+    "id": "data-engineering-boss",
+    "title": "「校招数据开发招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/b6948a2fa2c7263a1nd909y4Fg~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "data-engineering-official",
+    "url": "https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html"
+  },
+  {
+    "id": "data-warehouse-boss",
+    "title": "「校招数据开发招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/b6948a2fa2c7263a1nd909y4Fg~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "data-warehouse-official",
+    "url": "https://hive.apache.org/docs/latest/language/languagemanual-ddl/"
+  },
+  {
+    "id": "database-boss",
+    "title": "「数据库工程师实习招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/ec7f128da920e8131nB_2NS-GQ~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "database-official",
+    "url": "https://www.postgresql.org/docs/current/transaction-iso.html"
+  },
+  {
+    "id": "testing-boss",
+    "title": "「软件测试校招招聘信息」-BOSS直聘",
+    "url": "https://m.zhipin.com/zhaopin/fb8dead2d86c9c8a1n1-3tu7FA~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "testing-official",
+    "url": "https://playwright.dev/docs/test-assertions"
+  },
+  {
+    "id": "sdet-boss",
+    "title": "「北京字节跳动测试开发招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/4651a219fdd8cd3b1Xdy3NS8/",
+    "verification": "page_read"
+  },
+  {
+    "id": "sdet-official",
+    "url": "https://playwright.dev/docs/best-practices"
+  },
+  {
+    "id": "devops-boss",
+    "title": "「阿里云能力开放招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/5ed758a30c309d920Hd939q7/",
+    "verification": "page_read"
+  },
+  {
+    "id": "devops-official",
+    "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"
+  },
+  {
+    "id": "sre-boss",
+    "title": "「百度安全运维招聘信息」-BOSS直聘",
+    "url": "https://m.zhipin.com/zhaopin/e5ffd61c6db06f8b3nR42tW7/",
+    "verification": "page_read"
+  },
+  {
+    "id": "sre-official",
+    "url": "https://sre.google/sre-book/service-level-objectives/"
+  },
+  {
+    "id": "network-boss",
+    "title": "「网络实习生招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/e1215bf9bb31c3ef0HR_2d-1/",
+    "verification": "page_read"
+  },
+  {
+    "id": "network-official",
+    "url": "https://www.rfc-editor.org/rfc/rfc9293.html"
+  },
+  {
+    "id": "security-boss",
+    "title": "「安恒信息实习生鐩稿叧招聘信息」-BOSS直聘",
+    "url": "https://m.zhipin.com/zhaopin/28d3ee9c38c8b2af3nZ42Nu8/",
+    "verification": "page_read"
+  },
+  {
+    "id": "security-official",
+    "url": "https://owasp.org/www-project-web-security-testing-guide/"
+  },
+  {
+    "id": "embedded-boss",
+    "title": "「华为嵌入式实习招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/98562c99e8b753551nJ63925Fw~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "embedded-official",
+    "url": "https://docs.zephyrproject.org/latest/kernel/services/interrupts.html"
+  },
+  {
+    "id": "robotics-boss",
+    "title": "「深圳ros实习生招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/ed396bc91a423bb01HJy0ti_EA~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "robotics-official",
+    "url": "https://design.ros2.org/articles/qos.html"
+  },
+  {
+    "id": "game-client-boss",
+    "title": "「游戏客户端实习招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/4829d0cfc46f7a370HN439y_/",
+    "verification": "page_read"
+  },
+  {
+    "id": "game-client-official",
+    "url": "https://docs.unity3d.com/Manual/ExecutionOrder.html"
+  },
+  {
+    "id": "game-server-boss",
+    "title": "「游戏服务器实习招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/bf3c608a2586bf8f1nB-2di7EA~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "game-server-official",
+    "url": "https://heroiclabs.com/docs/nakama/concepts/multiplayer/authoritative/"
+  },
+  {
+    "id": "product-boss",
+    "title": "「字节跳动校招产品经理招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/37fcb696df3d4c8d0nZ93Nm5Eg~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "product-official",
+    "url": "https://www.atlassian.com/agile/product-management/requirements"
+  },
+  {
+    "id": "ai-product-boss",
+    "title": "「人工智能产品经理实习招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/0e5920648e2c95dc33Fz3Nq-/",
+    "verification": "page_read"
+  },
+  {
+    "id": "ai-product-official",
+    "url": "https://pair.withgoogle.com/guidebook/"
+  },
+  {
+    "id": "data-product-boss",
+    "title": "「京东数字科技数据产品经理实习生招聘信息」-BOSS直聘",
+    "url": "https://m.zhipin.com/zhaopin/81db6ac845cdcca20nB80tW0Eg~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "data-product-official",
+    "url": "https://learn.microsoft.com/en-us/purview/concept-data-products"
+  },
+  {
+    "id": "platform-product-boss",
+    "title": "「b端产品实习招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/125848c881ce00be1nZ93t-7EA~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "platform-product-official",
+    "url": "https://backstage.io/docs/features/software-catalog/"
+  },
+  {
+    "id": "ux-boss",
+    "title": "「交互设计实习招聘信息」-BOSS直聘",
+    "url": "https://www.zhipin.com/zhaopin/d99b774e573555e81XNz29m9/",
+    "verification": "page_read"
+  },
+  {
+    "id": "ux-official",
+    "url": "https://m3.material.io/foundations/accessible-design/overview"
+  },
+  {
+    "id": "solutions-boss",
+    "title": "「杭州解决方案实习生招聘信息」-BOSS直聘",
+    "url": "https://m.zhipin.com/zhaopin/cebcab3c0156b08d031y2du5FQ~~/",
+    "verification": "page_read"
+  },
+  {
+    "id": "solutions-official",
+    "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
+  }
+]

@@ -1,0 +1,191 @@
+[
+  {
+    "size": 1440,
+    "name": "personal-center",
+    "heading": "我的工作区",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "size": 1440,
+    "name": "resumes",
+    "heading": "我的简历",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "size": 1440,
+    "name": "resume-editor",
+    "heading": "编辑简历",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "size": 1440,
+    "name": "jobs",
+    "heading": "岗位库",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "size": 1440,
+    "name": "job-detail",
+    "heading": "AI 产品经理",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "size": 1440,
+    "name": "saved-jobs",
+    "heading": "目标岗位",
+    "pageWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "size": 1440,
+    "name": "interviews",
+    "heading": "面试记录",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "size": 1440,
+    "name": "setup",
+    "heading": "配置你的模拟面试",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "size": 1440,
+    "name": "report",
+    "heading": "每一次复盘，都有下一步",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "size": 1024,
+    "name": "personal-center",
+    "heading": "我的工作区",
+    "pageWidth": 1009,
+    "viewport": 1009
+  },
+  {
+    "size": 1024,
+    "name": "resumes",
+    "heading": "我的简历",
+    "pageWidth": 1009,
+    "viewport": 1009
+  },
+  {
+    "size": 1024,
+    "name": "resume-editor",
+    "heading": "编辑简历",
+    "pageWidth": 1009,
+    "viewport": 1009
+  },
+  {
+    "size": 1024,
+    "name": "jobs",
+    "heading": "岗位库",
+    "pageWidth": 1009,
+    "viewport": 1009
+  },
+  {
+    "size": 1024,
+    "name": "job-detail",
+    "heading": "AI 产品经理",
+    "pageWidth": 1009,
+    "viewport": 1009
+  },
+  {
+    "size": 1024,
+    "name": "saved-jobs",
+    "heading": "目标岗位",
+    "pageWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "size": 1024,
+    "name": "interviews",
+    "heading": "面试记录",
+    "pageWidth": 1009,
+    "viewport": 1009
+  },
+  {
+    "size": 1024,
+    "name": "setup",
+    "heading": "配置你的模拟面试",
+    "pageWidth": 1009,
+    "viewport": 1009
+  },
+  {
+    "size": 1024,
+    "name": "report",
+    "heading": "每一次复盘，都有下一步",
+    "pageWidth": 1009,
+    "viewport": 1009
+  },
+  {
+    "size": 390,
+    "name": "personal-center",
+    "heading": "我的工作区",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "size": 390,
+    "name": "resumes",
+    "heading": "我的简历",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "size": 390,
+    "name": "resume-editor",
+    "heading": "编辑简历",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "size": 390,
+    "name": "jobs",
+    "heading": "岗位库",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "size": 390,
+    "name": "job-detail",
+    "heading": "AI 产品经理",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "size": 390,
+    "name": "saved-jobs",
+    "heading": "目标岗位",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "size": 390,
+    "name": "interviews",
+    "heading": "面试记录",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "size": 390,
+    "name": "setup",
+    "heading": "配置你的模拟面试",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "size": 390,
+    "name": "report",
+    "heading": "每一次复盘，都有下一步",
+    "pageWidth": 375,
+    "viewport": 375
+  }
+]

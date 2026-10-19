@@ -1,0 +1,24 @@
+{
+  "name": "interviewlab",
+  "private": true,
+  "workspaces": [
+    "code/frontend",
+    "code/backend",
+    "code/core_engine"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @interviewlab/web",
+    "build": "npm run build --workspace @interviewlab/web",
+    "start": "npm run start --workspace @interviewlab/web",
+    "typecheck": "tsc --noEmit",
+    "content:check": "tsx scripts/check-content.ts",
+    "test": "tsx --test tests/unit/*.test.ts tests/integration/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.3"
+  }
+}
