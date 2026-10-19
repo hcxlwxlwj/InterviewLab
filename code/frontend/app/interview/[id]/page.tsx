@@ -1,7 +1,13 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { JOBS } from '@interviewlab/content';
+import {
+  TYPE_LABELS,
+  commitAnswer,
+  elapsedSeconds,
+  finishSession,
+  transitionSession,
+  type Session,
+} from '@interviewlab/core';
 import {
   ArrowLeft,
   ArrowUp,
@@ -19,15 +25,10 @@ import {
   Square,
   VolumeX,
 } from 'lucide-react';
-import {
-  JOBS,
-  TYPE_LABELS,
-  commitAnswer,
-  elapsedSeconds,
-  finishSession,
-  transitionSession,
-  type Session,
-} from '@interviewlab/core';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { CodeWorkspace } from '../../../components/code-workspace';
 import {
   Brand,
   DemoNotice,
@@ -37,7 +38,6 @@ import {
   formatTime,
 } from '../../../components/shared';
 import { Button } from '../../../components/ui/button';
-import { CodeWorkspace } from '../../../components/code-workspace';
 import { demoClient, readDemo, storageAvailable } from '../../../lib/demo-client';
 
 export default function InterviewPage() {

@@ -1,5 +1,6 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
+import { getJob as lookupJob } from '@interviewlab/content';
+import { reportFor, sampleSession } from '@interviewlab/content/demo';
+import type { Configuration } from '@interviewlab/core';
 import {
   buildQuestions,
   commitAnswer,
@@ -7,11 +8,11 @@ import {
   elapsedSeconds,
   finishSession,
   overallScore,
-  reportFor,
-  sampleSession,
   transitionSession,
   type Session,
 } from '@interviewlab/core';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 const start = Date.parse('2026-10-19T01:00:00Z');
 test('technical, HR and mixed types select different preset questions for the chosen job', () => {
   const config = {
@@ -19,13 +20,13 @@ test('technical, HR and mixed types select different preset questions for the ch
     interview_type: 'technical_qa' as const,
     difficulty: '挑战' as const,
   };
-  const technical = buildQuestions(config);
+  const technical = questionsFor(config);
   assert.match(technical[0].text, /事务/);
   assert.match(technical[0].text, /替代方案/);
   assert.equal(technical.length, 6);
-  const hr = buildQuestions({ ...config, interview_type: 'hr' });
+  const hr = questionsFor({ ...config, interview_type: 'hr' });
   assert.match(hr[0].text, /简单介绍自己/);
-  const mixed = buildQuestions({ ...config, interview_type: 'mixed' });
+  const mixed = questionsFor({ ...config, interview_type: 'mixed' });
   assert.ok(mixed.some((q) => q.text.includes('事务')));
   assert.ok(mixed.some((q) => q.text.includes('参与的项目')));
 });
@@ -43,13 +44,13 @@ function session(): Session {
   };
 }
 test('question budgets distinguish main questions and follow-ups', () => {
-  const questions = buildQuestions({ ...defaultConfiguration(), interviewer_style: '深入追问' });
+  const questions = questionsFor({ ...defaultConfiguration(), interviewer_style: '深入追问' });
   assert.equal(questions.filter((q) => !q.follow_up_index).length, 6);
   assert.ok(questions.every((q) => q.follow_up_index <= 2));
   assert.equal(new Set(questions.map((q) => q.id)).size, questions.length);
 });
 test('no materials produces general questions without project assumptions', () => {
-  const questions = buildQuestions({
+  const questions = questionsFor({
     ...defaultConfiguration(),
     focus_experience_ids: [],
     resume_document_id: undefined,
@@ -135,3 +136,7 @@ test('sample evidence quotes exist verbatim in the referenced revision', () => {
     }
   }
 });
+
+function questionsFor(config: Configuration) {
+  return buildQuestions(config, lookupJob(config.job));
+}

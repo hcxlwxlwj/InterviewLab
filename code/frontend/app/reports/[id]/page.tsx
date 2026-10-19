@@ -1,7 +1,12 @@
 'use client';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { JOBS } from '@interviewlab/content';
+import {
+  DIMENSION_LABELS,
+  TYPE_LABELS,
+  elapsedSeconds,
+  type JobStatus,
+  type Session,
+} from '@interviewlab/core';
 import {
   ArrowLeftRight,
   ArrowRight,
@@ -15,14 +20,9 @@ import {
   MicOff,
   RotateCcw,
 } from 'lucide-react';
-import {
-  DIMENSION_LABELS,
-  JOBS,
-  TYPE_LABELS,
-  elapsedSeconds,
-  type JobStatus,
-  type Session,
-} from '@interviewlab/core';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
   Breadcrumb,
   EmptyState,

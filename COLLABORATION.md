@@ -1,6 +1,6 @@
 # InterviewLab 协作操作须知
 
-版本：v0.2 · 更新日期：2026-10-15。当前产品与文档范围见[文档导航](docs/README.md)。
+版本：v0.3 · 更新日期：2026-10-19。当前产品与文档范围见[文档导航](docs/README.md)。
 
 ## 分支约定
 
@@ -25,6 +25,12 @@ git switch develop
 ```
 
 若已有空的项目文件夹，进入它后执行 `git clone https://github.com/hcxlwxlwj/InterviewLab.git .`。克隆完成后会自动建立远程连接，无需再次运行 `git init` 或 `git remote add`。
+
+## 本地运行与改动位置
+
+原型运行分支与启动方式见[根 README](README.md)。`main`、`develop` 在原型合并前不包含这些页面；需要延续未合并功能时，从对应任务分支建立自己的任务分支，并在 PR 说明基线和依赖。
+
+先读[工程目录与职责](docs/software/repository_structure.md)，在仓库根目录执行 `npm ci`。代码改动先运行 `npm run check`、`npm run build`；文档改动至少运行 `npm run docs:check` 与 `git diff --check`。修改已实现功能时同步原型状态，修改目标时同步需求与合同；已发生的复盘和反馈只追加。
 
 ## 日常开发
 

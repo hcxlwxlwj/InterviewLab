@@ -11,7 +11,8 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["node"]
+    "types": ["node"],
+    "noUnusedLocals": true
   },
   "include": ["code/**/*.ts", "code/**/*.tsx", "tests/**/*.ts", "scripts/**/*.ts"],
   "exclude": ["node_modules", "**/.next", "**/next-env.d.ts"]

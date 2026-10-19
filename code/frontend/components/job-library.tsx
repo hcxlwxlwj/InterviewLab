@@ -1,18 +1,12 @@
 'use client';
+import { CONTENT_SOURCES, JOB_CATEGORIES } from '@interviewlab/content';
+import { STAGE_LABELS, type CareerStage, type JobTemplate } from '@interviewlab/core';
+import { ArrowRight, Bookmark, Copy, ExternalLink, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { ArrowRight, Bookmark, Search, ExternalLink, Copy } from 'lucide-react';
-import {
-  JOB_CATEGORIES,
-  STAGE_LABELS,
-  CONTENT_SOURCES,
-  getJob,
-  type CareerStage,
-  type JobTemplate,
-} from '@interviewlab/core';
 import { demoClient } from '../lib/demo-client';
-import { Header, Footer, EmptyState, useDemoState } from './shared';
+import { EmptyState, Footer, Header, useDemoState } from './shared';
 import { Button } from './ui/button';
 
 export function JobLibrary() {
