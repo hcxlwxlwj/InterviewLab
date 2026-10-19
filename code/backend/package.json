@@ -1,0 +1,13 @@
+{
+  "name": "@interviewlab/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@interviewlab/core": "*",
+    "zod": "^4.1.0"
+  }
+}

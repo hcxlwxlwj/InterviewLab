@@ -1,0 +1,828 @@
+/* Shared reading scale: body, forms, and supporting copy stay at 14px or above. */
+body {
+  font-size: 16px;
+}
+h1,
+h2,
+h3 {
+  font-weight: 650;
+  letter-spacing: 0;
+}
+.brand {
+  font-family: var(--font-ui), sans-serif;
+  font-weight: 750;
+  letter-spacing: -0.4px;
+}
+.brand small {
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+.brand-mark {
+  margin-right: 0;
+}
+.main-nav a,
+.user-link {
+  font-size: 16px;
+}
+.button {
+  min-height: 46px;
+  font-weight: 600;
+}
+.button-sm {
+  min-height: 38px;
+  font-size: 14px;
+}
+.badge {
+  font-size: 13px;
+}
+.field-label,
+.form-panel-title h2,
+.panel-heading h2 {
+  font-size: 17px;
+}
+.input,
+textarea,
+select,
+.message p,
+.answer-quote p,
+.comparison-columns p {
+  font-size: 16px;
+}
+.field-group {
+  margin-bottom: 24px;
+}
+.form-panel {
+  padding: 28px;
+}
+.form-panel-title {
+  margin-bottom: 24px;
+}
+.choice {
+  padding: 11px 14px;
+  font-size: 15px;
+}
+.setup-grid {
+  grid-template-columns: minmax(0, 1fr) 350px;
+}
+.summary-row {
+  padding-block: 13px;
+  font-size: 15px;
+}
+.notice {
+  font-size: 14px;
+  line-height: 1.8;
+}
+.page-heading {
+  margin-bottom: 28px;
+}
+.page-heading h1 {
+  font-size: 32px;
+}
+.page-heading p {
+  font-size: 16px;
+}
+.current-question h1 {
+  font-size: 25px;
+}
+.answer-composer textarea {
+  font-size: 16px;
+  min-height: 130px;
+}
+.session-title {
+  font-size: 16px;
+}
+.session-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+.report-grid {
+  gap: 28px;
+}
+.turn-review summary > span:nth-child(2) {
+  font-size: 17px;
+}
+.turn-review summary {
+  padding: 24px;
+}
+.turn-review-body {
+  padding: 0 24px 24px;
+}
+.record-job strong {
+  font-size: 16px;
+}
+.records-table td {
+  padding-block: 24px;
+}
+.table-actions > .button {
+  font-size: 14px;
+}
+.personal-heading h1 {
+  font-size: 32px;
+}
+.personal-heading p {
+  font-size: 16px;
+}
+.resume-card-content h3 {
+  font-size: 18px;
+}
+.footer-inner {
+  gap: 30px;
+}
+
+/* Full-width scene follows the composition of the approved AI reference. */
+.home-page {
+  background: #fff;
+}
+.home-page .hero {
+  --hero-size: clamp(490px, 36vw, 650px);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #fbe8a6;
+}
+.hero-scene {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: max(100%, calc(var(--hero-size) * 3));
+  height: var(--hero-size);
+  transform: translateX(-50%);
+  z-index: -1;
+}
+.hero-scene img {
+  object-fit: fill;
+  object-position: center;
+}
+.home-page .hero-inner {
+  display: flex;
+  align-items: center;
+  min-height: var(--hero-size);
+  position: relative;
+}
+.home-page .hero-copy {
+  width: 52%;
+  padding: 45px 0 100px;
+}
+.home-page .hero h1 {
+  font-size: clamp(48px, 4.25vw, 72px);
+  line-height: 1.38;
+  letter-spacing: 0;
+  font-weight: 780;
+  color: #182342;
+}
+.home-page .hero-copy > p {
+  margin-top: 20px;
+  font-size: 19px;
+  line-height: 1.85;
+  color: #444b57;
+}
+.home-page .hero-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 30px;
+}
+.home-page .hero-actions .button {
+  min-height: 56px;
+  padding: 15px 28px;
+  font-size: 18px;
+  border-radius: 8px;
+}
+.home-page .hero-actions .button-outline {
+  background: #fffcf5;
+  border-color: #e7bd78;
+}
+.home-page .hero-bottom {
+  position: absolute;
+  bottom: 34px;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 38px;
+  padding: 0;
+  border: 0;
+}
+.home-page .hero-bottom > span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.home-page .hero-bottom svg {
+  width: 22px;
+  height: 22px;
+  color: #303c6c;
+}
+.home-page .hero-bottom b {
+  font-size: 17px;
+  font-weight: 550;
+}
+.home-page .section {
+  padding-block: 48px;
+}
+.home-page .section-heading {
+  margin-bottom: 26px;
+  align-items: center;
+}
+.home-page h2,
+.home-page .section-heading h2 {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.home-page .filter-tabs button {
+  font-size: 15px;
+  padding: 9px 14px;
+}
+.home-page .job-card {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  column-gap: 13px;
+  padding: 26px 22px;
+}
+.home-page .job-card-icon {
+  grid-row: 1/3;
+  height: 36px;
+  margin: 3px 0 0;
+}
+.home-page .job-card-icon svg {
+  width: 31px;
+  height: 31px;
+}
+.home-page .job-card h3 {
+  grid-column: 2;
+  font-size: 21px;
+  font-weight: 650;
+}
+.home-page .job-card > p {
+  grid-column: 2;
+  font-size: 14px;
+  line-height: 1.8;
+  min-height: 0;
+  margin-top: 8px;
+}
+.home-page .job-card-bottom {
+  grid-column: 1/-1;
+  margin-top: 23px;
+}
+.home-page .tags span {
+  font-size: 14px;
+  padding: 4px 8px;
+}
+.home-page .feature-section {
+  padding-block: 50px;
+}
+.home-page .feature-grid {
+  gap: 60px;
+}
+.home-page .feature-copy > p {
+  font-size: 17px;
+  line-height: 1.9;
+  margin: 19px 0 24px;
+}
+.home-page .text-link {
+  font-size: 16px;
+}
+.home-page .preview-top {
+  padding: 17px 24px;
+  font-size: 16px;
+}
+.home-page .preview-question h3 {
+  font-size: 18px;
+}
+.home-page .preview-question p {
+  font-size: 16px;
+  padding: 17px;
+}
+.home-page .preview-insight strong {
+  font-size: 16px;
+}
+.home-page .preview-insight p {
+  font-size: 15px;
+}
+.home-page .preview-footer {
+  font-size: 14px;
+}
+.home-page .steps {
+  gap: 50px;
+  margin-top: 24px;
+}
+.home-page .step h3 {
+  font-size: 20px;
+}
+.home-page .step p {
+  font-size: 16px;
+}
+.home-page .faq-section {
+  padding-block: 45px;
+}
+.home-page .faq-list summary {
+  font-size: 17px;
+}
+.home-page .faq-list p {
+  font-size: 16px;
+}
+.home-page .bottom-cta {
+  padding: 34px;
+}
+.home-page .bottom-cta h2 {
+  font-size: 25px;
+}
+
+@media (min-width: 1600px) {
+  .home-page .hero-copy {
+    padding-left: 0;
+  }
+}
+@media (max-width: 1100px) {
+  .header-inner {
+    gap: 28px;
+  }
+  .main-nav {
+    gap: 18px;
+  }
+  .header-actions {
+    gap: 12px;
+  }
+  .header-actions > .badge {
+    display: none;
+  }
+  .setup-grid {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+  .form-panel {
+    padding: 23px;
+  }
+  .choice {
+    padding: 10px;
+  }
+  .home-page .hero-inner {
+    min-height: var(--hero-size);
+  }
+  .home-page .hero {
+    --hero-size: 440px;
+  }
+  .hero-scene {
+    transform: translateX(-55%);
+  }
+  .home-page .hero-copy {
+    padding-bottom: 95px;
+  }
+  .home-page .hero h1 {
+    font-size: 44px;
+  }
+  .home-page .hero-copy > p {
+    font-size: 17px;
+  }
+  .home-page .hero-actions .button {
+    min-height: 50px;
+    padding: 12px 18px;
+    font-size: 16px;
+  }
+  .home-page .hero-bottom {
+    gap: 30px;
+    bottom: 28px;
+  }
+  .home-page .hero-bottom b {
+    font-size: 16px;
+  }
+  .home-page .job-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .home-page .job-card {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+  .home-page .section-heading {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 760px) {
+  .site-header {
+    height: 72px;
+  }
+  .brand {
+    font-size: 20px;
+  }
+  .brand small {
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+  .user-link {
+    font-size: 14px;
+    gap: 5px;
+  }
+  .user-link > svg:first-child {
+    display: none;
+  }
+  .main-nav {
+    top: 72px;
+    gap: 20px;
+  }
+  .main-nav a {
+    font-size: 15px;
+  }
+  .setup-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-panel {
+    padding: 22px 17px;
+  }
+  .form-panel-title h2 {
+    font-size: 19px;
+  }
+  .field-label {
+    font-size: 16px;
+  }
+  .page-heading h1,
+  .personal-heading h1 {
+    font-size: 27px;
+  }
+  .page-heading p,
+  .personal-heading p {
+    font-size: 15px;
+  }
+  .choice {
+    font-size: 15px;
+    padding: 10px;
+  }
+  .summary-rows {
+    grid-template-columns: 1fr;
+  }
+  .summary-row {
+    font-size: 15px;
+  }
+  .input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+  .notice {
+    font-size: 14px;
+  }
+  .current-question h1 {
+    font-size: 21px;
+  }
+  .session-title {
+    font-size: 14px;
+  }
+  .session-header .brand small {
+    font-size: 11px;
+  }
+  .message p,
+  .answer-quote p,
+  .comparison-columns p {
+    font-size: 16px;
+  }
+  .conversation {
+    height: 340px;
+  }
+  .turn-review summary > span:nth-child(2) {
+    font-size: 16px;
+  }
+  .turn-review summary {
+    padding: 18px;
+  }
+  .turn-review-body {
+    padding: 0 18px 18px;
+  }
+  .record-job strong {
+    font-size: 15px;
+  }
+  .records-table {
+    min-width: 800px;
+  }
+  .personal-tabs > button {
+    padding: 10px;
+    font-size: 14px;
+    gap: 5px;
+  }
+  .resume-card-content h3 {
+    font-size: 17px;
+  }
+  .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  .site-footer .footer-inner > span {
+    margin-left: 0;
+    font-size: 13px;
+  }
+  .home-page .hero {
+    background: #fbe8a6;
+  }
+  .hero-scene {
+    top: auto;
+    bottom: 0;
+    height: 270px;
+    width: 810px;
+    left: auto;
+    right: -12px;
+    transform: none;
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, transparent, #000 26px);
+    z-index: -1;
+  }
+  .hero-scene img {
+    width: 810px !important;
+    max-width: none;
+    height: 270px !important;
+    left: auto !important;
+    right: -12px !important;
+    object-fit: fill;
+  }
+  .home-page .hero-inner {
+    min-height: 650px;
+    display: block;
+  }
+  .home-page .hero-copy {
+    width: 100%;
+    padding: 33px 0 285px;
+  }
+  .home-page .hero h1 {
+    font-size: 40px;
+    line-height: 1.45;
+  }
+  .home-page .hero-copy > p {
+    font-size: 17px;
+    margin-top: 17px;
+  }
+  .home-page .hero-actions {
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+  .home-page .hero-actions .button {
+    min-height: 49px;
+    padding: 12px 17px;
+    font-size: 15px;
+  }
+  .home-page .hero-bottom {
+    display: none;
+  }
+  .home-page .section {
+    padding-block: 32px;
+  }
+  .home-page h2,
+  .home-page .section-heading h2 {
+    font-size: 27px;
+  }
+  .home-page .section-heading {
+    gap: 18px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .home-page .filter-tabs {
+    gap: 2px;
+  }
+  .home-page .filter-tabs button {
+    font-size: 14px;
+    padding: 7px 9px;
+  }
+  .home-page .job-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .home-page .job-card {
+    padding: 22px;
+    column-gap: 12px;
+    grid-template-columns: 36px 1fr;
+  }
+  .home-page .job-card h3 {
+    font-size: 21px;
+  }
+  .home-page .job-card > p {
+    font-size: 15px;
+    margin-top: 5px;
+  }
+  .home-page .job-card-bottom {
+    margin-top: 18px;
+  }
+  .home-page .tags span {
+    font-size: 14px;
+  }
+  .home-page .feature-section {
+    padding-block: 32px;
+  }
+  .home-page .feature-grid {
+    gap: 28px;
+  }
+  .home-page .feature-copy > p {
+    font-size: 16px;
+    margin-block: 15px 20px;
+  }
+  .home-page .preview-top {
+    padding: 15px 18px;
+    font-size: 15px;
+  }
+  .home-page .preview-question h3 {
+    font-size: 17px;
+  }
+  .home-page .preview-question p {
+    font-size: 15px;
+    padding: 13px;
+  }
+  .home-page .preview-footer {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .home-page .steps {
+    gap: 25px;
+  }
+  .home-page .step h3 {
+    font-size: 20px;
+  }
+  .home-page .step p {
+    font-size: 16px;
+  }
+  .home-page .faq-list summary {
+    font-size: 16px;
+    gap: 12px;
+  }
+  .home-page .bottom-cta {
+    padding: 25px;
+  }
+  .home-page .bottom-cta h2 {
+    font-size: 24px;
+  }
+}
+
+.hero-product-preview {
+  position: absolute;
+  left: 59.35%;
+  top: 16%;
+  width: 32.7%;
+  height: 55%;
+  background: #fff;
+  border-radius: 3px;
+  overflow: hidden;
+  transform: rotate(-0.2deg);
+  color: #35415a;
+  box-shadow: 0 0 3px #ffffff;
+}
+.product-preview-header {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 14px;
+  border-bottom: 1px solid #edf0f1;
+  font-size: 14px;
+}
+.product-preview-header > strong {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.product-preview-header > span:last-child {
+  margin-left: auto;
+  font-size: 13px;
+  color: #946143;
+  background: #fff1e3;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.mini-brand {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 17px;
+}
+.mini-brand i {
+  width: 4px;
+  height: 11px;
+  background: #efb35f;
+  border-radius: 1px;
+}
+.mini-brand i:nth-child(2) {
+  height: 17px;
+  background: #f4976c;
+}
+.mini-brand i:nth-child(3) {
+  height: 8px;
+}
+.product-preview-body {
+  display: grid;
+  grid-template-columns: 37% 63%;
+  height: calc(100% - 40px);
+}
+.product-question-list {
+  padding: 15px 12px;
+  border-right: 1px solid #edf0f1;
+  font-size: 14px;
+}
+.product-question-list > .avatar {
+  height: 29px;
+  width: 29px;
+  margin-bottom: 11px;
+  font-size: 14px;
+}
+.product-question-list > strong {
+  font-size: 14px;
+  line-height: 1.7;
+  font-weight: 550;
+  display: block;
+}
+.product-question-list p {
+  font-size: 13px !important;
+  line-height: 1.5;
+  padding: 7px;
+  margin-top: 7px;
+  color: #7a8190;
+}
+.product-question-list .product-question-selected {
+  background: #fff1e4;
+  color: #8a593b;
+  border-radius: 4px;
+}
+.product-conversation {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.product-question {
+  background: #eaf5f4;
+  border-radius: 5px;
+  padding: 10px 12px;
+}
+.product-conversation > p {
+  font-size: 14px;
+  line-height: 1.8;
+  background: #f5f6f8;
+  padding: 10px 12px;
+  border-radius: 5px;
+  color: #606b7e;
+}
+.product-input {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 9px;
+  border: 1px solid #e5e7eb;
+  border-radius: 5px;
+  color: #808794;
+  margin-top: auto;
+}
+.product-input > span {
+  padding: 3px;
+  background: #f4976c;
+  color: #303c6c;
+  border-radius: 4px;
+}
+@media (max-width: 1100px) {
+  .product-preview-header {
+    padding-inline: 10px;
+    height: 35px;
+  }
+  .product-preview-header > span:last-child {
+    display: none;
+  }
+  .product-preview-body {
+    height: calc(100% - 35px);
+  }
+  .product-question-list {
+    padding: 10px;
+  }
+  .product-question-list > p:last-child {
+    display: none;
+  }
+  .product-conversation {
+    padding: 10px;
+    gap: 10px;
+  }
+  .product-question {
+    padding: 7px;
+  }
+  .product-conversation > p {
+    padding: 7px;
+  }
+  .product-question-list > .avatar {
+    height: 25px;
+    width: 25px;
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 760px) {
+  .hero-product-preview {
+    display: none;
+  }
+}
+
+.score-notes {
+  margin-top: 22px;
+  font-size: 14px;
+  color: #697486;
+}
+.score-notes summary {
+  cursor: pointer;
+}
+.score-notes p {
+  font-size: 14px;
+  line-height: 1.9;
+  margin-top: 14px;
+}
+.score-notes strong {
+  font-weight: 550;
+}

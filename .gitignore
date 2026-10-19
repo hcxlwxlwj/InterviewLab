@@ -11,6 +11,9 @@ node_modules/
 dist/
 build/
 coverage/
+*.tsbuildinfo
+test-results/
+playwright-report/
 .venv/
 venv/
 __pycache__/

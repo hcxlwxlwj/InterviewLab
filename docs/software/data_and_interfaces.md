@@ -209,3 +209,13 @@ WSS `/api/v1/sessions/{id}/stream` 使用同源认证或短时会话凭证，长
 - 删除与备份恢复演练覆盖源文件、私有快照和派生数据，后台任务不重新写回。
 
 关联：[总体架构](architecture.md) · [功能需求](../requirements/functional_spec.md) · [知识库与智能体](../algorithm/knowledge_and_agent.md) · [评测计划](../algorithm/evaluation.md)。
+
+## 2026-10-19 原型合同扩展
+
+新增JobCategory、版本化JobTemplate、KnowledgeQuestion、ContentSource、JobTarget、JobBookmark。ResumeDocument增加文本content、target_job、updated_at、is_sample及file_type=text；Experience支持毕设、实习和其他类型。Configuration保留job字符串并通过共享岗位注册表校验，增加模板/目标/简历版本、JD来源及实习/校招阶段。历史四个job ID仍有效。
+
+公开读取增加 GET /job-categories、GET /job-templates/{id} 及 /sources；列表接受 search/category/stage/limit/cursor，沿用items/next_cursor。收藏合同为GET/POST /me/bookmarks、PATCH/DELETE /me/bookmarks/{id}；个人JD复用job-targets，文本简历POST /resume-documents使用source_type=text及结构内容。骨架写入仍返回capability_unavailable，当前无真实用户鉴权及私有服务。
+
+Session.material_snapshot增加job_template、job_target及knowledge_sources，保留实际使用的题目来源和版本。改动材料或撤回模板不静默重写旧快照；重新练习使用原题和原快照。公开知识与个人材料分别由内容目录与演示状态维护，不相互混入检索。
+
+演示状态schema=2，由统一客户端处理v1迁移、CRUD、版本冲突与失效关联；容量不足时保留最新内存状态并明确临时保存。当前删除库内文本简历会移除所属经历并解除未来选择，旧面试快照保留；这与未来全量清除私有材料的生产流程不同，不能把原型删除当作生产隐私清理已验收。
