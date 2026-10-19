@@ -4,43 +4,48 @@
 
 ## 与课程模板的对应
 
-参考 [IntelligentSWEPractice 的课程成果结构](https://github.com/bettermorn/IntelligentSWEPractice#课程成果)，保留指定的文档、代码、测试路径。增加公开内容数据和适配包，避免将静态题库及合成数据与纯领域逻辑混在一起。
+参考 [IntelligentSWEPractice 的课程成果结构](https://github.com/bettermorn/IntelligentSWEPractice#课程成果)，顶层收拢为 `.github`、`code`、`docs` 和课程要求的 `tests`。根目录保留 README 以及运行必需的 npm、TypeScript、Git 配置。
 
 ```text
 InterviewLab/
+├── .github/
+│   ├── workflows/          # 自动检查
+│   └── scripts/            # 内容、依赖和文档检查
+├── code/
+│   ├── backend/            # HTTP 接口、服务合同、src/content 公开适配
+│   ├── frontend/           # 页面、组件、演示客户端
+│   └── core_engine/        # 共享类型、纯规则及端口
 ├── docs/
 │   ├── requirements/       # 问题定义、功能、非功能、用户故事
-│   ├── algorithm/          # 研究、知识/Agent 方案、评测
-│   ├── software/           # 架构、接口、模块、原型与实现说明
-│   ├── mgmt/               # 团队、沟通、风险、反馈与提交记录
-│   └── retrospection/      # 按日期追加的决定、结果与复盘
-├── code/
-│   ├── frontend/           # Next.js 页面、组件、演示客户端
-│   ├── backend/            # HTTP 校验/路由与服务接入合同
-│   ├── core_engine/        # 共享类型、纯规则及端口
-│   └── content/            # JSON 适配与独立的合成案例入口
-├── content/                # 岗位、分类、来源 JSON 与研究资料
+│   ├── algorithm/          # 研究、评测、content 资料
+│   ├── software/           # 架构、接口、模块与原型
+│   ├── mgmt/               # 协作、团队、沟通与风险
+│   └── retrospection/      # 按日期保留复盘
 ├── tests/
-│   ├── unit/               # 规则、客户端及内容检索
-│   └── integration/        # API 合同测试
-├── scripts/                # 内容完整性与依赖边界检查
-└── .github/                # CI、Issue、PR 与文档检查
+│   ├── unit/
+│   └── integration/
+├── README.md
+├── package.json
+├── package-lock.json
+└── tsconfig.json
 ```
+
+不复制老师仓库的课件、考核文件或许可证。原根目录 `content` 和 `scripts` 已分别迁入 `docs/algorithm/content`、`.github/scripts`；协作说明位于 `docs/mgmt/COLLABORATION.md`。格式选项并入 `package.json`。
 
 ## 当前运行和依赖关系
 
 `npm run dev` 只启动 Next.js；`/api/v1` 由 Route Handlers 转交 `@interviewlab/backend`。浏览器交互使用标签页内演示客户端，未通过 HTTP 保存个人材料。
 
 ```text
-Next.js app/api → backend → content → core
-Next.js 页面/演示客户端 → content / core
-content/src/index.ts → 根 content/*.json
-content/src/demo.ts → 合成样例与演示报告
+Next.js app/api → backend HTTP → core / backend 内容模块
+Next.js 页面/演示客户端 → backend 的公开 content 子入口 / core
+backend/src/content/index.ts → docs/algorithm/content/*.json
+backend/src/content/demo.ts → 合成样例与演示报告
 ```
 
 核心仅定义和执行规则。`buildQuestions` 接收显式模板；`createJobCatalog` 接收模板与来源集合，不导入文件或全局题库。数据库、身份、模型、语音和代码执行通过核心接口由后端适配，不能倒向依赖 UI。
 
-`code/content` 是可被浏览器使用的公开适配包；它不读取个人材料，也不包含密钥。前端只有 `app/api/` 可以导入后端。`npm run boundaries:check` 与 CI 检查上述依赖约束。
+公开子入口 `@interviewlab/backend/content` 和 `/content/demo` 可被浏览器使用，只依赖领域核心和公开 JSON。前端只有 `app/api/` 可以导入后端 HTTP 入口；内容模块禁止导入服务端实现。`npm run boundaries:check` 与 CI 检查上述依赖约束。
 
 ## 修改任务应落在哪里
 
@@ -50,8 +55,8 @@ content/src/demo.ts → 合成样例与演示报告
 | 简历、收藏、个人 JD 演示操作 | `frontend/lib/demo` | 数据合同、客户端单元测试 |
 | 会话规则、预算与汇总 | `core_engine/src` | 功能需求、规则单元测试 |
 | HTTP 字段和错误 | `backend/src/http` | 数据与接口、接口测试 |
-| 岗位正文、问题、来源与版本 | 根 `content/` | 内容维护说明、内容检查 |
-| 本地公开内容加载 | `code/content/src` | 检索与模板测试 |
+| 岗位正文、问题、来源与版本 | `docs/algorithm/content` | 内容维护说明、内容检查 |
+| 本地公开内容加载 | `backend/src/content` | 检索与模板测试 |
 | 数据库与真实身份（后续） | `backend` 的仓储/服务适配 | 归属、并发、删除与集成测试 |
 | 模型与向量检索（后续） | `backend` 的供应商/知识适配 | Agent 权限、引用与效果评测 |
 

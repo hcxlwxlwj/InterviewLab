@@ -1,5 +1,5 @@
 'use client';
-import { JOBS } from '@interviewlab/content';
+import { JOBS } from '@interviewlab/backend/content';
 import {
   TYPE_LABELS,
   commitAnswer,

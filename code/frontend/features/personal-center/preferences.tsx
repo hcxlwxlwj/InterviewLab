@@ -1,5 +1,5 @@
 'use client';
-import { JOBS } from '@interviewlab/content';
+import { JOBS } from '@interviewlab/backend/content';
 import { RotateCcw } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { demoClient } from '../../lib/demo-client';

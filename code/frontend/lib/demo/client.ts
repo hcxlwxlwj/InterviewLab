@@ -1,5 +1,5 @@
-import { CONTENT_SOURCES, getJob, searchJobs } from '@interviewlab/content';
-import { reportFor } from '@interviewlab/content/demo';
+import { CONTENT_SOURCES, getJob, searchJobs } from '@interviewlab/backend/content';
+import { reportFor } from '@interviewlab/backend/content/demo';
 import {
   buildQuestions,
   defaultConfiguration,

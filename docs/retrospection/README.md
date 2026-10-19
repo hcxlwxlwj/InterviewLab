@@ -31,3 +31,5 @@
 - [2026-10-19 个人材料与岗位内容扩展](2026-10-19-materials-and-content.md)
 
 - [2026-10-19 课程模板对齐与代码职责整理](2026-10-19-repository-organization.md)
+
+- [2026-10-19 按老师目录收拢仓库](2026-10-19-course-layout.md)

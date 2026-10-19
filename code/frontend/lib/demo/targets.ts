@@ -1,4 +1,4 @@
-import { getJob } from '@interviewlab/content';
+import { getJob } from '@interviewlab/backend/content';
 import { type JobBookmark, type JobTarget } from '@interviewlab/core';
 import { readDemo, saveDemo } from './state';
 import { checkResumeId, nameChecked, now } from './validation';

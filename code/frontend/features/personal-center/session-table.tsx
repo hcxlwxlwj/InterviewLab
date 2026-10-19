@@ -1,5 +1,5 @@
 'use client';
-import { getJob } from '@interviewlab/content';
+import { getJob } from '@interviewlab/backend/content';
 import { STATUS_LABELS, TYPE_LABELS, type Session } from '@interviewlab/core';
 import { ArrowRight, Trash2 } from 'lucide-react';
 import Link from 'next/link';

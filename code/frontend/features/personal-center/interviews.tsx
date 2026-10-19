@@ -1,5 +1,5 @@
 'use client';
-import { JOBS } from '@interviewlab/content';
+import { JOBS } from '@interviewlab/backend/content';
 import { STATUS_LABELS } from '@interviewlab/core';
 import { EmptyState } from '../../components/shared';
 import { Button } from '../../components/ui/button';

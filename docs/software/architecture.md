@@ -6,7 +6,7 @@
 
 当前仅运行 Next.js，Route Handlers 承载后端接口骨架。前端使用 `sessionStorage` 演示客户端，后端提供公开岗位与合成读取；业务写入返回 `capability_unavailable`。没有数据库、实时网关或模型进程。
 
-代码分为 `frontend`、`backend`、`core_engine` 和公开内容适配包 `content`。核心只接受显式输入，不读 JSON、浏览器存储或框架。详细目录、依赖、修改入口与检查方式见[工程目录与职责](repository_structure.md)。现有页面与材料快照规则保持不变。
+代码分为 `frontend`、`backend`、`core_engine` 三部分；公开内容适配在 `backend/src/content`，资料位于 `docs/algorithm/content`。核心只接受显式输入，不读 JSON、浏览器存储或框架。详细目录、依赖、修改入口与检查方式见[工程目录与职责](repository_structure.md)。现有页面与材料快照规则保持不变。
 
 以下第 1–5 节描述目标系统，未接入的服务不能作为当前能力展示。
 

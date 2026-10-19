@@ -7,7 +7,7 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[2]
 REQUIRED = (
-    "README.md", "COLLABORATION.md", ".gitignore",
+    "README.md", "docs/mgmt/COLLABORATION.md", ".gitignore",
     "docs/requirements/problem_definition.md",
     "docs/requirements/functional_spec.md", "docs/requirements/nonfunctional_spec.md",
     "docs/requirements/user_stories.md", "docs/requirements/README.md",

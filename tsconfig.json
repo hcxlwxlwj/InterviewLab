@@ -14,6 +14,6 @@
     "types": ["node"],
     "noUnusedLocals": true
   },
-  "include": ["code/**/*.ts", "code/**/*.tsx", "tests/**/*.ts", "scripts/**/*.ts"],
+  "include": ["code/**/*.ts", "code/**/*.tsx", "tests/**/*.ts", ".github/scripts/**/*.ts"],
   "exclude": ["node_modules", "**/.next", "**/next-env.d.ts"]
 }

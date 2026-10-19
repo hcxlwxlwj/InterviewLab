@@ -3,13 +3,12 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import ts from 'typescript';
 
-const root = resolve(import.meta.dirname, '..');
-const packages = ['core_engine', 'content', 'backend', 'frontend'] as const;
+const root = resolve(import.meta.dirname, '../..');
+const packages = ['core_engine', 'backend', 'frontend'] as const;
 const dependencies: Record<(typeof packages)[number], string[]> = {
   core_engine: [],
-  content: ['@interviewlab/core'],
-  backend: ['@interviewlab/core', '@interviewlab/content'],
-  frontend: ['@interviewlab/core', '@interviewlab/content', '@interviewlab/backend'],
+  backend: ['@interviewlab/core'],
+  frontend: ['@interviewlab/core', '@interviewlab/backend'],
 };
 
 function files(directory: string): string[] {
@@ -33,12 +32,18 @@ for (const name of packages) {
     const check = (specifier: string) => {
       const location = relative(root, file).replaceAll('\\', '/');
       const fail = (message: string) => assert.fail(`${location}: ${message} (${specifier})`);
+      const publicContent = location.startsWith('code/backend/src/content/');
       if (specifier.startsWith('.')) {
         const target = relative(directory, resolve(dirname(file), specifier)).replaceAll('\\', '/');
-        if (
-          target.startsWith('../') &&
-          !(name === 'content' && target.startsWith('../../content/'))
-        )
+        const contentTarget = relative(
+          resolve(directory, 'src/content'),
+          resolve(dirname(file), specifier),
+        ).replaceAll('\\', '/');
+        const knowledgeData =
+          target.startsWith('../../docs/algorithm/content/') && specifier.endsWith('.json');
+        if (publicContent && contentTarget.startsWith('../') && !knowledgeData)
+          fail('公开内容入口不可引用后端服务实现');
+        if (target.startsWith('../') && !(publicContent && knowledgeData))
           fail('跨包相对引用应使用工作区入口');
       } else if (specifier.startsWith('@interviewlab/')) {
         if (
@@ -50,11 +55,15 @@ for (const name of packages) {
         if (
           name === 'frontend' &&
           specifier.startsWith('@interviewlab/backend') &&
+          !['@interviewlab/backend/content', '@interviewlab/backend/content/demo'].includes(
+            specifier,
+          ) &&
           !location.startsWith('code/frontend/app/api/')
         )
           fail('后端实现只能由服务端 API 路由导入');
-      } else if (name === 'core_engine') {
-        fail('领域核心不可依赖框架、Node 或外部包');
+        if (publicContent && specifier !== '@interviewlab/core') fail('公开内容入口只依赖领域核心');
+      } else if (name === 'core_engine' || publicContent) {
+        fail('领域核心与公开内容不可依赖框架、Node 或外部包');
       }
       if (name === 'core_engine' && /\.(json|css)$/.test(specifier))
         fail('领域核心不可读取内容或界面资源');

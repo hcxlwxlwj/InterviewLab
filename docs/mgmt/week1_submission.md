@@ -12,7 +12,7 @@
 | 提交规范的 README | [README](../../README.md) | 已通过 [PR #8](https://github.com/hcxlwxlwj/InterviewLab/pull/8) 合并到 `main`，包含第一周导航 |
 | 5W1H 报告和产品描述 | [问题定义报告](../requirements/problem_definition.md) | 指定文件已进入 `main`，六项内容与产品边界已核验 |
 | 规范目录结构 | [文档导航](../README.md)、`code/`、`tests/`、`.github/workflows/` | 本次建立课件目录骨架；占位目录不代表功能或测试已实现 |
-| 分支管理示例 | 远端 `main`、`develop`；[协作说明](../../COLLABORATION.md) | 两个远端分支已存在，已通过 `git ls-remote` 核验；团队使用约定见协作说明 |
+| 分支管理示例 | 远端 `main`、`develop`；[协作说明](COLLABORATION.md) | 两个远端分支已存在，已通过 `git ls-remote` 核验；团队使用约定见协作说明 |
 | Kanban | [Kanban 视图](https://github.com/users/hcxlwxlwj/projects/2/views/2)、[任务 #4](https://github.com/hcxlwxlwj/InterviewLab/issues/4) | Board 已按 Status 分列；本周任务 #2～#7 已加入 |
 | Team planning | [团队计划视图](https://github.com/users/hcxlwxlwj/projects/2/views/3)、[团队计划](team_plan.md) | 已配置状态、优先级、负责人和日期字段；成员绑定及课程截止日期待定 |
 | Bug tracker | [缺陷视图](https://github.com/users/hcxlwxlwj/projects/2/views/4) | 已配置 `label:bug` 筛选及缺陷表单；当前未登记真实缺陷 |

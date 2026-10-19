@@ -1,6 +1,6 @@
 # InterviewLab 协作操作须知
 
-版本：v0.3 · 更新日期：2026-10-19。当前产品与文档范围见[文档导航](docs/README.md)。
+版本：v0.3 · 更新日期：2026-10-19。当前产品与文档范围见[文档导航](../README.md)。
 
 ## 分支约定
 
@@ -16,7 +16,7 @@
 
 接受仓库邀请后，在准备存放项目的父目录执行：
 
-2026-10-05 的记录为协作者邀请已发出但尚未接受；本轮未重新核验邀请状态。具体分工见 [团队计划](docs/mgmt/team_plan.md)。
+2026-10-05 的记录为协作者邀请已发出但尚未接受；本轮未重新核验邀请状态。具体分工见 [团队计划](team_plan.md)。
 
 ```bash
 git clone https://github.com/hcxlwxlwj/InterviewLab.git
@@ -28,9 +28,9 @@ git switch develop
 
 ## 本地运行与改动位置
 
-原型运行分支与启动方式见[根 README](README.md)。`main`、`develop` 在原型合并前不包含这些页面；需要延续未合并功能时，从对应任务分支建立自己的任务分支，并在 PR 说明基线和依赖。
+原型运行分支与启动方式见[根 README](../../README.md)。当前原型已合入 `main`；需要延续未合并功能时，从对应任务分支建立自己的任务分支，并在 PR 说明基线和依赖。
 
-先读[工程目录与职责](docs/software/repository_structure.md)，在仓库根目录执行 `npm ci`。代码改动先运行 `npm run check`、`npm run build`；文档改动至少运行 `npm run docs:check` 与 `git diff --check`。修改已实现功能时同步原型状态，修改目标时同步需求与合同；已发生的复盘和反馈只追加。
+先读[工程目录与职责](../software/repository_structure.md)，在仓库根目录执行 `npm ci`。代码改动先运行 `npm run check`、`npm run build`；文档改动至少运行 `npm run docs:check` 与 `git diff --check`。修改已实现功能时同步原型状态，修改目标时同步需求与合同；已发生的复盘和反馈只追加。
 
 ## 日常开发
 
@@ -58,7 +58,7 @@ git push -u origin feature/your-task
 
 ## Issues 与项目看板
 
-使用仓库中的任务、缺陷和课程反馈表单，注明目标、负责人、验收条件和依赖。分工未定时保持未指派。Kanban、Team planning 和 Bug tracker 的配置与工作方式见 [项目管理](docs/mgmt/project_management.md)。只有验收通过的任务才标记 Done；用户转述的教师意见注明来源，不等同于 Issue 已回复或课程已验收。
+使用仓库中的任务、缺陷和课程反馈表单，注明目标、负责人、验收条件和依赖。分工未定时保持未指派。Kanban、Team planning 和 Bug tracker 的配置与工作方式见 [项目管理](project_management.md)。只有验收通过的任务才标记 Done；用户转述的教师意见注明来源，不等同于 Issue 已回复或课程已验收。
 
 ## 提交约定
 
@@ -83,7 +83,7 @@ git log -1 --oneline
 
 确认 `README.md` 和 `COLLABORATION.md` 已下载，且工作区干净。网页上的这次提交也会出现在提交记录中。
 
-课程提交前按 [第一周检查清单](docs/mgmt/week1_submission.md) 核对实际文件、看板、访问权限与反馈状态。
+课程提交前按 [第一周检查清单](week1_submission.md) 核对实际文件、看板、访问权限与反馈状态。
 
 若本地尚未克隆，第一次下载应使用 `git clone`。要单独测试 `pull`，先克隆，再在 GitHub 网页修改 README 并提交，然后回到本地执行上述拉取命令。
 

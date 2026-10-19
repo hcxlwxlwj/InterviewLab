@@ -4,7 +4,7 @@ import {
   getJob,
   localKnowledgeRetriever,
   searchJobs,
-} from '@interviewlab/content';
+} from '@interviewlab/backend/content';
 import type { Configuration } from '@interviewlab/core';
 import { buildQuestions, defaultConfiguration } from '@interviewlab/core';
 import assert from 'node:assert/strict';

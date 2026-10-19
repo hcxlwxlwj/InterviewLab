@@ -1,5 +1,5 @@
-import { getJob as lookupJob } from '@interviewlab/content';
-import { reportFor, sampleSession } from '@interviewlab/content/demo';
+import { getJob as lookupJob } from '@interviewlab/backend/content';
+import { reportFor, sampleSession } from '@interviewlab/backend/content/demo';
 import type { Configuration } from '@interviewlab/core';
 import {
   buildQuestions,

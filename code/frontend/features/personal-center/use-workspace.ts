@@ -1,5 +1,5 @@
 'use client';
-import { getJob } from '@interviewlab/content';
+import { getJob } from '@interviewlab/backend/content';
 import { templateJd, type JobBookmark, type JobTarget } from '@interviewlab/core';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';

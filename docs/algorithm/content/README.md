@@ -20,7 +20,7 @@ AI类及AI产品每30天复核，其他每90天复核。过期项列入维护清
 
 ## 检索与Agent接入
 
-内容文件由 [code/content](../code/content/README.md) 统一加载；领域核心只接收显式数据，不直接读取 JSON。前端展示与后端本地检索复用同一注册表，合成简历和演示报告使用独立的 `/demo` 包入口。
+内容文件由 [backend/src/content](../../../code/backend/src/content/README.md) 统一加载；领域核心只接收显式数据，不直接读取 JSON。前端展示与后端本地检索复用同一注册表，合成简历和演示报告使用独立的 `/demo` 包入口。
 
 本地KnowledgeRetriever按岗位、阶段、主题、难度过滤published内容，返回来源与版本；不足返回空集合。未来可换成PostgreSQL/pgvector实现。发布/撤回只影响新会话，历史面试和重练使用已冻结的模板、个人JD、材料、题目与来源。知识正文一律是资料，不能提供工具权限或覆盖系统指令。
 

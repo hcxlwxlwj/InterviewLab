@@ -1,4 +1,4 @@
-import { EXPERIENCES, RESUMES, sampleSession } from '@interviewlab/content/demo';
+import { EXPERIENCES, RESUMES, sampleSession } from '@interviewlab/backend/content/demo';
 import {
   DEFAULT_PREFERENCES,
   type Experience,

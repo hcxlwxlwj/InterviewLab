@@ -4,20 +4,19 @@
   "workspaces": [
     "code/frontend",
     "code/backend",
-    "code/core_engine",
-    "code/content"
+    "code/core_engine"
   ],
   "scripts": {
     "dev": "npm run dev --workspace @interviewlab/web",
     "build": "npm run build --workspace @interviewlab/web",
     "start": "npm run start --workspace @interviewlab/web",
     "typecheck": "tsc --noEmit",
-    "content:check": "tsx scripts/check-content.ts",
+    "content:check": "tsx .github/scripts/check-content.ts",
     "test": "tsx --test tests/unit/*.test.ts tests/integration/*.test.ts",
-    "boundaries:check": "tsx scripts/check-boundaries.ts",
+    "boundaries:check": "tsx .github/scripts/check-boundaries.ts",
     "docs:check": "python .github/scripts/check_repository.py",
     "check": "npm run boundaries:check && npm run typecheck && npm run content:check && npm test && npm run docs:check",
-    "format:code": "prettier --write \"code/**/*.{ts,tsx}\" \"tests/**/*.ts\" \"scripts/*.ts\""
+    "format:code": "prettier --ignore-path .gitignore --write \"code/**/*.{ts,tsx}\" \"tests/**/*.ts\" \".github/scripts/*.ts\""
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
@@ -26,5 +25,10 @@
     "prettier": "3.6.2",
     "tsx": "^4.20.0",
     "typescript": "^5.9.3"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 100,
+    "trailingComma": "all"
   }
 }
