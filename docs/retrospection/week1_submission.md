@@ -1,6 +1,6 @@
 # 第一周提交与验收清单
 
-> 历史记录说明（v0.2，2026-10-15 追加）：下方正文保留 2026-10-05 的第一周提交准备与核验事实，包括原检查数量、未完成项及提交模板，不代表今天的远端状态。用户现已在聊天中转述教师反馈，本轮处理见文末及[反馈记录](feedback.md)；没有据此确认 Issue #7 已回复或课程已验收。
+> 历史记录说明（v0.2，2026-10-15 追加）：下方正文保留 2026-10-05 的第一周提交准备与核验事实，包括原检查数量、未完成项及提交模板，不代表今天的远端状态。用户现已在聊天中转述教师反馈，本轮处理见文末及[反馈记录](teacher_feedback.md)；没有据此确认 Issue #7 已回复或课程已验收。
 
 更新日期：2026-10-05。检查依据为老师的“第 1 周实践：定义你的工程项目与仓库构建”任务图。下表区分本次准备的交付与仍需验证的远端、人工操作；只有链接和实际记录齐全才能标为完成。
 
@@ -12,12 +12,12 @@
 | 提交规范的 README | [README](../../README.md) | 已通过 [PR #8](https://github.com/hcxlwxlwj/InterviewLab/pull/8) 合并到 `main`，包含第一周导航 |
 | 5W1H 报告和产品描述 | [问题定义报告](../requirements/problem_definition.md) | 指定文件已进入 `main`，六项内容与产品边界已核验 |
 | 规范目录结构 | [文档导航](../README.md)、`code/`、`tests/`、`.github/workflows/` | 本次建立课件目录骨架；占位目录不代表功能或测试已实现 |
-| 分支管理示例 | 远端 `main`、`develop`；[协作说明](COLLABORATION.md) | 两个远端分支已存在，已通过 `git ls-remote` 核验；团队使用约定见协作说明 |
+| 分支管理示例 | 远端 `main`、`develop`；[协作说明](../mgmt/COLLABORATION.md) | 两个远端分支已存在，已通过 `git ls-remote` 核验；团队使用约定见协作说明 |
 | Kanban | [Kanban 视图](https://github.com/users/hcxlwxlwj/projects/2/views/2)、[任务 #4](https://github.com/hcxlwxlwj/InterviewLab/issues/4) | Board 已按 Status 分列；本周任务 #2～#7 已加入 |
-| Team planning | [团队计划视图](https://github.com/users/hcxlwxlwj/projects/2/views/3)、[团队计划](team_plan.md) | 已配置状态、优先级、负责人和日期字段；成员绑定及课程截止日期待定 |
+| Team planning | [团队计划视图](https://github.com/users/hcxlwxlwj/projects/2/views/3)、[团队计划](../mgmt/team_plan.md) | 已配置状态、优先级、负责人和日期字段；成员绑定及课程截止日期待定 |
 | Bug tracker | [缺陷视图](https://github.com/users/hcxlwxlwj/projects/2/views/4) | 已配置 `label:bug` 筛选及缺陷表单；当前未登记真实缺陷 |
 | 第一周结束前提交仓库链接 | 课程指定渠道的提交记录 | 待实际提交；课程截止日期尚未提供 |
-| 通过 GitHub Issues 获得第一轮反馈 | [第一轮反馈入口 #7](https://github.com/hcxlwxlwj/InterviewLab/issues/7)、[反馈记录](feedback.md) | 反馈 Issue 已创建，等待老师实际回复；尚未获得反馈 |
+| 通过 GitHub Issues 获得第一轮反馈 | [第一轮反馈入口 #7](https://github.com/hcxlwxlwj/InterviewLab/issues/7)、[反馈记录](teacher_feedback.md) | 反馈 Issue 已创建，等待老师实际回复；尚未获得反馈 |
 
 协作者邀请已发出，协作者尚未接受（用户确认）。接受后绑定各任务负责人，确认仓库与 Projects 权限。私有仓库链接本身不授予老师访问权限。
 
@@ -36,7 +36,7 @@ GitHub 已建立[第一周里程碑](https://github.com/hcxlwxlwj/InterviewLab/m
 - [ ] 老师拥有访问仓库、Projects 和 Issues 的权限。
 - [x] 第一轮反馈 Issue 已建立，明确希望老师评价的问题。
 - [ ] 在课程指定渠道提交仓库链接，并保留提交日期与凭据。
-- [ ] 老师回复后更新[反馈记录](feedback.md)，必要时建立修订任务。
+- [ ] 老师回复后更新[反馈记录](teacher_feedback.md)，必要时建立修订任务。
 
 勾选应以实际证据为依据；尚未发生的提交、权限授予和反馈保持未完成。
 
@@ -59,6 +59,6 @@ GitHub 已建立[第一周里程碑](https://github.com/hcxlwxlwj/InterviewLab/m
 
 本轮范围是文档、导航和仓库文档检查配置，不搭建前端。教师反馈来自用户转述，不能将原“等待 Issue 回复”记录改成已在 GitHub 获得反馈，也不凭本地文件修改声称已合并或提交课程渠道。
 
-当前入口：[六行产品描述](../requirements/problem_definition.md)、[功能需求](../requirements/functional_spec.md)、[非功能需求](../requirements/nonfunctional_spec.md)、[用户故事](../requirements/user_stories.md)、[原型说明](../software/prototype/README.md)、[本轮复盘](../retrospection/2026-10-15-scope-revision.md)。本轮本地检查结果在实际完成后追加，不替换上方 28 份 / 170 链接的历史数字。
+当前入口：[六行产品描述](../requirements/problem_definition.md)、[功能需求](../requirements/functional_spec.md)、[非功能需求](../requirements/nonfunctional_spec.md)、[用户故事](../requirements/user_stories.md)、[原型说明](../software/prototype/README.md)、[本轮复盘](2026-10-15-scope-revision.md)。本轮本地检查结果在实际完成后追加，不替换上方 28 份 / 170 链接的历史数字。
 
 本轮本地验证（2026-10-15）：仓库检查通过，覆盖 50 份 Markdown 和 267 个本地文件链接；额外核对 72 个表格及全部 Markdown 尾随空白，均通过；当前本地链接无章节片段，重点章节及需求/接口合同另经内容交叉审阅。git diff --check 通过。应用目录和依赖无变更；未执行应用或效果实验，未推送、合并或在课程渠道提交。

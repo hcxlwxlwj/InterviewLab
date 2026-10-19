@@ -1,33 +1,14 @@
 # 软件设计
 
-版本：v0.3 · 日期：2026-10-19 · 状态：高保真交互原型与后端骨架已建立，真实服务待接入。
-
-本目录是架构、接口、模块和原型正文的唯一维护位置。
+更新：2026-10-19。这里只维护架构、数据、接口、工程边界和原型；功能行为及验收分别维护在 requirements 的[功能规格](../requirements/functional_spec.md)与[用户故事](../requirements/user_stories.md)。
 
 | 正文 | 内容 |
 | --- | --- |
-| [工程目录与职责](repository_structure.md) | 课程模板对应、代码入口、依赖方向与真实服务接入位置 |
-| [总体架构](architecture.md) | 模块化单体、业务编排、任务、适配层、隔离代码执行与部署 |
-| [数据与接口](data_and_interfaces.md) | 简历库、经历、实时回合、原作答/识别纠错、音视频观测、临时复盘媒体、报告与删除 |
-| [原型说明](prototype/README.md) | 首页、配置、双栏面试、代码面板、报告和个人中心 |
-| [个人中心与岗位库扩展](prototype/library-expansion.md) | 多简历、目标岗位、36个模板与知识库接入边界 |
-| [首轮实现说明](prototype/implementation.md) | 本地运行、演示能力、暖黄浅橙配色、AI 设计参考与实测截图 |
-| [功能需求](../requirements/functional_spec.md) | 范围和需求编号 |
-| [评测方案](../algorithm/evaluation.md) | 合成案例、接口与恢复验证、试用对照 |
+| [系统架构](architecture.md) | 当前运行结构与目标服务、组件、部署及数据流 |
+| [数据与接口](data_and_interfaces.md) | 领域对象、HTTP/实时接口、状态、版本、权限和删除合同 |
+| [工程目录](repository_structure.md) | 课程目录、代码职责、依赖与后续接入位置 |
+| [原型设计](prototype/README.md) | 页面、交互和状态 |
+| [首轮实现记录](prototype/implementation.md) | 设计参考、本地运行和阶段截图 |
+| [个人中心/岗位库扩展](prototype/library-expansion.md) | 后续页面、36 个岗位内容及原型验证 |
 
-## 模块设计
-
-| 模块 | 正文 |
-| --- | --- |
-| 01 岗位与 JD | [岗位理解](modules/01-job-understanding.md) |
-| 02 简历库与事实 | [个人材料](modules/02-personal-materials.md) |
-| 03 配置与重点经历 | [面试配置](modules/03-interview-configuration.md) |
-| 05 面试编排 | [模拟面试](modules/05-mock-interview.md) |
-| 06 实时语音与可选镜头 | [语音与表达观测](modules/06-voice-and-speech.md) |
-| 07 面后分析 | [分析报告](modules/07-feedback-report.md) |
-| 08 定向重练 | [重练与对比](modules/08-retry-and-progress.md) |
-| 09 内容和运维 | [运行维护](modules/09-content-and-operations.md) |
-| 10 可选代码题 | [代码考核](modules/10-code-assessment.md) |
-| 11 个人数据入口 | [个人中心](modules/11-personal-center.md) |
-
-实时口头面试为目标主线；当前原型以文字演示流程，摄像头与媒体采集未接入。原04教学模式取消，旧路径保留[退出说明](../modules/04-guided-practice.md)。API 可读取公开整理的岗位内容与合成用户样例，业务写入明确返回未接入；数据合同中的真实服务能力仍待实现。
+当前文字原型可运行，真实服务尚未接入；目标架构与接口清单不表示全部业务能力已实现。原 modules 文档已按性质并入需求、算法及本目录接口合同，不另保留副本。

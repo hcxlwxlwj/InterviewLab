@@ -8,7 +8,7 @@
 
 - InterviewLab 已建立 GitHub 仓库，并已有中文 README、需求分析、总体架构、数据接口、知识/智能体设计、评测计划及九个功能技术文档。
 - 当前处于项目初始化与方案验证阶段，尚无可运行应用、实际用户研究或教学效果测量结果。
-- 本次按课程要求准备指定路径的 5W1H 报告、课程目录骨架、团队职责和任务验收、项目管理约定、反馈与提交清单。远端完成情况以[提交清单](../mgmt/week1_submission.md)的真实证据为准。
+- 本次按课程要求准备指定路径的 5W1H 报告、课程目录骨架、团队职责和任务验收、项目管理约定、反馈与提交清单。远端完成情况以[提交清单](week1_submission.md)的真实证据为准。
 - 上述仓库文件已通过 [PR #8](https://github.com/hcxlwxlwj/InterviewLab/pull/8) 合并到 `main`，并同步到 `develop`；GitHub Actions 的仓库检查通过。任务 #2、#3 已关闭，老师实际反馈仍待发生。
 
 ## 尚需确认
@@ -22,7 +22,7 @@
 
 收到反馈后补充：老师指出的主要问题、团队选择的修订、对应 Issue / PR 和验收证据，以及下一阶段调整。用户研究和效果结论应保留数据来源与局限，不能把合成示例当作实测。
 
-相关入口：[团队计划](../mgmt/team_plan.md) · [反馈记录](../mgmt/feedback.md) · [评测与迭代计划](../evaluation-and-roadmap.md)。
+相关入口：[团队计划](../mgmt/team_plan.md) · [反馈记录](teacher_feedback.md) · [评测与迭代计划](../algorithm/evaluation.md)。
 
 ## 后续复盘索引
 
@@ -33,3 +33,7 @@
 - [2026-10-19 课程模板对齐与代码职责整理](2026-10-19-repository-organization.md)
 
 - [2026-10-19 按老师目录收拢仓库](2026-10-19-course-layout.md)
+
+- [2026-10-19 文档归入课程五类目录](2026-10-19-docs-consolidation.md)
+- [教师反馈记录](teacher_feedback.md)
+- [第一周提交证据](week1_submission.md)

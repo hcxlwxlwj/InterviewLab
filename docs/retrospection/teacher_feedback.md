@@ -18,7 +18,7 @@
 | 模板与案例 | [产品描述模板](https://github.com/bettermorn/IntelligentSWEPractice/blob/main/courseware/pages/part1analyze.md#产品描述)、[参考案例](https://github.com/bettermorn/IntelligentSWEPractice/blob/main/courseware/pages/part1analyze.md#产品描述参考案例)、[案例续](https://github.com/bettermorn/IntelligentSWEPractice/blob/main/courseware/pages/part1analyze.md#产品描述参考案例续) |
 | 处理决定 | 接受。课程五类目录承载当前正文，问题定义保留 5W1H 并按六行模板重写；同步整个文档集 |
 | 对应文件 | [问题定义](../requirements/problem_definition.md)、[需求导航](../requirements/README.md)、[总导航](../README.md) |
-| 状态 | 本地文档修订与检查完成；证据见[本轮复盘](../retrospection/2026-10-15-scope-revision.md)。尚未推送、合并或获得教师验收确认 |
+| 状态 | 本地文档修订与检查完成；证据见[本轮复盘](2026-10-15-scope-revision.md)。尚未推送、合并或获得教师验收确认 |
 | 负责人/排期 | 责任角色为产品与需求、软件、AI 和测试；具体成员与截止日期待团队确认 |
 
 教师要求涉及描述格式与文档组织；下节的产品范围调整来自用户，不归因为教师提出的原话。
@@ -49,7 +49,7 @@
 - 阶段 A 为基础闭环和文本联调过渡；阶段 B 交付首版核心实时语音与基础多模态，阶段 C 评测。继续只修订文档，六界面结构、多简历库和可选代码考核保留。
 - 产品描述直接说明目标用户、需求、能力与设计重点；效果仍为待验证目标。
 
-影响范围为需求、原型、数据接口、Agent、评测、README 与过程计划。当前正文以各目录中的 v0.2 为准，检查证据追加到[本轮复盘](../retrospection/2026-10-15-scope-revision.md)。
+影响范围为需求、原型、数据接口、Agent、评测、README 与过程计划。当前正文以各目录中的 v0.2 为准，检查证据追加到[本轮复盘](2026-10-15-scope-revision.md)。
 
 ## 5. 后续记录规则
 

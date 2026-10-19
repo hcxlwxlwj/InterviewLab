@@ -18,7 +18,7 @@ InterviewLab/
 ├── docs/
 │   ├── requirements/       # 问题定义、功能、非功能、用户故事
 │   ├── algorithm/          # 研究、评测、content 资料
-│   ├── software/           # 架构、接口、模块与原型
+│   ├── software/           # 架构、接口与原型
 │   ├── mgmt/               # 协作、团队、沟通与风险
 │   └── retrospection/      # 按日期保留复盘
 ├── tests/
@@ -60,7 +60,7 @@ backend/src/content/demo.ts → 合成样例与演示报告
 | 数据库与真实身份（后续） | `backend` 的仓储/服务适配 | 归属、并发、删除与集成测试 |
 | 模型与向量检索（后续） | `backend` 的供应商/知识适配 | Agent 权限、引用与效果评测 |
 
-目录内说明见[代码导航](../../code/README.md)及[测试导航](../../tests/README.md)。已有路由和组件兼容入口保留；旧文档路径保留导航，不维护重复正文。
+目录内说明见[代码导航](../../code/README.md)及[测试导航](../../tests/README.md)。已有路由和组件兼容入口保留；文档只维护当前正文，旧目录由 Git 历史追溯。
 
 ## 当前文档与历史记录
 
@@ -68,7 +68,7 @@ backend/src/content/demo.ts → 合成样例与演示报告
 - `requirements`、`algorithm`、`software` 更新为当前目标与设计；正文开头区分已实现原型和未接入服务，避免把目标写成验收结果。
 - `mgmt` 的计划可以更新；已发生的沟通、反馈和提交记录保留日期与依据。`retrospection` 按日期追加，不改写旧的决定。
 - 原型设计提示、参考图与实测截图仍在 `software/prototype`；首轮实现记录标注为阶段记录，当前范围指向后续扩展说明。
-- 旧 `docs/*.md` 和 `docs/modules` 仅用于兼容导航，不重新复制正文。
+- `requirements` 的四份正文分别维护问题、功能、非功能和验收；原 `modules` 内容已按职责并入，不保留重复文件。
 
 ## 接入数据库与 Agent 前的剩余工作
 

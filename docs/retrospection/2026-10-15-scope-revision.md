@@ -40,7 +40,7 @@
 3. 同题重练和人工同类新题中，学生是否更能独立讲清贡献、取舍与结果边界。
 4. 语音基础观测的质量和体验成本是否可接受。
 
-后续对照使用相同学生材料与相近时间，包含现有陪练和认真提示的通用模型，不预设本系统优胜。相关入口：[需求](../requirements/README.md)、[调研](../algorithm/research.md)、[评测](../algorithm/evaluation.md)、[教师反馈](../mgmt/feedback.md)。
+后续对照使用相同学生材料与相近时间，包含现有陪练和认真提示的通用模型，不预设本系统优胜。相关入口：[需求](../requirements/README.md)、[调研](../algorithm/research.md)、[评测](../algorithm/evaluation.md)、[教师反馈](teacher_feedback.md)。
 
 ## 同日追加决定：实时交互与多模态表达复盘
 

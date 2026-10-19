@@ -87,15 +87,15 @@
 
 | 场景 | 预期行为 | 关联模块 |
 | --- | --- | --- |
-| 选简历后切换另一个版本 | 重新确认重点经历及材料摘要 | [个人材料](../modules/02-personal-materials.md)、[配置](../modules/03-interview-configuration.md) |
-| 不上传简历或解析失败 | 提供手填或岗位通用问答 | [配置](../modules/03-interview-configuration.md) |
-| 拒绝麦克风、识别失败、播报失败 | 文本可继续，不丢已保存回答 | [语音](../modules/06-voice-and-speech.md) |
-| 思考、口头自纠、误截续答 | 端点不急切截断，追加到原回合并保留事件 | [语音](../modules/06-voice-and-speech.md) |
-| 关闭镜头、遮挡、媒体到期/删除 | 不扣专业分；低质量不可用，过期不伪造回放 | [语音](../modules/06-voice-and-speech.md) |
-| 暂停、重连、取消旧输出 | 权威状态恢复，不重计回合或重置时长 | [模拟](../modules/05-mock-interview.md) |
-| 无代码题、跳题、零回答、部分报告 | 未观察/范围标记正确，无虚假零分 | [报告](../modules/07-feedback-report.md) |
-| 只运行代码或运行失败 | 不冒充正式提交或正确答案 | [代码](../modules/10-code-assessment.md) |
-| 重练和删除来源 | 明确对照版本，关联清理和失效提示 | [重练](../modules/08-retry-and-progress.md) |
+| 选简历后切换另一个版本 | 重新确认重点经历及材料摘要 | [个人材料](../../requirements/functional_spec.md#feature-materials)、[配置](../../requirements/functional_spec.md#feature-configuration) |
+| 不上传简历或解析失败 | 提供手填或岗位通用问答 | [配置](../../requirements/functional_spec.md#feature-configuration) |
+| 拒绝麦克风、识别失败、播报失败 | 文本可继续，不丢已保存回答 | [语音](../../requirements/functional_spec.md#feature-speech) |
+| 思考、口头自纠、误截续答 | 端点不急切截断，追加到原回合并保留事件 | [语音](../../requirements/functional_spec.md#feature-speech) |
+| 关闭镜头、遮挡、媒体到期/删除 | 不扣专业分；低质量不可用，过期不伪造回放 | [语音](../../requirements/functional_spec.md#feature-speech) |
+| 暂停、重连、取消旧输出 | 权威状态恢复，不重计回合或重置时长 | [模拟](../../requirements/functional_spec.md#feature-interview) |
+| 无代码题、跳题、零回答、部分报告 | 未观察/范围标记正确，无虚假零分 | [报告](../../requirements/functional_spec.md#feature-report) |
+| 只运行代码或运行失败 | 不冒充正式提交或正确答案 | [代码](../../requirements/functional_spec.md#feature-code-assessment) |
+| 重练和删除来源 | 明确对照版本，关联清理和失效提示 | [重练](../../requirements/functional_spec.md#feature-retry) |
 
 所有主要操作支持键盘、清晰焦点与可读状态，图表提供文本替代。原型使用合成材料并区分演示与真实检测，不能用界面状态替代真实能力验收。公共定义以[数据与接口](../data_and_interfaces.md)为准，需求追溯见[用户故事](../../requirements/user_stories.md)。
 
