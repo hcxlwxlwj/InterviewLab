@@ -1,5 +1,5 @@
 'use client';
-import { JOBS } from '@interviewlab/content';
+import { JOBS } from '@interviewlab/backend/content';
 import { type JobTarget, type ResumeDocument } from '@interviewlab/core';
 import { useState } from 'react';
 import { demoClient } from '../lib/demo-client';

@@ -1,4 +1,4 @@
-import { getJob } from '@interviewlab/content';
+import { getJob } from '../content';
 import { z } from 'zod';
 export const configurationSchema = z.object({
   job: z.string().refine((id) => !!getJob(id), '岗位模板不可用'),

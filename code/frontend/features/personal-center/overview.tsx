@@ -1,5 +1,5 @@
 'use client';
-import { getJob } from '@interviewlab/content';
+import { getJob } from '@interviewlab/backend/content';
 import { ArrowRight, Bookmark, FileText, FolderOpen } from 'lucide-react';
 import Link from 'next/link';
 import { EmptyState } from '../../components/shared';

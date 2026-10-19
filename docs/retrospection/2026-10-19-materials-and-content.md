@@ -8,4 +8,4 @@
 
 界面继续遵守用户对正常网站的要求：清楚的字号、有限辅助说明、列表与表格为主。新页面先生成参考稿，按实际模块实现，不复制图中虚构数据或装饰模块。
 
-当前限制及证据见[扩展实现记录](../software/prototype/library-expansion.md)和[内容维护说明](../../content/README.md)。后续重点是内容专家复核、鉴权及云端持久化，再接入检索与Agent，而不是依靠问题数量宣称系统质量已得到验证。
+当前限制及证据见[扩展实现记录](../software/prototype/library-expansion.md)和[内容维护说明](../algorithm/content/README.md)。后续重点是内容专家复核、鉴权及云端持久化，再接入检索与Agent，而不是依靠问题数量宣称系统质量已得到验证。

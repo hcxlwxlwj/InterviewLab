@@ -1,5 +1,5 @@
-import { CONTENT_SOURCES, getJob, JOB_CATEGORIES, searchJobs } from '@interviewlab/content';
-import { EXPERIENCES, reportFor, RESUMES, sampleSession } from '@interviewlab/content/demo';
+import { CONTENT_SOURCES, getJob, JOB_CATEGORIES, searchJobs } from '../content';
+import { EXPERIENCES, reportFor, RESUMES, sampleSession } from '../content/demo';
 import { DEFAULT_PREFERENCES, type CareerStage } from '@interviewlab/core';
 import { API_CONTRACT } from './contracts';
 import { contentJson, error, json } from './responses';

@@ -4,11 +4,12 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./content": "./src/content/index.ts",
+    "./content/demo": "./src/content/demo.ts"
   },
   "dependencies": {
     "@interviewlab/core": "*",
-    "zod": "^4.1.0",
-    "@interviewlab/content": "*"
+    "zod": "^4.1.0"
   }
 }

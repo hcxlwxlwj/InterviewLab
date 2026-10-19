@@ -1,5 +1,5 @@
 'use client';
-import { JOBS, getJob } from '@interviewlab/content';
+import { JOBS, getJob } from '@interviewlab/backend/content';
 import { type Experience, type ResumeContent, type ResumeDocument } from '@interviewlab/core';
 import { ArrowDown, ArrowUp, Plus, Save, Trash2 } from 'lucide-react';
 import Link from 'next/link';

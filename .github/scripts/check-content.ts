@@ -1,4 +1,4 @@
-import { ALL_JOB_TEMPLATES, CONTENT_SOURCES, JOB_CATEGORIES } from '@interviewlab/content';
+import { ALL_JOB_TEMPLATES, CONTENT_SOURCES, JOB_CATEGORIES } from '@interviewlab/backend/content';
 import assert from 'node:assert/strict';
 
 export function validateContent() {

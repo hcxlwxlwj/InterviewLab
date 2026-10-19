@@ -6,16 +6,16 @@
 
 ## 本地运行
 
-已使用 Node.js 24、npm 11 验证。当前原型在 `codex/initial-ui-prototype` 分支；合并前 `main` / `develop` 不包含这些页面。
+已使用 Node.js 24、npm 11 验证，当前原型已合入 `main`。
 
 ```bash
-git clone --branch codex/initial-ui-prototype https://github.com/hcxlwxlwj/InterviewLab.git
+git clone https://github.com/hcxlwxlwj/InterviewLab.git
 cd InterviewLab
 npm ci
 npm run dev
 ```
 
-已有仓库先保存自己的改动，再执行 `git fetch origin`、`git switch codex/initial-ui-prototype`、`git pull --ff-only`，然后安装依赖并启动。无需数据库、Docker、供应商密钥或 `.env`。
+已有仓库先保存自己的改动，再执行 `git fetch origin`、`git switch main`、`git pull --ff-only`，然后安装依赖并启动。无需数据库、Docker、供应商密钥或 `.env`。
 
 打开 [首页](http://127.0.0.1:3000/)、[岗位库](http://127.0.0.1:3000/jobs)或[个人中心](http://127.0.0.1:3000/me)。协作者各自在自己的电脑执行上述命令；localhost 不是可分享给其他电脑的在线预览地址，共享访问需要另行部署。
 
@@ -38,21 +38,18 @@ npm run dev
 
 ## 仓库结构
 
-采用 [IntelligentSWEPractice 课程模板](https://github.com/bettermorn/IntelligentSWEPractice#课程成果)的文档、代码与测试分层，并增加公开内容适配包。
+采用 [IntelligentSWEPractice 课程模板](https://github.com/bettermorn/IntelligentSWEPractice#课程成果)的文档、代码与测试分层；根目录按课程结构收拢，运行必需的 npm/TypeScript 配置保留。
 
 ```text
-docs/              requirements / algorithm / software / mgmt / retrospection
+docs/              requirements / algorithm（含 content）/ software / mgmt / retrospection
 code/frontend/     Next.js 页面、组件与标签页演示客户端
-code/backend/      HTTP 路由、请求校验与服务端接入合同
+code/backend/      HTTP 接口、服务合同、公开内容适配
 code/core_engine/  不依赖框架或存储的共享类型与领域规则
-code/content/      公开 JSON 适配与独立的合成演示样例
-content/           岗位、问题、来源、版本与审核资料
 tests/             unit / integration
-scripts/           内容与依赖边界检查
-.github/           CI、文档检查与协作模板
+.github/           workflows、scripts 与协作模板
 ```
 
-开始修改前阅读[工程目录与职责](docs/software/repository_structure.md)。[代码导航](code/README.md)、[测试导航](tests/README.md)和[内容维护](content/README.md)分别说明修改入口、验证范围和审核流程。
+开始修改前阅读[工程目录与职责](docs/software/repository_structure.md)。[代码导航](code/README.md)、[测试导航](tests/README.md)和[内容维护](docs/algorithm/content/README.md)分别说明修改入口、验证范围和审核流程。
 
 ## 文档入口
 
@@ -82,6 +79,6 @@ npm start
 
 接下来先建立异步客户端、真实身份和数据库仓储，再通过核心适配接口接入知识检索与 Agent；其后实现实时语音与基础表达观测，最后开展对照评测和小规模试用。语音是目标主线，当前文字原型用于先验证流程。材料归属、快照、删除和媒体保留规则见[数据合同](docs/software/data_and_interfaces.md)。
 
-任务分支经 PR 合入 `develop`，阶段验收后再合入 `main`；操作及检查见[协作须知](COLLABORATION.md)。[第一周提交记录](docs/mgmt/week1_submission.md)保留此前交付证据，不倒写为本次结果。
+任务分支经 PR 合入 `develop`，阶段验收后再合入 `main`；操作及检查见[协作须知](docs/mgmt/COLLABORATION.md)。[第一周提交记录](docs/mgmt/week1_submission.md)保留此前交付证据，不倒写为本次结果。
 
 不提交密钥、真实简历、录音和用户记录。公开岗位属于平台原创整理的通用参考，题目不标为企业真实面试题；来源与素材使用依据在内容和原型文档维护。

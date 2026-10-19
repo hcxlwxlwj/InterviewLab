@@ -1,5 +1,5 @@
 'use client';
-import { JOBS, JOB_CATEGORIES, getJob } from '@interviewlab/content';
+import { JOBS, JOB_CATEGORIES, getJob } from '@interviewlab/backend/content';
 import {
   TYPE_LABELS,
   defaultConfiguration,

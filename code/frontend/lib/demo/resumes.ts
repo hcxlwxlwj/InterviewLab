@@ -1,4 +1,4 @@
-import { getJob } from '@interviewlab/content';
+import { getJob } from '@interviewlab/backend/content';
 import { type Experience, type ResumeDocument } from '@interviewlab/core';
 import { emptyResumeContent, readDemo, saveDemo } from './state';
 import { checkResumeId, nameChecked, now } from './validation';

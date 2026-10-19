@@ -1,5 +1,5 @@
 'use client';
-import { CONTENT_SOURCES, JOB_CATEGORIES } from '@interviewlab/content';
+import { CONTENT_SOURCES, JOB_CATEGORIES } from '@interviewlab/backend/content';
 import { STAGE_LABELS, type CareerStage, type JobTemplate } from '@interviewlab/core';
 import { ArrowRight, Bookmark, Copy, ExternalLink, Search } from 'lucide-react';
 import Link from 'next/link';

@@ -1,4 +1,4 @@
-import { getJob, JOBS } from '@interviewlab/content';
+import { getJob, JOBS } from '@interviewlab/backend/content';
 import { notFound } from 'next/navigation';
 import { JobDetail } from '../../../components/job-library';
 export function generateStaticParams() {

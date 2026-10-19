@@ -1,5 +1,5 @@
 'use client';
-import { getJob } from '@interviewlab/content';
+import { getJob } from '@interviewlab/backend/content';
 import { Bookmark, Search, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { EmptyState, formatDate } from '../../components/shared';

@@ -16,6 +16,6 @@
 
 `buildQuestions(configuration, template)` 显式接收模板；新面试由内容适配器解析岗位，历史面试使用被冻结的内容，不读取不断变化的全局题库。默认配置沿用原型初始值；前端演示客户端会按当前简历和偏好重新选择材料。
 
-合成简历、示例会话与演示报告已移到 `@interviewlab/content/demo`。此处定义的 `DataClient` 是同步演示合同，不是已完成的 HTTP 客户端；真实服务需要独立的异步合同、加载及错误处理。
+合成简历、示例会话与演示报告已移到 `@interviewlab/backend/content/demo`。此处定义的 `DataClient` 是同步演示合同，不是已完成的 HTTP 客户端；真实服务需要独立的异步合同、加载及错误处理。
 
 在仓库根目录执行 `npm test` 和 `npm run boundaries:check`。规则测试在[单元测试目录](../../tests/unit)。
