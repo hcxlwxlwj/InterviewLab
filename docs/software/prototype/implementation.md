@@ -85,3 +85,5 @@ npm run dev
 | 报告 | [桌面](screenshots/report-desktop.jpg) | [手机](screenshots/report-mobile.jpg) |
 | 个人中心 | [桌面](screenshots/personal-center-desktop.jpg) | [手机](screenshots/personal-center-mobile.jpg) |
 | 代码 / 重练 | [代码](screenshots/code-desktop.jpg) | [回答对照](screenshots/comparison-desktop.jpg) |
+
+源码已按职责拆分，当前位置见[工程目录与职责](../repository_structure.md)；本页保留首轮实现记录。

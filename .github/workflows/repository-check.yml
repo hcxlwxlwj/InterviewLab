@@ -2,7 +2,7 @@ name: Repository checks
 
 on:
   push:
-    branches: [main, develop, "codex/**", "feature/**", "fix/**"]
+    branches: [main, develop, 'codex/**', 'feature/**', 'fix/**']
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
-          python-version: "3.13"
+          python-version: '3.13'
       - name: Check structure and local Markdown links
         run: python .github/scripts/check_repository.py
 
@@ -33,12 +33,13 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
-          node-version: "24"
+          node-version: '24'
           cache: npm
       - run: npm ci
+      - run: npm run boundaries:check
       - run: npm run typecheck
       - run: npm run content:check
       - run: npm test
       - run: npm run build
         env:
-          NEXT_TELEMETRY_DISABLED: "1"
+          NEXT_TELEMETRY_DISABLED: '1'

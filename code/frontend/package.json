@@ -24,6 +24,7 @@
     "@uiw/react-codemirror": "^4.25.0",
     "@codemirror/lang-cpp": "^6.0.3",
     "@codemirror/lang-java": "^6.0.2",
-    "@codemirror/lang-python": "^6.2.1"
+    "@codemirror/lang-python": "^6.2.1",
+    "@interviewlab/content": "*"
   }
 }

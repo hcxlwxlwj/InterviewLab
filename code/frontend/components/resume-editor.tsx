@@ -1,18 +1,13 @@
 'use client';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { JOBS, getJob } from '@interviewlab/content';
+import { type Experience, type ResumeContent, type ResumeDocument } from '@interviewlab/core';
 import { ArrowDown, ArrowUp, Plus, Save, Trash2 } from 'lucide-react';
-import {
-  JOBS,
-  getJob,
-  type ResumeDocument,
-  type Experience,
-  type ResumeContent,
-} from '@interviewlab/core';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { demoClient, emptyResumeContent } from '../lib/demo-client';
-import { DemoNotice, EmptyState, Loading, useDemoState } from './shared';
 import { WorkspaceFrame } from './personal-workspace';
+import { DemoNotice, EmptyState, Loading, useDemoState } from './shared';
 import { Button } from './ui/button';
 
 export default function ResumeEditor() {

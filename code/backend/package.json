@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@interviewlab/core": "*",
-    "zod": "^4.1.0"
+    "zod": "^4.1.0",
+    "@interviewlab/content": "*"
   }
 }

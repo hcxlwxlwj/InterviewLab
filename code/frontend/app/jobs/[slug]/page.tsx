@@ -1,5 +1,5 @@
+import { getJob, JOBS } from '@interviewlab/content';
 import { notFound } from 'next/navigation';
-import { getJob, JOBS } from '@interviewlab/core';
 import { JobDetail } from '../../../components/job-library';
 export function generateStaticParams() {
   return JOBS.map((j) => ({ slug: j.slug }));

@@ -1,7 +1,5 @@
 'use client';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useState } from 'react';
+import { JOBS } from '@interviewlab/content';
 import {
   ArrowDown,
   ArrowRight,
@@ -12,7 +10,9 @@ import {
   Play,
   RotateCcw,
 } from 'lucide-react';
-import { JOBS } from '@interviewlab/core';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
 import { Footer, Header, JobIcon } from '../components/shared';
 import { Button } from '../components/ui/button';
 export default function Home() {

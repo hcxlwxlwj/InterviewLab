@@ -1,9 +1,5 @@
+import { ALL_JOB_TEMPLATES, CONTENT_SOURCES, JOB_CATEGORIES } from '@interviewlab/content';
 import assert from 'node:assert/strict';
-import {
-  ALL_JOB_TEMPLATES,
-  CONTENT_SOURCES,
-  JOB_CATEGORIES,
-} from '../code/core_engine/src/catalog';
 
 export function validateContent() {
   const sourceIds = new Set(CONTENT_SOURCES.map((s) => s.id)),

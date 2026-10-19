@@ -1,7 +1,12 @@
 'use client';
-import { Suspense, useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { JOBS, JOB_CATEGORIES, getJob } from '@interviewlab/content';
+import {
+  TYPE_LABELS,
+  defaultConfiguration,
+  templateJd,
+  type Configuration,
+  type JobTarget,
+} from '@interviewlab/core';
 import {
   ArrowRight,
   CameraOff,
@@ -11,29 +16,21 @@ import {
   MicOff,
   ShieldCheck,
 } from 'lucide-react';
-import {
-  JOB_CATEGORIES,
-  getJob,
-  templateJd,
-  type JobTarget,
-  JOBS,
-  TYPE_LABELS,
-  defaultConfiguration,
-  type Configuration,
-} from '@interviewlab/core';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import {
   Breadcrumb,
   DemoNotice,
   Footer,
   Header,
-  JobIcon,
   Loading,
   Modal,
   useDemoState,
 } from '../../../components/shared';
+import { TargetEditor, emptyTarget } from '../../../components/target-editor';
 import { Button } from '../../../components/ui/button';
 import { demoClient, newConfiguration } from '../../../lib/demo-client';
-import { TargetEditor, emptyTarget } from '../../../components/target-editor';
 
 function Choices<T extends string | number>({
   label,
