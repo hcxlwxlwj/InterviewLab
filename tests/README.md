@@ -21,5 +21,8 @@
 - integration/backend.test.ts：无需数据库的 Fastify 注入测试，验证公开岗位、游标、schema、错误、能力缺失、身份边界与 OpenAPI。
 - npm run test:db：运行 integration/database，必须配置独立 interviewlab_test* 数据库；执行迁移、回滚、并发幂等、outbox、租约/次数限制、归属和真实 pg-boss worker 测试。
 - npm run test:process：先 build:backend 和 test:db；启动编译产物验证无库 API、有库 worker、失败启动和优雅停止/重启。
+- integration/database/auth.test.ts：真实 Better Auth/Drizzle 密码哈希、Cookie、退出/过期/撤销、角色、资源归属、同源策略及跨实例限流。
+- unit/http-client.test.ts：同源路径限制、幂等键、错误体、取消/超时及写入不自动重试。
+- npm run test:web：先 npm run build，使用真实 Next.js 生产代理与 PostgreSQL 验证 Cookie 往返、登录/退出、Origin、错误、游标和后端断开后不回退合成接口。代理目标必须为本机且端口空闲。
 
-数据库测试会清空五张基础表；缺失数据库直接失败，不会跳过。真实测试与普通 npm test 分开，避免首次运行原型要求安装数据库。CI 的 backend-infrastructure 使用 PostgreSQL 16 运行真实测试，application 保持原有无库检查。启动和测试库命令见[后端说明](../code/backend/README.md)。
+数据库测试会清空公共基础及认证会话/限流测试表；缺失数据库直接失败，不会跳过。真实测试与普通 npm test 分开，避免首次运行原型要求安装数据库。CI 的 backend-infrastructure 使用 PostgreSQL 16 运行数据库、进程及真实代理测试，application 保持无库检查。启动和测试库命令见[后端说明](../code/backend/README.md)。

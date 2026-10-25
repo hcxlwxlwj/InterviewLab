@@ -8,6 +8,15 @@ const environmentSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_HOST: z.string().min(1).default('127.0.0.1'),
   API_PORT: z.coerce.number().int().min(1).max(65535).default(3001),
+  PUBLIC_ORIGIN: z.string().url().default('http://127.0.0.1:3000'),
+  AUTH_ENABLED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
+  BETTER_AUTH_SECRET: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.string().min(32).optional(),
+  ),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   DATABASE_URL: optionalUrl,
   DATABASE_POOL_SIZE: z.coerce.number().int().min(1).max(50).default(10),
@@ -29,6 +38,20 @@ export function loadConfig(env: Record<string, unknown> = process.env): BackendC
         parsed.error.issues.map((issue) => issue.path.join('.') + ' ' + issue.message).join('; '),
     );
   const config = parsed.data;
+  const origin = new URL(config.PUBLIC_ORIGIN);
+  if (!['http:', 'https:'].includes(origin.protocol) || origin.origin !== config.PUBLIC_ORIGIN) {
+    throw new ConfigurationError(
+      'Invalid configuration: PUBLIC_ORIGIN must be an HTTP origin without a path',
+    );
+  }
+  if (config.AUTH_ENABLED && (!config.DATABASE_URL || !config.BETTER_AUTH_SECRET)) {
+    throw new ConfigurationError(
+      'Invalid configuration: authentication requires DATABASE_URL and BETTER_AUTH_SECRET',
+    );
+  }
+  if (config.AUTH_ENABLED && config.NODE_ENV === 'production' && origin.protocol !== 'https:') {
+    throw new ConfigurationError('Invalid configuration: production authentication requires HTTPS');
+  }
   if (config.DATABASE_URL && !/^postgres(ql)?:\/\//.test(config.DATABASE_URL)) {
     throw new ConfigurationError('Invalid configuration: DATABASE_URL must use PostgreSQL');
   }

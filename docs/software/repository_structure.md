@@ -34,10 +34,11 @@ InterviewLab/
 
 ## 当前运行和依赖关系
 
-`npm run dev` 只启动 Next.js；`/api/v1` 由 Route Handlers 转交 `@interviewlab/backend`。浏览器交互使用标签页内演示客户端，未通过 HTTP 保存个人材料。
+`npm run dev` 只启动 Next.js；真实 `/api/v1` 同源代理到 npm run dev:api 启动的 Fastify。原 Route Handlers 合成接口迁至 `/api/demo/v1`。业务页面仍使用标签页演示客户端，未通过 HTTP 保存个人材料；公共 /login 和会话上下文已经调用真实认证。
 
 ```text
-Next.js app/api → backend HTTP → core / backend 内容模块
+浏览器 lib/api → Next.js /api/v1 代理 → Fastify → 模块服务
+Next.js app/api/demo → 旧合成 HTTP → core / backend 内容模块
 Next.js 页面/演示客户端 → backend 的公开 content 子入口 / core
 backend/src/content/index.ts → docs/algorithm/content/*.json
 backend/src/content/demo.ts → 合成样例与演示报告
@@ -49,7 +50,7 @@ backend/src/content/demo.ts → 合成样例与演示报告
 
 ## 修改任务应落在哪里
 
-独立真实后端由 npm run dev:api / dev:worker 启动，不经过旧演示路由。src/server 负责装配，src/modules/jobs 为完整示例，src/foundation/database/tasks 是公共基础，src/entrypoints 为命令；业务 schema 随模块建立。前端暂未迁移，后续通过同源 HTTP 接入。新 HTTP schema 不放入旧演示 src/http。成员流程见[后端 README](../../code/backend/README.md)。
+独立后端由 npm run dev:api / dev:worker 启动，不经过旧演示路由。src/server 负责装配，src/modules/jobs 为完整示例，src/foundation/database/tasks 是公共基础，src/modules/accounts 包含认证适配与表，src/entrypoints 为命令。前端 lib/api 和 SessionProvider 由公共负责人维护，业务页面由模块负责人迁移。新 schema 不放入旧演示 src/http。成员流程见[后端 README](../../code/backend/README.md)及[前端接入](../../code/frontend/README.md)。
 
 | 任务 | 代码位置 | 同步文档 / 验证 |
 | --- | --- | --- |

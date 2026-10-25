@@ -1,0 +1,22 @@
+.auth-panel {
+  max-width: 480px;
+  margin: 0 auto;
+}
+.auth-panel > * + * {
+  margin-top: 20px;
+}
+.auth-form {
+  display: grid;
+  gap: 20px;
+}
+.auth-form > label:not(.row-actions) {
+  display: grid;
+  gap: 8px;
+}
+.auth-form input:not([type='checkbox']) {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border, #d9d5c9);
+  border-radius: 8px;
+  background: white;
+}

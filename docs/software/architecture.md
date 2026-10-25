@@ -1,10 +1,10 @@
 # 总体技术架构
 
-版本：v0.5 · 更新：2026-10-25 · 状态：独立后端公共骨架已实现；各模块完整业务及外部能力按阶段接入。
+版本：v0.6 · 更新：2026-10-25 · 状态：公共骨架、同源接入与受邀账号认证已实现；各模块业务及外部能力按阶段接入。
 
 ## 0. 当前实现与本次设计的关系
 
-前端仍运行原 Next.js 演示接口和标签页客户端。新增独立 Fastify API 与 worker 已可运行，具备公开岗位读取、PostgreSQL 公共迁移、事务/幂等/outbox/任务基础和 OpenAPI。认证、私有业务、模型和实时语音尚未接通。
+业务页面仍运行标签页演示客户端；原合成 HTTP 入口移至 /api/demo/v1。/api/v1 经 Next.js 同源代理到独立 Fastify，公共 HTTP 客户端、登录页、会话上下文和 Better Auth/Drizzle 受邀账号认证已接入。API/worker 具备公开岗位、公共迁移、事务/幂等/outbox/任务基础和 OpenAPI；私有业务、模型和实时语音尚未接通。
 
 下文保留全产品目标。已实现范围和启动方式以[后端 README](../../code/backend/README.md)为准，不能将完整目标当成已验收能力。原型与真实服务入口分开，不自动上传浏览器个人材料。
 
@@ -40,11 +40,11 @@ flowchart LR
 
 统一入口将页面转给 Next.js，将 `/api/v1` 和 WebSocket 升级请求转给 Fastify。开发同样通过代理访问后端，浏览器保持同源 Cookie；仅部署独立后端不意味着让浏览器直接携带凭证访问任意域名。
 
-官方依据：[Fastify 模块机制](https://fastify.dev/docs/latest/Reference/)、[WebSocket 接入](https://github.com/fastify/fastify-websocket)、[Drizzle 向量检索](https://orm.drizzle.team/docs/guides/vector-similarity-search)、[Better Auth 的 Fastify 集成](https://better-auth.com/docs/integrations/fastify)、[Drizzle 认证适配](https://better-auth.com/docs/adapters/drizzle)、[pg-boss](https://github.com/timgit/pg-boss)。公共基础依赖已锁定并验证；Better Auth、pgvector 和供应商待各阶段接入。
+官方依据：[Fastify 模块机制](https://fastify.dev/docs/latest/Reference/)、[WebSocket 接入](https://github.com/fastify/fastify-websocket)、[Drizzle 向量检索](https://orm.drizzle.team/docs/guides/vector-similarity-search)、[Better Auth 的 Fastify 集成](https://better-auth.com/docs/integrations/fastify)、[Drizzle 认证适配](https://better-auth.com/docs/adapters/drizzle)、[pg-boss](https://github.com/timgit/pg-boss)。公共基础和认证依赖已锁定；pgvector 和供应商待各阶段接入。
 
 ## 2. 六个业务模块
 
-2026-10-25 实现说明：独立 API 默认监听 127.0.0.1:3001；现有 Next.js 演示继续使用。六模块职责保持不变，当前只有公开岗位业务读取和公共基础已实现。API/worker 独立构建，未将所有规划模块生成为空 CRUD。PostgreSQL 暂不安装 pgvector，知识检索方案由模块通过接口接入；认证保留 Better Auth 方向，当前不开放真实账号。
+2026-10-25 实现说明：独立 API 默认监听 127.0.0.1:3001；现有业务演示继续使用。六模块职责保持不变，当前已实现公开岗位查询、公共基础与受邀账号认证，AUTH_ENABLED=true 时开放登录。API/worker 独立构建，未将规划模块生成为空 CRUD。PostgreSQL 暂不安装 pgvector，知识检索由模块通过接口接入。
 
 | 模块 | 拥有的数据与服务 | 对其他模块提供的能力 |
 | --- | --- | --- |
@@ -117,6 +117,6 @@ Agent、数据库、WebSocket 和 worker 是上述业务的实现能力，不是
 
 验证包含两用户隔离、材料版本、重复提交、暂停/结束竞态、进程重启、断线、模型失败、旧任务与删除、内容发布/撤回、零回答与未观察。分别验收 OpenAPI 合同、数据库一致性、浏览器主路径和 Agent 质量，不以服务启动成功代替业务可用。
 
-2026-10-25 本轮已实现公共后端骨架、岗位只读模块、迁移和测试，未实现面试/报告等业务闭环；通过本地 Git 提交交付，未推送或部署。原型启动方式保持兼容。
+2026-10-25 已实现公共后端骨架、岗位只读模块、迁移、同源代理、HTTP 客户端和受邀账号认证，未实现面试/报告等业务闭环。通过功能分支提交交付，不自动部署；业务原型页面仍可独立启动，真实联调需同时运行 API。
 
 关联：[功能需求](../requirements/functional_spec.md) · [数据与接口](data_and_interfaces.md) · [知识与 Agent](../algorithm/knowledge_and_agent.md) · [评测](../algorithm/evaluation.md)。

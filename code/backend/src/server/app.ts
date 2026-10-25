@@ -11,7 +11,14 @@ import { z } from 'zod';
 import type { CapabilityView } from '@interviewlab/core';
 import { loadConfig, type BackendConfig } from '../foundation/config';
 import { installErrorHandler, unavailable } from '../foundation/errors';
-import { requireIdentity, type IdentityProvider } from '../foundation/auth';
+import {
+  requireIdentity,
+  requireRole,
+  requireSameOrigin,
+  type IdentityProvider,
+} from '../foundation/auth';
+import { createAuthService } from '../modules/accounts/auth-service';
+import { registerAuthRoutes } from '../modules/accounts/auth-routes';
 import { createDatabase, type Database } from '../database/connection';
 import { errorSchema, taskViewSchema } from '../foundation/schemas';
 import { createTaskService } from '../tasks/service';
@@ -31,7 +38,8 @@ export interface ApplicationOptions {
 export async function buildApp(options: ApplicationOptions = {}) {
   const config = options.config ?? loadConfig();
   const database = options.database ?? (config.DATABASE_URL ? createDatabase(config) : undefined);
-  const identity = options.identity ?? options.services?.accounts;
+  const auth = config.AUTH_ENABLED && database ? createAuthService(database, config) : undefined;
+  const identity = options.identity ?? options.services?.accounts ?? auth;
   const app = Fastify({
     logger:
       options.logger === false
@@ -68,7 +76,7 @@ export async function buildApp(options: ApplicationOptions = {}) {
         openapi: '3.0.3',
         info: {
           title: 'InterviewLab Backend',
-          version: '0.2.0',
+          version: '0.3.0',
           description:
             'Implemented foundation routes only. Synthetic prototype routes are separate.',
         },
@@ -83,8 +91,25 @@ export async function buildApp(options: ApplicationOptions = {}) {
     await app.register(
       async (instance) => {
         const api = instance.withTypeProvider<ZodTypeProvider>();
+        // Every real browser write, including module routes and login/logout, has one origin policy.
+        instance.addHook('onRequest', async (request) => {
+          if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method))
+            requireSameOrigin(request, config.PUBLIC_ORIGIN);
+        });
+        instance.addHook('onRoute', (route) => {
+          const methods = Array.isArray(route.method) ? route.method : [route.method];
+          if (methods.some((method) => !['GET', 'HEAD', 'OPTIONS'].includes(method))) {
+            route.schema = {
+              ...route.schema,
+              response: {
+                ...(route.schema?.response as Record<string, unknown> | undefined),
+                403: errorSchema,
+              },
+            };
+          }
+        });
         const readiness = () =>
-          database?.ready(config.WORKER_STALE_MS) ??
+          database?.ready(config.WORKER_STALE_MS, config.AUTH_ENABLED) ??
           Promise.resolve({ database: false, worker: false });
         api.get(
           '/health',
@@ -127,13 +152,17 @@ export async function buildApp(options: ApplicationOptions = {}) {
         api.get(
           '/capabilities',
           { schema: { tags: ['runtime'], response: { 200: capabilitySchema } } },
-          async () => ({
-            ...(await readiness()),
-            authentication: Boolean(identity),
-            llm: false,
-            private_storage: false,
-          }),
+          async () => {
+            const dependencies = await readiness();
+            return {
+              ...dependencies,
+              authentication: Boolean(identity) && (!auth || dependencies.database),
+              llm: false,
+              private_storage: false,
+            };
+          },
         );
+        await registerAuthRoutes(instance, auth);
         api.get(
           '/tasks/:id',
           {
@@ -157,7 +186,12 @@ export async function buildApp(options: ApplicationOptions = {}) {
         );
         // The API factory registers only supplied module implementations.
         for (const module of modules) {
-          await instance.register(async (scope) => module.register(scope));
+          await instance.register(async (scope) =>
+            module.register(scope, {
+              requireIdentity: (request) => requireIdentity(request, identity),
+              requireRole,
+            }),
+          );
         }
         if (config.NODE_ENV === 'development') {
           api.get('/openapi.json', { schema: { hide: true } }, async () => app.swagger());

@@ -4,6 +4,17 @@ export interface RequestIdentity {
   owner_id: string;
   roles: MemberRole[];
 }
+/** Public session view. Credentials and session tokens never cross this DTO. */
+export interface AuthSession {
+  user: { id: string; name: string; email: string };
+  roles: MemberRole[];
+  expires_at: string;
+}
+export interface SignInInput {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}
 export interface VersionRef {
   id: string;
   version: number;

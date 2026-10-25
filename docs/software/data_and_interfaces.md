@@ -1,10 +1,10 @@
 # 数据与接口合同
 
-版本：v0.5 · 更新：2026-10-25 · 状态：公共骨架和岗位只读 HTTP 已实现，业务合同仍按阶段落地。
+版本：v0.6 · 更新：2026-10-25 · 状态：公共骨架、同源接入、认证和岗位只读 HTTP 已实现，业务合同仍按阶段落地。
 
 ## 0. 当前接口与目标合同
 
-原 Next.js Route Handlers 与同步演示客户端继续保留。新增独立 Fastify 提供公开岗位、健康/就绪、能力状态和需身份的任务查询；已生成的 OpenAPI 只列真实注册路由。PostgreSQL 五张公共表、事务、幂等、outbox 和 pg-boss worker 已实现；私有业务和认证尚未接通。
+原同步演示客户端继续保留，Next.js 合成接口迁至 /api/demo/v1。/api/v1 经同源代理转发 Fastify，提供公开岗位、健康/就绪、能力状态、认证和需身份的任务查询；OpenAPI 只列实际路由。PostgreSQL 五张公共表、五张认证/限流表、事务、幂等、outbox 和 pg-boss worker 已实现；私有业务尚未接通。前端使用统一 apiRequest 和 SessionProvider，模块接入见前后端 README。
 
 本文第 1–9 节保留全产品合同；已实现范围见后端 README 及下方骨架说明。原 API_CONTRACT、Session 和同步 DataClient 属于演示合同，不能当作新的真实 HTTP 客户端。
 
@@ -107,7 +107,7 @@
 
 | 方法与路径 | 功能/输入输出 | 阶段 |
 | --- | --- | --- |
-| `/auth/*` | Better Auth 原生协议：POST /auth/sign-in/email、POST /auth/sign-out、GET /auth/get-session；关闭公开 sign-up 及邮件找回，授权命令创建账号 | 1 |
+| `/auth/*` | 自有安全 DTO 包装 Better Auth：POST /auth/sign-in/email 返回 success、POST /auth/sign-out 接收 {}、GET /auth/session 返回 AuthSession 或 null；不返回 token；注册/邮件找回关闭，授权命令创建账号 | 已接入 |
 | `GET/PATCH /me` | 本人基本信息与 version；不通过此接口修改凭证或维护权限 | 1 |
 | `GET /me/overview` | 最近面试、常用简历、收藏和实际计数，组合只读查询 | 1 |
 | `GET/PATCH /me/preferences` | 交互/播报/编辑器/岗位偏好与 version，不影响已开始面试 | 1 |
@@ -270,13 +270,13 @@ Agent 不是浏览器可任意调用的总入口。简历提取、JD 分析、�
 
 第一阶段落地身份、文本材料、岗位、面试、报告/重练、任务与数据库；第二阶段接文件、PDF、内容维护/混合检索及评分校准；第三阶段接实时语音/观测；第四阶段接可选代码、镜头、复盘媒体和管理页面。每阶段保留前阶段回归，具体门槛见[评测计划](../algorithm/evaluation.md)。
 
-Fastify、Zod/OpenAPI、Drizzle/PostgreSQL 与 pg-boss worker 公共基础已建立。Better Auth、业务服务、文件和供应商尚待接入；pgvector 暂不安装。缺少身份或数据库的私有能力明确不可用，禁止用合成结果冒充成功。
+Fastify、Zod/OpenAPI、Drizzle/PostgreSQL、pg-boss worker、同源代理与 Better Auth 公共认证已建立。业务服务、文件和供应商尚待接入；pgvector 暂不安装。认证未启用时为 501，未登录为 401，依赖失效为 503，不能用合成结果冒充成功。
 
 关联：[总体架构](architecture.md) · [功能需求](../requirements/functional_spec.md) · [知识与 Agent](../algorithm/knowledge_and_agent.md) · [工程目录](repository_structure.md)。
 
 ## 10. 已实现的公共骨架（2026-10-25）
 
-真实 Fastify HTTP 使用相同 /api/v1 前缀但独立监听 3001，原演示由 Next.js 继续提供。公共响应保留错误/分页合同；岗位游标绑定筛选、稳定排序及内容版本，正文和来源来自同一发布内容。
+Fastify 独立监听 3001；浏览器经 Next.js /api/v1 同源代理调用，原演示显式改为 /api/demo/v1。公共响应保留错误/分页合同；岗位游标绑定筛选、稳定排序及内容版本，正文和来源来自同一发布内容。
 
 当前注册：GET /health、/health/ready、/capabilities、/job-categories、/job-templates、/job-templates/{id}、/tasks/{id}；development 另有 /openapi.json。任务查询需注入身份服务，未接入返回 501；身份服务确认未登录返回 401，他人和不存在任务统一 404。业务目标路由尚未批量注册。
 
@@ -291,10 +291,24 @@ Fastify、Zod/OpenAPI、Drizzle/PostgreSQL 与 pg-boss worker 公共基础已建
 | reports | 报告版本、重练关联、比较、导出 | 读取封存输入；创建重练调用 interviews，不直接改会话表 |
 | knowledge | 模板/来源/知识/题目/标准和索引版本 | 仅发布内容进入读取；个人材料不进入共享检索库 |
 
-以下为逻辑 ER，除末尾五个公共实体外，业务表尚未迁移；虚线表示跨模块的版本化服务引用，不要求现在创建跨模块 FK。
+以下为逻辑 ER，五个公共实体和 AuthUser/AuthSession/AuthAccount/AuthVerification/AuthRateLimit 已迁移，其余业务表随模块建立；虚线表示跨模块的版本化服务引用，不要求现在创建跨模块 FK。Identity 对应已验证的 AuthUser 标识。
 
 ~~~mermaid
 erDiagram
+    AuthUser ||--o{ AuthSession : authenticates
+    AuthUser ||--o{ AuthAccount : credentials
+    AuthUser ||..|| Identity : provides
+    AuthVerification {
+        text id PK
+        text identifier
+        timestamptz expires_at
+    }
+    AuthRateLimit {
+        text id PK
+        text key UK
+        integer count
+        bigint last_request
+    }
     Identity ||--o{ Resume : owns
     Resume ||--|{ ResumeVersion : versions
     ResumeVersion }o--o{ ExperienceVersion : selects
@@ -337,7 +351,7 @@ erDiagram
 - audit_events：操作者、动作、资源 ID、请求 ID、结果和时间；不存私有全文或原始错误。
 - worker_heartbeats：实例 ID、支持任务类型、启动及最近心跳。仅表示进程存活，不承诺任何业务能力已接通。
 
-owner_id 是未来认证模块提供的不透明标识，不提前创建用户表/FK。内部实体采用服务端 UUID 和 UTC 时间。需要列表/关联的字段保持可查询列；仅任务必要载荷、响应及结果引用用 JSONB。
+owner_id 使用认证模块 AuthUser.id，不信任客户端输入。公共任务表暂不增加用户 FK，兼容内部处理和既有任务；业务表按模块需求增加约束。auth_users 保存邮箱、显示名和服务端角色；auth_accounts 保存 Better Auth 密码哈希；auth_sessions 保存到期会话；auth_verifications 预留组件核心 schema；auth_rate_limits 保存跨实例限流计数。内部实体采用服务端 UUID 和 UTC 时间。
 
 任务 enqueueTask 接收业务事务，业务写入、tasks 和 outbox 一起提交。投递在独立事务领取 outbox，使用 FOR UPDATE SKIP LOCKED；队列不可用保留已提交任务，重投可能重复。外部调用不在业务事务里；runner 使用执行 token/60 秒租约，先调用处理器，再在短事务校验并执行结果 commit。处理器仍须检查本模块的输入版本、删除和 generation。默认最多两次实际执行（可配置 1–5），不保证外部请求严格只调用一次。
 

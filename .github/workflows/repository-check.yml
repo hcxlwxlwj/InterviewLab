@@ -76,3 +76,7 @@ jobs:
       - run: npm run openapi:generate
       - run: npm run test:db
       - run: npm run test:process
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+      - run: npm run test:web

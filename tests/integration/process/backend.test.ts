@@ -5,8 +5,67 @@ import { createServer } from 'node:net';
 import { once } from 'node:events';
 import { setTimeout as delay } from 'node:timers/promises';
 import { existsSync } from 'node:fs';
+import { randomBytes, randomUUID } from 'node:crypto';
 import { config as dotenv } from 'dotenv';
 dotenv({ quiet: true });
+test('built API authenticates invited users using the configured persistent database', async () => {
+  const testUrl = process.env.TEST_DATABASE_URL;
+  assert.ok(
+    testUrl && /^interviewlab_test[a-z0-9_]*$/.test(new URL(testUrl).pathname.slice(1)),
+    'A dedicated test database is required',
+  );
+  const { loadConfig } = await import('../../../code/backend/src/foundation/config');
+  const { createDatabase } = await import('../../../code/backend/src/database/connection');
+  const { createInvitedUser } = await import(
+    '../../../code/backend/src/modules/accounts/provision'
+  );
+  const database = createDatabase(loadConfig({ DATABASE_URL: testUrl }));
+  const email = `${randomUUID()}@example.test`;
+  const password = randomBytes(24).toString('base64url');
+  const port = await freePort();
+  const origin = `http://127.0.0.1:${port}`;
+  const user = await createInvitedUser(database, {
+    email,
+    password,
+    name: 'Synthetic built API student',
+  });
+  const api = spawn(process.execPath, ['code/backend/dist/api.js'], {
+    env: {
+      ...process.env,
+      NODE_ENV: 'test',
+      DATABASE_URL: testUrl,
+      AUTH_ENABLED: 'true',
+      BETTER_AUTH_SECRET: randomBytes(32).toString('base64url'),
+      PUBLIC_ORIGIN: origin,
+      API_PORT: String(port),
+      LOG_LEVEL: 'silent',
+    },
+    stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
+  });
+  api.stdout?.on('data', () => {});
+  api.stderr?.on('data', () => {});
+  try {
+    await eventually(async () => (await fetch(origin + '/api/v1/health')).ok);
+    const response = await fetch(origin + '/api/v1/auth/sign-in/email', {
+      method: 'POST',
+      headers: { origin, 'content-type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { success: true });
+    const cookie = response.headers
+      .getSetCookie()
+      .map((value) => value.split(';')[0])
+      .join('; ');
+    const session = await fetch(origin + '/api/v1/auth/session', { headers: { cookie } });
+    assert.equal((await session.json()).user.id, user.id);
+  } finally {
+    await gracefulClose(api);
+    await database.pool.query('DELETE FROM audit_events WHERE resource_id=$1', [user.id]);
+    await database.pool.query('DELETE FROM auth_users WHERE id=$1', [user.id]);
+    await database.close();
+  }
+});
 async function freePort() {
   const server = createServer();
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -54,6 +113,7 @@ test('built API starts without database, serves public data and releases resourc
     env: {
       ...process.env,
       DATABASE_URL: '',
+      AUTH_ENABLED: 'false',
       NODE_ENV: 'test',
       LOG_LEVEL: 'silent',
       API_PORT: String(port),
@@ -82,7 +142,7 @@ test('built API starts without database, serves public data and releases resourc
 test('built worker fails explicitly without database configuration', async () => {
   assert.ok(existsSync('code/backend/dist/worker.js'), 'Run npm run build:backend first');
   const child = spawn(process.execPath, ['code/backend/dist/worker.js'], {
-    env: { ...process.env, DATABASE_URL: '', NODE_ENV: 'test' },
+    env: { ...process.env, DATABASE_URL: '', AUTH_ENABLED: 'false', NODE_ENV: 'test' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let output = '';
@@ -102,6 +162,7 @@ test('built API readiness tracks a real worker process, which can gracefully sto
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     DATABASE_URL: url,
+    AUTH_ENABLED: 'false',
     NODE_ENV: 'test',
     LOG_LEVEL: 'silent',
     API_PORT: String(port),

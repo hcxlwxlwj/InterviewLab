@@ -10,8 +10,10 @@
     "./content/demo": "./src/content/demo.ts"
   },
   "dependencies": {
-    "@interviewlab/core": "*",
+    "@better-auth/drizzle-adapter": "1.7.12",
     "@fastify/swagger": "^9.7.0",
+    "@interviewlab/core": "*",
+    "better-auth": "1.7.12",
     "dotenv": "^17.0.0",
     "drizzle-orm": "0.45.4",
     "fastify": "5.12.7",
@@ -24,6 +26,7 @@
   "scripts": {
     "dev:api": "tsx watch src/entrypoints/api.ts",
     "dev:worker": "tsx watch src/entrypoints/worker.ts",
+    "auth:create-user": "tsx src/entrypoints/create-user.ts",
     "build": "tsup",
     "start:api": "node dist/api.js",
     "start:worker": "node dist/worker.js",
