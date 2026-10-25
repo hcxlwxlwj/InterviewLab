@@ -5,7 +5,7 @@
 | 工作区 | 包名 | 修改入口 |
 | --- | --- | --- |
 | [frontend](frontend/README.md) | `@interviewlab/web` | Next.js 页面、个人中心分区、组件和标签页演示客户端 |
-| [backend](backend/README.md) | `@interviewlab/backend` | HTTP 路由、Zod 校验、错误格式、未来身份与仓储接入 |
+| [backend](backend/README.md) | `@interviewlab/backend` | 独立 Fastify/worker、公共数据库与任务基础、岗位模块和演示接口 |
 | [core_engine](core_engine/README.md) | `@interviewlab/core` | 领域类型、适配接口、问题预算、会话规则和分数空值规则 |
 
 依赖方向：前端与后端 → 内容适配 → 领域核心。前端通过后端的 `/content`、`/content/demo` 子入口读取公开内容；HTTP 后端入口仅供 `app/api/` 使用；领域核心不依赖 Next.js、浏览器存储、Node API 或 JSON 文件。依赖边界由 `npm run boundaries:check` 校验。

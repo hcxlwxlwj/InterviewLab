@@ -15,3 +15,11 @@
 `npm test` 执行单元和接口测试，`npm run check` 执行上述检查及类型检查。再单独运行 `npm run build` 验证生产构建。
 
 接口测试不启动数据库、真实身份或模型。浏览器主路径与响应式检查另在[原型实现](../docs/software/prototype/library-expansion.md)记录证据，不能把规则测试解释为真实 AI 质量或学习效果验证。
+
+## 独立后端基础验收
+
+- integration/backend.test.ts：无需数据库的 Fastify 注入测试，验证公开岗位、游标、schema、错误、能力缺失、身份边界与 OpenAPI。
+- npm run test:db：运行 integration/database，必须配置独立 interviewlab_test* 数据库；执行迁移、回滚、并发幂等、outbox、租约/次数限制、归属和真实 pg-boss worker 测试。
+- npm run test:process：先 build:backend 和 test:db；启动编译产物验证无库 API、有库 worker、失败启动和优雅停止/重启。
+
+数据库测试会清空五张基础表；缺失数据库直接失败，不会跳过。真实测试与普通 npm test 分开，避免首次运行原型要求安装数据库。CI 的 backend-infrastructure 使用 PostgreSQL 16 运行真实测试，application 保持原有无库检查。启动和测试库命令见[后端说明](../code/backend/README.md)。

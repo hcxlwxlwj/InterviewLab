@@ -10,6 +10,16 @@
     "dev": "npm run dev --workspace @interviewlab/web",
     "build": "npm run build --workspace @interviewlab/web",
     "start": "npm run start --workspace @interviewlab/web",
+    "dev:api": "npm run dev:api --workspace @interviewlab/backend",
+    "dev:worker": "npm run dev:worker --workspace @interviewlab/backend",
+    "build:backend": "npm run build --workspace @interviewlab/backend",
+    "start:api": "npm run start:api --workspace @interviewlab/backend",
+    "start:worker": "npm run start:worker --workspace @interviewlab/backend",
+    "db:generate": "npm run db:generate --workspace @interviewlab/backend",
+    "db:migrate": "npm run db:migrate --workspace @interviewlab/backend",
+    "openapi:generate": "npm run openapi:generate --workspace @interviewlab/backend",
+    "test:db": "tsx --test --test-concurrency=1 tests/integration/database/*.test.ts",
+    "test:process": "tsx --test tests/integration/process/*.test.ts",
     "typecheck": "tsc --noEmit",
     "content:check": "tsx .github/scripts/check-content.ts",
     "test": "tsx --test tests/unit/*.test.ts tests/integration/*.test.ts",
@@ -19,12 +29,18 @@
     "format:code": "prettier --ignore-path .gitignore --write \"code/**/*.{ts,tsx}\" \"tests/**/*.ts\" \".github/scripts/*.ts\""
   },
   "devDependencies": {
+    "drizzle-kit": "0.31.11",
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "prettier": "3.6.2",
     "tsx": "^4.20.0",
     "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "drizzle-kit": {
+      "@esbuild-kit/esm-loader": "npm:tsx@4.23.15"
+    }
   },
   "prettier": {
     "singleQuote": true,

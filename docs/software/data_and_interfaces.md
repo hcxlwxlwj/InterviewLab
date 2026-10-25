@@ -1,12 +1,12 @@
 # 数据与接口合同
 
-版本：v0.4 · 更新：2026-10-19 · 状态：独立后端目标合同；本轮只改文档，尚无生成的 OpenAPI 或真实私有服务。
+版本：v0.5 · 更新：2026-10-25 · 状态：公共骨架和岗位只读 HTTP 已实现，业务合同仍按阶段落地。
 
 ## 0. 当前接口与目标合同
 
-当前代码仍是 Next.js Route Handlers 转发给 `code/backend/src/http` 的骨架。公开岗位列表、详情、来源和分类可读；其他已支持读取是合成样例，真实写入在已覆盖校验后返回 `501 capability_unavailable`。浏览器使用同步演示客户端，尚未调用真实持久化服务。当前演示删除简历会移除所属经历和未来选择，但保留旧面试快照；这不是下文生产级私有事实清理已验收的证明。
+原 Next.js Route Handlers 与同步演示客户端继续保留。新增独立 Fastify 提供公开岗位、健康/就绪、能力状态和需身份的任务查询；已生成的 OpenAPI 只列真实注册路由。PostgreSQL 五张公共表、事务、幂等、outbox 和 pg-boss worker 已实现；私有业务和认证尚未接通。
 
-本文第 1–9 节是后续 Fastify 服务的正式设计方向，不表示这些路径已经可用。当前 `API_CONTRACT`、Zod 和共享 `Session`/`ResumeDocument` 等仍是旧原型合同，本轮没有同步改代码。目标 API schema 实现后生成 OpenAPI，作为联调依据；不得把本文当作已可执行的接口说明。
+本文第 1–9 节保留全产品合同；已实现范围见后端 README 及下方骨架说明。原 API_CONTRACT、Session 和同步 DataClient 属于演示合同，不能当作新的真实 HTTP 客户端。
 
 ### 旧草案迁移
 
@@ -270,6 +270,75 @@ Agent 不是浏览器可任意调用的总入口。简历提取、JD 分析、�
 
 第一阶段落地身份、文本材料、岗位、面试、报告/重练、任务与数据库；第二阶段接文件、PDF、内容维护/混合检索及评分校准；第三阶段接实时语音/观测；第四阶段接可选代码、镜头、复盘媒体和管理页面。每阶段保留前阶段回归，具体门槛见[评测计划](../algorithm/evaluation.md)。
 
-Fastify、Zod/OpenAPI、Drizzle/PostgreSQL/pgvector、Better Auth、pg-boss 和独立 worker 的组织已经确定；模型/语音/嵌入提供商、凭证与部署资源仍待实际接入核验。没有凭证返回能力不可用，不用合成结果冒充服务成功。本文不承诺尚未生成的 OpenAPI 文件、迁移脚本或未来命令已经存在。
+Fastify、Zod/OpenAPI、Drizzle/PostgreSQL 与 pg-boss worker 公共基础已建立。Better Auth、业务服务、文件和供应商尚待接入；pgvector 暂不安装。缺少身份或数据库的私有能力明确不可用，禁止用合成结果冒充成功。
 
 关联：[总体架构](architecture.md) · [功能需求](../requirements/functional_spec.md) · [知识与 Agent](../algorithm/knowledge_and_agent.md) · [工程目录](repository_structure.md)。
+
+## 10. 已实现的公共骨架（2026-10-25）
+
+真实 Fastify HTTP 使用相同 /api/v1 前缀但独立监听 3001，原演示由 Next.js 继续提供。公共响应保留错误/分页合同；岗位游标绑定筛选、稳定排序及内容版本，正文和来源来自同一发布内容。
+
+当前注册：GET /health、/health/ready、/capabilities、/job-categories、/job-templates、/job-templates/{id}、/tasks/{id}；development 另有 /openapi.json。任务查询需注入身份服务，未接入返回 501；身份服务确认未登录返回 401，他人和不存在任务统一 404。业务目标路由尚未批量注册。
+
+### 模块数据归属与依赖
+
+| 模块 | 主要实体 | 跨模块约定 |
+| --- | --- | --- |
+| accounts | 身份、角色、设置、默认简历指针 | 提供经过验证的身份；默认简历必须由 resumes 校验 |
+| resumes | 简历/经历版本、文件、候选与确认 | 只提供本人选择的已确认版本；更新不改历史快照 |
+| jobs | 个人 JD/分析、收藏 | 平台模板和来源由 knowledge 维护，jobs 只读查询 |
+| interviews | 会话、快照、问题回合、回答 revision/片段、封存 | 唯一状态写入口；按版本读取材料，向 reports 提供封存输入 |
+| reports | 报告版本、重练关联、比较、导出 | 读取封存输入；创建重练调用 interviews，不直接改会话表 |
+| knowledge | 模板/来源/知识/题目/标准和索引版本 | 仅发布内容进入读取；个人材料不进入共享检索库 |
+
+以下为逻辑 ER，除末尾五个公共实体外，业务表尚未迁移；虚线表示跨模块的版本化服务引用，不要求现在创建跨模块 FK。
+
+~~~mermaid
+erDiagram
+    Identity ||--o{ Resume : owns
+    Resume ||--|{ ResumeVersion : versions
+    ResumeVersion }o--o{ ExperienceVersion : selects
+    Identity ||--o{ JobTarget : owns
+    Identity ||--o{ Bookmark : owns
+    Bookmark }o..|| JobTemplateVersion : references
+    JobTemplateVersion }o--o{ SourceVersion : cites
+    JobTemplateVersion ||--o{ KnowledgeChunk : scopes
+    Identity ||--o{ Interview : owns
+    Interview ||--o| MaterialSnapshot : freezes_on_start
+    MaterialSnapshot }o..o| ResumeVersion : freezes
+    MaterialSnapshot }o..o| JobTarget : freezes_version
+    MaterialSnapshot }o..o{ ExperienceVersion : freezes
+    MaterialSnapshot }o..o{ JobTemplateVersion : freezes
+    Interview ||--o{ InterviewTurn : asks
+    InterviewTurn ||--o{ AnswerRevision : records
+    AnswerRevision ||--o{ AnswerSegment : preserves
+    Interview ||..o{ ReportVersion : sealed_input
+    ReportVersion }o..o{ AnswerRevision : cites
+    Interview ||..o{ RetryRelation : source
+    RetryRelation }o..|| Interview : retry
+    AnswerRevision }o..o{ Comparison : compares
+    ReportVersion ||--o{ Export : renders
+    Task ||--|| OutboxEvent : dispatches
+    Identity ||..o{ Task : owner_reference
+    Identity ||..o{ IdempotencyRecord : scopes
+    Identity ||..o{ AuditEvent : actor_reference
+    WorkerHeartbeat {
+        uuid id PK
+        json supported_types
+        timestamptz last_seen_at
+    }
+~~~
+
+### 五张基础表和可靠性
+
+- tasks：用户、版本化任务类型、业务键、输入摘要、必要 payload、状态、实际尝试次数/上限、结果引用、执行 token/租约和时间；(owner_id,type,key) 唯一。
+- outbox_events：任务引用、pending/published、投递尝试、重试时间和发布时间；与 tasks 同事务，每任务一个 outbox。当前承载任务投递，尚非通用事件订阅系统。
+- idempotency_records：用户、操作、键、输入摘要和响应；同作用域唯一。事务级 advisory lock 串行化同键请求，失败整体回滚。
+- audit_events：操作者、动作、资源 ID、请求 ID、结果和时间；不存私有全文或原始错误。
+- worker_heartbeats：实例 ID、支持任务类型、启动及最近心跳。仅表示进程存活，不承诺任何业务能力已接通。
+
+owner_id 是未来认证模块提供的不透明标识，不提前创建用户表/FK。内部实体采用服务端 UUID 和 UTC 时间。需要列表/关联的字段保持可查询列；仅任务必要载荷、响应及结果引用用 JSONB。
+
+任务 enqueueTask 接收业务事务，业务写入、tasks 和 outbox 一起提交。投递在独立事务领取 outbox，使用 FOR UPDATE SKIP LOCKED；队列不可用保留已提交任务，重投可能重复。外部调用不在业务事务里；runner 使用执行 token/60 秒租约，先调用处理器，再在短事务校验并执行结果 commit。处理器仍须检查本模块的输入版本、删除和 generation。默认最多两次实际执行（可配置 1–5），不保证外部请求严格只调用一次。
+
+InternalEvent 定义事件 ID/type/schema_version、归属、资源版本、时间、request_id 和 payload，供跨模块合同使用；具体事件生产者与消费者随业务模块添加。资料删除、派生失效和关联清理按前文规则实现，骨架没有宣称这些业务已经可用。
