@@ -1,6 +1,6 @@
 # 工程目录与职责
 
-更新：2026-10-19。区分当前可运行原型与独立后端目标；本轮只更新文档，未调整目录、代码或依赖。产品架构见[总体架构](architecture.md)。
+更新：2026-10-25。独立 Fastify/worker 骨架、公共迁移和岗位只读模块已实现；其他业务按模块接入。产品架构见[总体架构](architecture.md)。
 
 ## 与课程模板的对应
 
@@ -49,6 +49,8 @@ backend/src/content/demo.ts → 合成样例与演示报告
 
 ## 修改任务应落在哪里
 
+独立真实后端由 npm run dev:api / dev:worker 启动，不经过旧演示路由。src/server 负责装配，src/modules/jobs 为完整示例，src/foundation/database/tasks 是公共基础，src/entrypoints 为命令；业务 schema 随模块建立。前端暂未迁移，后续通过同源 HTTP 接入。新 HTTP schema 不放入旧演示 src/http。成员流程见[后端 README](../../code/backend/README.md)。
+
 | 任务 | 代码位置 | 同步文档 / 验证 |
 | --- | --- | --- |
 | 个人中心布局与筛选 | `frontend/features/personal-center` | 原型说明、浏览器回归 |
@@ -70,26 +72,26 @@ backend/src/content/demo.ts → 合成样例与演示报告
 - 原型设计提示、参考图与实测截图仍在 `software/prototype`；首轮实现记录标注为阶段记录，当前范围指向后续扩展说明。
 - `requirements` 的四份正文分别维护问题、功能、非功能和验收；原 `modules` 内容已按职责并入，不保留重复文件。
 
-## 独立后端的目标组织（尚未建立）
+## 独立后端的工程组织
 
-后续仍使用三个工作区，不新增顶层应用目录或恢复 modules 文档目录。下表是未来代码位置约定，不代表本轮已创建这些目录、类或命令。
+继续使用三个工作区。模块归属与逻辑 ER 统一维护在数据合同中，不新增重复模块文档。
 
-| 位置 | 后续职责 |
+| 位置 | 当前职责 |
 | --- | --- |
-| `code/backend/src/modules` | account、materials、jobs、interviews、reports、knowledge 六个业务模块；各自路由、服务、仓储 |
-| `code/backend/src/infrastructure` | Drizzle schema/仓储、认证适配、私有存储、pg-boss/outbox、供应商与日志 |
-| `code/backend/src` 的进程入口 | Fastify API 与独立 worker；授权账号初始化、内容导入/审核/发布等命令复用服务，不另建业务实现 |
-| `code/core_engine/src` | 公共 DTO/协议 schema、纯会话/预算/分数规则、任务输入输出和适配端口 |
-| `code/frontend` | 页面与组件、异步 HTTP/实时客户端、明确标记的演示客户端；页面 URL 不变 |
-| `tests/unit`、`tests/integration` | 纯规则、模块服务、HTTP/OpenAPI、数据库权限/事务及任务恢复；浏览器主路径验证在集成范围 |
+| backend/src/modules | accounts、resumes、jobs、interviews、reports、knowledge 的合同与注册；jobs 已有完整实现 |
+| backend/src/foundation | 公共配置、身份接口、错误、HTTP schema、幂等 |
+| backend/src/database、backend/drizzle | 连接池、事务、公共表、显式迁移 |
+| backend/src/tasks | pg-boss、outbox、任务执行、状态和 worker 心跳 |
+| backend/src/server、backend/src/entrypoints | 应用装配与 API/worker/迁移/OpenAPI 命令 |
+| core_engine/src | 纯 DTO、规则、任务/事件合同和适配端口 |
+| frontend | 现有页面与演示客户端；真实异步客户端后续接入 |
+| tests/unit、tests/integration | 规则、HTTP、数据库及进程测试 |
 
-模块调用方向为“路由 → 应用/业务服务 → 仓储或适配器”。跨模块读取使用显式服务，事务需要时传递同一事务上下文，不从路由相互调用，也不直接更新其他模块拥有的表。Agent 和 worker 都复用业务规则。
-
-Fastify API 和 worker 是同一个 backend 工作区的两个运行入口。前端经统一入口访问 `/api/v1`，WebSocket 直接转发 Fastify；Next.js 不再承载正式业务 HTTP 实现。API/worker 的启动命令、环境示例和部署文件在后续实现时再添加，当前仍只使用根 README 已存在的 Next.js 命令。
+路由调用应用服务，服务调用仓储/适配器；模块间通过显式服务协作，需要时传递同一数据库事务。API/worker 已有独立入口及构建，原 Next.js 演示仍保留。生产同源代理、实时通道和业务模块在相应阶段接入。
 
 ### 依赖与客户端迁移
 
-- 共享核心可以在实现阶段容纳公共 DTO 的 Zod schema，禁止数据库、文件、框架、SDK 及供应商 I/O；现有依赖检查只允许纯类型/规则，届时须同步调整精确允许项，不能直接放开所有外部包。
+- 共享核心保持纯类型与规则，不引入 Zod、框架、数据库或供应商。Zod schema 留在后端并与公共 DTO 做类型一致检查；依赖边界不放开。
 - 后端实现依赖核心；前端正式客户端只依赖核心 DTO 和 HTTP/实时协议，不导入 backend 运行入口、Drizzle、Better Auth 配置或模型适配器。
 - 当前 `/content` 与 `/content/demo` 是已验证的公开静态过渡入口，本轮保留。真实模式通过岗位 API 获取内容，演示样例继续单独标记；私有服务不得通过公开子入口泄漏到浏览器。
 - 同步 `DataClient` 保留为演示合同，不强行将真实请求伪装成同步接口。新建异步客户端，页面显式处理加载、错误、任务轮询和版本冲突，再整体迁移旧 `/sessions`、`/resume-documents` 等路径。

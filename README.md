@@ -2,7 +2,7 @@
 
 面向高校学生的模拟面试与复盘 Web 应用。围绕课程项目、竞赛、科研、毕设及实习经历练习岗位问答，讲清个人贡献、方案取舍与验证过程。
 
-**当前阶段：可运行的高保真文字交互原型、公开岗位知识内容与后端接口骨架。** 真实账号、数据库、模型、语音、文件上传、代码执行及 PDF 导出尚未接入。完整产品目标见[问题定义](docs/requirements/problem_definition.md)。
+**当前阶段：文字交互原型、公开岗位内容，以及可独立运行的后端公共骨架。** Fastify/worker、数据库迁移、事务与任务基础已实现；前端仍使用演示数据。真实账号、个人业务、模型、语音、上传、代码执行和 PDF 尚未接通。
 
 ## 本地运行
 
@@ -77,9 +77,9 @@ npm start
 
 ## 后续接入与协作
 
-目标后端改为独立 TypeScript/Node 模块化单体：Fastify + Zod/OpenAPI、Drizzle/PostgreSQL/pgvector、Better Auth 受邀账号、pg-boss 独立 worker，六个业务模块共享服务与数据合同。**这些是已确定的设计，尚未安装或实现；当前仍只启动 Next.js。**
+独立后端采用 TypeScript/Node 模块化单体：Fastify + Zod/OpenAPI、Drizzle/PostgreSQL、pg-boss worker。公共基础和岗位只读模块已实现；六模块业务、Better Auth 认证、pgvector 及供应商能力按阶段接入。详见[后端启动与成员接入](code/backend/README.md)。
 
-后续按四阶段实施：1 真实文字闭环，2 文件/内容/检索及评分校准，3 实时语音与独立语音观测，4 可选代码/镜头/复盘媒体/管理页面；各阶段回归，稳定后做对照与试用。保留显式演示入口，个人材料不自动上传。模块职责见[架构](docs/software/architecture.md)，新 HTTP 及旧路径迁移、材料快照和删除规则见[数据合同](docs/software/data_and_interfaces.md)。本轮仅更新文档，没有修改代码、启动命令或依赖。
+后续按四阶段实施：1 真实文字闭环，2 文件/内容/检索及评分校准，3 实时语音与独立语音观测，4 可选代码/镜头/复盘媒体/管理页面；各阶段回归，稳定后做对照与试用。保留显式演示入口，个人材料不自动上传。模块职责见[架构](docs/software/architecture.md)，新 HTTP 及旧路径迁移、材料快照和删除规则见[数据合同](docs/software/data_and_interfaces.md)。本轮已新增独立后端命令、依赖、迁移与测试；原型启动方式保持兼容。
 
 任务分支经 PR 合入 `develop`，阶段验收后再合入 `main`；操作及检查见[协作须知](docs/mgmt/COLLABORATION.md)。[第一周提交记录](docs/retrospection/week1_submission.md)保留此前交付证据，不倒写为本次结果。
 

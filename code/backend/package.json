@@ -5,11 +5,34 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./server": "./src/server/app.ts",
     "./content": "./src/content/index.ts",
     "./content/demo": "./src/content/demo.ts"
   },
   "dependencies": {
     "@interviewlab/core": "*",
-    "zod": "^4.1.0"
+    "@fastify/swagger": "^9.7.0",
+    "dotenv": "^17.0.0",
+    "drizzle-orm": "0.45.4",
+    "fastify": "5.12.7",
+    "fastify-type-provider-zod": "^7.0.0",
+    "openapi-types": "^12.1.3",
+    "pg": "^8.0.0",
+    "pg-boss": "12.38.0",
+    "zod": "^4.1.5"
+  },
+  "scripts": {
+    "dev:api": "tsx watch src/entrypoints/api.ts",
+    "dev:worker": "tsx watch src/entrypoints/worker.ts",
+    "build": "tsup",
+    "start:api": "node dist/api.js",
+    "start:worker": "node dist/worker.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/entrypoints/migrate.ts",
+    "openapi:generate": "tsx src/entrypoints/openapi.ts"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "tsup": "^9.0.0"
   }
 }

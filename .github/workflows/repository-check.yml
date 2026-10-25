@@ -43,3 +43,36 @@ jobs:
       - run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: '1'
+
+  backend-infrastructure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: interviewlab
+          POSTGRES_PASSWORD: ci_only
+          POSTGRES_DB: interviewlab_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U interviewlab -d interviewlab_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      TEST_DATABASE_URL: postgresql://interviewlab:ci_only@127.0.0.1:5432/interviewlab_test
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run build:backend
+      - run: npm run openapi:generate
+      - run: npm run test:db
+      - run: npm run test:process
