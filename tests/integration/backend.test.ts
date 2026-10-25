@@ -100,7 +100,7 @@ test('validation, not-found and private capability errors share a safe error env
 test('custom modules use injected identity, response validation and centralized error handling', async (t) => {
   const { z } = await import('zod');
   const app = await buildApp({
-    config: { ...config, BODY_LIMIT_BYTES: 1024 },
+    config: { ...config, BODY_LIMIT_BYTES: 1024, PUBLIC_ORIGIN: 'http://localhost:3000' },
     logger: false,
     modules: [
       {
@@ -156,7 +156,7 @@ test('custom modules use injected identity, response validation and centralized 
   const tooLarge = await app.inject({
     method: 'POST',
     url: '/api/v1/guarded',
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', origin: 'http://localhost:3000' },
     payload: JSON.stringify({ text: 'x'.repeat(2000) }),
   });
   assert.equal(tooLarge.statusCode, 413);
@@ -168,6 +168,9 @@ test('OpenAPI describes registered routes and is hidden outside development', as
   const specification = (await app.inject('/api/v1/openapi.json')).json();
   assert.equal(specification.openapi, '3.0.3');
   assert.ok(specification.paths['/api/v1/job-templates']);
+  assert.ok(specification.paths['/api/v1/auth/session']);
+  assert.ok(specification.paths['/api/v1/auth/sign-in/email']);
+  assert.ok(!specification.paths['/api/v1/auth/sign-up/email']);
   assert.ok(!specification.paths['/api/v1/interviews']);
   const production = await buildApp({
     config: { ...config, NODE_ENV: 'production' },
@@ -178,6 +181,59 @@ test('OpenAPI describes registered routes and is hidden outside development', as
   await assert.rejects(
     buildApp({ config, logger: false, modules: [{ name: 'jobs', register: async () => {} }] }),
     /Duplicate module/,
+  );
+});
+
+test('unconfigured authentication is explicit and every module write shares the origin policy', async (t) => {
+  const app = await buildApp({
+    config,
+    logger: false,
+    modules: [
+      {
+        name: 'accounts',
+        async register(instance) {
+          instance.post('/write-example', async () => ({ ok: true }));
+        },
+      },
+    ],
+  });
+  t.after(() => app.close());
+  const unavailable = await app.inject('/api/v1/auth/session');
+  assert.equal(unavailable.statusCode, 501);
+  assert.equal(unavailable.json().code, 'capability_unavailable');
+  for (const origin of [undefined, 'https://attacker.test']) {
+    assert.equal(
+      (
+        await app.inject({
+          method: 'POST',
+          url: '/api/v1/write-example',
+          headers: origin ? { origin } : {},
+        })
+      ).statusCode,
+      403,
+    );
+  }
+  assert.equal(
+    (
+      await app.inject({
+        method: 'POST',
+        url: '/api/v1/write-example',
+        headers: { origin: config.PUBLIC_ORIGIN },
+      })
+    ).statusCode,
+    200,
+  );
+  assert.throws(() => loadConfig({ AUTH_ENABLED: 'true' }), /authentication requires/);
+  assert.throws(() => loadConfig({ PUBLIC_ORIGIN: 'http://example.test/path' }), /PUBLIC_ORIGIN/);
+  assert.throws(
+    () =>
+      loadConfig({
+        AUTH_ENABLED: 'true',
+        DATABASE_URL: 'postgresql://local/db',
+        BETTER_AUTH_SECRET: 'x'.repeat(40),
+        NODE_ENV: 'production',
+      }),
+    /HTTPS/,
   );
 });
 

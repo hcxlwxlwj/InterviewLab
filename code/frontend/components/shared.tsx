@@ -62,6 +62,9 @@ export function Header() {
         </nav>
         <div className="header-actions">
           <span className="badge badge-yellow">演示版本</span>
+          <Link href="/login" className="text-link">
+            账号登录
+          </Link>
           <Link href="/me" className="user-link">
             <UserRound size={17} />
             <span>个人中心</span>

@@ -1,9 +1,10 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
 import type {
   Experience,
   JobTarget,
   KnowledgeQuery,
   KnowledgeRetriever,
+  MemberRole,
   ModuleName,
   RequestIdentity,
   ResumeDocument,
@@ -13,7 +14,11 @@ import type { IdentityProvider } from '../foundation/auth';
 
 export interface BackendModule {
   name: ModuleName;
-  register(app: FastifyInstance): Promise<void>;
+  register(app: FastifyInstance, context: ModuleContext): Promise<void>;
+}
+export interface ModuleContext {
+  requireIdentity(request: FastifyRequest): Promise<RequestIdentity>;
+  requireRole(identity: RequestIdentity, role: MemberRole): void;
 }
 export const MODULES: Record<ModuleName, { owns: string; status: 'available' | 'planned' }> = {
   accounts: { owns: 'Identity, roles, preferences and default resume pointer', status: 'planned' },

@@ -1,7 +1,9 @@
 import { Pool, type PoolClient } from 'pg';
 import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { BackendConfig } from '../foundation/config';
-import * as schema from './schema';
+import * as foundationSchema from './schema';
+import * as authSchema from '../modules/accounts/auth-schema';
+const schema = { ...foundationSchema, ...authSchema };
 export interface Transaction {
   client: PoolClient;
   db: NodePgDatabase<typeof schema>;
@@ -37,10 +39,20 @@ export function createDatabase(config: BackendConfig) {
         client.release();
       }
     },
-    async ready(workerStaleMs: number) {
+    async ready(workerStaleMs: number, authentication = false) {
       try {
         // Missing migrations are not considered ready.
         await pool.query('SELECT id FROM tasks LIMIT 0');
+        if (authentication) {
+          for (const table of [
+            'auth_users',
+            'auth_sessions',
+            'auth_accounts',
+            'auth_verifications',
+            'auth_rate_limits',
+          ])
+            await pool.query(`SELECT id FROM ${table} LIMIT 0`);
+        }
         const result = await pool.query(
           "SELECT EXISTS (SELECT 1 FROM worker_heartbeats WHERE last_seen_at > now() - $1 * interval '1 millisecond') AS worker",
           [workerStaleMs],
