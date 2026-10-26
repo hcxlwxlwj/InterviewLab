@@ -124,7 +124,7 @@ export function InterviewsSection({ workspace }: { workspace: LoadedWorkspace })
         <EmptyState
           title="没有符合条件的记录"
           description="试试调整筛选，或开始一次新的模拟。"
-          href="/interview/setup"
+          href="/interview/setup?demo=1"
         />
       )}
     </section>

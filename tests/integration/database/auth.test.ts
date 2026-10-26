@@ -38,7 +38,7 @@ before(async () => {
     logger: false,
     modules: [
       {
-        name: 'interviews',
+        name: 'knowledge',
         async register(instance, access) {
           instance.get('/test-private', async (request) => access.requireIdentity(request));
           instance.post('/test-maintainer', async (request) => {

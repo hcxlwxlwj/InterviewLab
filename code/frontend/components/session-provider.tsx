@@ -9,16 +9,32 @@ type SessionState =
   | { status: 'signed_out'; session: null }
   | { status: 'signed_in'; session: AuthSession }
   | { status: 'unavailable' | 'error'; session: null; error: string };
-const SessionContext = createContext<{ state: SessionState; refresh(): Promise<void> } | null>(
-  null,
-);
-export function SessionProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<SessionState>({ status: 'loading', session: null });
+const SessionContext = createContext<{
+  state: SessionState;
+  refresh(): Promise<void>;
+  isDevelopment: boolean;
+} | null>(null);
+export function SessionProvider({
+  children,
+  developmentSession,
+}: {
+  children: React.ReactNode;
+  developmentSession?: AuthSession;
+}) {
+  const [state, setState] = useState<SessionState>(
+    developmentSession
+      ? { status: 'signed_in', session: developmentSession }
+      : { status: 'loading', session: null },
+  );
   const sequence = useRef(0);
   const pending = useRef<AbortController | null>(null);
   const refresh = useCallback(async () => {
     const current = ++sequence.current;
     pending.current?.abort();
+    if (developmentSession) {
+      setState({ status: 'signed_in', session: developmentSession });
+      return;
+    }
     const controller = new AbortController();
     pending.current = controller;
     try {
@@ -38,7 +54,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         error: error instanceof Error ? error.message : '无法读取登录状态。',
       });
     }
-  }, []);
+  }, [developmentSession]);
   useEffect(() => {
     const update = () => {
       void refresh();
@@ -53,7 +69,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('focus', update);
     };
   }, [refresh]);
-  return <SessionContext.Provider value={{ state, refresh }}>{children}</SessionContext.Provider>;
+  return (
+    <SessionContext.Provider value={{ state, refresh, isDevelopment: Boolean(developmentSession) }}>
+      {children}
+    </SessionContext.Provider>
+  );
 }
 export function useSession() {
   const context = useContext(SessionContext);

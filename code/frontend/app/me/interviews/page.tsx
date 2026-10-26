@@ -1,9 +1,15 @@
+'use client';
 import { Suspense } from 'react';
-import PersonalWorkspace from '../../../components/personal-workspace';
+import { useSearchParams } from 'next/navigation';
+import Demo from './demo';
+import LiveHistory from '../../../features/live-interview/history';
+function Entry() {
+  return useSearchParams().get('demo') === '1' ? <Demo /> : <LiveHistory />;
+}
 export default function Page() {
   return (
     <Suspense>
-      <PersonalWorkspace section="interviews" />
+      <Entry />
     </Suspense>
   );
 }

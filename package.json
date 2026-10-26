@@ -12,6 +12,7 @@
     "start": "npm run start --workspace @interviewlab/web",
     "dev:api": "npm run dev:api --workspace @interviewlab/backend",
     "dev:worker": "npm run dev:worker --workspace @interviewlab/backend",
+    "dev:interview": "tsx tests/support/interview-preview.ts --interview-dev",
     "auth:create-user": "npm run auth:create-user --workspace @interviewlab/backend",
     "build:backend": "npm run build --workspace @interviewlab/backend",
     "start:api": "npm run start:api --workspace @interviewlab/backend",
@@ -22,13 +23,19 @@
     "test:db": "tsx --test --test-concurrency=1 tests/integration/database/*.test.ts",
     "test:process": "tsx --test tests/integration/process/*.test.ts",
     "test:web": "tsx --test tests/integration/web/*.test.ts",
+    "test:llm": "tsx tests/support/interview-live-smoke.ts",
+    "test:llm:conversation": "tsx tests/support/interview-conversation-smoke.ts",
     "typecheck": "tsc --noEmit",
     "content:check": "tsx .github/scripts/check-content.ts",
     "test": "tsx --test tests/unit/*.test.ts tests/integration/*.test.ts",
     "boundaries:check": "tsx .github/scripts/check-boundaries.ts",
     "docs:check": "python .github/scripts/check_repository.py",
     "check": "npm run boundaries:check && npm run typecheck && npm run content:check && npm test && npm run docs:check",
-    "format:code": "prettier --ignore-path .gitignore --write \"code/**/*.{ts,tsx}\" \"tests/**/*.ts\" \".github/scripts/*.ts\""
+    "format:code": "prettier --ignore-path .gitignore --write \"code/**/*.{ts,tsx}\" \"tests/**/*.ts\" \".github/scripts/*.ts\"",
+    "knowledge": "tsx code/backend/src/modules/knowledge/command.ts",
+    "test:latency": "tsx tests/support/model-latency.ts",
+    "test:knowledge": "tsx tests/support/knowledge-evaluation.ts",
+    "test:realtime": "tsx tests/support/interview-realtime-smoke.ts"
   },
   "devDependencies": {
     "drizzle-kit": "0.31.11",

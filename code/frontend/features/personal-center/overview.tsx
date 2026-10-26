@@ -16,7 +16,7 @@ export function OverviewSection({ workspace }: { workspace: LoadedWorkspace }) {
           <FileText />
           <strong>{state.resumes.length}</strong>份简历
         </Link>
-        <Link href="/me/interviews">
+        <Link href="/me/interviews?demo=1">
           <FolderOpen />
           <strong>{state.sessions.length}</strong>次面试
         </Link>
@@ -47,9 +47,9 @@ export function OverviewSection({ workspace }: { workspace: LoadedWorkspace }) {
                   </Link>
                   <Button asChild size="sm">
                     <Link
-                      href={`/interview/setup?job=${r.target_job ?? 'frontend'}&resume=${r.id}`}
+                      href={`/interview/setup?demo=1&job=${r.target_job ?? 'frontend'}&resume=${r.id}`}
                     >
-                      使用
+                      在预设演示中使用
                     </Link>
                   </Button>
                 </div>
@@ -64,7 +64,7 @@ export function OverviewSection({ workspace }: { workspace: LoadedWorkspace }) {
             )}
           </section>
           <section className="library-panel">
-            <SectionTitle title="最近的面试" href="/me/interviews" />
+            <SectionTitle title="最近的面试" href="/me/interviews?demo=1" />
             {state.sessions.length ? (
               <SessionTable sessions={state.sessions.slice(0, 4)} />
             ) : (
@@ -97,12 +97,12 @@ export function OverviewSection({ workspace }: { workspace: LoadedWorkspace }) {
               {state.job_targets.slice(0, 3).map((t) => (
                 <Link
                   className="target-summary"
-                  href={`/interview/setup?target=${t.id}`}
+                  href={`/interview/setup?demo=1&target=${t.id}`}
                   key={t.id}
                 >
                   <strong>{t.title}</strong>
                   <span>
-                    {t.company || '个人 JD'}
+                    {t.company || '个人 JD'} · 预设演示
                     <ArrowRight size={16} />
                   </span>
                 </Link>

@@ -14,5 +14,21 @@ services:
       interval: 2s
       timeout: 3s
       retries: 30
+  knowledge-postgres:
+    image: pgvector/pgvector:0.8.7-pg16
+    environment:
+      POSTGRES_USER: interviewlab
+      POSTGRES_PASSWORD: interviewlab_local
+      POSTGRES_DB: interviewlab_knowledge
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - interviewlab_knowledge:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U interviewlab -d interviewlab_knowledge"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
 volumes:
+  interviewlab_knowledge:
   interviewlab_postgres:

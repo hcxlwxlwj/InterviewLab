@@ -3,7 +3,9 @@ import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { BackendConfig } from '../foundation/config';
 import * as foundationSchema from './schema';
 import * as authSchema from '../modules/accounts/auth-schema';
-const schema = { ...foundationSchema, ...authSchema };
+import * as interviewSchema from '../modules/interviews/schema';
+import * as reportSchema from '../modules/reports/schema';
+const schema = { ...foundationSchema, ...authSchema, ...interviewSchema, ...reportSchema };
 export interface Transaction {
   client: PoolClient;
   db: NodePgDatabase<typeof schema>;

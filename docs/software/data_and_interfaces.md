@@ -4,7 +4,7 @@
 
 ## 0. 当前接口与目标合同
 
-原同步演示客户端继续保留，Next.js 合成接口迁至 /api/demo/v1。/api/v1 经同源代理转发 Fastify，提供公开岗位、健康/就绪、能力状态、认证和需身份的任务查询；OpenAPI 只列实际路由。PostgreSQL 五张公共表、五张认证/限流表、事务、幂等、outbox 和 pg-boss worker 已实现；私有业务尚未接通。前端使用统一 apiRequest 和 SessionProvider，模块接入见前后端 README。
+原同步演示客户端继续保留，Next.js 合成接口为 /api/demo/v1。真实 /api/v1 提供公开岗位、认证、任务及文字面试/报告/重练/比较；OpenAPI 只列注册路由。除公共与认证表外，迁移 0002 新增六张面试/报告模块表。真实 DTO 使用独立 Interview，支持未校准证据报告及任务引用；原 Session 和 DataClient 仅供演示。当前实现、接口补充及未验收范围见[文字面试接入](interview-agent-implementation.md)。
 
 本文第 1–9 节保留全产品合同；已实现范围见后端 README 及下方骨架说明。原 API_CONTRACT、Session 和同步 DataClient 属于演示合同，不能当作新的真实 HTTP 客户端。
 

@@ -171,7 +171,9 @@ test('OpenAPI describes registered routes and is hidden outside development', as
   assert.ok(specification.paths['/api/v1/auth/session']);
   assert.ok(specification.paths['/api/v1/auth/sign-in/email']);
   assert.ok(!specification.paths['/api/v1/auth/sign-up/email']);
-  assert.ok(!specification.paths['/api/v1/interviews']);
+  assert.ok(specification.paths['/api/v1/interviews']);
+  assert.ok(specification.paths['/api/v1/interviews/{id}/turns/{turn_id}/answer']);
+  assert.ok(specification.paths['/api/v1/comparisons']);
   const production = await buildApp({
     config: { ...config, NODE_ENV: 'production' },
     logger: false,

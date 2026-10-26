@@ -73,8 +73,20 @@ test(
         logger: false,
         modules: [
           {
-            name: 'interviews',
+            name: 'knowledge',
             async register(app, access) {
+              app.get('/test-stream', async (request, reply) => {
+                await access.requireIdentity(request);
+                reply.hijack();
+                reply.raw.writeHead(200, {
+                  'Content-Type': 'text/event-stream',
+                  'Cache-Control': 'no-store, no-transform',
+                  'X-Accel-Buffering': 'no',
+                });
+                reply.raw.write('event: status\ndata: {"state":"pending"}\n\n');
+                await delay(1500);
+                reply.raw.end('event: committed\ndata: {"complete":true}\n\n');
+              });
               app.post('/test-identity', async (request) => ({
                 ...(await access.requireIdentity(request)),
                 key: request.headers['idempotency-key'],
@@ -170,6 +182,22 @@ test(
       );
       const session = await request<AuthSession>('/auth/session');
       assert.equal(session.user.id, userId);
+      const streamStarted = performance.now();
+      const streamResponse = await fetch(origin + '/api/v1/test-stream', {
+        headers: { cookie: [...cookies].map(([name, value]) => `${name}=${value}`).join('; ') },
+      });
+      assert.match(streamResponse.headers.get('content-type') ?? '', /text\/event-stream/);
+      const reader = streamResponse.body!.getReader();
+      const firstChunk = await reader.read();
+      assert.ok(performance.now() - streamStarted < 1200, 'Proxy buffered the initial SSE event');
+      let eventText = new TextDecoder().decode(firstChunk.value);
+      assert.match(eventText, /event: status/);
+      while (true) {
+        const part = await reader.read();
+        if (part.done) break;
+        eventText += new TextDecoder().decode(part.value);
+      }
+      assert.match(eventText, /event: committed/);
       const who = await request<{ owner_id: string; key: string }>('/test-identity', {
         method: 'POST',
         body: {},

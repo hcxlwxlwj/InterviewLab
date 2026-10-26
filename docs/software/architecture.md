@@ -4,7 +4,7 @@
 
 ## 0. 当前实现与本次设计的关系
 
-业务页面仍运行标签页演示客户端；原合成 HTTP 入口移至 /api/demo/v1。/api/v1 经 Next.js 同源代理到独立 Fastify，公共 HTTP 客户端、登录页、会话上下文和 Better Auth/Drizzle 受邀账号认证已接入。API/worker 具备公开岗位、公共迁移、事务/幂等/outbox/任务基础和 OpenAPI；私有业务、模型和实时语音尚未接通。
+真实文字配置、面试、报告/重练/比较和历史已接入 /api/v1，经 Next.js 同源代理到 Fastify，沿用 Better Auth/Drizzle 身份及公共事务、幂等、outbox 和任务。ecnu-plus 单案例真实闭环已通过，专业质量和教学效果仍待评审。简历/JD、语音等仍待接入；旧业务演示通过显式入口保留。当前实现和验证范围见[文字面试接入](interview-agent-implementation.md)。
 
 下文保留全产品目标。已实现范围和启动方式以[后端 README](../../code/backend/README.md)为准，不能将完整目标当成已验收能力。原型与真实服务入口分开，不自动上传浏览器个人材料。
 
@@ -117,6 +117,6 @@ Agent、数据库、WebSocket 和 worker 是上述业务的实现能力，不是
 
 验证包含两用户隔离、材料版本、重复提交、暂停/结束竞态、进程重启、断线、模型失败、旧任务与删除、内容发布/撤回、零回答与未观察。分别验收 OpenAPI 合同、数据库一致性、浏览器主路径和 Agent 质量，不以服务启动成功代替业务可用。
 
-2026-10-25 已实现公共后端骨架、岗位只读模块、迁移、同源代理、HTTP 客户端和受邀账号认证，未实现面试/报告等业务闭环。通过功能分支提交交付，不自动部署；业务原型页面仍可独立启动，真实联调需同时运行 API。
+2026-10-25 公共骨架基础包含岗位只读、迁移、同源代理、HTTP 客户端和受邀账号认证；本轮在其上实现真实文字面试/报告/重练闭环，实际模型效果仍待验收。真实联调同时运行 API、worker 和前端；保留显式演示，不自动部署。
 
 关联：[功能需求](../requirements/functional_spec.md) · [数据与接口](data_and_interfaces.md) · [知识与 Agent](../algorithm/knowledge_and_agent.md) · [评测](../algorithm/evaluation.md)。

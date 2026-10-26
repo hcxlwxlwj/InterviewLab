@@ -53,7 +53,7 @@ export default function PersonalWorkspace({ section = 'overview' }: { section?: 
         ) : (
           <Button asChild>
             <Link href="/interview/setup">
-              开始模拟
+              开始 AI 面试
               <ArrowRight size={18} />
             </Link>
           </Button>

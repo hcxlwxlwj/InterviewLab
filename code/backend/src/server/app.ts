@@ -26,6 +26,9 @@ import { publicCatalogRepository } from '../modules/jobs/repository';
 import { createJobsService } from '../modules/jobs/service';
 import { jobsModule } from '../modules/jobs/routes';
 import { validateModules, type BackendModule, type ServiceRegistry } from '../modules/contracts';
+import { createInterviewRuntime, type InterviewRuntimeOptions } from '../modules/interview-runtime';
+import { interviewsModule } from '../modules/interviews/routes';
+import { reportsModule } from '../modules/reports/routes';
 
 export interface ApplicationOptions {
   config?: BackendConfig;
@@ -34,6 +37,7 @@ export interface ApplicationOptions {
   services?: ServiceRegistry;
   modules?: BackendModule[];
   logger?: boolean;
+  interview?: InterviewRuntimeOptions;
 }
 export async function buildApp(options: ApplicationOptions = {}) {
   const config = options.config ?? loadConfig();
@@ -71,6 +75,10 @@ export async function buildApp(options: ApplicationOptions = {}) {
   if (database && !options.database) app.addHook('onClose', () => database.close());
 
   try {
+    const interview = database
+      ? createInterviewRuntime(database, config, options.interview)
+      : undefined;
+    if (interview) app.addHook('onClose', () => interview.close());
     await app.register(swagger, {
       openapi: {
         openapi: '3.0.3',
@@ -85,6 +93,7 @@ export async function buildApp(options: ApplicationOptions = {}) {
     });
     const modules = [
       jobsModule(createJobsService(publicCatalogRepository)),
+      ...(interview?.modules ?? [interviewsModule(), reportsModule()]),
       ...(options.modules ?? []),
     ];
     validateModules(modules);
@@ -157,7 +166,7 @@ export async function buildApp(options: ApplicationOptions = {}) {
             return {
               ...dependencies,
               authentication: Boolean(identity) && (!auth || dependencies.database),
-              llm: false,
+              llm: Boolean(interview?.agent.available),
               private_storage: false,
             };
           },

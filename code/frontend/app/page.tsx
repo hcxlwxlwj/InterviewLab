@@ -81,7 +81,7 @@ export default function Home() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link href="/reports/sample-interview">
+                  <Link href="/reports/sample-interview?demo=1">
                     <Play size={16} />
                     查看示例报告
                   </Link>
@@ -178,7 +178,7 @@ export default function Home() {
                 <br />
                 先找到一个缺口，再针对同一道题重新练习。
               </p>
-              <Link className="text-link" href="/reports/sample-interview">
+              <Link className="text-link" href="/reports/sample-interview?demo=1">
                 看看一份示例报告
                 <ArrowRight size={17} />
               </Link>
@@ -205,7 +205,7 @@ export default function Home() {
               </div>
               <div className="preview-footer">
                 <span>依据：第 1 题回答原文</span>
-                <Link href="/reports/sample-interview">
+                <Link href="/reports/sample-interview?demo=1">
                   查看完整示例
                   <ChevronRight size={14} />
                 </Link>

@@ -74,11 +74,7 @@ export function SavedJobsSection({ workspace }: { workspace: LoadedWorkspace }) 
                   </div>
                   <div className="row-actions wrap">
                     <Button asChild variant="outline" size="sm">
-                      <Link
-                        href={`/interview/setup?job=${b.template_id}${b.preferred_resume_id ? `&resume=${b.preferred_resume_id}` : ''}`}
-                      >
-                        开始模拟
-                      </Link>
+                      <Link href={`/interview/setup?job=${b.template_id}`}>开始 AI 面试</Link>
                     </Button>
                     <button className="text-link" onClick={() => setBookmark({ ...b })}>
                       备注与简历
@@ -126,7 +122,7 @@ export function SavedJobsSection({ workspace }: { workspace: LoadedWorkspace }) 
                 </div>
                 <div className="row-actions wrap">
                   <Button asChild size="sm">
-                    <Link href={`/interview/setup?target=${t.id}`}>开始模拟</Link>
+                    <Link href={`/interview/setup?demo=1&target=${t.id}`}>预设流程演示</Link>
                   </Button>
                   <button className="text-link" onClick={() => setTarget(t)}>
                     编辑 JD
