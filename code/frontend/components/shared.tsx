@@ -17,6 +17,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from './ui/button';
 import { readDemo, storageAvailable, type DemoState } from '../lib/demo-client';
+import { useSession } from './session-provider';
 export function Brand() {
   return (
     <Link href="/" className="brand" aria-label="InterviewLab 首页">
@@ -33,6 +34,7 @@ export function Brand() {
 }
 export function Header() {
   const path = usePathname();
+  const { isDevelopment } = useSession();
   const [open, setOpen] = useState(false);
   return (
     <header className="site-header">
@@ -61,13 +63,17 @@ export function Header() {
           </Link>
         </nav>
         <div className="header-actions">
-          <span className="badge badge-yellow">演示版本</span>
-          <Link href="/login" className="text-link">
-            账号登录
-          </Link>
-          <Link href="/me" className="user-link">
+          <span className="badge badge-yellow">
+            {isDevelopment ? '面试流程联调' : '文字面试 Beta'}
+          </span>
+          {!isDevelopment && (
+            <Link href="/login" className="text-link">
+              账号登录
+            </Link>
+          )}
+          <Link href="/me/interviews" className="user-link">
             <UserRound size={17} />
-            <span>个人中心</span>
+            <span>{isDevelopment ? '面试记录' : '个人中心'}</span>
             <ChevronRight size={14} />
           </Link>
           <button
@@ -89,7 +95,7 @@ export function Footer() {
       <div className="container footer-inner">
         <Brand />
         <p>每一次练习，都从自己的经历出发。</p>
-        <span>本地演示 · 不接入真实测评服务</span>
+        <span>真实文字面试 · 合成演示独立提供</span>
       </div>
     </footer>
   );
@@ -120,10 +126,13 @@ export function DemoNotice({ compact = false }: { compact?: boolean }) {
       <Info size={16} />
       <span>
         {available
-          ? '演示模式：请使用虚构内容。记录仅保留在当前标签页。'
-          : '浏览器存储不可用，当前记录仅临时保留，刷新后可能丢失。'}
+          ? '旧版预设流程演示（不调用 AI）：请使用虚构内容。记录仅保留在当前标签页。'
+          : '旧版预设流程演示（不调用 AI）：浏览器存储不可用，刷新后记录可能丢失。'}
         {!compact && ' 尚未接入真实评估。'}
       </span>
+      <Link className="text-link" href="/interview/setup">
+        进入 AI 面试 →
+      </Link>
     </div>
   );
 }

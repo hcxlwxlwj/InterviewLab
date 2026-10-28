@@ -1,0 +1,911 @@
+{
+  "id": "frontend-agent-2026-10-v1",
+  "review_state": "draft",
+  "reviewer": null,
+  "embedding_model": "ecnu-embedding-small",
+  "dimensions": 1024,
+  "sources": [
+    {
+      "id": "react-state",
+      "title": "React 状态管理",
+      "url": "https://react.dev/learn/managing-state",
+      "publisher": "React",
+      "section": "Managing State",
+      "reviewed_at": null,
+      "acquired_at": "2026-10-26",
+      "usage_basis": "reference_only; platform-authored summary; no full-page reproduction"
+    },
+    {
+      "id": "react-effect",
+      "title": "React useEffect",
+      "url": "https://react.dev/reference/react/useEffect",
+      "publisher": "React",
+      "section": "Reference / useEffect",
+      "reviewed_at": null,
+      "acquired_at": "2026-10-26",
+      "usage_basis": "reference_only; platform-authored summary; no full-page reproduction"
+    },
+    {
+      "id": "mdn-js",
+      "title": "JavaScript Guide",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide",
+      "publisher": "MDN",
+      "section": "JavaScript Guide",
+      "reviewed_at": null,
+      "acquired_at": "2026-10-26",
+      "usage_basis": "reference_only; platform-authored summary; no full-page reproduction"
+    },
+    {
+      "id": "mdn-fetch",
+      "title": "Using Fetch",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch",
+      "publisher": "MDN",
+      "section": "Using Fetch",
+      "reviewed_at": null,
+      "acquired_at": "2026-10-26",
+      "usage_basis": "reference_only; platform-authored summary; no full-page reproduction"
+    },
+    {
+      "id": "mdn-abort",
+      "title": "AbortController",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortController",
+      "publisher": "MDN",
+      "section": "AbortController",
+      "reviewed_at": null,
+      "acquired_at": "2026-10-26",
+      "usage_basis": "reference_only; platform-authored summary; no full-page reproduction"
+    },
+    {
+      "id": "w3c-dialog",
+      "title": "Modal dialog pattern",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
+      "publisher": "W3C",
+      "section": "Dialog (Modal) Pattern",
+      "reviewed_at": null,
+      "acquired_at": "2026-10-26",
+      "usage_basis": "reference_only; platform-authored summary; no full-page reproduction"
+    },
+    {
+      "id": "gov-needs",
+      "title": "Learning about users and their needs",
+      "url": "https://www.gov.uk/service-manual/user-research/start-by-learning-user-needs",
+      "publisher": "GOV.UK",
+      "section": "Understanding and validating user needs",
+      "reviewed_at": null,
+      "acquired_at": "2026-10-26",
+      "usage_basis": "reference_only; platform-authored summary; no full-page reproduction"
+    },
+    {
+      "id": "sre-slo",
+      "title": "Service Level Objectives",
+      "url": "https://sre.google/sre-book/service-level-objectives/",
+      "publisher": "Google SRE",
+      "section": "Indicators and objectives",
+      "reviewed_at": null,
+      "acquired_at": "2026-10-26",
+      "usage_basis": "reference_only; platform-authored summary; no full-page reproduction"
+    },
+    {
+      "id": "opm",
+      "title": "Structured Interviews",
+      "url": "https://www.opm.gov/policy-data-oversight/assessment-and-selection/structured-interviews/",
+      "publisher": "OPM",
+      "section": "Structured Interviews",
+      "reviewed_at": null,
+      "acquired_at": "2026-10-26",
+      "usage_basis": "reference_only; platform-authored summary; no full-page reproduction"
+    }
+  ],
+  "competencies": [
+    {
+      "id": "understanding",
+      "title": "专业理解",
+      "evidence_wanted": "解释原理及适用边界",
+      "probe_when": "只有名词或结论，缺少为什么",
+      "stop_when": "已说明原理、适用条件和限制",
+      "alternative": "从学过的概念或课程练习展开"
+    },
+    {
+      "id": "verification",
+      "title": "实现与验证",
+      "evidence_wanted": "本人行动、排查步骤与可观察结果",
+      "probe_when": "声称有效但没有验证方法",
+      "stop_when": "已有过程、验证依据和局限",
+      "alternative": "使用可复现的小实验或假设场景"
+    },
+    {
+      "id": "business",
+      "title": "用户与业务目标",
+      "evidence_wanted": "谁遇到了什么问题、预期结果",
+      "probe_when": "只描述功能没有目标",
+      "stop_when": "已说明用户问题与结果判断",
+      "alternative": "选择校园场景，不强求商业收入"
+    },
+    {
+      "id": "tradeoffs",
+      "title": "约束与取舍",
+      "evidence_wanted": "限制、备选方案和选择理由",
+      "probe_when": "结论没有约束或比较",
+      "stop_when": "已说明关键约束和取舍理由",
+      "alternative": "给明确的假设约束让候选人分析"
+    },
+    {
+      "id": "contribution",
+      "title": "个人贡献",
+      "evidence_wanted": "本人负责的行动及协作边界",
+      "probe_when": "只有团队成果没有个人行动",
+      "stop_when": "本人行动和职责边界已明确",
+      "alternative": "允许个人或课程项目"
+    },
+    {
+      "id": "collaboration",
+      "title": "协作",
+      "evidence_wanted": "具体分歧、本人行动和处理结果",
+      "probe_when": "泛泛说沟通缺少行动",
+      "stop_when": "已说明双方诉求、行动和后续",
+      "alternative": "可使用学习小组经历"
+    },
+    {
+      "id": "learning",
+      "title": "学习与反馈",
+      "evidence_wanted": "发现问题、获得反馈和调整",
+      "probe_when": "只说学习了没有改变",
+      "stop_when": "已有反馈、改进和检验",
+      "alternative": "可使用课程或自主学习经历"
+    },
+    {
+      "id": "motivation",
+      "title": "岗位动机",
+      "evidence_wanted": "对岗位任务的理解和选择依据",
+      "probe_when": "仅表达兴趣缺少具体依据",
+      "stop_when": "已说明任务理解和实际探索",
+      "alternative": "允许尚在探索，不强求职业承诺"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "frontend-technical_qa",
+      "version": "1",
+      "type": "technical_qa",
+      "label": "专业面",
+      "goals": [
+        "understanding",
+        "verification",
+        "contribution",
+        "tradeoffs"
+      ]
+    },
+    {
+      "id": "frontend-business_scenario",
+      "version": "1",
+      "type": "business_scenario",
+      "label": "业务面",
+      "goals": [
+        "business",
+        "tradeoffs",
+        "verification",
+        "contribution"
+      ]
+    },
+    {
+      "id": "frontend-hr",
+      "version": "1",
+      "type": "hr",
+      "label": "HR 面",
+      "goals": [
+        "motivation",
+        "collaboration",
+        "learning",
+        "contribution"
+      ]
+    },
+    {
+      "id": "frontend-mixed",
+      "version": "1",
+      "type": "mixed",
+      "label": "综合面试",
+      "goals": [
+        "verification",
+        "business",
+        "collaboration",
+        "motivation"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "fe-k01",
+      "title": "React 状态归属与单一数据源",
+      "text": "React 状态归属与单一数据源。组件之间共享状态时，应明确状态归属。需要协调多个组件的数据通常提升到共同父组件；能够由现有状态计算出的值通常不必另存一份。观察候选人能否解释数据如何传递、状态由谁修改，以及重复保存数据可能产生的不一致。不能仅凭使用某个状态库判断能力。",
+      "source_refs": [
+        "react-state"
+      ],
+      "goals": [
+        "understanding"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k02",
+      "title": "受控输入与表单状态",
+      "text": "受控输入与表单状态。受控输入由状态提供 value 并在输入变化时更新。表单还需要区分草稿、提交中、已保存和失败状态。可以沿候选人实际实现询问网络失败如何保留输入、何时清空草稿，以及重复点击如何处理；没有陈述这些实现时只能提问，不能假定存在。",
+      "source_refs": [
+        "react-state"
+      ],
+      "goals": [
+        "verification"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k03",
+      "title": "状态结构与派生数据",
+      "text": "状态结构与派生数据。状态结构应减少矛盾、冗余和重复数据。相互排斥的界面状态可用一个明确状态表达，派生信息由现有数据计算。面试时关注为什么这样组织，以及增加状态后如何维持一致，避免要求候选人背诵 API 名称。",
+      "source_refs": [
+        "react-state"
+      ],
+      "goals": [
+        "understanding"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k04",
+      "title": "副作用与依赖",
+      "text": "副作用与依赖。Effect 用于与外部系统同步。依赖应反映 Effect 读取的响应式值；清理在后续相关 Effect 执行前及卸载时处理旧同步。关注候选人是否理解依赖、闭包和清理的关系，不把所有计算都要求放进 Effect。",
+      "source_refs": [
+        "react-effect"
+      ],
+      "goals": [
+        "understanding"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k05",
+      "title": "请求竞态与过期结果",
+      "text": "请求竞态与过期结果。异步请求返回顺序可能与发送顺序不同。页面切换或查询条件改变后，旧请求的结果可能覆盖新状态。可询问候选人如何识别过期响应以及如何验证；取消请求和忽略过期结果有不同作用，不能只凭调用取消 API 就认定没有竞态。",
+      "source_refs": [
+        "react-effect"
+      ],
+      "goals": [
+        "verification"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k06",
+      "title": "取消与资源生命周期",
+      "text": "取消与资源生命周期。AbortController 提供 AbortSignal 通知支持取消的操作。请求取消需要与页面状态、错误处理和资源释放配合。关注取消后是否仍会更新无效页面，以及取消和实际业务失败是否在交互上区分；不能把客户端取消等同服务端操作必定回滚。",
+      "source_refs": [
+        "mdn-abort"
+      ],
+      "goals": [
+        "verification"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k07",
+      "title": "HTTP 错误与网络错误",
+      "text": "HTTP 错误与网络错误。Fetch 返回 HTTP 错误状态时通常仍会兑现为 Response，需要结合状态判断；网络等错误则可能拒绝 Promise。沿实际流程了解失败提示、重试条件和原输入保留。不要在问题里直接提示候选人应使用哪些状态码或 API。",
+      "source_refs": [
+        "mdn-fetch"
+      ],
+      "goals": [
+        "understanding"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k08",
+      "title": "流式读取与增量解码",
+      "text": "流式读取与增量解码。响应体可通过流逐段读取。分段不等同完整业务消息，文本解码和消息边界需要分别处理。观察如何处理跨片段字符、半条消息、流中断和重连，若用户没有做过流式功能，应先确认经验再使用明确假设场景。",
+      "source_refs": [
+        "mdn-fetch"
+      ],
+      "goals": [
+        "verification"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k09",
+      "title": "闭包与异步上下文",
+      "text": "闭包与异步上下文。函数可以访问其词法环境中的变量。异步回调读取的值取决于具体作用域与代码组织。可让候选人结合实际问题解释看到的值及原因；不要只因为没有使用术语就判定不理解，也不要假设一定遇到过陈旧闭包。",
+      "source_refs": [
+        "mdn-js"
+      ],
+      "goals": [
+        "understanding"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k10",
+      "title": "异步流程与异常传播",
+      "text": "异步流程与异常传播。Promise 和 async/await 帮助组织异步操作。异常传播、并行关系和清理需要结合调用位置理解。关注候选人如何验证失败分支与任务依赖，而不是把并行请求一概视为更优方案；前置依赖和取消约束可能要求顺序执行。",
+      "source_refs": [
+        "mdn-js"
+      ],
+      "goals": [
+        "verification"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k11",
+      "title": "前端性能与用户可感知指标",
+      "text": "前端性能与用户可感知指标。性能优化应先明确用户感受到的等待与测量条件。首个内容、可交互、完整操作耗时是不同指标，不能相互替代。比较优化前后应说明设备、网络、样本和测量方式。课程项目可以用小规模重复实验说明局限，不要求编造线上收益。",
+      "source_refs": [
+        "sre-slo"
+      ],
+      "goals": [
+        "tradeoffs"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k12",
+      "title": "对话框可访问性",
+      "text": "对话框可访问性。模态对话框需要考虑可访问名称、键盘操作、焦点进入及关闭后的恢复，并限制模态开启时与背景内容的交互。关注用户能否完成任务及测试方法，而不是仅检查某个 aria 属性是否出现；具体行为应以采用的组件和模式核对。",
+      "source_refs": [
+        "w3c-dialog"
+      ],
+      "goals": [
+        "understanding"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k13",
+      "title": "从功能回到用户问题",
+      "text": "从功能回到用户问题。用户需求描述谁希望完成什么以及为什么。功能建议需要对应具体问题和预期结果；来自团队的意见仍需验证。面试可以询问如何发现需求及依据，不强求校园项目必须有真实商业客户。材料属于服务设计方法，不能冒充某企业面试标准。",
+      "source_refs": [
+        "gov-needs"
+      ],
+      "goals": [
+        "business"
+      ],
+      "types": [
+        "business_scenario",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k14",
+      "title": "约束下的需求优先级",
+      "text": "约束下的需求优先级。资源有限时需要明确核心用户任务与影响，区分必要结果和实现方案。关注候选人如何获取依据、比较范围及处理不确定性。不同方案可能在可交付性、可访问性、维护成本和用户收益上有不同取舍，不预设唯一正确答案。",
+      "source_refs": [
+        "gov-needs"
+      ],
+      "goals": [
+        "tradeoffs"
+      ],
+      "types": [
+        "business_scenario",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k15",
+      "title": "结果验证与指标边界",
+      "text": "结果验证与指标边界。应区分用户目标、可观察指标和目标值。指标需要与预期结果相关，并说明采样、统计口径和限制。页面请求次数下降本身不必然代表用户任务更快；面试应询问证据而非直接宣布成功或失败。",
+      "source_refs": [
+        "sre-slo"
+      ],
+      "goals": [
+        "business"
+      ],
+      "types": [
+        "business_scenario",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k16",
+      "title": "需求变化与最小验证",
+      "text": "需求变化与最小验证。对需求理解需要在迭代中持续验证。可以使用访谈、观察、原型或已有使用证据，选择取决于待验证的问题。关注候选人如何调整假设及方案，并承认样本和场景限制；不要求没有条件的学生项目伪造研究或运营数据。",
+      "source_refs": [
+        "gov-needs"
+      ],
+      "goals": [
+        "business"
+      ],
+      "types": [
+        "business_scenario",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k17",
+      "title": "岗位动机的行为依据",
+      "text": "岗位动机的行为依据。围绕岗位任务了解候选人的兴趣、实际探索和选择依据。允许学生仍在探索方向，通过具体学习或项目经历了解选择过程。不从学校、家庭、性别或个人背景推断适配程度，不要求宣称长期不变的职业承诺。此卡为平台提问方法。",
+      "source_refs": [
+        "opm"
+      ],
+      "goals": [
+        "motivation"
+      ],
+      "types": [
+        "hr",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k18",
+      "title": "协作中的具体行动",
+      "text": "协作中的具体行动。通过过去行为了解协作：具体情境、本人职责、采取的行动和后续结果。若描述只有团队成果，可先厘清个人行动；如果已经说明充分，不反复要求职责。没有实习时允许课程小组或社团经历，不从单次回答推断人格。",
+      "source_refs": [
+        "opm"
+      ],
+      "goals": [
+        "collaboration"
+      ],
+      "types": [
+        "hr",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k19",
+      "title": "反馈与学习的验证",
+      "text": "反馈与学习的验证。了解候选人如何识别不足、获得反馈、调整行为以及检查变化。过去行为与假设回答需明确区分。观察重点是可定位的行动和依据，不是能否完整套用某种答题模板；也不能把没有被问到的信息自动作为缺点。",
+      "source_refs": [
+        "opm"
+      ],
+      "goals": [
+        "learning"
+      ],
+      "types": [
+        "hr",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    },
+    {
+      "id": "fe-k20",
+      "title": "追问边界与证据不足",
+      "text": "追问边界与证据不足。追问应围绕与岗位相关、尚未解释的信息。用户明确没有某类经历时应换用允许的经历或假设问题；依据不足记录为未观察，不补造经历或评价。公开结构化面试材料提供方法参考，本项目的动态追问不等同经过效度验证的正式招聘测评。",
+      "source_refs": [
+        "opm"
+      ],
+      "goals": [
+        "contribution"
+      ],
+      "types": [
+        "hr",
+        "mixed"
+      ],
+      "job": "frontend",
+      "stages": [
+        "internship",
+        "campus"
+      ],
+      "difficulty": "基础"
+    }
+  ],
+  "questions": [
+    {
+      "id": "fe-q01",
+      "topic": "React 状态归属与单一数据源",
+      "text": "结合你提到的实现，能解释一下这样设计的原因吗？",
+      "goals": [
+        "understanding"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "source_refs": [
+        "react-state"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "只有名词或结论，缺少为什么"
+    },
+    {
+      "id": "fe-q02",
+      "topic": "受控输入与表单状态",
+      "text": "你当时是怎样验证这个结果的？",
+      "goals": [
+        "verification"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "source_refs": [
+        "react-state"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "声称有效但没有验证方法"
+    },
+    {
+      "id": "fe-q03",
+      "topic": "状态结构与派生数据",
+      "text": "结合你提到的实现，能解释一下这样设计的原因吗？",
+      "goals": [
+        "understanding"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "source_refs": [
+        "react-state"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "只有名词或结论，缺少为什么"
+    },
+    {
+      "id": "fe-q04",
+      "topic": "副作用与依赖",
+      "text": "结合你提到的实现，能解释一下这样设计的原因吗？",
+      "goals": [
+        "understanding"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "source_refs": [
+        "react-effect"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "只有名词或结论，缺少为什么"
+    },
+    {
+      "id": "fe-q05",
+      "topic": "请求竞态与过期结果",
+      "text": "你当时是怎样验证这个结果的？",
+      "goals": [
+        "verification"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "source_refs": [
+        "react-effect"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "声称有效但没有验证方法"
+    },
+    {
+      "id": "fe-q06",
+      "topic": "取消与资源生命周期",
+      "text": "你当时是怎样验证这个结果的？",
+      "goals": [
+        "verification"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "source_refs": [
+        "mdn-abort"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "声称有效但没有验证方法"
+    },
+    {
+      "id": "fe-q07",
+      "topic": "HTTP 错误与网络错误",
+      "text": "结合你提到的实现，能解释一下这样设计的原因吗？",
+      "goals": [
+        "understanding"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "source_refs": [
+        "mdn-fetch"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "只有名词或结论，缺少为什么"
+    },
+    {
+      "id": "fe-q08",
+      "topic": "流式读取与增量解码",
+      "text": "你当时是怎样验证这个结果的？",
+      "goals": [
+        "verification"
+      ],
+      "types": [
+        "technical_qa",
+        "mixed"
+      ],
+      "source_refs": [
+        "mdn-fetch"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "声称有效但没有验证方法"
+    },
+    {
+      "id": "fe-q09",
+      "topic": "从功能回到用户问题",
+      "text": "你怎样确认这项工作解决了用户的问题？",
+      "goals": [
+        "business"
+      ],
+      "types": [
+        "business_scenario",
+        "mixed"
+      ],
+      "source_refs": [
+        "gov-needs"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "只描述功能没有目标"
+    },
+    {
+      "id": "fe-q10",
+      "topic": "约束下的需求优先级",
+      "text": "在当时的约束下，你为什么选择这个方案？",
+      "goals": [
+        "tradeoffs"
+      ],
+      "types": [
+        "business_scenario",
+        "mixed"
+      ],
+      "source_refs": [
+        "gov-needs"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "结论没有约束或比较"
+    },
+    {
+      "id": "fe-q11",
+      "topic": "结果验证与指标边界",
+      "text": "你怎样确认这项工作解决了用户的问题？",
+      "goals": [
+        "business"
+      ],
+      "types": [
+        "business_scenario",
+        "mixed"
+      ],
+      "source_refs": [
+        "sre-slo"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "只描述功能没有目标"
+    },
+    {
+      "id": "fe-q12",
+      "topic": "需求变化与最小验证",
+      "text": "你怎样确认这项工作解决了用户的问题？",
+      "goals": [
+        "business"
+      ],
+      "types": [
+        "business_scenario",
+        "mixed"
+      ],
+      "source_refs": [
+        "gov-needs"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "只描述功能没有目标"
+    },
+    {
+      "id": "fe-q13",
+      "topic": "岗位动机的行为依据",
+      "text": "哪一段实际经历影响了你选择这个方向？",
+      "goals": [
+        "motivation"
+      ],
+      "types": [
+        "hr",
+        "mixed"
+      ],
+      "source_refs": [
+        "opm"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "仅表达兴趣缺少具体依据"
+    },
+    {
+      "id": "fe-q14",
+      "topic": "协作中的具体行动",
+      "text": "在这次协作中，你具体做了什么？",
+      "goals": [
+        "collaboration"
+      ],
+      "types": [
+        "hr",
+        "mixed"
+      ],
+      "source_refs": [
+        "opm"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "泛泛说沟通缺少行动"
+    },
+    {
+      "id": "fe-q15",
+      "topic": "反馈与学习的验证",
+      "text": "收到反馈后，你做了什么调整？",
+      "goals": [
+        "learning"
+      ],
+      "types": [
+        "hr",
+        "mixed"
+      ],
+      "source_refs": [
+        "opm"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "只说学习了没有改变"
+    },
+    {
+      "id": "fe-q16",
+      "topic": "追问边界与证据不足",
+      "text": "这部分工作中你本人负责什么？",
+      "goals": [
+        "contribution"
+      ],
+      "types": [
+        "hr",
+        "mixed"
+      ],
+      "source_refs": [
+        "opm"
+      ],
+      "origin": "platform_authored",
+      "follow_up_trigger": "只有团队成果没有个人行动"
+    }
+  ]
+}

@@ -7,6 +7,7 @@
 | `src/domain/interview.ts` | 配置、简历、经历、会话、回答、报告等共享对象 |
 | `src/domain/knowledge.ts` | 岗位、来源、知识、查询及检索接口 |
 | `src/ports.ts` | 模型、语音、执行、存储、会话仓储与演示数据客户端合同 |
+| `src/live-interview.ts` | 真实文字面试 DTO、知识端口、证据与未校准报告/比较、题量规则；独立于演示 Session |
 | `src/configuration.ts` | 默认配置与显示标签 |
 | `src/questions.ts` | 根据传入的模板生成预设题目，控制主问题/追问预算 |
 | `src/session.ts` | 提交幂等、暂停、结束及 12 分钟安全上限 |

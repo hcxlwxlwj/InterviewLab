@@ -12,8 +12,11 @@ Fastify API 与 pg-boss worker 共用一个后端包。公共基础统一维护�
 | 同源代理、公共 HTTP 客户端和登录入口 | 已实现，见[前端接入](../frontend/README.md) |
 | Better Auth、Cookie 会话、角色校验、受邀账号命令 | 已实现，配置后启用；没有公开注册 |
 | 任务查询 | 已实现 Cookie 身份和资源归属校验 |
-| 账号资料/偏好、简历、个人 JD/收藏、面试、报告、内容维护业务 | 待模块负责人实现 |
-| 模型、私有文件、语音、向量检索 | 尚未接通 |
+| 真实文字面试、证据报告、单题重练、比较、历史和删除 | 已实现，真实模型效果单独验收 |
+| ecnu-plus 兼容模型适配、冻结知识接口、本地公开内容适配 | 已实现；须配置本机 LLM_API_KEY，真实效果尚待验收 |
+| 账号资料/偏好、简历、个人 JD/收藏、内容维护业务 | 待模块负责人实现 |
+| pgvector 混合检索、目标记忆与流式面试 | 前端岗位 v3 联调试点，草案待人工审核；见[说明](../../docs/software/interview-agent-v3.md) |
+| 私有文件、语音 | 尚未接通 |
 
 [架构](../../docs/software/architecture.md)和[数据合同](../../docs/software/data_and_interfaces.md)区分当前能力与目标方案；规划接口不等于已实现接口。
 
@@ -66,7 +69,7 @@ PostgreSQL 16 仅映射本机 5433。示例是公开本地凭证，生产必须�
 
 入口从仓库根 .env 加载，显式环境变量优先；范围见 src/foundation/config.ts。API 启动不迁移应用表。五张基础表通过 db:migrate 建立；首次 worker 启动会初始化/升级 pg-boss 自有 pgboss schema，部署升级前应审核版本。
 
-当前 worker 入口没有业务处理器。空 worker 仅证明连接和心跳可用，不代表面试/报告可用。未注册类型变为 failed/unsupported_task_type，不能静默吞掉。
+worker 入口已注册面试规划/推进、逐题报告和比较处理器，并每秒处理期限、最终失败和报告汇总。默认 ecnu-plus，配置项及真实/演示入口见[文字面试接入](../../docs/software/interview-agent-implementation.md)。没有 LLM_API_KEY 时能力明确不可用，不能把心跳当成模型成功。未注册类型仍显式失败。
 
 停止本项目数据库可执行 docker compose -f code/backend/compose.yaml stop；卷保留。不要删除其他成员的数据库或使用生产数据测试。
 
@@ -151,7 +154,7 @@ npm run build:backend
 npm run build
 ~~~
 
-test:db 会清空五张公共表，只能使用独立的 interviewlab_test* 数据库；缺少数据库时失败，不跳过。不要与其他写同一测试库的进程并行运行。
+test:db 会清空公共基础及面试/报告测试表，并清理认证会话/限流测试数据，只能使用独立的 interviewlab_test* 数据库；缺少数据库时失败，不跳过。不要与其他写同一测试库的进程并行运行。
 
 ~~~powershell
 docker compose -f code/backend/compose.yaml exec -T postgres createdb -U interviewlab interviewlab_test

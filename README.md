@@ -2,7 +2,7 @@
 
 面向高校学生的模拟面试与复盘 Web 应用。围绕课程项目、竞赛、科研、毕设及实习经历练习岗位问答，讲清个人贡献、方案取舍与验证过程。
 
-**当前阶段：文字交互原型、公开岗位内容，以及可独立运行的后端公共骨架。** Fastify/worker、数据库迁移、事务与任务、同源代理、统一 HTTP 客户端及可配置的 Better Auth 受邀账号认证已实现；业务页面仍使用演示数据。个人业务、模型、语音、上传、代码执行和 PDF 尚未接通。
+**当前阶段：真实文字面试闭环、公开岗位内容及独立后端。** 已实现受邀账号、持久化面试、动态 Agent 提问、证据报告、单题重练、比较与历史，以及可配置的 ecnu-plus 兼容适配器；单案例真实模型闭环已通过，质量评审仍待完成。使用时需在本机配置密钥；简历/个人 JD 仍为演示，语音、上传、代码执行和 PDF 未接入。详细范围与验证边界见[文字面试接入](docs/software/interview-agent-implementation.md)。
 
 ## 本地运行
 
@@ -17,7 +17,7 @@ npm run dev
 
 已有仓库先保存自己的改动，再执行 `git fetch origin`、`git switch main`、`git pull --ff-only`，然后安装依赖并启动。无需数据库、Docker、供应商密钥或 `.env`。
 
-上面的命令可单独运行原演示页面。联调真实接口时另开终端执行 `npm run dev:api`，浏览器通过前端 `/api/v1` 同源访问；原合成接口移至 `/api/demo/v1`。启用受邀账号登录需配置数据库和密钥，见[后端认证启动](code/backend/README.md)；成员统一调用方式见[前端公共接入](code/frontend/README.md)。
+上面的命令可单独浏览公开内容及[显式演示配置](http://127.0.0.1:3000/interview/setup?demo=1)。真实面试需配置数据库、认证及 LLM_API_KEY，执行 `npm run db:migrate` 后另开终端运行 `npm run dev:api` 和 `npm run dev:worker`；浏览器通过 `/api/v1` 同源访问。默认模型为 ecnu-plus，见[完整启动与模型配置](docs/software/interview-agent-implementation.md)。
 
 打开 [首页](http://127.0.0.1:3000/)、[岗位库](http://127.0.0.1:3000/jobs)或[个人中心](http://127.0.0.1:3000/me)。协作者各自在自己的电脑执行上述命令；localhost 不是可分享给其他电脑的在线预览地址，共享访问需要另行部署。
 
@@ -34,7 +34,7 @@ npm run dev
 
 体验路径：岗位库 → 收藏或保存个人 JD → 配置材料 → 文字模拟 → 报告 → 单题重练 → 个人中心回看。
 
-用户回答不生成专业分数；固定评分只出现在明确标注的合成报告。语音仅为流程预览，摄像头与媒体采集关闭；代码区提供草稿和未真实运行的演示说明。当前数据存于本标签页的 `sessionStorage`，刷新恢复、关闭标签页后不保证保留，存储不可用时降级为内存；请使用合成材料。各协作者的数据不互通。
+上述表格描述演示入口。真实入口 `/interview/setup` 和 `/me/interviews` 使用账号与数据库，报告提供证据分析且全部分数为空；固定分数只出现在明确标注的合成报告。演示材料仍只在当前标签页 sessionStorage，不自动上传或迁移到真实账号。语音、摄像头、媒体及代码执行均未启用。
 
 当前页面、设计参考、截图和局限见[首轮原型记录](docs/software/prototype/implementation.md)及[个人中心/岗位库扩展](docs/software/prototype/library-expansion.md)。
 
@@ -79,7 +79,7 @@ npm start
 
 ## 后续接入与协作
 
-独立后端采用 TypeScript/Node 模块化单体：Fastify + Zod/OpenAPI、Drizzle/PostgreSQL、pg-boss worker。公共基础、Better Auth 认证和岗位只读模块已实现；各模块业务、pgvector 及供应商能力按阶段接入。详见[后端启动与成员接入](code/backend/README.md)。
+独立后端采用 TypeScript/Node 模块化单体：Fastify + Zod/OpenAPI、Drizzle/PostgreSQL、pg-boss worker。公共基础、认证、岗位读取、真实文字面试/报告和模型适配已实现；简历/JD、pgvector、多模态等按阶段接入。知识库通过版本化接口注入，无需等待新知识库完成才能联调面试流程。详见[后端启动与成员接入](code/backend/README.md)。
 
 后续按四阶段实施：1 真实文字闭环，2 文件/内容/检索及评分校准，3 实时语音与独立语音观测，4 可选代码/镜头/复盘媒体/管理页面；各阶段回归，稳定后做对照与试用。保留显式演示入口，个人材料不自动上传。模块职责见[架构](docs/software/architecture.md)，新 HTTP 及旧路径迁移、材料快照和删除规则见[数据合同](docs/software/data_and_interfaces.md)。本轮已新增独立后端命令、依赖、迁移与测试；原型启动方式保持兼容。
 

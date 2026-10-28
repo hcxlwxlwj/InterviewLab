@@ -14,6 +14,7 @@ coverage/
 *.tsbuildinfo
 test-results/
 playwright-report/
+/tests/artifacts/
 .venv/
 venv/
 __pycache__/

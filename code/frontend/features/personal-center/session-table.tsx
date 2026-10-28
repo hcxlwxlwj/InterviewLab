@@ -6,7 +6,9 @@ import Link from 'next/link';
 import { formatDate } from '../../components/shared';
 
 export const destination = (s: Session) =>
-  ['completed', 'failed', 'ending'].includes(s.status) ? `/reports/${s.id}` : `/interview/${s.id}`;
+  ['completed', 'failed', 'ending'].includes(s.status)
+    ? `/reports/${s.id}?demo=1`
+    : `/interview/${s.id}?demo=1`;
 export function sessionTitle(s: Session) {
   return (
     s.material_snapshot.job_target?.title ||

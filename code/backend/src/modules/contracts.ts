@@ -29,9 +29,12 @@ export const MODULES: Record<ModuleName, { owns: string; status: 'available' | '
   jobs: { owns: 'Public job queries (personal JD and bookmarks planned)', status: 'available' },
   interviews: {
     owns: 'Interview state, snapshots, questions, answers and finalization',
-    status: 'planned',
+    status: 'available',
   },
-  reports: { owns: 'Reports, retry relations, comparisons and exports', status: 'planned' },
+  reports: {
+    owns: 'Evidence reports, retry relations and comparisons (exports planned)',
+    status: 'available',
+  },
   knowledge: {
     owns: 'Published content, sources, questions, rubrics and index versions',
     status: 'planned',

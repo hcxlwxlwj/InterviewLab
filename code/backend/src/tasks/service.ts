@@ -56,6 +56,7 @@ export async function enqueueTask(tx: Transaction, input: TaskInput): Promise<Ta
     'INSERT INTO outbox_events (id,task_id) VALUES ($1,$2) ON CONFLICT (task_id) DO NOTHING',
     [randomUUID(), row.id],
   );
+  await tx.client.query("SELECT pg_notify('interview_outbox','ready')");
   return taskView(row);
 }
 export function taskView(row: TaskRow): TaskView {

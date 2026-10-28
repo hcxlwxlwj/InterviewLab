@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { SessionProvider } from '../components/session-provider';
+import { interviewDevelopmentSession } from '../lib/development-session';
 import './globals.css';
 import './workspace.css';
 import './refinement.css';
 import './library.css';
 import './auth.css';
+import './live-interview.css';
 const uiFont = localFont({
   src: '../public/fonts/interviewlab-sans.woff2',
   variable: '--font-ui',
@@ -25,7 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a className="skip-link" href="#main-content">
           跳到主要内容
         </a>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider developmentSession={interviewDevelopmentSession(process.env)}>
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );

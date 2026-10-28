@@ -1,6 +1,18 @@
 # 前端公共接入
 
-业务负责人在现有 Next.js 工作区实现页面和联调，不需要再建 HTTP 客户端或认证系统。公共实现为同源代理、JSON HTTP 客户端、受邀账号登录页和会话上下文；首页、岗位、面试和个人中心业务页面仍是原演示实现，逐模块迁移。
+业务负责人沿用现有 Next.js、HTTP 客户端和认证系统。真实 `/interview/setup`、`/interview/{id}`、`/reports/{id}`、`/me/interviews` 已通过 HTTP 接入面试闭环；对应路径的 `?demo=1` 显式保留旧演示。简历与个人 JD 等尚为演示，不自动上传。启动、模型及验收边界见[文字面试接入](../../docs/software/interview-agent-implementation.md)。
+
+个人中心和收藏岗位的主按钮进入真实 AI 配置；简历与个人 JD 的旧流程入口明确标为预设演示。所有演示提示注明“不调用 AI”，并提供进入真实面试的链接；旧演示记录不自动转换为真实面试。入口区分截图见[入口提示](../../docs/software/prototype/screenshots/live-entry-clarity.png)。
+
+配置和面试沿用原有页面设计。`components/interview-setup.tsx` 复用原配置页框架与选项控件，`components/interview-workspace.tsx` 复用原顶部计时、左侧面试官/题目轨迹、右侧对话/输入框；真实 HTTP 控制器和显式演示控制器共用这些视图，不再维护另外一套聊天布局。真实流程只开放已接通选项。界面证据：[原配置布局](../../docs/software/prototype/screenshots/live-original-setup.png)、[原面试布局接入 AI](../../docs/software/prototype/screenshots/live-original-interview.png)。
+
+## 只开发面试流程与 Agent
+
+本机 `.env` 配置 `INTERVIEW_DEV_DATABASE_URL`（数据库名必须以 `interviewlab_dev` 开头）和现有模型参数后，运行 `npm run dev:interview`，直接打开 `http://127.0.0.1:33600/interview/setup`。该命令启动 API、worker 与原前端，使用真实 ecnu-plus；服务端注入固定联调身份，前端注入同一公开身份上下文，不创建账号、不需要密码、不调用登录接口。联调记录保留在独立开发库，退出后不会自动删除。`TEST_DATABASE_URL` 留给自动测试，不能与联调库混用。
+
+该方式只监听本机回环地址，启动脚本拒绝 production。前端开发身份只在 development 下显式注入，正常生产构建仍使用队友的认证模块。账号模块对接 `IdentityProvider/RequestIdentity` 与共享会话上下文；面试模块只负责配置、Agent 推进、原回答、状态和封存；知识库及报告模块分别通过现有内容与封存接口交接，不在面试模块里开发账号密码或报告业务。
+
+面试专用联调通过 `onFinalize` 接口在封存后停止，不自动生成报告，也不展示报告入口。正式组合继续使用报告模块的接收实现，面试模块保留可读取的封存记录供其对接。
 
 ## 工程位置
 
