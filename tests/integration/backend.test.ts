@@ -29,20 +29,31 @@ test('real backend starts without a database and separates liveness/readiness/ca
 test('published catalog has stable opaque cursors, filters and embedded sources', async (t) => {
   const app = await buildApp({ config, logger: false });
   t.after(() => app.close());
-  const first = (await app.inject('/api/v1/job-templates?limit=20')).json();
-  assert.equal(first.items.length, 20);
+  const first = (await app.inject('/api/v1/job-templates?limit=30')).json();
+  assert.equal(first.items.length, 30);
   assert.ok(first.next_cursor && !/^\d+$/.test(first.next_cursor));
-  const second = (
-    await app.inject({
-      url: '/api/v1/job-templates',
-      query: { cursor: first.next_cursor, limit: '20' },
-    })
-  ).json();
-  assert.equal(second.items.length, 16);
-  assert.equal(second.next_cursor, null);
+  const pages = [first];
+  for (let cursor = first.next_cursor; cursor; ) {
+    const page = (
+      await app.inject({
+        url: '/api/v1/job-templates',
+        query: { cursor, limit: '30' },
+      })
+    ).json();
+    pages.push(page);
+    cursor = page.next_cursor;
+  }
+  assert.equal(pages.length, 34);
+  assert.deepEqual(
+    pages.map((page) => page.items.length),
+    [...Array(33).fill(30), 10],
+  );
+  assert.equal(pages[pages.length - 1].next_cursor, null);
   assert.equal(
-    new Set([...first.items, ...second.items].map((item: { id: string }) => item.id)).size,
-    36,
+    new Set(
+      pages.flatMap((page) => page.items.map((item: { id: string }) => item.id)),
+    ).size,
+    1000,
   );
   const filtered = await app.inject(
     '/api/v1/job-templates?category=product&stage=internship&limit=50',

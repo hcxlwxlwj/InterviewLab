@@ -1,0 +1,134 @@
+[
+  {
+    "id": "harmony",
+    "role": "鸿蒙应用开发",
+    "recruit_title": "客户端实习生-抖音研发（A02988A）",
+    "recruit_url": "https://jobs.bytedance.com/campus/position/7592561295309932805/detail",
+    "recruit_verification": "page_read",
+    "official_url": "https://developer.huawei.com/consumer/cn/doc/doccenter-getting-started/arkts-get-started",
+    "checked_at": "2026-10-28",
+    "search_terms": "字节跳动校园招聘 keywords=客户端 实习 HarmonyOS ArkTS",
+    "review_notes": "打开详情页读取职责与要求，只归纳与鸿蒙客户端相关的通用条目，未复制企业JD全文。"
+  },
+  {
+    "id": "cross-platform",
+    "role": "跨端应用开发",
+    "recruit_title": "客户端开发工程师 - Cross Platform（A06979）",
+    "recruit_url": "https://jobs.bytedance.com/campus/position/7667967027332811013/detail",
+    "recruit_verification": "page_read",
+    "official_url": "https://reactnative.dev/architecture/landing-page",
+    "checked_at": "2026-10-28",
+    "search_terms": "字节跳动校园招聘 keywords=客户端 Cross Platform 跨端 实习",
+    "review_notes": "打开详情页读取职责与要求，只归纳跨端架构与原生协作相关条目，未复制企业JD全文。"
+  },
+  {
+    "id": "multimodal",
+    "role": "多模态算法",
+    "recruit_title": "多模态大模型算法工程师 - 搜索（A19917B）",
+    "recruit_url": "https://jobs.bytedance.com/campus/position/7668567141327784197/detail",
+    "recruit_verification": "page_read",
+    "official_url": "https://huggingface.co/docs/transformers/en/model_doc/clip",
+    "checked_at": "2026-10-28",
+    "search_terms": "字节跳动校园招聘 keywords=多模态 大模型 算法 实习",
+    "review_notes": "打开详情页读取职责与要求，只归纳表征对齐、评测与检索相关条目，未复制企业JD全文。"
+  },
+  {
+    "id": "llm-eval",
+    "role": "大模型评测",
+    "recruit_title": "大模型评测工程师 - 模型数据工程（A11274B）",
+    "recruit_url": "https://jobs.bytedance.com/campus/position/7669710611392416053/detail",
+    "recruit_verification": "page_read",
+    "official_url": "https://huggingface.co/docs/evaluate/index",
+    "checked_at": "2026-10-28",
+    "search_terms": "字节跳动校园招聘 keywords=大模型 评测 实习 2027届",
+    "review_notes": "选择2027届校园招聘条目；打开详情页读取职责与要求，只归纳评测集、指标与回归相关条目，未复制企业JD全文。"
+  },
+  {
+    "id": "data-science",
+    "role": "数据科学",
+    "recruit_title": "数据科学 - 抖音生活服务（A127113A）",
+    "recruit_url": "https://jobs.bytedance.com/campus/position/7668232018053155125/detail",
+    "recruit_verification": "page_read",
+    "official_url": "https://scikit-learn.org/stable/modules/model_evaluation.html",
+    "checked_at": "2026-10-28",
+    "search_terms": "字节跳动校园招聘 keywords=数据科学 生活服务 实习",
+    "review_notes": "打开详情页读取职责与要求，只归纳指标口径、实验与归因相关条目，未复制企业JD全文。"
+  },
+  {
+    "id": "realtime-computing",
+    "role": "实时计算",
+    "recruit_title": "大数据开发实习生-Data-抖音/直播/电商/剪映（A00759）",
+    "recruit_url": "https://jobs.bytedance.com/campus/position/7595244302092798261/detail",
+    "recruit_verification": "page_read",
+    "official_url": "https://nightlies.apache.org/flink/flink-docs-stable/docs/concepts/overview/",
+    "checked_at": "2026-10-28",
+    "search_terms": "字节跳动校园招聘 keywords=大数据开发 实时 实习 Flink",
+    "review_notes": "打开详情页读取职责与要求，只归纳事件时间、状态与一致性相关条目，未复制企业JD全文。"
+  },
+  {
+    "id": "privacy-testing",
+    "role": "隐私合规测试",
+    "recruit_title": "测试开发实习生-TikTok隐私安全（A108430A）",
+    "recruit_url": "https://jobs.bytedance.com/campus/position/7592959160417945909/detail",
+    "recruit_verification": "page_read",
+    "official_url": "https://www.nist.gov/privacy-framework",
+    "checked_at": "2026-10-28",
+    "search_terms": "字节跳动校园招聘 keywords=测试开发 隐私安全 实习 TikTok",
+    "review_notes": "打开详情页读取职责与要求，只归纳权限、数据生命周期与合规验证相关条目，未复制企业JD全文。"
+  },
+  {
+    "id": "dev-efficiency",
+    "role": "研发效能",
+    "recruit_title": "Agent开发（研发效能方向）实习生 - 剪映CapCut（A70474）",
+    "recruit_url": "https://jobs.bytedance.com/campus/position/7673007990174009605/detail",
+    "recruit_verification": "page_read",
+    "official_url": "https://docs.github.com/en/copilot",
+    "checked_at": "2026-10-28",
+    "search_terms": "字节跳动校园招聘 keywords=Agent 研发效能 实习 剪映",
+    "review_notes": "打开详情页读取职责与要求，只归纳流水线、代码评审与效能度量相关条目，未复制企业JD全文。"
+  },
+  {
+    "id": "technical-artist",
+    "role": "技术美术",
+    "recruit_title": "游戏技术美术工程师 - 深圳射击项目（A191888）",
+    "recruit_url": "https://jobs.bytedance.com/campus/position/7669721871590263045/detail",
+    "recruit_verification": "page_read",
+    "official_url": "https://dev.epicgames.com/documentation/unreal-engine/testing-and-optimizing-your-content",
+    "checked_at": "2026-10-28",
+    "search_terms": "字节跳动校园招聘 keywords=技术美术 游戏 渲染 实习",
+    "review_notes": "打开详情页读取职责与要求，只归纳渲染管线、资产规范与性能相关条目，未复制企业JD全文。"
+  },
+  {
+    "id": "user-research",
+    "role": "用户研究",
+    "recruit_title": "用户研究分析师 - 经营办公室（用户研究）（A258044A）",
+    "recruit_url": "https://jobs.bytedance.com/campus/position/7667609460127516933/detail",
+    "recruit_verification": "page_read",
+    "official_url": "https://digital.gov/topics/usability/",
+    "checked_at": "2026-10-28",
+    "search_terms": "字节跳动校园招聘 keywords=用户研究 分析师 实习",
+    "review_notes": "打开详情页读取职责与要求，只归纳研究设计、访谈与落地相关条目，未复制企业JD全文。"
+  },
+  {
+    "id": "visual-design",
+    "role": "视觉设计",
+    "recruit_title": "创意视觉设计师 - 番茄小说（A54609）",
+    "recruit_url": "https://jobs.bytedance.com/campus/position/7672970454508079413/detail",
+    "recruit_verification": "page_read",
+    "official_url": "https://m3.material.io/foundations",
+    "checked_at": "2026-10-28",
+    "search_terms": "字节跳动校园招聘 keywords=视觉设计 创意 实习 番茄小说",
+    "review_notes": "打开详情页读取职责与要求，只归纳视觉层级、品牌一致性与多端适配相关条目，未复制企业JD全文。"
+  },
+  {
+    "id": "growth-product",
+    "role": "增长产品",
+    "recruit_title": "增长产品经理 - 红果短剧（A218928）",
+    "recruit_url": "https://jobs.bytedance.com/campus/position/7698570105329568005/detail",
+    "recruit_verification": "page_read",
+    "official_url": "https://developers.google.com/analytics/devguides/collection/ga4",
+    "checked_at": "2026-10-28",
+    "search_terms": "字节跳动校园招聘 keywords=增长产品经理 实习 短剧",
+    "review_notes": "打开详情页读取职责与要求，只归纳增长目标、漏斗与实验相关条目，未复制企业JD全文。"
+  }
+]

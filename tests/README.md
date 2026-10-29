@@ -6,7 +6,7 @@
 | --- | --- |
 | `unit/session.test.ts` | 主问题/追问预算、提交幂等、安全上限、终态、未观察/零回答及演示报告 |
 | `unit/demo-client.test.ts` | 多简历、经历关联、版本冲突、快照、收藏、个人 JD、旧存储迁移及降级 |
-| `unit/catalog.test.ts` | 36 个岗位的独立题库、检索过滤、退役及显式模板输入 |
+| `unit/catalog.test.ts` | 1000 个岗位的独立题库、检索过滤、退役及显式模板输入 |
 | `unit/interview-agent.test.ts` | ecnu-plus 兼容协议、结构/引用校验、超时/取消、错误脱敏及真实题量约束 |
 | `integration/api.test.ts` | 内存 Request/Response 路由、分页、错误、同源检查与未接入能力 |
 | `npm run boundaries:check` | 工作区依赖方向、纯核心与 API 服务端边界 |

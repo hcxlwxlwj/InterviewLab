@@ -161,7 +161,7 @@ export default function Home() {
           </div>
           <div className="catalog-home-link">
             <Link href="/jobs" className="text-link">
-              查看全部 36 个岗位模板 <ArrowRight size={18} />
+              查看全部 {JOBS.length} 个岗位模板 <ArrowRight size={18} />
             </Link>
           </div>
         </section>

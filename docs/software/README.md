@@ -10,6 +10,6 @@
 | [工程目录](repository_structure.md) | 课程目录、代码职责、依赖与后续接入位置 |
 | [原型设计](prototype/README.md) | 页面、交互和状态 |
 | [首轮实现记录](prototype/implementation.md) | 设计参考、本地运行和阶段截图 |
-| [个人中心/岗位库扩展](prototype/library-expansion.md) | 后续页面、36 个岗位内容及原型验证 |
+| [个人中心/岗位库扩展](prototype/library-expansion.md) | 后续页面、1000 个岗位内容及原型验证 |
 
 当前公开岗位、独立后端和真实文字面试/报告/重练均可运行，ecnu-plus 真实效果需密钥配置后单独验收。其他规划业务不表示已实现，详见文字面试接入。成员从[后端 README](../../code/backend/README.md)开始接入。原 modules 文档已按性质并入需求、算法及本目录接口合同，不另保留副本。

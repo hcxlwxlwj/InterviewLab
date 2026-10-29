@@ -1,5 +1,5 @@
 'use client';
-import { CONTENT_SOURCES, JOB_CATEGORIES } from '@interviewlab/backend/content';
+import { CONTENT_SOURCES, JOB_CATEGORIES, JOBS } from '@interviewlab/backend/content';
 import { STAGE_LABELS, type CareerStage, type JobTemplate } from '@interviewlab/core';
 import { ArrowRight, Bookmark, Copy, ExternalLink, Search } from 'lucide-react';
 import Link from 'next/link';
@@ -64,7 +64,7 @@ export function JobLibrary() {
             <h2>方向分类</h2>
             <nav aria-label="岗位方向">
               <button aria-pressed={!category} onClick={() => setCategory('')}>
-                全部方向<span>36</span>
+                全部方向<span>{JOBS.length}</span>
               </button>
               {JOB_CATEGORIES.map((c) => (
                 <button

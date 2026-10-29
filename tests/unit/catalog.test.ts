@@ -9,8 +9,8 @@ import type { Configuration } from '@interviewlab/core';
 import { buildQuestions, defaultConfiguration } from '@interviewlab/core';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-test('all 36 roles have distinct sourced question banks and a six-main-question session', () => {
-  assert.equal(JOBS.length, 36);
+test('all 1000 roles have distinct sourced question banks and a six-main-question session', () => {
+  assert.equal(JOBS.length, 1000);
   const first = new Set<string>();
   for (const j of JOBS) {
     assert.equal(j.questions.length, 8);
@@ -23,7 +23,7 @@ test('all 36 roles have distinct sourced question banks and a six-main-question 
     assert.ok(questions.every((q) => q.template_version === j.version));
     assert.ok(j.source_refs.every((ref) => CONTENT_SOURCES.some((s) => s.id === ref)));
   }
-  assert.equal(first.size, 36);
+  assert.equal(first.size, 1000);
   const deep = questionsFor({
     ...defaultConfiguration('ai-product'),
     interview_type: 'technical_qa',
@@ -48,7 +48,7 @@ test('retrieval filters by role, stage, topic and supported difficulty without f
   });
   assert.equal(r.items.length, 1);
   assert.equal(r.template_id, 'ai-product');
-  assert.equal(r.sources.length, 2);
+  assert.equal(r.sources.length, 3);
   assert.equal(
     (await localKnowledgeRetriever.retrieve({ job_id: 'ai-product', difficulty: '挑战' })).items
       .length,

@@ -85,13 +85,26 @@ test('catalog pagination, filters, detail, source routes and invalid cursors are
   const a = await (
     await handleApi(new Request(`${base}/job-templates?limit=30`), ['job-templates'])
   ).json();
-  const b = await (
-    await handleApi(new Request(`${base}/job-templates?limit=30&cursor=${a.next_cursor}`), [
-      'job-templates',
-    ])
-  ).json();
-  assert.equal(new Set([...a.items, ...b.items].map((j) => j.id)).size, 36);
-  assert.equal(b.next_cursor, null);
+  const pages = [a];
+  for (let cursor = a.next_cursor; cursor; ) {
+    const page = await (
+      await handleApi(new Request(`${base}/job-templates?limit=30&cursor=${cursor}`), [
+        'job-templates',
+      ])
+    ).json();
+    pages.push(page);
+    cursor = page.next_cursor;
+  }
+  assert.equal(pages.length, 34);
+  assert.deepEqual(
+    pages.map((page) => page.items.length),
+    [...Array(33).fill(30), 10],
+  );
+  assert.equal(
+    new Set(pages.flatMap((page) => page.items.map((j: { id: string }) => j.id))).size,
+    1000,
+  );
+  assert.equal(pages[pages.length - 1].next_cursor, null);
   const products = await (
     await handleApi(new Request(`${base}/job-templates?category=product&stage=internship`), [
       'job-templates',
