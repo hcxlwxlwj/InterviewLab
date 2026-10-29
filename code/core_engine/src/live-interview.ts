@@ -129,7 +129,13 @@ export interface InterviewEvaluation {
   dimensions: DimensionKey[];
   limitations: string[];
 }
+export interface InterviewDimensionAssessment extends InterviewFinding {
+  dimension: Exclude<DimensionKey, 'coding_ability'>;
+  level: 0 | 1 | 2 | 3 | 4;
+}
 export interface InterviewReportSummary {
+  /** Optional on historical reports; levels are AI estimates, not calibrated scores. */
+  dimension_assessments?: InterviewDimensionAssessment[];
   overview: InterviewFinding;
   strengths: InterviewFinding[];
   improvements: (InterviewFinding & { turn_id: string; retry_goal: string })[];
@@ -160,15 +166,16 @@ export interface InterviewReport {
     prompt_version: string;
     rubric_version: string;
     schema_version: string;
+    scoring_rubric_version?: string;
     input_mode: 'text_fallback';
   };
-  scoring_status: 'uncalibrated';
-  overall_score: null;
+  scoring_status: 'uncalibrated' | 'experimental';
+  overall_score: number | null;
   dimensions: Record<
     DimensionKey,
     {
       status: 'observed' | 'not_observed';
-      score: null;
+      score: number | null;
       evidence_refs: InterviewEvidence[];
       explanation: string;
     }

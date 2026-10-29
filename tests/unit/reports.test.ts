@@ -218,17 +218,78 @@ test('summary uses the shared model adapter with checked evaluations and records
       const body = JSON.parse(init!.body as string);
       const payload = JSON.parse(body.messages[1].content);
       assert.equal(payload.task, 'summarize');
-      assert.deepEqual(payload.input.evaluations, [evaluation]);
+      assert.equal(payload.input.evaluations[0].turn_id, evaluation.turn_id);
+      assert.deepEqual(
+        payload.input.evidence_catalog['e0-s0-0'],
+        evaluation.strengths[0].evidence_refs[0],
+      );
       assert.equal(body.model, snapshot.model);
       return Response.json({
-        choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(summary) } }],
+        choices: [
+          {
+            finish_reason: 'stop',
+            message: {
+              content: JSON.stringify({
+                overview: { text: summary.overview.text, evidence_ids: ['e0-s0-0'] },
+                strengths: [{ text: summary.strengths[0].text, evidence_ids: ['e0-s0-0'] }],
+                improvements: [
+                  {
+                    text: summary.improvements[0].text,
+                    evidence_ids: ['e0-g0-0'],
+                    turn_id: evaluation.turn_id,
+                  },
+                ],
+                dimension_assessments: {
+                  technical_knowledge: null,
+                  project_communication: null,
+                  logical_expression: null,
+                },
+                limitations: [],
+              }),
+            },
+          },
+        ],
       });
     },
     (entry) => logs.push(entry),
   );
   assert.deepEqual(
     await agent.summarize([evaluation], snapshot, new AbortController().signal, false),
-    summary,
+    { ...summary, dimension_assessments: [] },
   );
-  assert.equal((logs[0] as { prompt_version: string }).prompt_version, 'text-review-v1');
+  assert.equal((logs[0] as { prompt_version: string }).prompt_version, 'text-review-v2');
+});
+
+test('AI reference scores use explicit evidence levels and equal-weight averaging, excluding unobserved skills', () => {
+  const { state, task, summary } = fixture();
+  task.result!.dimensions = ['project_communication', 'logical_expression'];
+  summary.dimension_assessments = [
+    { ...summary.overview, dimension: 'project_communication', level: 3 },
+    { ...summary.overview, dimension: 'logical_expression', level: 2 },
+  ];
+  assert.doesNotThrow(() => assertSummary(summary, [task.result!]));
+  const report = aggregateReport(
+    state,
+    { ...emptyReport(state, randomUUID()), summary, summary_status: 'ready' },
+    [task],
+  );
+  assert.equal(report.dimensions.project_communication.score, 75);
+  assert.equal(report.dimensions.logical_expression.score, 50);
+  assert.equal(report.overall_score, 63);
+  assert.equal(report.scoring_status, 'experimental');
+  assert.equal(report.dimensions.technical_knowledge.score, null);
+  assert.equal(report.dimensions.coding_ability.score, null);
+});
+
+test('dimension scores reject unrelated evidence, duplicates and unobserved dimensions', () => {
+  const { summary, evaluation } = fixture();
+  summary.dimension_assessments = [
+    { ...summary.overview, dimension: 'technical_knowledge', level: 4 },
+  ];
+  assert.throws(() => assertSummary(summary, [evaluation]));
+  summary.dimension_assessments = [
+    { ...summary.overview, dimension: 'project_communication', level: 3 },
+  ];
+  summary.dimension_assessments.push(summary.dimension_assessments[0]);
+  assert.throws(() => assertSummary(summary, [evaluation]));
 });

@@ -226,6 +226,14 @@ export function createInterviewAgent(
         throw new Error('incomplete');
       return schema.parse(JSON.parse(choice.message.content));
     } catch (error) {
+      if (error instanceof z.ZodError)
+        log({
+          task: kind,
+          code: 'model_schema_validation',
+          issues: error.issues
+            .map((issue) => ({ path: issue.path.join('.'), code: issue.code }))
+            .slice(0, 8),
+        });
       code = signal.aborted
         ? 'cancelled'
         : timeout.aborted
@@ -377,7 +385,7 @@ knowledge 仅提供可用背景和观察点，不按其顺序出题。没有对�
       }
       return result;
     },
-    ...createReportAnalysis(call),
+    ...createReportAnalysis(call, log),
     async compare(input, signal, repair) {
       const comparisonEvidence = z.union([
         evidence.extend({

@@ -277,7 +277,12 @@ export function createReportsService(
         };
         next.summary_status = 'ready';
         next.status = 'ready';
-        await repository.updateReport(tx.client, current.id, current.version, next);
+        await repository.updateReport(
+          tx.client,
+          current.id,
+          current.version,
+          aggregateReport(fresh, next, await repository.evaluationRows(tx.client, current.id)),
+        );
       },
     };
   };
@@ -360,7 +365,12 @@ export function createReportsService(
           // A pending summary must finish before a new report version can invalidate its input.
           if (['pending', 'generating'].includes(row.status)) return { id };
           if (body.scope === 'summary') {
-            if (report.summary_status === 'ready' || !report.evaluations.length) return { id };
+            if (
+              (report.summary_status === 'ready' &&
+                report.summary?.dimension_assessments !== undefined) ||
+              !report.evaluations.length
+            )
+              return { id };
           } else if (!report.missing_turn_ids.length && row.status !== 'failed') return { id };
           const version = row.version + 1;
           const next = {

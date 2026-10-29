@@ -981,3 +981,56 @@ test('a summary computed for an obsolete report version is cancelled instead of 
   assert.equal(task.status, 'cancelled');
   assert.equal(task.result_ref, null);
 });
+
+test('a historical ready report can add reference scores without reevaluating answers and persists the computed total', async () => {
+  let v = await started();
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: v.turns[0].id, text: '我负责验证边界条件。' },
+    },
+    randomUUID(),
+  );
+  await drain();
+  const before = await runtime.reports.get(identity, v.id);
+  assert.equal(before.overall_score, null);
+  const summarize = agent.summarize;
+  agent.evaluate = async () => {
+    throw new Error('summary upgrade must not reevaluate answers');
+  };
+  agent.summarize = async (...args) => ({
+    ...(await summarize(...args)),
+    dimension_assessments: [
+      {
+        ...args[0][0].strengths[0],
+        dimension: 'logical_expression',
+        level: 3,
+      },
+    ],
+  });
+  await runtime.reports.request(
+    identity,
+    v.id,
+    { version: before.version, scope: 'summary' },
+    randomUUID(),
+  );
+  await drain();
+  const ready = await runtime.reports.get(identity, v.id);
+  assert.equal(ready.overall_score, 75);
+  assert.equal(ready.scoring_status, 'experimental');
+  assert.equal(ready.dimensions.coding_ability.score, null);
+  const row = (
+    await database.pool.query('SELECT result FROM interview_reports WHERE interview_id=$1', [v.id])
+  ).rows[0];
+  assert.equal(row.result.overall_score, 75);
+  const reused = await runtime.reports.request(
+    identity,
+    v.id,
+    { version: ready.version, scope: 'summary' },
+    randomUUID(),
+  );
+  assert.equal(reused.version, ready.version);
+});

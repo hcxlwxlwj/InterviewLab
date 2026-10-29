@@ -13,14 +13,22 @@ import { interviewsApi } from '../../lib/api/interviews';
 import { CommandNotice, ErrorNotice, LiveFrame, useLiveCommand, useLiveResource } from './common';
 
 function Evidence({ refs }: { refs: InterviewEvidence[] }) {
+  const unique = [
+    ...new Map(
+      refs.map((ref) => [JSON.stringify([ref.turn_id, ref.revision, ref.quote]), ref]),
+    ).values(),
+  ];
+  if (!unique.length) return null;
   return (
-    <>
-      {refs.map((ref, i) => (
+    <details className="report-evidence">
+      <summary>查看依据（{unique.length} 处）</summary>
+      {unique.map((ref, i) => (
         <blockquote className="live-evidence" key={`${ref.turn_id}:${i}`}>
-          <a href={`#turn-${ref.turn_id}`}>回答 v{ref.revision}</a>：“{ref.quote}”
+          <a href={`#turn-${ref.turn_id}`}>定位回答 v{ref.revision}</a>
+          <p>“{ref.quote.length > 160 ? `${ref.quote.slice(0, 160)}…` : ref.quote}”</p>
         </blockquote>
       ))}
-    </>
+    </details>
   );
 }
 function Findings({ items }: { items: InterviewFinding[] }) {
@@ -180,7 +188,9 @@ function ReportBody({ id }: { id: string }) {
                   ? '部分复盘'
                   : '面后复盘'}
           </span>
-          <span>未校准数值评分</span>
+          <span>
+            {report.scoring_status === 'experimental' ? 'AI 参考评分 · 未经人工校准' : '证据复盘'}
+          </span>
         </div>
         <p>
           文字面试 · {interview.configuration.duration_minutes} 分钟配置 ·{' '}
@@ -203,7 +213,7 @@ function ReportBody({ id }: { id: string }) {
             interview.end_reason as 'completed'
           ] ?? '面试已结束'}
         </p>
-        <p>{report.coverage}</p>
+
         {report.analysis_progress && (
           <p role="status" aria-live="polite">
             有效回答 {report.analysis_progress.total} 题 · 已分析{' '}
@@ -233,16 +243,73 @@ function ReportBody({ id }: { id: string }) {
           </>
         )}
         {report.evaluations.length > 0 && (
-          <div className="live-dimensions">
-            {Object.entries(report.dimensions).map(([key, d]) => (
-              <article key={key}>
-                <h3>{DIMENSION_LABELS[key as keyof typeof DIMENSION_LABELS]}</h3>
-                <strong>{d.status === 'observed' ? '已观察 · 暂不评分' : '未观察'}</strong>
-                <p>{d.explanation}</p>
-                <Evidence refs={d.evidence_refs.slice(0, 3)} />
-              </article>
-            ))}
-          </div>
+          <section className="report-score-panel" aria-label="能力评分概览">
+            <div className="report-score-heading">
+              <div>
+                <h3>AI 参考总分</h3>
+                <strong className="report-score-total">{report.overall_score ?? '—'}</strong>
+                {report.overall_score !== null && <span> / 100</span>}
+              </div>
+              <p>
+                {report.overall_score === null
+                  ? '尚未生成参考评分'
+                  : `按 ${Object.values(report.dimensions).filter((d) => d.score !== null).length} 个已评分维度等权平均`}
+                <br />
+                {report.is_partial
+                  ? '当前为部分复盘，仅反映已成功分析的内容。'
+                  : '仅反映本场已观察的回答内容。'}
+              </p>
+            </div>
+            <div className="live-dimensions report-score-dimensions">
+              {Object.entries(report.dimensions).map(([key, d]) => (
+                <article key={key}>
+                  <div className="report-dimension-heading">
+                    <h3>{DIMENSION_LABELS[key as keyof typeof DIMENSION_LABELS]}</h3>
+                    <strong>
+                      {d.score !== null ? d.score : d.status === 'observed' ? '待评分' : '未观察'}
+                    </strong>
+                  </div>
+                  <progress
+                    className="report-score-bar"
+                    max={100}
+                    value={d.score ?? 0}
+                    aria-label={`${DIMENSION_LABELS[key as keyof typeof DIMENSION_LABELS]}${d.score === null ? '未评分' : `${d.score} 分`}`}
+                  />
+                  <p>{d.explanation}</p>
+                  <Evidence refs={d.evidence_refs} />
+                </article>
+              ))}
+            </div>
+            <details className="report-scoring-rules">
+              <summary>评分如何计算？</summary>
+              <p>
+                AI 根据已校验的逐题评价选择 0–4 档：0 为明显偏题或关键错误，1 为关键内容缺失，2
+                为基本回应但有明显缺口，3 为清晰且有依据、仍有次要缺口，4
+                为在题目要求范围内充分且边界清楚。档位乘以 25
+                得到维度分数，总分为已评分维度的平均值四舍五入。
+              </p>
+              <p>
+                专业知识看原理与推理，项目表达看个人职责和行动，逻辑表达看切题与组织。未观察维度不计入总分；没有代码考核时不评代码能力。这是未经人工校准的
+                AI 参考评分，不代表招聘结论。
+              </p>
+            </details>
+            {!reportPending &&
+              report.summary_status === 'ready' &&
+              report.summary?.dimension_assessments === undefined && (
+                <button
+                  className="live-button"
+                  disabled={command.blocked}
+                  onClick={() =>
+                    command.run(
+                      (key) => interviewsApi.retryReport(id, report.version, key, 'summary'),
+                      (result) => resource.accept({ interview, report: result }),
+                    )
+                  }
+                >
+                  生成 AI 参考评分
+                </button>
+              )}
+          </section>
         )}
         {interview.parent_interview_id && retryTurn && (
           <button
@@ -370,10 +437,12 @@ function ReportBody({ id }: { id: string }) {
             <h2>{turn.text}</h2>
             {turn.answer_status === 'answered' ? (
               <>
-                <div className="live-answer">
-                  <h3>你的回答 · v{turn.revision}</h3>
+                <details className="live-answer report-original-answer">
+                  <summary>
+                    查看你的原回答 · v{turn.revision}（{turn.answer_text?.length ?? 0} 字）
+                  </summary>
                   <p>{turn.answer_text}</p>
-                </div>
+                </details>
                 {evaluation && (
                   <>
                     <h3>已说明的内容</h3>

@@ -6,7 +6,7 @@ import type {
   InterviewEvaluation,
 } from '@interviewlab/core';
 import { inputDigest } from '../../foundation/idempotency';
-import { REPORT_PROMPT_VERSION, REPORT_SCHEMA_VERSION } from './analysis';
+import { REPORT_PROMPT_VERSION, REPORT_SCHEMA_VERSION, SCORING_RUBRIC_VERSION } from './analysis';
 export interface EvaluationTask {
   turn_id: string;
   task_id: string | null;
@@ -127,6 +127,43 @@ export function aggregateReport(
         score: null,
         evidence_refs: unique,
         explanation: `已从 ${observed.length} 个回答回合获得本维度的文字证据；仅分析已作答内容，暂不评分。`,
+      };
+  }
+  const assessments = report.summary?.dimension_assessments ?? [];
+  for (const assessment of assessments) {
+    const dimension = report.dimensions[assessment.dimension];
+    // Historical summaries remain unscored; never turn an unobserved dimension into a zero.
+    if (dimension.status !== 'observed') continue;
+    const valid =
+      assessment.evidence_refs.length &&
+      assessment.evidence_refs.every((r) =>
+        dimension.evidence_refs.some(
+          (v) => v.turn_id === r.turn_id && v.revision === r.revision && v.quote === r.quote,
+        ),
+      );
+    if (
+      !valid ||
+      !Number.isInteger(assessment.level) ||
+      assessment.level < 0 ||
+      assessment.level > 4
+    )
+      continue;
+    dimension.score = assessment.level * 25;
+    dimension.explanation = assessment.text;
+    dimension.evidence_refs = assessment.evidence_refs;
+  }
+  const scored = Object.values(report.dimensions).flatMap((d) =>
+    d.score === null ? [] : [d.score],
+  );
+  if (scored.length) {
+    report.overall_score = Math.round(
+      scored.reduce((sum, score) => sum + score, 0) / scored.length,
+    );
+    report.scoring_status = 'experimental';
+    if (report.analysis_metadata)
+      report.analysis_metadata = {
+        ...report.analysis_metadata,
+        scoring_rubric_version: SCORING_RUBRIC_VERSION,
       };
   }
   return report;

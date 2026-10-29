@@ -11,7 +11,7 @@ export const reportRequestBody = z
   .strict() satisfies z.ZodType<ReportRequest>;
 const dimension = z.object({
   status: z.enum(['observed', 'not_observed']),
-  score: z.null(),
+  score: z.number().int().min(0).max(100).nullable(),
   evidence_refs: z.array(evidence),
   explanation: z.string(),
 });
@@ -21,8 +21,8 @@ export const reportSchema = z.object({
   version: z.number().int(),
   task_ids: z.array(z.string()),
   status: z.enum(['pending', 'generating', 'ready', 'failed']),
-  scoring_status: z.literal('uncalibrated'),
-  overall_score: z.null(),
+  scoring_status: z.enum(['uncalibrated', 'experimental']),
+  overall_score: z.number().int().min(0).max(100).nullable(),
   dimensions: z.object({
     technical_knowledge: dimension,
     project_communication: dimension,
@@ -69,6 +69,7 @@ export const reportSchema = z.object({
       prompt_version: z.string(),
       rubric_version: z.string(),
       schema_version: z.string(),
+      scoring_rubric_version: z.string().optional(),
       input_mode: z.literal('text_fallback'),
     })
     .optional(),
