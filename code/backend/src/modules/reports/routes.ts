@@ -1,8 +1,10 @@
+import type { ReportRequest } from '@interviewlab/core';
+import { reportSchema, reportRequestBody } from './schemas';
 import { z } from 'zod';
 import type { BackendModule } from '../contracts';
 import type { LiveReportsService } from './service';
 import { idParams, privateErrors, writeHeaders } from '../interviews/routes';
-import { comparisonBody, comparisonSchema, reportSchema, versionBody } from '../interviews/schemas';
+import { comparisonBody, comparisonSchema, versionBody } from '../interviews/schemas';
 import { ServiceError } from '../../foundation/errors';
 
 export function reportsModule(service?: LiveReportsService): BackendModule {
@@ -27,14 +29,14 @@ export function reportsModule(service?: LiveReportsService): BackendModule {
         },
         async (request) => ready().get(await context.requireIdentity(request), request.params.id),
       );
-      app.post<{ Params: { id: string }; Body: { version: number } }>(
+      app.post<{ Params: { id: string }; Body: ReportRequest }>(
         '/interviews/:id/report',
         {
           schema: {
             tags: ['reports'],
             params: idParams,
             headers: writeHeaders,
-            body: versionBody,
+            body: reportRequestBody,
             response: { 200: reportSchema, 202: reportSchema, ...privateErrors },
           },
         },

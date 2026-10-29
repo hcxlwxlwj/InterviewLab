@@ -1,3 +1,9 @@
+import {
+  createReportAnalysis,
+  REPORT_PROMPT_VERSION,
+  type ReportAnalysis,
+} from '../reports/analysis';
+export { assertEvaluation, evaluationOutput } from '../reports/analysis';
 import type { AdvanceContext } from './agent-v3';
 import type { InterviewMemory, InterviewRetrieval } from '@interviewlab/core';
 import { z } from 'zod';
@@ -10,7 +16,6 @@ import {
   type Interview,
   type InterviewSnapshot,
   type InterviewQuestion,
-  type InterviewEvaluation,
   type InterviewComparison,
   type InterviewTurn,
 } from '@interviewlab/core';
@@ -52,27 +57,6 @@ const nextOutput = z
     clarification: z.string().max(800).nullable(),
   })
   .strict();
-export const evaluationOutput = z
-  .object({
-    turn_id: z.string(),
-    revision: z.number().int().positive(),
-    strengths: z.array(finding).max(5),
-    gaps: z.array(finding).max(5),
-    reference_points: strings,
-    retry_goal: z.string().min(1).max(500),
-    dimensions: z
-      .array(
-        z.enum([
-          'technical_knowledge',
-          'project_communication',
-          'coding_ability',
-          'logical_expression',
-        ]),
-      )
-      .max(4),
-    limitations: strings,
-  })
-  .strict();
 const comparisonOutput = z
   .object({
     changes: z.array(finding).max(8),
@@ -99,12 +83,8 @@ export interface InterviewAgent {
   ): Promise<
     z.infer<typeof nextOutput> & { memory?: InterviewMemory; retrieval?: InterviewRetrieval }
   >;
-  evaluate(
-    turn: InterviewTurn,
-    snapshot: InterviewSnapshot,
-    signal: AbortSignal,
-    repair: boolean,
-  ): Promise<InterviewEvaluation>;
+  evaluate: ReportAnalysis['evaluate'];
+  summarize: ReportAnalysis['summarize'];
   compare(
     input: InterviewComparison,
     signal: AbortSignal,
@@ -153,26 +133,6 @@ export function assertQuestion(
   )
     throw new ServiceError('invalid_model_output', 502, '面试承接语不能评价回答或方案');
 }
-export function assertEvaluation(
-  value: InterviewEvaluation,
-  turn: InterviewTurn,
-  snapshot: InterviewSnapshot,
-) {
-  if (
-    value.turn_id !== turn.id ||
-    value.revision !== turn.revision ||
-    value.dimensions.includes('coding_ability') ||
-    [...value.strengths, ...value.gaps].some((f) =>
-      f.evidence_refs.some((ref) => !evidenceMatches(ref, [turn])),
-    )
-  )
-    throw new ServiceError('invalid_model_output', 502, '报告回答版本或证据校验失败');
-  if (value.dimensions.length && !value.strengths.length && !value.gaps.length)
-    throw new ServiceError('invalid_model_output', 502, '观察维度需要回答证据');
-  if (!snapshot.knowledge.questions.length && value.dimensions.includes('technical_knowledge'))
-    throw new ServiceError('invalid_model_output', 502, '缺少专业评估依据');
-}
-
 /** Shared model adapter: evidence analysis/comparison plus non-streaming historical/other-role turns.
  * Frontend v3 replaces only advance through withRealtimeAgent; this is not a second interviewer service.
  */
@@ -266,6 +226,14 @@ export function createInterviewAgent(
         throw new Error('incomplete');
       return schema.parse(JSON.parse(choice.message.content));
     } catch (error) {
+      if (error instanceof z.ZodError)
+        log({
+          task: kind,
+          code: 'model_schema_validation',
+          issues: error.issues
+            .map((issue) => ({ path: issue.path.join('.'), code: issue.code }))
+            .slice(0, 8),
+        });
       code = signal.aborted
         ? 'cancelled'
         : timeout.aborted
@@ -285,7 +253,9 @@ export function createInterviewAgent(
         provider: new URL(config.LLM_BASE_URL!).host,
         task: kind,
         model,
-        prompt_version: INTERVIEW_PROMPT_VERSION,
+        prompt_version: ['evaluate', 'summarize'].includes(kind)
+          ? REPORT_PROMPT_VERSION
+          : INTERVIEW_PROMPT_VERSION,
         duration_ms: Date.now() - started,
         usage,
         code,
@@ -415,74 +385,7 @@ knowledge 仅提供可用背景和观察点，不按其顺序出题。没有对�
       }
       return result;
     },
-    async evaluate(turn, snapshot, signal, repair) {
-      const related = snapshot.knowledge.questions.filter(
-        (q) => q.id === turn.knowledge_question_id || q.topic === turn.topic,
-      );
-      const allowedDimensions =
-        turn.stage === 'introduction'
-          ? (['logical_expression'] as const)
-          : related.length
-            ? (['technical_knowledge', 'project_communication', 'logical_expression'] as const)
-            : (['project_communication', 'logical_expression'] as const);
-      const schema = evaluationOutput.extend({
-        turn_id: z.literal(turn.id),
-        revision: z.literal(turn.revision),
-        strengths: z
-          .array(
-            finding.extend({
-              evidence_refs: z
-                .array(
-                  evidence.extend({
-                    turn_id: z.literal(turn.id),
-                    revision: z.literal(turn.revision),
-                  }),
-                )
-                .min(1)
-                .max(8),
-            }),
-          )
-          .max(5),
-        gaps: z
-          .array(
-            finding.extend({
-              evidence_refs: z
-                .array(
-                  evidence.extend({
-                    turn_id: z.literal(turn.id),
-                    revision: z.literal(turn.revision),
-                  }),
-                )
-                .min(1)
-                .max(8),
-            }),
-          )
-          .max(5),
-        dimensions: z.array(z.enum(allowedDimensions)).max(allowedDimensions.length),
-      });
-      const result = await call(
-        'evaluate',
-        schema,
-        {
-          turn,
-          observation_points: related,
-          missing_reason: related.length
-            ? snapshot.knowledge.missing_reason
-            : '当前题目没有已发布的专业观察点，仅评价项目表达与逻辑表达，不观察专业知识或代码能力。',
-          allowed_dimensions: allowedDimensions,
-          instructions:
-            '输出逐题证据复盘。自我介绍只观察表达与信息组织，不要求展开技术细节或项目验证。所有维度不输出分数。缺口只对应当前题明确要求，不把没有问到的重试、锁或隔离级别等列为缺陷；扩展建议必须标为可选。缺少对应观察点时不判断专业对错。优势只描述观察到的陈述，不用“诚实”“真实可信”等未核实判断；局限注明项目事实来自用户当场陈述。',
-        },
-        signal,
-        repair,
-        snapshot.model,
-      );
-      assertEvaluation(result, turn, {
-        ...snapshot,
-        knowledge: { ...snapshot.knowledge, questions: related },
-      });
-      return result;
-    },
+    ...createReportAnalysis(call, log),
     async compare(input, signal, repair) {
       const comparisonEvidence = z.union([
         evidence.extend({

@@ -3,7 +3,6 @@ import {
   INTERVIEW_MAX_ANSWER,
   type Interview,
   type InterviewConfig,
-  type InterviewReport,
   type InterviewComparison,
 } from '@interviewlab/core';
 
@@ -117,49 +116,7 @@ export const interviewSchema = z.object({
   parent_revision: z.number().int().nullable(),
   retry_goal: z.string().nullable(),
 }) satisfies z.ZodType<Interview>;
-const dimension = z.object({
-  status: z.enum(['observed', 'not_observed']),
-  score: z.null(),
-  evidence_refs: z.array(evidence),
-  explanation: z.string(),
-});
-export const reportSchema = z.object({
-  id: z.string(),
-  interview_id: z.string(),
-  version: z.number().int(),
-  task_ids: z.array(z.string()),
-  status: z.enum(['pending', 'generating', 'ready', 'failed']),
-  scoring_status: z.literal('uncalibrated'),
-  overall_score: z.null(),
-  dimensions: z.object({
-    technical_knowledge: dimension,
-    project_communication: dimension,
-    coding_ability: dimension,
-    logical_expression: dimension,
-  }),
-  evaluations: z.array(
-    z.object({
-      turn_id: z.string(),
-      revision: z.number().int(),
-      strengths: z.array(finding),
-      gaps: z.array(finding),
-      reference_points: z.array(z.string()),
-      retry_goal: z.string(),
-      dimensions: z.array(
-        z.enum([
-          'technical_knowledge',
-          'project_communication',
-          'coding_ability',
-          'logical_expression',
-        ]),
-      ),
-      limitations: z.array(z.string()),
-    }),
-  ),
-  missing_turn_ids: z.array(z.string()),
-  is_partial: z.boolean(),
-  coverage: z.string(),
-}) satisfies z.ZodType<InterviewReport>;
+export { reportSchema } from '../reports/schemas';
 export const comparisonSchema = z.object({
   id: z.string(),
   version: z.number().int(),

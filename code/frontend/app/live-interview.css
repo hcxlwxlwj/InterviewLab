@@ -180,3 +180,77 @@
     gap: 10px;
   }
 }
+
+/* Compact report overview: complete answers live once in the per-turn review. */
+.report-score-panel {
+  margin-top: 24px;
+  border-top: 1px solid #e3e8e5;
+  padding-top: 24px;
+}
+.report-score-heading {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.report-score-heading h3 {
+  margin: 0;
+}
+.report-score-total {
+  font-size: clamp(44px, 6vw, 68px);
+  line-height: 1.3;
+}
+.report-score-heading > p {
+  color: #65736c;
+}
+.report-score-dimensions article {
+  min-width: 0;
+}
+.report-dimension-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.report-dimension-heading h3 {
+  margin: 0;
+}
+.report-score-bar {
+  width: 100%;
+  height: 8px;
+  margin: 12px 0;
+  border: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #eef1ef;
+  accent-color: #8fcbd0;
+}
+.report-score-bar::-webkit-progress-bar {
+  background: #eef1ef;
+  border-radius: 8px;
+}
+.report-score-bar::-webkit-progress-value {
+  background: #8fcbd0;
+  border-radius: 8px;
+}
+.report-score-bar::-moz-progress-bar {
+  background: #8fcbd0;
+  border-radius: 8px;
+}
+.report-evidence,
+.report-scoring-rules {
+  margin: 12px 0;
+  font-size: 0.9rem;
+}
+.report-evidence summary,
+.report-scoring-rules summary,
+.report-original-answer summary {
+  cursor: pointer;
+  color: #315d50;
+}
+.report-evidence blockquote p {
+  margin-bottom: 0;
+}
+.report-original-answer {
+  margin: 16px 0;
+}

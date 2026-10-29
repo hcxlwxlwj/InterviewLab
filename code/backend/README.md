@@ -20,6 +20,8 @@ Fastify API 与 pg-boss worker 共用一个后端包。公共基础统一维护�
 
 [架构](../../docs/software/architecture.md)和[数据合同](../../docs/software/data_and_interfaces.md)区分当前能力与目标方案；规划接口不等于已实现接口。
 
+文字报告的新增总结、进度、重试合同与迁移说明见[报告模块](src/modules/reports/README.md)。
+
 ## 无需数据库即可使用
 
 使用 Node.js 24.11+，在仓库根目录执行：

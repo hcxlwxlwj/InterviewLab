@@ -118,6 +118,21 @@ async function main() {
           dimensions: ['logical_expression'],
           limitations: ['受控测试模型输出，仅验证产品流程。', '经历内容来自用户当场陈述。'],
         };
+      } else if (task === 'summarize') {
+        const evaluations = input.evaluations;
+        value = {
+          overview: evaluations[0].strengths[0],
+          strengths: evaluations
+            .slice(0, 3)
+            .flatMap((e: { strengths: unknown[] }) => e.strengths.slice(0, 1)),
+          improvements: [],
+          dimension_assessments: {
+            technical_knowledge: null,
+            project_communication: null,
+            logical_expression: { text: '本次合成回答说明了个人行动。', level: 3 },
+          },
+          limitations: ['受控测试模型仅验证界面流程，不代表实际分析质量。'],
+        };
       } else if (task === 'compare')
         value = {
           changes: [

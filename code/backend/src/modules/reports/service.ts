@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import type {
-  DimensionKey,
   InterviewReport,
   RequestIdentity,
   InterviewComparison,
+  ReportRequest,
 } from '@interviewlab/core';
 import type { Database, Transaction } from '../../database/connection';
 import { inputDigest, withIdempotency } from '../../foundation/idempotency';
@@ -11,49 +11,12 @@ import { ServiceError } from '../../foundation/errors';
 import { enqueueTask } from '../../tasks/service';
 import type { TaskHandler } from '../../tasks/runner';
 import type { InterviewAgent } from '../interviews/agent';
-import { assertEvaluation } from '../interviews/agent';
+import { assertEvaluation, assertSummary } from './analysis';
+import { aggregateReport, emptyReport, evaluationDigest, taskSettled } from './aggregate';
 import type { InterviewState } from '../interviews/repository';
 import { interviewInputDigest, type LiveInterviewsService } from '../interviews/service';
 import * as repository from './repository';
 
-const keys: DimensionKey[] = [
-  'technical_knowledge',
-  'project_communication',
-  'coding_ability',
-  'logical_expression',
-];
-function emptyReport(state: InterviewState, id: string): InterviewReport {
-  const answered = state.view.turns.some((t) => t.answer_status === 'answered');
-  const dimension = (explanation: string): InterviewReport['dimensions']['coding_ability'] => ({
-    status: 'not_observed',
-    score: null,
-    evidence_refs: [],
-    explanation,
-  });
-  return {
-    id,
-    interview_id: state.view.id,
-    version: 1,
-    task_ids: [],
-    status: answered ? 'pending' : 'ready',
-    scoring_status: 'uncalibrated',
-    overall_score: null,
-    dimensions: {
-      technical_knowledge: dimension('本维度尚无可用观察证据。'),
-      project_communication: dimension('本维度尚无可用观察证据。'),
-      logical_expression: dimension('本维度尚无可用观察证据。'),
-      coding_ability: dimension('本场未进行代码考核。'),
-    },
-    evaluations: [],
-    missing_turn_ids: [],
-    is_partial:
-      state.view.status === 'failed' ||
-      ['user_finished', 'hard_deadline'].includes(state.view.end_reason ?? ''),
-    coverage: answered
-      ? '文字作答；未校准数值评分。经历内容来自用户当场陈述。'
-      : '没有有效回答，仅保存面试记录，不进行能力评估。',
-  };
-}
 export function createReportsService(
   database: Database,
   interviews: LiveInterviewsService,
@@ -100,17 +63,34 @@ export function createReportsService(
     if (result.status !== 'ready') await queueEvaluations(tx, state, id, 1);
   }
   async function get(identity: RequestIdentity, interviewId: string): Promise<InterviewReport> {
-    await interviews.readFinalized(identity, interviewId);
+    const state = await interviews.readFinalized(identity, interviewId);
     const row = await repository.reportByInterview(database.pool, identity.owner_id, interviewId);
     if (!row?.result) throw new ServiceError('not_found', 404, '报告尚未请求');
-    return {
-      ...row.result,
-      task_ids: (await repository.evaluationRows(database.pool, row.id)).flatMap((e) =>
-        e.task_id ? [e.task_id] : [],
-      ),
-      status: row.status as InterviewReport['status'],
-      version: row.version,
-    };
+    const report = aggregateReport(
+      state,
+      { ...row.result, version: row.version, status: row.status as InterviewReport['status'] },
+      await repository.evaluationRows(database.pool, row.id),
+    );
+    if (row.summary_task_id) report.task_ids.push(row.summary_task_id);
+    return report;
+  }
+  async function queueSummary(tx: Transaction, state: InterviewState, report: InterviewReport) {
+    const digest = evaluationDigest(report.evaluations);
+    const task = await enqueueTask(tx, {
+      owner_id: state.owner,
+      type: 'reports.summarize.v1',
+      key: `${report.id}:${report.version}:${digest}`,
+      input: {
+        interview_id: state.view.id,
+        report_id: report.id,
+        report_version: report.version,
+        input_digest: interviewInputDigest(state),
+        evaluations_digest: digest,
+      },
+    });
+    await repository.setSummaryTask(tx.client, report.id, task.id, digest);
+    report.summary_status = 'pending';
+    report.status = 'generating';
   }
   async function lockSources(
     tx: Transaction,
@@ -150,7 +130,22 @@ export function createReportsService(
         t.id === input.turn_id && t.revision === input.revision && t.answer_status === 'answered',
     );
     if (!turn || interviewInputDigest(state) !== input.input_digest) return { result_ref: null };
-    const value = await agent.evaluate(turn, state.snapshot!, signal, task.attempts > 1);
+    const active = await repository.reportByInterview(
+      database.pool,
+      task.owner_id,
+      input.interview_id,
+    );
+    if (!active || active.id !== input.report_id || active.version !== input.report_version)
+      return { result_ref: null };
+    const group = state.view.turns.filter(
+      (t) => t.main_question_index === turn.main_question_index,
+    );
+    const value = await agent.evaluate(turn, state.snapshot!, signal, task.attempts > 1, {
+      main_question: group.find((t) => t.follow_up_index === 0)?.text ?? turn.text,
+      earlier_answers: group
+        .filter((t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered')
+        .map((t) => ({ question: t.text, answer: t.answer_text! })),
+    });
     const related = state.snapshot!.knowledge.questions.filter(
       (q) => q.id === turn.knowledge_question_id || q.topic === turn.topic,
     );
@@ -185,6 +180,109 @@ export function createReportsService(
         )
           return false;
         await repository.putEvaluationResult(tx.client, report.id, turn.id, task.id, value);
+      },
+    };
+  };
+  const summarize: TaskHandler = async (task, signal) => {
+    const input = task.payload as {
+      interview_id: string;
+      report_id: string;
+      report_version: number;
+      input_digest: string;
+      evaluations_digest: string;
+    };
+    const identity = { owner_id: task.owner_id, roles: [] };
+    const state = await interviews.readFinalized(identity, input.interview_id);
+    const row = await repository.reportByInterview(
+      database.pool,
+      task.owner_id,
+      input.interview_id,
+    );
+    if (
+      !row?.result ||
+      row.id !== input.report_id ||
+      row.version !== input.report_version ||
+      row.summary_task_id !== task.id ||
+      row.summary_input_digest !== input.evaluations_digest ||
+      interviewInputDigest(state) !== input.input_digest
+    )
+      return { result_ref: null };
+    const report = aggregateReport(
+      state,
+      row.result,
+      await repository.evaluationRows(database.pool, row.id),
+    );
+    if (
+      !report.evaluations.length ||
+      report.analysis_progress!.pending ||
+      evaluationDigest(report.evaluations) !== input.evaluations_digest
+    )
+      return { result_ref: null };
+    const value = await agent.summarize(
+      report.evaluations,
+      state.snapshot!,
+      signal,
+      task.attempts > 1,
+    );
+    assertSummary(value, report.evaluations);
+    return {
+      result_ref: { id: row.id, version: row.version },
+      lock: async (tx) => {
+        try {
+          await interviews.lock(tx, identity, input.interview_id);
+        } catch (e) {
+          if (e instanceof ServiceError && e.statusCode === 404) return false;
+          throw e;
+        }
+      },
+      commit: async (tx) => {
+        const fresh = await interviews.lock(tx, identity, input.interview_id);
+        const current = await repository.reportByInterview(
+          tx.client,
+          task.owner_id,
+          input.interview_id,
+          true,
+        );
+        if (
+          !current?.result ||
+          current.id !== input.report_id ||
+          current.version !== input.report_version ||
+          current.summary_task_id !== task.id ||
+          current.summary_input_digest !== input.evaluations_digest ||
+          interviewInputDigest(fresh) !== input.input_digest
+        )
+          return false;
+        const next = aggregateReport(
+          fresh,
+          current.result,
+          await repository.evaluationRows(tx.client, current.id),
+        );
+        if (
+          next.analysis_progress!.pending ||
+          evaluationDigest(next.evaluations) !== input.evaluations_digest
+        )
+          return false;
+        next.summary = {
+          ...value,
+          limitations: [
+            ...new Set([
+              '仅依据本次文字回答；经历事实来自用户陈述，未经独立核验。',
+              ...(next.is_partial
+                ? ['本场或部分题目分析不完整，总结仅覆盖已成功分析的回答。']
+                : []),
+              ...value.limitations,
+              ...next.evaluations.flatMap((e) => e.limitations),
+            ]),
+          ].slice(0, 12),
+        };
+        next.summary_status = 'ready';
+        next.status = 'ready';
+        await repository.updateReport(
+          tx.client,
+          current.id,
+          current.version,
+          aggregateReport(fresh, next, await repository.evaluationRows(tx.client, current.id)),
+        );
       },
     };
   };
@@ -238,7 +336,7 @@ export function createReportsService(
       repository.eraseReports(tx.client, owner, id),
     get,
     getComparison,
-    async request(identity: RequestIdentity, id: string, body: { version: number }, key: string) {
+    async request(identity: RequestIdentity, id: string, body: ReportRequest, key: string) {
       await withIdempotency(
         database,
         { owner_id: identity.owner_id, operation: `reports.${id}.request`, key, input: body },
@@ -251,28 +349,49 @@ export function createReportsService(
             await seal(tx, state);
             row = await repository.reportByInterview(tx.client, identity.owner_id, id);
           }
-          if (!row) throw new Error('report missing');
+          if (!row?.result) throw new ServiceError('not_found', 404, '报告尚未请求');
           if (row.version !== body.version)
             throw new ServiceError('version_conflict', 409, '报告版本已更新');
-          if (
-            row.status === 'failed' ||
-            (row.status === 'ready' && row.result?.missing_turn_ids.length)
-          ) {
-            const version = row.version + 1;
-            const results = await repository.evaluationRows(tx.client, row.id);
+          const results = await repository.evaluationRows(tx.client, row.id);
+          const report = aggregateReport(
+            state,
+            {
+              ...row.result,
+              version: row.version,
+              status: row.status as InterviewReport['status'],
+            },
+            results,
+          );
+          // A pending summary must finish before a new report version can invalidate its input.
+          if (['pending', 'generating'].includes(row.status)) return { id };
+          if (body.scope === 'summary') {
+            if (
+              (report.summary_status === 'ready' &&
+                report.summary?.dimension_assessments !== undefined) ||
+              !report.evaluations.length
+            )
+              return { id };
+          } else if (!report.missing_turn_ids.length && row.status !== 'failed') return { id };
+          const version = row.version + 1;
+          const next = {
+            ...report,
+            version,
+            summary: null,
+            summary_status: 'pending' as const,
+            status: 'pending' as const,
+          };
+          if (body.scope === 'summary') await queueSummary(tx, state, next);
+          else {
+            await repository.setSummaryTask(tx.client, row.id, null, null);
             await queueEvaluations(
               tx,
               state,
               row.id,
               version,
-              results.filter((r) => r.result).map((r) => r.turn_id),
+              report.evaluations.map((e) => e.turn_id),
             );
-            await repository.updateReport(tx.client, row.id, version, {
-              ...row.result!,
-              version,
-              status: 'pending',
-            });
           }
+          await repository.updateReport(tx.client, row.id, version, next);
           return { id };
         },
       );
@@ -403,7 +522,11 @@ export function createReportsService(
       );
       return getComparison(identity, id);
     },
-    handlers: { 'reports.evaluate.v1': evaluate, 'comparisons.generate.v1': compare },
+    handlers: {
+      'reports.evaluate.v1': evaluate,
+      'reports.summarize.v1': summarize,
+      'comparisons.generate.v1': compare,
+    },
     async maintain() {
       for (const row of await repository.pendingReports(database.pool))
         await database.transaction(async (tx) => {
@@ -426,45 +549,31 @@ export function createReportsService(
           );
           if (!current || !['pending', 'generating'].includes(current.status)) return;
           const evaluations = await repository.evaluationRows(tx.client, row.id);
-          const settled = evaluations.every(
-            (e) =>
-              Boolean(e.result) ||
-              e.task_status === 'cancelled' ||
-              (e.task_status === 'failed' &&
-                (e.attempts >= e.max_attempts || e.error_code === 'unsupported_task_type')),
+          const report = aggregateReport(
+            state,
+            { ...current.result!, version: current.version },
+            evaluations,
           );
-          if (!settled) {
-            if (current.status !== 'generating')
-              await repository.updateReport(tx.client, row.id, current.version, {
-                ...current.result!,
-                status: 'generating',
-              });
-            return;
-          }
-          const values = evaluations.flatMap((e) => (e.result ? [e.result] : []));
-          const missing = evaluations.filter((e) => !e.result).map((e) => e.turn_id);
-          const report = emptyReport(state, row.id);
-          report.version = current.version;
-          report.status = values.length || !evaluations.length ? 'ready' : 'failed';
-          report.evaluations = values.sort(
-            (a, b) =>
-              state.view.turns.findIndex((t) => t.id === a.turn_id) -
-              state.view.turns.findIndex((t) => t.id === b.turn_id),
-          );
-          report.missing_turn_ids = missing;
-          report.is_partial ||= missing.length > 0;
-          report.coverage += ` 已分析 ${values.length} 题，缺失 ${missing.length} 题。`;
-          for (const key of keys.filter((k) => k !== 'coding_ability')) {
-            const observed = values.filter((v) => v.dimensions.includes(key));
-            if (observed.length)
-              report.dimensions[key] = {
-                status: 'observed',
-                score: null,
-                evidence_refs: observed.flatMap((v) =>
-                  [...v.strengths, ...v.gaps].flatMap((f) => f.evidence_refs),
-                ),
-                explanation: '已观察对应回答，评分标准尚未校准，仅提供证据分析。',
-              };
+          if (report.analysis_progress!.pending) report.status = 'generating';
+          else if (!report.evaluations.length) {
+            report.status = report.analysis_progress!.total ? 'failed' : 'ready';
+            report.summary_status = 'not_applicable';
+          } else if (!report.evaluations.some((e) => e.strengths.length || e.gaps.length)) {
+            report.status = 'ready';
+            report.summary_status = 'not_applicable';
+          } else if (!current.summary_task_id) {
+            await queueSummary(tx, state, report);
+          } else {
+            const task = await repository.summaryTask(tx.client, current.summary_task_id);
+            if (!task || taskSettled(task)) {
+              // Summary publication is atomic with task success. A settled task without a summary is a failure.
+              report.summary_status = report.summary ? 'ready' : 'failed';
+              report.status = 'ready';
+              report.is_partial ||= !report.summary;
+            } else {
+              report.status = 'generating';
+              report.summary_status = task.task_status === 'running' ? 'generating' : 'pending';
+            }
           }
           await repository.updateReport(tx.client, row.id, current.version, report);
         });

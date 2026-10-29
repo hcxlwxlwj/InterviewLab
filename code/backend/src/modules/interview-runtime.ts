@@ -56,6 +56,8 @@ export function createInterviewRuntime(
       const input = task.payload as {
         interview_id?: string;
         generation_id?: string;
+        report_id?: string;
+        report_version?: number;
         comparison_id?: string;
         version?: number;
       };
@@ -65,6 +67,13 @@ export function createInterviewRuntime(
             { owner_id: task.owner_id, roles: [] },
             input.interview_id,
           );
+          if (input.report_id) {
+            const report = await reports.get(
+              { owner_id: task.owner_id, roles: [] },
+              input.interview_id,
+            );
+            return report.id !== input.report_id || report.version !== input.report_version;
+          }
           return Boolean(
             input.generation_id &&
               (current.generation_id !== input.generation_id || current.status !== 'in_progress'),

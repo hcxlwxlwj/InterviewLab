@@ -3,6 +3,7 @@ import type {
   InterviewProfiles,
   InterviewConfig,
   InterviewReport,
+  ReportRequest,
   InterviewComparison,
   JobTemplate,
   PageResult,
@@ -40,10 +41,15 @@ export const interviewsApi = {
     }),
   report: (id: string, signal?: AbortSignal) =>
     apiRequest<InterviewReport>(`/interviews/${id}/report`, { signal }),
-  retryReport: (id: string, version: number, key: string) =>
+  retryReport: (
+    id: string,
+    version: number,
+    key: string,
+    scope: ReportRequest['scope'] = 'missing',
+  ) =>
     apiRequest<InterviewReport>(`/interviews/${id}/report`, {
       method: 'POST',
-      body: { version },
+      body: { version, scope },
       idempotencyKey: key,
     }),
   retry: (id: string, body: { turn_id: string; revision: number; goal: string }, key: string) =>
