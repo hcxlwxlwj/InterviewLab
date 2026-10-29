@@ -129,12 +129,39 @@ export interface InterviewEvaluation {
   dimensions: DimensionKey[];
   limitations: string[];
 }
+export interface InterviewReportSummary {
+  overview: InterviewFinding;
+  strengths: InterviewFinding[];
+  improvements: (InterviewFinding & { turn_id: string; retry_goal: string })[];
+  limitations: string[];
+}
+export interface ReportRequest {
+  version: number;
+  scope?: 'missing' | 'summary';
+}
 export interface InterviewReport {
   id: string;
   interview_id: string;
   version: number;
   task_ids: string[];
   status: 'pending' | 'generating' | 'ready' | 'failed';
+  /** Optional for reports produced before the text review upgrade. */
+  analysis_progress?: { total: number; completed: number; failed: number; pending: number };
+  summary_status?:
+    | 'pending'
+    | 'generating'
+    | 'ready'
+    | 'failed'
+    | 'not_applicable'
+    | 'not_requested';
+  summary?: InterviewReportSummary | null;
+  analysis_metadata?: {
+    model: string;
+    prompt_version: string;
+    rubric_version: string;
+    schema_version: string;
+    input_mode: 'text_fallback';
+  };
   scoring_status: 'uncalibrated';
   overall_score: null;
   dimensions: Record<

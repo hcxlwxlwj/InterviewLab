@@ -112,6 +112,14 @@ function fakeAgent(): InterviewAgent {
         limitations: ['仅依据本次文字回答。'],
       };
     },
+    async summarize(evaluations) {
+      return {
+        overview: evaluations[0].strengths[0],
+        strengths: evaluations.slice(0, 3).flatMap((e) => e.strengths.slice(0, 1)),
+        improvements: [],
+        limitations: ['受控测试总结，不代表真实模型质量。'],
+      };
+    },
     async compare(v) {
       return {
         changes: [
@@ -157,7 +165,12 @@ async function drain() {
     const rows = await database.pool.query<{ id: string }>(
       "SELECT id FROM tasks WHERE status='queued' OR (status='failed' AND attempts<max_attempts) ORDER BY created_at,id",
     );
-    if (!rows.rows.length) break;
+    if (!rows.rows.length) {
+      await runtime.maintain();
+      const pending = await database.pool.query("SELECT id FROM tasks WHERE status='queued'");
+      if (!pending.rows.length) break;
+      continue;
+    }
     for (const row of rows.rows) {
       try {
         await runTask(database, row.id, runtime.handlers);
@@ -739,4 +752,232 @@ test('durable outbox survives worker restart and advertises registered business 
       await worker.close();
     }
   }
+});
+
+test('report summary failure preserves per-turn evidence and summary-only retry never reevaluates answers', async () => {
+  let calls = 0;
+  const evaluate = agent.evaluate;
+  const summarize = agent.summarize;
+  agent.evaluate = async (...args) => {
+    calls++;
+    return evaluate(...args);
+  };
+  agent.summarize = async () => {
+    throw new ServiceError('provider_timeout', 502, 'controlled timeout');
+  };
+  let v = await started();
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: v.turns[0].id, text: '我负责测试并记录边界条件。' },
+    },
+    randomUUID(),
+  );
+  await drain();
+  const partial = await runtime.reports.get(identity, v.id);
+  assert.equal(partial.status, 'ready');
+  assert.equal(partial.summary_status, 'failed');
+  assert.equal(partial.evaluations.length, 1);
+  assert.equal(partial.is_partial, true);
+  const evaluationsBefore = calls;
+  agent.summarize = summarize;
+  const key = randomUUID();
+  const body = { version: partial.version, scope: 'summary' as const };
+  const queued = await runtime.reports.request(identity, v.id, body, key);
+  assert.equal(queued.summary_status, 'pending');
+  assert.equal(queued.version, partial.version + 1);
+  await runtime.reports.request(identity, v.id, body, key);
+  await assert.rejects(
+    runtime.reports.request(identity, v.id, body, randomUUID()),
+    (e: ServiceError) => e.code === 'version_conflict',
+  );
+  await drain();
+  const ready = await runtime.reports.get(identity, v.id);
+  assert.equal(ready.summary_status, 'ready');
+  assert.ok(ready.summary?.overview.evidence_refs.length);
+  assert.equal(calls, evaluationsBefore);
+  await assert.rejects(
+    runtime.reports.request(
+      { owner_id: 'other', roles: [] },
+      v.id,
+      { version: ready.version, scope: 'summary' },
+      randomUUID(),
+    ),
+    (e: ServiceError) => e.statusCode === 404,
+  );
+});
+
+test('report GET exposes successful results while another answer is pending; missing-only retry reuses successes', async () => {
+  let v = await started();
+  const firstId = v.turns[0].id;
+  v = await runtime.interviews.answer(
+    identity,
+    v.id,
+    firstId,
+    { version: v.version, text: '我先记录测试结果。' },
+    randomUUID(),
+  );
+  await drain();
+  v = await runtime.interviews.read(identity, v.id);
+  const secondId = v.turns[1].id;
+  const evaluate = agent.evaluate;
+  const calls = new Map<string, number>();
+  let fail = true;
+  agent.evaluate = async (...args) => {
+    calls.set(args[0].id, (calls.get(args[0].id) ?? 0) + 1);
+    if (fail && args[0].id === secondId)
+      throw new ServiceError('provider_timeout', 502, 'controlled');
+    return evaluate(...args);
+  };
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: secondId, text: '我用边界用例复核结果。' },
+    },
+    randomUUID(),
+  );
+  const rows = await database.pool.query<{ id: string }>(
+    "SELECT id FROM tasks WHERE type='reports.evaluate.v1' AND payload->>'turn_id'=$1",
+    [firstId],
+  );
+  await runTask(database, rows.rows[0].id, runtime.handlers);
+  const interim = await runtime.reports.get(identity, v.id);
+  assert.equal(interim.evaluations.length, 1);
+  assert.deepEqual(interim.analysis_progress, { total: 2, completed: 1, failed: 0, pending: 1 });
+  await drain();
+  const partial = await runtime.reports.get(identity, v.id);
+  assert.equal(partial.summary_status, 'ready');
+  assert.deepEqual(partial.missing_turn_ids, [secondId]);
+  const firstCalls = calls.get(firstId);
+  fail = false;
+  await runtime.reports.request(identity, v.id, { version: partial.version }, randomUUID());
+  await drain();
+  const ready = await runtime.reports.get(identity, v.id);
+  assert.equal(ready.summary_status, 'ready');
+  assert.equal(ready.evaluations.length, 2);
+  assert.equal(ready.missing_turn_ids.length, 0);
+  assert.equal(calls.get(firstId), firstCalls);
+});
+
+test('legacy reports do not request summaries on GET; an explicit summary request upgrades them', async () => {
+  let v = await started();
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: v.turns[0].id, text: '我负责测试。' },
+    },
+    randomUUID(),
+  );
+  await drain();
+  await database.pool.query(
+    "UPDATE interview_reports SET result=result-'summary'-'summary_status'-'analysis_metadata',summary_task_id=NULL,summary_input_digest=NULL WHERE interview_id=$1",
+    [v.id],
+  );
+  const before = await database.pool.query(
+    "SELECT count(*) FROM tasks WHERE type='reports.summarize.v1'",
+  );
+  const legacy = await runtime.reports.get(identity, v.id);
+  assert.equal(legacy.summary_status, 'not_requested');
+  assert.equal(legacy.summary, null);
+  await runtime.maintain();
+  assert.deepEqual(
+    (await database.pool.query("SELECT count(*) FROM tasks WHERE type='reports.summarize.v1'"))
+      .rows,
+    before.rows,
+  );
+  await runtime.reports.request(
+    identity,
+    v.id,
+    { version: legacy.version, scope: 'summary' },
+    randomUUID(),
+  );
+  await drain();
+  assert.equal((await runtime.reports.get(identity, v.id)).summary_status, 'ready');
+});
+
+test('deleting an interview during summary generation prevents publication and removes its summary task', async () => {
+  const summarize = agent.summarize;
+  let v = await started();
+  agent.summarize = async (...args) => {
+    const result = await summarize(...args);
+    await runtime.interviews.delete(identity, v.id, { version: v.version }, randomUUID());
+    return result;
+  };
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: v.turns[0].id, text: '我负责测试。' },
+    },
+    randomUUID(),
+  );
+  await drain();
+  await assert.rejects(
+    runtime.reports.get(identity, v.id),
+    (e: ServiceError) => e.statusCode === 404,
+  );
+  assert.equal(
+    (
+      await database.pool.query('SELECT count(*) FROM interview_reports WHERE interview_id=$1', [
+        v.id,
+      ])
+    ).rows[0].count,
+    '0',
+  );
+  assert.equal(
+    (
+      await database.pool.query(
+        "SELECT count(*) FROM tasks WHERE type='reports.summarize.v1' AND payload->>'interview_id'=$1",
+        [v.id],
+      )
+    ).rows[0].count,
+    '0',
+  );
+});
+
+test('a summary computed for an obsolete report version is cancelled instead of published', async () => {
+  const summarize = agent.summarize;
+  let v = await started();
+  agent.summarize = async (...args) => {
+    const value = await summarize(...args);
+    // Simulate a concurrent source/version invalidation while the provider is running.
+    await database.pool.query(
+      "UPDATE interview_reports SET version=version+1,result=jsonb_set(result,'{version}',to_jsonb(version+1)) WHERE interview_id=$1",
+      [v.id],
+    );
+    return value;
+  };
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: v.turns[0].id, text: '我负责验证边界条件。' },
+    },
+    randomUUID(),
+  );
+  await drain();
+  const report = await runtime.reports.get(identity, v.id);
+  assert.equal(report.version, 2);
+  assert.equal(report.summary, null);
+  const task = (
+    await database.pool.query(
+      "SELECT status,result_ref FROM tasks WHERE type='reports.summarize.v1' AND payload->>'interview_id'=$1",
+      [v.id],
+    )
+  ).rows[0];
+  assert.equal(task.status, 'cancelled');
+  assert.equal(task.result_ref, null);
 });

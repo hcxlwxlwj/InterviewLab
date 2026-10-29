@@ -8,6 +8,7 @@ import {
   type InterviewFinding,
 } from '@interviewlab/core';
 import { Loading } from '../../components/shared';
+import { ApiClientError } from '../../lib/api/http';
 import { interviewsApi } from '../../lib/api/interviews';
 import { CommandNotice, ErrorNotice, LiveFrame, useLiveCommand, useLiveResource } from './common';
 
@@ -103,9 +104,14 @@ function ReportBody({ id }: { id: string }) {
   const load = useCallback(
     async (signal: AbortSignal) => {
       const interview = await interviewsApi.read(id, signal);
-      const report = ['completed', 'failed'].includes(interview.status)
-        ? await interviewsApi.report(id, signal)
-        : null;
+      let report = null;
+      if (['completed', 'failed'].includes(interview.status)) {
+        try {
+          report = await interviewsApi.report(id, signal);
+        } catch (e) {
+          if (!(e instanceof ApiClientError && e.status === 404)) throw e;
+        }
+      }
       return { interview, report };
     },
     [id],
@@ -123,16 +129,38 @@ function ReportBody({ id }: { id: string }) {
       </>
     );
   const { interview, report } = data;
-  if (!report)
+  if (!report) {
+    const finalized = ['completed', 'failed'].includes(interview.status);
     return (
       <section className="panel">
-        <h2>面试尚未结束</h2>
-        <p>结束后再提供复盘，进行中不展示参考答案或评价。</p>
-        <Link className="live-button" href={`/interview/${id}`}>
-          返回面试
-        </Link>
+        <h2>{finalized ? '面试记录已保存' : '面试尚未结束'}</h2>
+        <p>
+          {finalized
+            ? '尚未生成复盘，你可以基于本场已保存的回答请求分析。'
+            : '结束后再提供复盘，进行中不展示参考答案或评价。'}
+        </p>
+        <CommandNotice command={command} refresh={() => void resource.refresh()} />
+        {finalized ? (
+          <button
+            className="live-button"
+            disabled={command.blocked}
+            onClick={() =>
+              command.run(
+                (key) => interviewsApi.retryReport(id, 1, key),
+                (result) => resource.accept({ interview, report: result }),
+              )
+            }
+          >
+            生成文字复盘
+          </button>
+        ) : (
+          <Link className="live-button" href={`/interview/${id}`}>
+            返回面试
+          </Link>
+        )}
       </section>
     );
+  }
   const retryTurn = interview.turns.find((t) => t.answer_status === 'answered');
   const comparisonId = search.get('comparison');
   const reportPending = ['pending', 'generating'].includes(report.status);
@@ -144,11 +172,48 @@ function ReportBody({ id }: { id: string }) {
         <div className="live-toolbar">
           <h2>{interview.job_title}</h2>
           <span className="badge">
-            {reportPending ? '复盘生成中' : report.is_partial ? '部分复盘' : '面后复盘'}
+            {reportPending
+              ? '复盘生成中'
+              : report.status === 'failed'
+                ? '分析失败'
+                : report.is_partial
+                  ? '部分复盘'
+                  : '面后复盘'}
           </span>
           <span>未校准数值评分</span>
         </div>
+        <p>
+          文字面试 · {interview.configuration.duration_minutes} 分钟配置 ·{' '}
+          {
+            {
+              technical_qa: '技术问答',
+              project_deep_dive: '项目深挖',
+              business_scenario: '业务场景',
+              hr: '综合素质',
+              mixed: '混合面试',
+            }[interview.configuration.interview_type]
+          }
+        </p>
+        <p>
+          结束时间：
+          {interview.ended_at
+            ? new Date(interview.ended_at).toLocaleString('zh-CN')
+            : '未记录'} ·{' '}
+          {{ completed: '正常完成', user_finished: '提前结束', hard_deadline: '达到时间上限' }[
+            interview.end_reason as 'completed'
+          ] ?? '面试已结束'}
+        </p>
         <p>{report.coverage}</p>
+        {report.analysis_progress && (
+          <p role="status" aria-live="polite">
+            有效回答 {report.analysis_progress.total} 题 · 已分析{' '}
+            {report.analysis_progress.completed} 题 · 待处理 {report.analysis_progress.pending} 题 ·
+            失败 {report.analysis_progress.failed} 题
+          </p>
+        )}
+        {report.analysis_progress?.total === 0 && (
+          <p>没有有效回答，仅保存面试记录，不作能力评价。</p>
+        )}
         {reportPending && <p role="status">回答已保存，正在逐题整理复盘，可以稍后从记录中回来。</p>}
         {!reportPending && (report.status === 'failed' || report.missing_turn_ids.length > 0) && (
           <>
@@ -167,13 +232,14 @@ function ReportBody({ id }: { id: string }) {
             </button>
           </>
         )}
-        {report.status === 'ready' && (
+        {report.evaluations.length > 0 && (
           <div className="live-dimensions">
             {Object.entries(report.dimensions).map(([key, d]) => (
               <article key={key}>
                 <h3>{DIMENSION_LABELS[key as keyof typeof DIMENSION_LABELS]}</h3>
                 <strong>{d.status === 'observed' ? '已观察 · 暂不评分' : '未观察'}</strong>
                 <p>{d.explanation}</p>
+                <Evidence refs={d.evidence_refs.slice(0, 3)} />
               </article>
             ))}
           </div>
@@ -209,6 +275,88 @@ function ReportBody({ id }: { id: string }) {
           </p>
         )}
       </section>
+      {(report.summary || (report.analysis_progress?.total ?? report.evaluations.length) > 0) && (
+        <section className="panel" aria-label="整场总结">
+          <h2>整场总结</h2>
+          {report.summary ? (
+            <>
+              <Findings items={[report.summary.overview]} />
+              <h3>主要优势</h3>
+              {report.summary.strengths.length ? (
+                <Findings items={report.summary.strengths} />
+              ) : (
+                <p>本次没有足够依据归纳整场优势，可查看逐题分析。</p>
+              )}
+              <h3>优先练习目标</h3>
+              {report.summary.improvements.length ? (
+                report.summary.improvements.map((item, index) => (
+                  <article key={item.turn_id}>
+                    <h4>
+                      {index + 1}. {item.text}
+                    </h4>
+                    <Evidence refs={item.evidence_refs} />
+                    <p>练习目标：{item.retry_goal}</p>
+                    <a className="live-button secondary" href={`#turn-${item.turn_id}`}>
+                      查看原题并重练
+                    </a>
+                  </article>
+                ))
+              ) : (
+                <p>没有需要优先列出的已确认缺口，不强行生成练习目标。</p>
+              )}
+              <h3>分析范围与局限</h3>
+              <ul>
+                {report.summary.limitations.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p role="status">
+              {report.summary_status === 'failed'
+                ? '整场总结生成失败，已完成的逐题复盘仍可查看。'
+                : report.summary_status === 'not_requested' || !report.summary_status
+                  ? '这份历史报告尚未生成整场总结。'
+                  : report.summary_status === 'not_applicable'
+                    ? '本次没有足够的评价证据生成整场总结，可查看原回答和逐题分析。'
+                    : report.status === 'failed'
+                      ? '暂无成功的逐题分析，请先重试缺失分析。'
+                      : '逐题分析完成后整理整场总结，可以先查看下面已完成的题目。'}
+            </p>
+          )}
+          {!reportPending &&
+            report.evaluations.length > 0 &&
+            !report.summary &&
+            ['failed', 'not_requested', undefined].includes(report.summary_status) && (
+              <button
+                className="live-button"
+                disabled={command.blocked}
+                onClick={() =>
+                  command.run(
+                    (key) => interviewsApi.retryReport(id, report.version, key, 'summary'),
+                    (result) => resource.accept({ interview, report: result }),
+                  )
+                }
+              >
+                {report.summary_status === 'failed' ? '重试整场总结' : '生成整场总结'}
+              </button>
+            )}
+        </section>
+      )}
+      <section className="panel">
+        <h2>逐题复盘</h2>
+        <nav aria-label="按主问题浏览">
+          {interview.turns
+            .filter((t) => !t.follow_up_index)
+            .map((turn) => (
+              <p key={turn.id}>
+                <a href={`#turn-${turn.id}`}>
+                  主问题 {turn.main_question_index}：{turn.text}
+                </a>
+              </p>
+            ))}
+        </nav>
+      </section>
       {interview.turns.map((turn) => {
         const evaluation = report.evaluations.find(
           (e) => e.turn_id === turn.id && e.revision === turn.revision,
@@ -229,9 +377,17 @@ function ReportBody({ id }: { id: string }) {
                 {evaluation && (
                   <>
                     <h3>已说明的内容</h3>
-                    <Findings items={evaluation.strengths} />
+                    {evaluation.strengths.length ? (
+                      <Findings items={evaluation.strengths} />
+                    ) : (
+                      <p>暂无足够依据归纳亮点。</p>
+                    )}
                     <h3>可改进的缺口</h3>
-                    <Findings items={evaluation.gaps} />
+                    {evaluation.gaps.length ? (
+                      <Findings items={evaluation.gaps} />
+                    ) : (
+                      <p>本题未识别到有证据支持的明确缺口。</p>
+                    )}
                     <h3>参考要点</h3>
                     <ul>
                       {evaluation.reference_points.map((point, i) => (

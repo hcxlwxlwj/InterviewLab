@@ -82,6 +82,29 @@ export async function putEvaluationResult(
     [reportId, turnId, taskId, JSON.stringify(value)],
   );
 }
+export async function setSummaryTask(
+  db: Executor,
+  reportId: string,
+  taskId: string | null,
+  digest: string | null,
+) {
+  await db.query(
+    'UPDATE interview_reports SET summary_task_id=$2,summary_input_digest=$3 WHERE id=$1',
+    [reportId, taskId, digest],
+  );
+}
+export async function summaryTask(db: Executor, taskId: string) {
+  return (
+    await db.query<{
+      task_status: string;
+      attempts: number;
+      max_attempts: number;
+      error_code: string | null;
+    }>('SELECT status AS task_status,attempts,max_attempts,error_code FROM tasks WHERE id=$1', [
+      taskId,
+    ])
+  ).rows[0];
+}
 export async function pendingReports(db: Executor) {
   return (
     await db.query<ReportRow>(
@@ -172,6 +195,10 @@ export async function eraseReports(db: Executor, owner: string, interviewId: str
     owner,
     comparisons.rows.map((r) => r.task_id),
   ]);
+  await db.query(
+    'DELETE FROM tasks WHERE owner_id=$1 AND id IN (SELECT summary_task_id FROM interview_reports WHERE owner_id=$1 AND interview_id=$2)',
+    [owner, interviewId],
+  );
   await db.query('DELETE FROM interview_reports WHERE owner_id=$1 AND interview_id=$2', [
     owner,
     interviewId,

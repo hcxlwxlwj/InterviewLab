@@ -29,6 +29,13 @@
       "when": 1792990277210,
       "tag": "0003_curved_loki",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793278323787,
+      "tag": "0004_text_report_summary",
+      "breakpoints": true
     }
   ]
 }

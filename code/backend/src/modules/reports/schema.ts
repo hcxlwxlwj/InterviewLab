@@ -20,6 +20,8 @@ export const interviewReports = pgTable(
     version: integer().notNull().default(1),
     status: text().notNull().default('pending'),
     result: jsonb().$type<InterviewReport>(),
+    summary_task_id: uuid(),
+    summary_input_digest: text(),
     created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
