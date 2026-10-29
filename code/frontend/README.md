@@ -1,5 +1,7 @@
 # 前端公共接入
 
+未登录访问 `/me/interviews` 时展示明确标注的预设演示记录，可进入演示报告；登录后展示本人真实记录。会话读取失败仍显示错误，不切换到演示数据。真实记录接口的身份和归属校验保持有效。
+
 业务负责人沿用现有 Next.js、HTTP 客户端和认证系统。真实 `/interview/setup`、`/interview/{id}`、`/reports/{id}`、`/me/interviews` 已通过 HTTP 接入面试闭环；对应路径的 `?demo=1` 显式保留旧演示。简历与个人 JD 等尚为演示，不自动上传。启动、模型及验收边界见[文字面试接入](../../docs/software/interview-agent-implementation.md)。
 
 个人中心和收藏岗位的主按钮进入真实 AI 配置；简历与个人 JD 的旧流程入口明确标为预设演示。所有演示提示注明“不调用 AI”，并提供进入真实面试的链接；旧演示记录不自动转换为真实面试。入口区分截图见[入口提示](../../docs/software/prototype/screenshots/live-entry-clarity.png)。
