@@ -215,7 +215,12 @@ test('saved JD versions and template sources freeze at session start; unsafe lin
     demoClient.getSession(session.id)!.material_snapshot.job_template?.version,
     session.configuration.job_template_version,
   );
-  assert.equal(demoClient.getSession(session.id)!.material_snapshot.knowledge_sources?.length, 2);
+  const snapshot = demoClient.getSession(session.id)!.material_snapshot;
+  assert.ok(snapshot.knowledge_sources?.length);
+  assert.deepEqual(
+    snapshot.knowledge_sources.map((source) => source.id).sort(),
+    [...snapshot.job_template!.source_refs].sort(),
+  );
 });
 
 test('stale resume and unknown job cannot silently start another interview', () => {

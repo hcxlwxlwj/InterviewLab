@@ -127,17 +127,17 @@ test('catalog pagination, filters, detail, source routes and invalid cursors are
     (await handleApi(new Request(`${base}/job-templates?cursor=NaN`), ['job-templates'])).status,
     400,
   );
-  assert.equal(
-    (
-      await (
-        await handleApi(new Request(`${base}/job-templates/ai-product/sources`), [
-          'job-templates',
-          'ai-product',
-          'sources',
-        ])
-      ).json()
-    ).items.length,
-    2,
+  const sources = await (
+    await handleApi(new Request(`${base}/job-templates/ai-product/sources`), [
+      'job-templates',
+      'ai-product',
+      'sources',
+    ])
+  ).json();
+  assert.ok(sources.items.length > 0);
+  assert.deepEqual(
+    sources.items.map((source: { id: string }) => source.id).sort(),
+    [...detail.source_refs].sort(),
   );
 });
 test('new write skeletons validate input and never claim persistence', async () => {
