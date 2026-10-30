@@ -50,9 +50,7 @@ test('published catalog has stable opaque cursors, filters and embedded sources'
   );
   assert.equal(pages[pages.length - 1].next_cursor, null);
   assert.equal(
-    new Set(
-      pages.flatMap((page) => page.items.map((item: { id: string }) => item.id)),
-    ).size,
+    new Set(pages.flatMap((page) => page.items.map((item: { id: string }) => item.id))).size,
     1000,
   );
   const filtered = await app.inject(
@@ -181,7 +179,7 @@ test('OpenAPI describes registered routes and is hidden outside development', as
   assert.ok(specification.paths['/api/v1/job-templates']);
   assert.ok(specification.paths['/api/v1/auth/session']);
   assert.ok(specification.paths['/api/v1/auth/sign-in/email']);
-  assert.ok(!specification.paths['/api/v1/auth/sign-up/email']);
+  assert.ok(specification.paths['/api/v1/auth/sign-up/email']);
   assert.ok(specification.paths['/api/v1/interviews']);
   assert.ok(specification.paths['/api/v1/interviews/{id}/turns/{turn_id}/answer']);
   assert.ok(specification.paths['/api/v1/comparisons']);
@@ -214,6 +212,14 @@ test('unconfigured authentication is explicit and every module write shares the 
   const unavailable = await app.inject('/api/v1/auth/session');
   assert.equal(unavailable.statusCode, 501);
   assert.equal(unavailable.json().code, 'capability_unavailable');
+  const signup = await app.inject({
+    method: 'POST',
+    url: '/api/v1/auth/sign-up/email',
+    headers: { origin: config.PUBLIC_ORIGIN },
+    payload: { name: 'Student', email: 'student@example.test', password: 'long-password-for-test' },
+  });
+  assert.equal(signup.statusCode, 501);
+
   for (const origin of [undefined, 'https://attacker.test']) {
     assert.equal(
       (

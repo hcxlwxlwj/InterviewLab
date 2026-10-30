@@ -7,6 +7,7 @@ import { useCallback, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { LIVE_TYPE_LABELS, type InterviewConfig } from '@interviewlab/core';
 import { interviewsApi } from '../../lib/api/interviews';
+import { jobsApi } from '../../lib/api/jobs';
 import { Loading } from '../../components/shared';
 import { CommandNotice, ErrorNotice, SessionGate, useLiveCommand, useLiveResource } from './common';
 
@@ -22,7 +23,18 @@ function Form() {
     interviewer_style: '标准',
     interaction_mode: 'text_fallback',
   });
-  const load = useCallback((signal: AbortSignal) => interviewsApi.jobs(signal), []);
+  const requestedJob = search.get('job') ?? 'frontend';
+  const load = useCallback(
+    async (signal: AbortSignal) => {
+      const page = await interviewsApi.jobs(signal);
+      if (!page.items.some((job) => job.id === requestedJob)) {
+        const selectedJob = await jobsApi.read(requestedJob, signal);
+        page.items.unshift(selectedJob);
+      }
+      return page;
+    },
+    [requestedJob],
+  );
   const jobs = useLiveResource(load, () => false);
   const loadProfiles = useCallback(
     (signal: AbortSignal) => interviewsApi.profiles(config.job, config.career_stage, signal),

@@ -10,8 +10,16 @@ export class ApiClientError extends Error {
   }
 }
 export const SESSION_CHANGED = 'interviewlab:session-changed';
+export const SESSION_INVALIDATED = 'interviewlab:session-invalidated';
 export function notifySessionChanged() {
-  if (typeof window !== 'undefined') window.dispatchEvent(new Event(SESSION_CHANGED));
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(SESSION_CHANGED));
+    if (typeof BroadcastChannel !== 'undefined') {
+      const channel = new BroadcastChannel(SESSION_CHANGED);
+      channel.postMessage('refresh');
+      channel.close();
+    }
+  }
 }
 export interface ApiRequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -77,7 +85,8 @@ export function createApiClient(fetcher: typeof fetch = (...args) => fetch(...ar
       });
     }
     if (!response.ok) {
-      if (response.status === 401) notifySessionChanged();
+      if (response.status === 401 && !path.startsWith('/auth/') && typeof window !== 'undefined')
+        window.dispatchEvent(new Event(SESSION_INVALIDATED));
       throw new ApiClientError(
         response.status,
         isApiError(data)

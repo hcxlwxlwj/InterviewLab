@@ -6,7 +6,7 @@
 
 原同步演示客户端继续保留，Next.js 合成接口为 /api/demo/v1。真实 /api/v1 提供公开岗位、认证、任务及文字面试/报告/重练/比较；OpenAPI 只列注册路由。除公共与认证表外，迁移 0002 新增六张面试/报告模块表。真实 DTO 使用独立 Interview，支持未校准证据报告及任务引用；原 Session 和 DataClient 仅供演示。当前实现、接口补充及未验收范围见[文字面试接入](interview-agent-implementation.md)。
 
-本文第 1–9 节保留全产品合同；已实现范围见后端 README 及下方骨架说明。原 API_CONTRACT、Session 和同步 DataClient 属于演示合同，不能当作新的真实 HTTP 客户端。
+当前账号访问及错误细节见[账号与访问管理](account-management.md)。本文第 1–9 节保留全产品合同；已实现范围见后端 README 及下方骨架说明。原 API_CONTRACT、Session 和同步 DataClient 属于演示合同，不能当作新的真实 HTTP 客户端。
 
 ### 旧草案迁移
 
@@ -44,7 +44,7 @@
 
 | 模块/实体 | 最小数据与关系 | 约束 |
 | --- | --- | --- |
-| Auth/User/Profile | 认证组件的用户/凭证/登录会话；display_name、locale、timezone、profile version | 认证表与面试表分开，授权命令创建受邀账号 |
+| Auth/User/Profile | 认证组件的用户/凭证/登录会话；display_name、locale、timezone、profile version | 认证表与面试表分开，公开注册固定 student，授权命令可创建受邀账号 |
 | Preferences/DefaultResume | 交互、播报、编辑器、岗位偏好及 version；默认简历指针 | 每人至多一份默认；仅本人 library 且 confirmed 的当前版本可设默认 |
 | Resume/ResumeVersion | id、owner、name、current_version、scope、时间；每版正文、方向、文件和经历顺序 | 文本字段含基本信息、教育、技能、自我介绍和原始文本；历史内容版本独立 |
 | Experience/ExperienceVersion | kind、个人职责、行动、技术决策、结果、确认、来源简历及版本、证据 | 可独立手填；复制生成新经历 ID；结果可缺失，不补造数字 |
@@ -107,7 +107,7 @@
 
 | 方法与路径 | 功能/输入输出 | 阶段 |
 | --- | --- | --- |
-| `/auth/*` | 自有安全 DTO 包装 Better Auth：POST /auth/sign-in/email 返回 success、POST /auth/sign-out 接收 {}、GET /auth/session 返回 AuthSession 或 null；不返回 token；注册/邮件找回关闭，授权命令创建账号 | 已接入 |
+| `/auth/*` | 自有安全 DTO 包装 Better Auth：POST /auth/sign-in/email 返回 success、POST /auth/sign-out 接收 {}、GET /auth/session 返回 AuthSession 或 null；不返回 token；新增 POST /auth/sign-up/email 接收 name/email/password，返回 success 并自动建立 Cookie 会话；注册固定 student，邮箱未经验证，邮件找回关闭；授权命令仍可创建账号 | 已接入 |
 | `GET/PATCH /me` | 本人基本信息与 version；不通过此接口修改凭证或维护权限 | 1 |
 | `GET /me/overview` | 最近面试、常用简历、收藏和实际计数，组合只读查询 | 1 |
 | `GET/PATCH /me/preferences` | 交互/播报/编辑器/岗位偏好与 version，不影响已开始面试 | 1 |
@@ -235,7 +235,7 @@ Agent 不是浏览器可任意调用的总入口。简历提取、JD 分析、�
 ## 7. 保存、权限与删除
 
 
-身份采用 Better Auth 的受邀账号与服务端登录会话，生产使用 HttpOnly/Secure Cookie；写接口检查同源/CSRF，退出与过期立即失效。文件默认上限 10 MiB，仅可提取文本 PDF/DOCX，检查扩展名、实际类型与结构；拒绝密码文件、损坏文件、异常压缩，禁宏/脚本/外链加载，解析任务受资源限制。OCR 后续扩展，失败给手填入口。预览转换在受限进程进行。
+身份采用 Better Auth 的邮箱密码注册/受邀账号与服务端登录会话，生产使用 HttpOnly/Secure Cookie；写接口检查同源/CSRF，退出与过期立即失效。文件默认上限 10 MiB，仅可提取文本 PDF/DOCX，检查扩展名、实际类型与结构；拒绝密码文件、损坏文件、异常压缩，禁宏/脚本/外链加载，解析任务受资源限制。OCR 后续扩展，失败给手填入口。预览转换在受限进程进行。
 
 | 数据 | 默认保存 | 删除/到期 |
 | --- | --- | --- |

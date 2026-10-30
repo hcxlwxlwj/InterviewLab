@@ -1,2 +1,4 @@
-import ResumeEditor from '../../../../components/resume-editor';
-export default ResumeEditor;
+import { UnavailableWorkspace } from '../../../../features/personal-center/live-workspace';
+export default function Page() {
+  return <UnavailableWorkspace section="resumes" />;
+}

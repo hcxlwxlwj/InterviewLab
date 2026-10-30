@@ -81,9 +81,9 @@ export default function Home() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link href="/reports/sample-interview?demo=1">
+                  <Link href="/me/interviews">
                     <Play size={16} />
-                    查看示例报告
+                    查看面试记录
                   </Link>
                 </Button>
               </div>
@@ -178,8 +178,8 @@ export default function Home() {
                 <br />
                 先找到一个缺口，再针对同一道题重新练习。
               </p>
-              <Link className="text-link" href="/reports/sample-interview?demo=1">
-                看看一份示例报告
+              <Link className="text-link" href="/me/interviews">
+                查看我的面试记录
                 <ArrowRight size={17} />
               </Link>
             </div>
@@ -205,8 +205,8 @@ export default function Home() {
               </div>
               <div className="preview-footer">
                 <span>依据：第 1 题回答原文</span>
-                <Link href="/reports/sample-interview?demo=1">
-                  查看完整示例
+                <Link href="/me/interviews">
+                  查看我的记录
                   <ChevronRight size={14} />
                 </Link>
               </div>
@@ -247,15 +247,15 @@ export default function Home() {
               },
               {
                 q: '现在可以使用语音和上传简历吗？',
-                a: '当前是交互演示版本，可通过文字体验完整流程，使用预置合成简历。真实语音、文件上传和模型服务尚未接入，不采集音视频。',
+                a: '目前支持登录后的真实 AI 文字面试与复盘。语音、文件上传和简历维护暂未开放，不采集音视频。',
               },
               {
-                q: '示例分数代表我的面试水平吗？',
-                a: '不代表。示例报告展示的是固定合成案例。你在演示中提交的回答只用于体验流程，不会生成专业评分。',
+                q: '报告能代表我的面试水平吗？',
+                a: '报告仅依据本次回答提供 AI 参考反馈，不代表专业能力认证。首页的合成案例只说明界面，不属于你的账号记录。',
               },
               {
                 q: '练习记录会保存多久？',
-                a: '演示记录仅保留在当前浏览器标签页，刷新可以恢复，关闭标签页后会清除。请勿输入真实简历或个人敏感信息。',
+                a: '真实面试记录保存在当前账号中，退出登录或关闭标签页不会清除。可在面试记录中主动删除；简历等个人材料维护暂未开放。',
               },
             ].map((f) => (
               <details key={f.q}>

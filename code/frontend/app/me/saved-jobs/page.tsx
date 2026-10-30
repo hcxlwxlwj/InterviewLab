@@ -1,9 +1,4 @@
-import { Suspense } from 'react';
-import PersonalWorkspace from '../../../components/personal-workspace';
+import { UnavailableWorkspace } from '../../../features/personal-center/live-workspace';
 export default function Page() {
-  return (
-    <Suspense>
-      <PersonalWorkspace section="saved-jobs" />
-    </Suspense>
-  );
+  return <UnavailableWorkspace section="saved-jobs" />;
 }

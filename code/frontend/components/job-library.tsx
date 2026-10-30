@@ -1,31 +1,44 @@
 'use client';
-import { CONTENT_SOURCES, JOB_CATEGORIES, JOBS } from '@interviewlab/backend/content';
-import { STAGE_LABELS, type CareerStage, type JobTemplate } from '@interviewlab/core';
+import {
+  STAGE_LABELS,
+  type CareerStage,
+  type JobTemplate,
+  type ContentSource,
+} from '@interviewlab/core';
 import { ArrowRight, Bookmark, Copy, ExternalLink, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { demoClient } from '../lib/demo-client';
-import { EmptyState, Footer, Header, useDemoState } from './shared';
+import { useCallback, useEffect, useState } from 'react';
+import { jobsApi } from '../lib/api/jobs';
+import { ErrorNotice, useLiveResource } from '../features/live-interview/common';
+import { EmptyState, Footer, Header, Loading } from './shared';
 import { Button } from './ui/button';
 
 export function JobLibrary() {
-  const params = useSearchParams(),
-    state = useDemoState();
+  const params = useSearchParams();
+  const [cursor, setCursor] = useState('');
   const [query, setQuery] = useState(''),
     [category, setCategory] = useState(params.get('category') ?? ''),
-    [stage, setStage] = useState<CareerStage | ''>(''),
-    [message, setMessage] = useState('');
-  useEffect(() => setCategory(params.get('category') ?? ''), [params]);
-  const jobs = demoClient.listJobs({ search: query, category, stage: stage || undefined });
-  function toggle(id: string) {
-    try {
-      const added = demoClient.toggleBookmark(id);
-      setMessage(added ? '已收藏，可在个人中心维护备注与常用简历。' : '已取消收藏。');
-    } catch (e) {
-      setMessage((e as Error).message);
-    }
-  }
+    [stage, setStage] = useState<CareerStage | ''>('');
+  useEffect(() => {
+    setCategory(params.get('category') ?? '');
+    setCursor('');
+  }, [params]);
+  const load = useCallback(
+    (signal: AbortSignal) => {
+      const querystring = new URLSearchParams({ limit: '20' });
+      if (query) querystring.set('search', query);
+      if (category) querystring.set('category', category);
+      if (stage) querystring.set('stage', stage);
+      if (cursor) querystring.set('cursor', cursor);
+      return jobsApi.list(querystring.toString(), signal);
+    },
+    [query, category, stage, cursor],
+  );
+  const resource = useLiveResource(load, () => false);
+  const categoriesLoad = useCallback((signal: AbortSignal) => jobsApi.categories(signal), []);
+  const categories = useLiveResource(categoriesLoad, () => false);
+  const jobs = resource.value?.items ?? [];
   return (
     <>
       <Header />
@@ -43,14 +56,24 @@ export function JobLibrary() {
                   aria-label="搜索岗位或技能"
                   placeholder="搜索岗位或技能，如 Agent、产品、SQL"
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setCursor('');
+                  }}
                 />
               </label>
               <div className="row-actions">
                 <span>适用阶段</span>
                 <div className="segmented" role="group" aria-label="筛选适用阶段">
                   {(['', 'internship', 'campus'] as const).map((s) => (
-                    <button key={s} aria-pressed={stage === s} onClick={() => setStage(s)}>
+                    <button
+                      key={s}
+                      aria-pressed={stage === s}
+                      onClick={() => {
+                        setStage(s);
+                        setCursor('');
+                      }}
+                    >
                       {s ? STAGE_LABELS[s] : '全部'}
                     </button>
                   ))}
@@ -63,34 +86,41 @@ export function JobLibrary() {
           <aside className="job-categories">
             <h2>方向分类</h2>
             <nav aria-label="岗位方向">
-              <button aria-pressed={!category} onClick={() => setCategory('')}>
-                全部方向<span>{JOBS.length}</span>
+              <button
+                aria-pressed={!category}
+                onClick={() => {
+                  setCategory('');
+                  setCursor('');
+                }}
+              >
+                全部方向
               </button>
-              {JOB_CATEGORIES.map((c) => (
+              {categories.value?.items.map((c) => (
                 <button
                   key={c.id}
                   aria-pressed={category === c.id}
-                  onClick={() => setCategory(c.id)}
+                  onClick={() => {
+                    setCategory(c.id);
+                    setCursor('');
+                  }}
                 >
                   {c.title}
-                  <span>{demoClient.listJobs({ category: c.id }).length}</span>
                 </button>
               ))}
             </nav>
           </aside>
           <div className="job-results">
             <div className="section-title-row">
-              <p>{jobs.length} 个岗位模板</p>
+              <p>岗位模板</p>
               <Link className="text-link" href="/me/saved-jobs">
                 我的目标岗位
                 <ArrowRight size={16} />
               </Link>
             </div>
-            {message && (
-              <p className="toast-inline" role="status">
-                {message}
-              </p>
-            )}
+            <ErrorNotice message={resource.error} retry={() => void resource.refresh()} />
+            <ErrorNotice message={categories.error} retry={() => void categories.refresh()} />
+            {!resource.value && !resource.error && <Loading />}
+            <p className="muted">岗位收藏与个人 JD 维护暂未开放。</p>
             <div className="catalog-rows">
               {jobs.map((j) => (
                 <article className="catalog-job" key={j.id}>
@@ -108,19 +138,11 @@ export function JobLibrary() {
                   <div className="catalog-actions">
                     <button
                       className="icon-button"
-                      disabled={!state}
-                      aria-label={`${state?.bookmarks.some((b) => b.template_id === j.id) ? '取消收藏' : '收藏'}${j.title}`}
-                      aria-pressed={state?.bookmarks.some((b) => b.template_id === j.id) ?? false}
-                      onClick={() => toggle(j.id)}
+                      disabled
+                      title="岗位收藏暂未开放"
+                      aria-label="岗位收藏暂未开放"
                     >
-                      <Bookmark
-                        size={21}
-                        fill={
-                          state?.bookmarks.some((b) => b.template_id === j.id)
-                            ? 'currentColor'
-                            : 'none'
-                        }
-                      />
+                      <Bookmark size={21} />
                     </button>
                     <Link className="text-link" href={`/jobs/${j.slug}`}>
                       查看岗位
@@ -130,12 +152,24 @@ export function JobLibrary() {
                 </article>
               ))}
             </div>
-            {!jobs.length && (
+            {resource.value && !jobs.length && (
               <EmptyState
                 title="没有找到对应岗位"
                 description="试试其他岗位名称、技能关键词，或切换方向分类。"
               />
             )}
+            <div className="row-actions">
+              {cursor && (
+                <Button variant="outline" onClick={() => setCursor('')}>
+                  回到第一页
+                </Button>
+              )}
+              {resource.value?.next_cursor && (
+                <Button variant="outline" onClick={() => setCursor(resource.value!.next_cursor!)}>
+                  下一页
+                </Button>
+              )}
+            </div>
             <p className="catalog-note">
               通用参考模板，面向实习与校招整理。企业实际要求请核对原招聘信息。
             </p>
@@ -147,12 +181,23 @@ export function JobLibrary() {
   );
 }
 
-export function JobDetail({ job }: { job: JobTemplate }) {
-  const state = useDemoState(),
-    [message, setMessage] = useState('');
-  const saved = state?.bookmarks.find((b) => b.template_id === job.id),
-    category = JOB_CATEGORIES.find((c) => c.id === job.category_id);
-  const sources = CONTENT_SOURCES.filter((s) => job.source_refs.includes(s.id));
+export function LiveJobDetail({ id }: { id: string }) {
+  const load = useCallback((signal: AbortSignal) => jobsApi.read(id, signal), [id]);
+  const resource = useLiveResource(load, () => false);
+  if (!resource.value)
+    return (
+      <>
+        <Header />
+        <main id="main-content" className="container section">
+          <ErrorNotice message={resource.error} retry={() => void resource.refresh()} />
+          {!resource.error && <Loading />}
+        </main>
+        <Footer />
+      </>
+    );
+  return <JobDetail job={resource.value} sources={resource.value.sources} />;
+}
+export function JobDetail({ job, sources }: { job: JobTemplate; sources: ContentSource[] }) {
   return (
     <>
       <Header />
@@ -162,7 +207,7 @@ export function JobDetail({ job }: { job: JobTemplate }) {
             <div className="job-breadcrumb">
               <Link href="/jobs">岗位库</Link>
               <span>/</span>
-              <Link href={`/jobs?category=${job.category_id}`}>{category?.title}</Link>
+              <Link href={`/jobs?category=${job.category_id}`}>{job.category_id}</Link>
               <span>/</span>
               <span>{job.title}</span>
             </div>
@@ -173,28 +218,14 @@ export function JobDetail({ job }: { job: JobTemplate }) {
               </div>
               <div className="row-actions wrap">
                 <Button asChild>
-                  <Link
-                    href={`/interview/setup?job=${job.id}${saved?.preferred_resume_id ? `&resume=${saved.preferred_resume_id}` : ''}`}
-                  >
+                  <Link href={`/interview/setup?job=${job.id}`}>
                     使用模板模拟
                     <ArrowRight size={18} />
                   </Link>
                 </Button>
-                <Button
-                  variant="outline"
-                  disabled={!state}
-                  aria-pressed={!!saved}
-                  onClick={() => {
-                    try {
-                      const added = demoClient.toggleBookmark(job.id);
-                      setMessage(added ? '已加入目标岗位。' : '已取消收藏。');
-                    } catch (e) {
-                      setMessage((e as Error).message);
-                    }
-                  }}
-                >
-                  <Bookmark size={18} fill={saved ? 'currentColor' : 'none'} />
-                  {saved ? '已收藏' : '收藏岗位'}
+                <Button variant="outline" disabled title="岗位收藏暂未开放">
+                  <Bookmark size={18} />
+                  收藏暂未开放
                 </Button>
               </div>
             </div>
@@ -202,11 +233,6 @@ export function JobDetail({ job }: { job: JobTemplate }) {
         </section>
         <div className="container job-detail-layout">
           <div>
-            {message && (
-              <p role="status" className="toast-inline">
-                {message}
-              </p>
-            )}
             <nav className="job-detail-nav" aria-label="岗位详情章节">
               <a href="#job-jd">岗位 JD</a>
               <a href="#job-topics">考查主题</a>
@@ -272,7 +298,7 @@ export function JobDetail({ job }: { job: JobTemplate }) {
                         适用：{q.stages.map((s) => STAGE_LABELS[s]).join(' / ')} · {q.difficulty}
                       </p>
                       {q.source_refs.map((id) => {
-                        const s = CONTENT_SOURCES.find((s) => s.id === id);
+                        const s = sources.find((s) => s.id === id);
                         return s ? (
                           <a
                             key={id}
@@ -322,17 +348,13 @@ export function JobDetail({ job }: { job: JobTemplate }) {
                 <li key={t}>{t}</li>
               ))}
             </ol>
-            <Button asChild variant="outline">
-              <Link href={`/me/saved-jobs?create=${job.id}`}>
-                <Copy size={17} />
-                复制为个人 JD
-              </Link>
+            <Button variant="outline" disabled>
+              <Copy size={17} />
+              个人 JD 暂未开放
             </Button>
-            <Link className="text-link" href="/me/resumes">
-              维护我的简历
-              <ArrowRight size={16} />
-            </Link>
-            <p className="muted">可补充企业要求，再用于下一次模拟。</p>
+            <p className="muted">
+              简历与个人 JD 维护尚未接入真实账号，可直接使用岗位模板开始文字面试。
+            </p>
           </aside>
         </div>
       </main>

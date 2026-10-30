@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from './ui/button';
 import { readDemo, storageAvailable, type DemoState } from '../lib/demo-client';
 import { useSession } from './session-provider';
+import { AccountControls } from './account-controls';
 export function Brand() {
   return (
     <Link href="/" className="brand" aria-label="InterviewLab 首页">
@@ -66,12 +67,8 @@ export function Header() {
           <span className="badge badge-yellow">
             {isDevelopment ? '面试流程联调' : '文字面试 Beta'}
           </span>
-          {!isDevelopment && (
-            <Link href="/login" className="text-link">
-              账号登录
-            </Link>
-          )}
-          <Link href="/me/interviews" className="user-link">
+          <AccountControls />
+          <Link href={isDevelopment ? '/me/interviews' : '/me'} className="user-link">
             <UserRound size={17} />
             <span>{isDevelopment ? '面试记录' : '个人中心'}</span>
             <ChevronRight size={14} />
@@ -95,7 +92,7 @@ export function Footer() {
       <div className="container footer-inner">
         <Brand />
         <p>每一次练习，都从自己的经历出发。</p>
-        <span>真实文字面试 · 合成演示独立提供</span>
+        <span>真实文字面试 · 记录归属当前账号</span>
       </div>
     </footer>
   );

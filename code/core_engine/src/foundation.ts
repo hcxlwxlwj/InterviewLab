@@ -15,6 +15,11 @@ export interface SignInInput {
   password: string;
   rememberMe?: boolean;
 }
+export interface SignUpInput {
+  name: string;
+  email: string;
+  password: string;
+}
 export interface VersionRef {
   id: string;
   version: number;

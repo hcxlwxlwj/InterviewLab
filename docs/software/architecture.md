@@ -1,10 +1,10 @@
 # 总体技术架构
 
-版本：v0.6 · 更新：2026-10-25 · 状态：公共骨架、同源接入与受邀账号认证已实现；各模块业务及外部能力按阶段接入。
+版本：v0.6 · 更新：2026-10-25 · 状态：公共骨架、同源接入与邮箱密码注册与账号认证已实现；各模块业务及外部能力按阶段接入。
 
 ## 0. 当前实现与本次设计的关系
 
-真实文字配置、面试、报告/重练/比较和历史已接入 /api/v1，经 Next.js 同源代理到 Fastify，沿用 Better Auth/Drizzle 身份及公共事务、幂等、outbox 和任务。ecnu-plus 单案例真实闭环已通过，专业质量和教学效果仍待评审。简历/JD、语音等仍待接入；旧业务演示通过显式入口保留。当前实现和验证范围见[文字面试接入](interview-agent-implementation.md)。
+真实文字配置、面试、报告/重练/比较和历史已接入 /api/v1，经 Next.js 同源代理到 Fastify，沿用 Better Auth/Drizzle 身份及公共事务、幂等、outbox 和任务。ecnu-plus 单案例真实闭环已通过，专业质量和教学效果仍待评审。简历/JD、语音等仍待接入；旧业务演示通过显式入口保留。账号访问规则见[账号与访问管理](account-management.md)。当前实现和验证范围见[文字面试接入](interview-agent-implementation.md)。
 
 下文保留全产品目标。已实现范围和启动方式以[后端 README](../../code/backend/README.md)为准，不能将完整目标当成已验收能力。原型与真实服务入口分开，不自动上传浏览器个人材料。
 
@@ -31,7 +31,7 @@ flowchart LR
 | --- | --- | --- |
 | HTTP 服务 | Fastify | 路由、认证上下文、输入/输出校验、错误映射；业务规则放在模块服务 |
 | 数据合同 | Zod + OpenAPI | 可执行 schema 生成 HTTP 合同；HTTP DTO 与实时事件由共享核心声明；公共路由 OpenAPI 已生成，业务合同按模块接入 |
-| 身份 | Better Auth + Drizzle 适配 | 受邀账号、服务端登录会话、生产 HttpOnly/Secure Cookie；首轮不开放注册及邮件找回 |
+| 身份 | Better Auth + Drizzle 适配 | 邮箱密码注册及受邀账号、服务端会话、生产 HttpOnly/Secure Cookie；邮箱未经验证，邮件找回暂未开放 |
 | 数据库 | Drizzle + PostgreSQL | 迁移、约束、索引、事务和仓储；知识向量使用 pgvector |
 | 异步任务 | pg-boss + 独立 worker | 解析、JD 分析、问题生成、报告、比较、导出、索引和清理；业务写入使用事务发件箱衔接投递 |
 | 实时接入 | Fastify WebSocket 入口 | 连接鉴权、音频、端点、取消和恢复；调用同一面试服务，不维护第二套状态机 |

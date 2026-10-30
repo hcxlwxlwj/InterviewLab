@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { ApiClientError, createApiClient } from '../../code/frontend/lib/api/http';
+import {
+  ApiClientError,
+  createApiClient,
+  SESSION_INVALIDATED,
+} from '../../code/frontend/lib/api/http';
 
 test('HTTP client uses the same origin, preserves idempotency and handles JSON and empty responses', async () => {
   const calls: { path: string; options?: RequestInit }[] = [];
@@ -124,5 +128,34 @@ test('malformed JSON retains the HTTP status and request ID', async () => {
         error.status === status &&
         error.detail.request_id === 'broken-json-request',
     );
+  }
+});
+
+test('private 401 immediately invalidates visible account state while bad login does not trigger a loop', async () => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'window');
+  const events: string[] = [];
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      dispatchEvent: (event: Event) => {
+        events.push(event.type);
+        return true;
+      },
+    },
+  });
+  try {
+    const request = createApiClient(async () =>
+      Response.json(
+        { code: 'unauthorized', message: 'Sign in required', retryable: false, request_id: 'one' },
+        { status: 401 },
+      ),
+    );
+    await assert.rejects(request('/interviews'));
+    assert.deepEqual(events, [SESSION_INVALIDATED]);
+    await assert.rejects(request('/auth/sign-in/email', { method: 'POST', body: {} }));
+    assert.deepEqual(events, [SESSION_INVALIDATED]);
+  } finally {
+    if (descriptor) Object.defineProperty(globalThis, 'window', descriptor);
+    else Reflect.deleteProperty(globalThis, 'window');
   }
 });

@@ -28,6 +28,7 @@ const password = randomBytes(24).toString('base64url');
 const email = `${randomUUID()}@example.test`;
 let user: Awaited<ReturnType<typeof createInvitedUser>>;
 const origin = config.PUBLIC_ORIGIN;
+const registeredIds: string[] = [];
 before(async () => {
   database = createDatabase(config);
   await migrateDatabase(database);
@@ -62,6 +63,8 @@ after(async () => {
       await database.pool.query('DELETE FROM audit_events WHERE resource_id=$1', [user.id]);
       await database.pool.query('DELETE FROM auth_users WHERE id=$1', [user.id]);
     }
+    for (const id of registeredIds)
+      await database.pool.query('DELETE FROM auth_users WHERE id=$1', [id]);
     await database.pool.query('TRUNCATE auth_rate_limits');
     await database.close();
   }
@@ -191,7 +194,7 @@ test('logout, expiry and revocation invalidate the server session; cookie authen
   );
 });
 
-test('origin policy rejects missing and foreign origins before authentication; registration and role injection stay closed', async () => {
+test('origin policy rejects missing and foreign origins before authentication; role injection stays closed', async () => {
   for (const headers of [{}, { origin: 'https://attacker.test', host: 'attacker.test' }]) {
     const rejected = await app.inject({
       method: 'POST',
@@ -208,10 +211,15 @@ test('origin policy rejects missing and foreign origins before authentication; r
         method: 'POST',
         url: '/api/v1/auth/sign-up/email',
         headers: { origin },
-        payload: { email: 'new@example.test', password, name: 'No registration' },
+        payload: {
+          email: 'new@example.test',
+          password,
+          name: 'No privileged registration',
+          role: 'operator',
+        },
       })
     ).statusCode,
-    404,
+    400,
   );
   assert.equal(
     (
@@ -312,7 +320,245 @@ test('authentication dependency failure returns a safe 503 and clears the capabi
     assert.equal(current.json().code, 'dependency_unavailable');
     assert.ok(!/unused|ECONNREFUSED|postgresql/.test(current.body));
     assert.equal((await offline.inject('/api/v1/capabilities')).json().authentication, false);
+    const signupUnavailable = await offline.inject({
+      method: 'POST',
+      url: '/api/v1/auth/sign-up/email',
+      headers: { origin },
+      payload: { name: 'Offline', email: `${randomUUID()}@example.test`, password },
+    });
+    assert.equal(signupUnavailable.statusCode, 503, signupUnavailable.body);
+    assert.ok(!/unused|ECONNREFUSED|postgresql/.test(signupUnavailable.body));
   } finally {
     await offline.close();
+  }
+});
+
+async function signup(signupEmail = `${randomUUID()}@example.test`, remoteAddress = '127.0.0.1') {
+  return app.inject({
+    method: 'POST',
+    url: '/api/v1/auth/sign-up/email',
+    remoteAddress,
+    headers: { origin },
+    payload: { name: '  Registered student  ', email: signupEmail, password },
+  });
+}
+function responseCookie(response: Awaited<ReturnType<typeof signup>>) {
+  const headers = response.headers['set-cookie'];
+  assert.ok(headers);
+  return (Array.isArray(headers) ? headers : [headers])
+    .map((item) => item.split(';')[0])
+    .join('; ');
+}
+async function registeredSession(response: Awaited<ReturnType<typeof signup>>) {
+  assert.equal(response.statusCode, 200, response.body);
+  assert.deepEqual(response.json(), { success: true });
+  const cookie = responseCookie(response);
+  const session = (await app.inject({ url: '/api/v1/auth/session', headers: { cookie } })).json();
+  registeredIds.push(session.user.id);
+  return { cookie, session };
+}
+
+test('registration normalizes identity, hashes credentials and signs in with a safe student session', async () => {
+  const signupEmail = `${randomUUID()}@EXAMPLE.TEST`;
+  const response = await signup(signupEmail);
+  const { cookie, session } = await registeredSession(response);
+  assert.equal(session.user.email, signupEmail.toLowerCase());
+  assert.equal(session.user.name, 'Registered student');
+  assert.deepEqual(session.roles, ['student']);
+  const stored = (
+    await database.pool.query(
+      'SELECT a.password,u.email_verified FROM auth_accounts a JOIN auth_users u ON u.id=a.user_id WHERE u.id=$1',
+      [session.user.id],
+    )
+  ).rows[0];
+  assert.notEqual(stored.password, password);
+  assert.ok(stored.password.length > password.length);
+  const signIn = await app.inject({
+    method: 'POST',
+    url: '/api/v1/auth/sign-in/email',
+    headers: { origin },
+    payload: { email: signupEmail.toLowerCase(), password },
+  });
+  assert.equal(signIn.statusCode, 200, signIn.body);
+  assert.equal(stored.email_verified, false);
+  const repeated = await app.inject({
+    method: 'POST',
+    url: '/api/v1/auth/sign-up/email',
+    headers: { origin },
+    payload: {
+      email: signupEmail.toLowerCase(),
+      name: 'Overwrite attempt',
+      password: password + '-changed',
+    },
+  });
+  assert.equal(repeated.statusCode, 409, repeated.body);
+  assert.equal(repeated.json().code, 'email_already_exists');
+  assert.equal(
+    (
+      await database.pool.query('SELECT password FROM auth_accounts WHERE user_id=$1', [
+        session.user.id,
+      ])
+    ).rows[0].password,
+    stored.password,
+  );
+  assert.ok(!/token|password|secret/i.test(response.body));
+  assert.equal(
+    (await app.inject({ url: '/api/v1/test-private', headers: { cookie } })).statusCode,
+    200,
+  );
+});
+
+test('registration validates all fields and rejects privileged or provider-only fields and foreign origins', async () => {
+  const valid = { name: 'Student', email: `${randomUUID()}@example.test`, password };
+  for (const fields of [
+    { name: ' ' },
+    { name: 'n'.repeat(101) },
+    { email: 'invalid' },
+    { email: 'e'.repeat(245) + '@example.test' },
+    { password: 'short' },
+    { password: 'p'.repeat(129) },
+    { role: 'operator' },
+    { owner_id: 'other' },
+    { callbackURL: 'https://attacker.test' },
+  ]) {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/auth/sign-up/email',
+      headers: { origin },
+      payload: { ...valid, ...fields },
+    });
+    assert.equal(response.statusCode, 400, response.body);
+  }
+  for (const headers of [{}, { origin: 'https://attacker.test' }])
+    assert.equal(
+      (
+        await app.inject({
+          method: 'POST',
+          url: '/api/v1/auth/sign-up/email',
+          headers,
+          payload: valid,
+        })
+      ).statusCode,
+      403,
+    );
+  assert.equal(
+    (await database.pool.query('SELECT count(*) FROM auth_users WHERE email=$1', [valid.email]))
+      .rows[0].count,
+    '0',
+  );
+});
+
+test('concurrent registration leaves exactly one linked account and does not overwrite its password', async () => {
+  const signupEmail = `${randomUUID()}@example.test`;
+  const responses = await Promise.all([
+    signup(signupEmail, '192.0.2.30'),
+    signup(signupEmail, '192.0.2.31'),
+  ]);
+  assert.deepEqual(responses.map((r) => r.statusCode).sort(), [200, 409]);
+  const { session } = await registeredSession(responses.find((r) => r.statusCode === 200)!);
+  assert.equal(
+    (
+      await database.pool.query('SELECT count(*) FROM auth_accounts WHERE user_id=$1', [
+        session.user.id,
+      ])
+    ).rows[0].count,
+    '1',
+  );
+  assert.equal(
+    (await database.pool.query('SELECT count(*) FROM auth_users WHERE email=$1', [signupEmail]))
+      .rows[0].count,
+    '1',
+  );
+});
+
+test('registration rate limit persists after restarting and ignores forged forwarding headers', async () => {
+  for (let index = 0; index < 5; index++) {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/auth/sign-up/email',
+      headers: { origin, 'x-forwarded-for': `192.0.2.${index}` },
+      payload: { name: 'Duplicate', email, password },
+    });
+    assert.equal(response.statusCode, 409, response.body);
+  }
+  const restarted = await buildApp({ config, database, logger: false });
+  try {
+    const response = await restarted.inject({
+      method: 'POST',
+      url: '/api/v1/auth/sign-up/email',
+      headers: { origin },
+      payload: { name: 'Duplicate', email, password },
+    });
+    assert.equal(response.statusCode, 429, response.body);
+  } finally {
+    await restarted.close();
+  }
+});
+
+test('two registered cookie accounts isolate real interviews and a privileged role cannot access another account', async () => {
+  const first = await registeredSession(await signup());
+  const second = await registeredSession(await signup());
+  const created = await app.inject({
+    method: 'POST',
+    url: '/api/v1/interviews',
+    headers: { cookie: first.cookie, origin, 'idempotency-key': randomUUID() },
+    payload: {
+      job: 'frontend',
+      career_stage: 'internship',
+      interview_type: 'technical_qa',
+      difficulty: '基础',
+      duration_minutes: 5,
+      interviewer_style: '标准',
+      interaction_mode: 'text_fallback',
+    },
+  });
+  assert.equal(created.statusCode, 201, created.body);
+  const interview = created.json();
+  try {
+    await database.pool.query("UPDATE auth_users SET role='operator' WHERE id=$1", [
+      second.session.user.id,
+    ]);
+    const own = (
+      await app.inject({ url: '/api/v1/interviews', headers: { cookie: first.cookie } })
+    ).json();
+    const other = (
+      await app.inject({ url: '/api/v1/interviews', headers: { cookie: second.cookie } })
+    ).json();
+    assert.ok(own.items.some((item: { id: string }) => item.id === interview.id));
+    assert.equal(other.items.length, 0);
+    for (const suffix of ['', '/report', `/events?generation_id=${randomUUID()}`]) {
+      assert.equal(
+        (
+          await app.inject({
+            url: `/api/v1/interviews/${interview.id}${suffix}`,
+            headers: { cookie: second.cookie },
+          })
+        ).statusCode,
+        404,
+      );
+      assert.equal(
+        (await app.inject({ url: `/api/v1/interviews/${interview.id}${suffix}` })).statusCode,
+        401,
+      );
+    }
+    assert.equal(
+      (
+        await app.inject({
+          method: 'DELETE',
+          url: `/api/v1/interviews/${interview.id}`,
+          headers: { cookie: second.cookie, origin, 'idempotency-key': randomUUID() },
+          payload: { version: interview.version },
+        })
+      ).statusCode,
+      404,
+    );
+  } finally {
+    const removed = await app.inject({
+      method: 'DELETE',
+      url: `/api/v1/interviews/${interview.id}`,
+      headers: { cookie: first.cookie, origin, 'idempotency-key': randomUUID() },
+      payload: { version: interview.version },
+    });
+    assert.equal(removed.statusCode, 204, removed.body);
   }
 });

@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth/minimal';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
-import type { AuthSession, SignInInput } from '@interviewlab/core';
+import type { AuthSession, SignInInput, SignUpInput } from '@interviewlab/core';
+import { eq } from 'drizzle-orm';
 import type { FastifyRequest } from 'fastify';
 import type { IdentityProvider } from '../../foundation/auth';
 import type { BackendConfig } from '../../foundation/config';
@@ -29,7 +30,8 @@ export function createAuthService(database: Database, config: BackendConfig) {
     }),
     emailAndPassword: {
       enabled: true,
-      disableSignUp: true,
+      disableSignUp: false,
+      autoSignIn: true,
       minPasswordLength: 12,
       maxPasswordLength: 128,
     },
@@ -59,7 +61,10 @@ export function createAuthService(database: Database, config: BackendConfig) {
       storage: 'database',
       window: 60,
       max: 100,
-      customRules: { '/sign-in/email': { window: 60, max: 10 } },
+      customRules: {
+        '/sign-in/email': { window: 60, max: 10 },
+        '/sign-up/email': { window: 60, max: 5 },
+      },
     },
     // Provider failures may contain private data. Our HTTP layer logs only a safe error type.
     logger: { disabled: true },
@@ -89,7 +94,7 @@ export function createAuthService(database: Database, config: BackendConfig) {
     }
   };
   const invoke = async (
-    path: 'sign-in/email' | 'sign-out',
+    path: 'sign-in/email' | 'sign-up/email' | 'sign-out',
     request: FastifyRequest,
     body: unknown,
   ) => {
@@ -118,6 +123,31 @@ export function createAuthService(database: Database, config: BackendConfig) {
     }
     if (!response.ok) {
       const status = response.status;
+      if (path === 'sign-up/email' && status === 422) {
+        // Concurrent signups can hit the unique constraint inside Better Auth's transaction.
+        const result = (await response.json().catch(() => null)) as { code?: string } | null;
+        if (result?.code === 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL')
+          throw new ServiceError('email_already_exists', 409, '该邮箱已注册，请登录。');
+        if (result?.code === 'FAILED_TO_CREATE_USER') {
+          try {
+            const existing = await database.db
+              .select({ id: authUser.id })
+              .from(authUser)
+              .where(eq(authUser.email, (body as SignUpInput).email))
+              .limit(1);
+            if (existing.length)
+              throw new ServiceError('email_already_exists', 409, '该邮箱已注册，请登录。');
+          } catch (error) {
+            if (error instanceof ServiceError) throw error;
+          }
+          throw new ServiceError(
+            'dependency_unavailable',
+            503,
+            '注册暂时不可用，请稍后重试。',
+            true,
+          );
+        }
+      }
       if (status === 401)
         throw new ServiceError('unauthorized', 401, 'Email or password is incorrect');
       if (status === 429)
@@ -144,6 +174,8 @@ export function createAuthService(database: Database, config: BackendConfig) {
     },
     signIn: (request: FastifyRequest, input: SignInInput) =>
       invoke('sign-in/email', request, input),
+    signUp: (request: FastifyRequest, input: SignUpInput) =>
+      invoke('sign-up/email', request, input),
     signOut: (request: FastifyRequest) => invoke('sign-out', request, {}),
   } satisfies IdentityProvider & Record<string, unknown>;
 }
