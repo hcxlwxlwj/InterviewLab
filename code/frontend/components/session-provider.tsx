@@ -2,7 +2,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import type { AuthSession } from '@interviewlab/core';
 import { authClient } from '../lib/api/auth';
-import { ApiClientError, SESSION_CHANGED } from '../lib/api/http';
+import { ApiClientError, SESSION_CHANGED, SESSION_INVALIDATED } from '../lib/api/http';
 
 type SessionState =
   | { status: 'loading'; session: null }
@@ -11,7 +11,7 @@ type SessionState =
   | { status: 'unavailable' | 'error'; session: null; error: string };
 const SessionContext = createContext<{
   state: SessionState;
-  refresh(): Promise<void>;
+  refresh(): Promise<AuthSession | null>;
   isDevelopment: boolean;
 } | null>(null);
 export function SessionProvider({
@@ -33,7 +33,7 @@ export function SessionProvider({
     pending.current?.abort();
     if (developmentSession) {
       setState({ status: 'signed_in', session: developmentSession });
-      return;
+      return developmentSession;
     }
     const controller = new AbortController();
     pending.current = controller;
@@ -43,8 +43,9 @@ export function SessionProvider({
         setState(
           session ? { status: 'signed_in', session } : { status: 'signed_out', session: null },
         );
+      return current === sequence.current ? session : null;
     } catch (error) {
-      if (current !== sequence.current || controller.signal.aborted) return;
+      if (current !== sequence.current || controller.signal.aborted) return null;
       setState({
         status:
           error instanceof ApiClientError && error.detail.code === 'capability_unavailable'
@@ -53,22 +54,45 @@ export function SessionProvider({
         session: null,
         error: error instanceof Error ? error.message : '无法读取登录状态。',
       });
+      return null;
     }
   }, [developmentSession]);
   useEffect(() => {
     const update = () => {
       void refresh();
     };
+    const invalidate = () => {
+      setState({ status: 'loading', session: null });
+      void refresh();
+    };
+    const channel =
+      typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(SESSION_CHANGED) : null;
+    if (channel) channel.onmessage = invalidate;
     update();
-    window.addEventListener(SESSION_CHANGED, update);
+    window.addEventListener(SESSION_CHANGED, invalidate);
+    window.addEventListener(SESSION_INVALIDATED, invalidate);
     window.addEventListener('focus', update);
     return () => {
       sequence.current++;
       pending.current?.abort();
-      window.removeEventListener(SESSION_CHANGED, update);
+      channel?.close();
+      window.removeEventListener(SESSION_CHANGED, invalidate);
+      window.removeEventListener(SESSION_INVALIDATED, invalidate);
       window.removeEventListener('focus', update);
     };
   }, [refresh]);
+  useEffect(() => {
+    if (state.status !== 'signed_in' || developmentSession) return;
+    const remaining = Date.parse(state.session.expires_at) - Date.now();
+    const timer = setTimeout(
+      () => {
+        setState({ status: 'loading', session: null });
+        void refresh();
+      },
+      Math.max(0, Math.min(remaining, 2147483647)),
+    );
+    return () => clearTimeout(timer);
+  }, [state, developmentSession, refresh]);
   return (
     <SessionContext.Provider value={{ state, refresh, isDevelopment: Boolean(developmentSession) }}>
       {children}

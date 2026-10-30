@@ -34,7 +34,7 @@ InterviewLab/
 
 ## 当前运行和依赖关系
 
-`npm run dev` 只启动 Next.js；真实 `/api/v1` 同源代理到 npm run dev:api 启动的 Fastify。原 Route Handlers 合成接口迁至 `/api/demo/v1`。业务页面仍使用标签页演示客户端，未通过 HTTP 保存个人材料；公共 /login 和会话上下文已经调用真实认证。
+`npm run dev` 只启动 Next.js；真实 `/api/v1` 同源代理到 npm run dev:api 启动的 Fastify。原 Route Handlers 合成接口迁至 `/api/demo/v1`。真实账号、岗位、文字面试与报告已通过 HTTP 接入；未实现的个人材料维护显示空状态。旧演示客户端保留，正常导航不再使用其个人数据。
 
 ```text
 浏览器 lib/api → Next.js /api/v1 代理 → Fastify → 模块服务
@@ -85,7 +85,7 @@ backend/src/content/demo.ts → 合成样例与演示报告
 | backend/src/tasks | pg-boss、outbox、任务执行、状态和 worker 心跳 |
 | backend/src/server、backend/src/entrypoints | 应用装配与 API/worker/迁移/OpenAPI 命令 |
 | core_engine/src | 纯 DTO、规则、任务/事件合同和适配端口 |
-| frontend | 现有页面与演示客户端；真实异步客户端后续接入 |
+| frontend | 现有页面、真实异步客户端及保留的演示客户端 |
 | tests/unit、tests/integration | 规则、HTTP、数据库及进程测试 |
 
 路由调用应用服务，服务调用仓储/适配器；模块间通过显式服务协作，需要时传递同一数据库事务。API/worker 已有独立入口及构建，原 Next.js 演示仍保留。生产同源代理、实时通道和业务模块在相应阶段接入。

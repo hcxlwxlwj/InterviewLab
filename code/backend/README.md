@@ -10,11 +10,11 @@ Fastify API 与 pg-boss worker 共用一个后端包。公共基础统一维护�
 | 岗位分类、分页列表、详情及来源 | 已实现，读取现有 1000 个公开岗位 |
 | PostgreSQL 迁移、事务、幂等、outbox、任务执行、worker 心跳 | 已实现公共基础，业务处理器另行注册 |
 | 同源代理、公共 HTTP 客户端和登录入口 | 已实现，见[前端接入](../frontend/README.md) |
-| Better Auth、Cookie 会话、角色校验、受邀账号命令 | 已实现，配置后启用；没有公开注册 |
+| Better Auth、Cookie 会话、角色校验、注册及受邀账号命令 | 已实现，配置后启用公开邮箱密码注册 |
 | 任务查询 | 已实现 Cookie 身份和资源归属校验 |
 | 真实文字面试、证据报告、单题重练、比较、历史和删除 | 已实现，真实模型效果单独验收 |
 | ecnu-plus 兼容模型适配、冻结知识接口、本地公开内容适配 | 已实现；须配置本机 LLM_API_KEY，真实效果尚待验收 |
-| 账号资料/偏好、简历、个人 JD/收藏、内容维护业务 | 待模块负责人实现 |
+| 账号资料编辑/偏好、简历、个人 JD/收藏、内容维护业务 | 待模块负责人实现 |
 | pgvector 混合检索、目标记忆与流式面试 | 前端岗位 v3 联调试点，草案待人工审核；见[说明](../../docs/software/interview-agent-v3.md) |
 | 私有文件、语音 | 尚未接通 |
 
@@ -83,6 +83,7 @@ worker 入口已注册面试规划/推进、逐题报告和比较处理器，并
 node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"
 docker compose -f code/backend/compose.yaml up -d --wait
 npm run db:migrate
+# 可选：需要指定维护角色时才通过受控命令创建账号
 npm run auth:create-user
 ~~~
 
@@ -90,13 +91,13 @@ auth:create-user 在交互终端询问邮箱、显示名和角色，生成并只
 
 分别启动 npm run dev:api 和 npm run dev，打开 http://127.0.0.1:3000/login。PUBLIC_ORIGIN 必须与浏览器来源精确一致，BACKEND_ORIGIN 指向内部 API。生产认证要求 PUBLIC_ORIGIN 为 HTTPS，Cookie 为 HttpOnly/Secure/SameSite=Lax 且不设置跨域 Domain。
 
-认证仅公开三个自有合同：GET /api/v1/auth/session 返回 AuthSession 或 null；POST /api/v1/auth/sign-in/email 接收 email/password/rememberMe，成功返回 {success:true}；POST /api/v1/auth/sign-out 接收 {}，成功撤销会话并清 Cookie。底层使用 Better Auth 1.7.12 和 Drizzle；不会把原生含 token 的登录/会话对象返回前端。公开注册、邮件找回、改密、OAuth 和管理 API 均未开放。
+认证公开四个自有合同：GET /api/v1/auth/session 返回 AuthSession 或 null；POST /api/v1/auth/sign-up/email 接收 name/email/password，注册后自动登录；POST /api/v1/auth/sign-in/email 接收 email/password/rememberMe；POST /api/v1/auth/sign-out 接收 {}。写操作成功均只返回 {success:true}。底层使用 Better Auth 1.7.12 和 Drizzle；不会返回原生含 token 的对象。注册固定 student，邮箱未经验证；改密、邮件找回、OAuth 和管理 API 未开放。详细校验及错误见[账号说明](../../docs/software/account-management.md)。
 
 会话固定七天有效，不开启 Cookie 缓存或滑动续期；rememberMe=false 时浏览器 Cookie 随会话结束，服务端仍校验到期时间。退出、删除会话和到期后，旧 Cookie 不再授权。角色从数据库读取，不接受客户端角色或 owner 请求头。
 
 所有 /api/v1 的 POST/PUT/PATCH/DELETE 在公共层检查 Origin；命令行联调也要发送配置的 Origin。模块注册收到 ModuleContext，使用 context.requireIdentity(request) 和 context.requireRole(identity, role)，再在业务服务中检查资源归属。鉴权不会自动替模块校验任意资源 ID。
 
-登录限流保存在 PostgreSQL，默认每个 API 对端 IP 每分钟 10 次，重启后保留。Fastify 不信任客户端转发 IP；目前经过 Next.js 的访问共享代理对端的桶。多用户正式部署前由公共负责人配置可信入口 IP 策略，不能让模块自行信任 X-Forwarded-For。
+注册及登录限流保存在 PostgreSQL，默认每个 API 对端 IP 每分钟分别 5 次和 10 次，重启后保留。Fastify 不信任客户端转发 IP；目前经过 Next.js 的访问共享代理对端的桶。多用户正式部署前由公共负责人配置可信入口 IP 策略，不能让模块自行信任 X-Forwarded-For。
 
 AUTH_ENABLED=false 时会话接口返回明确 501；设为 true 但缺库或密钥时启动失败，依赖运行中失效返回 503。公开岗位不要求身份。登录本身不需要 worker；/health/ready 仍反映数据库和 worker 整体就绪。
 

@@ -1,8 +1,12 @@
-import type { AuthSession, SignInInput } from '@interviewlab/core';
+import type { AuthSession, SignInInput, SignUpInput } from '@interviewlab/core';
 import { apiRequest, notifySessionChanged } from './http';
 
 export const authClient = {
   session: (signal?: AbortSignal) => apiRequest<AuthSession | null>('/auth/session', { signal }),
+  async signUp(input: SignUpInput) {
+    await apiRequest<{ success: true }>('/auth/sign-up/email', { method: 'POST', body: input });
+    notifySessionChanged();
+  },
   async signIn(input: SignInInput) {
     await apiRequest<{ success: true }>('/auth/sign-in/email', { method: 'POST', body: input });
     notifySessionChanged();

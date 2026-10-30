@@ -19,7 +19,6 @@ export function LiveFrame({ children, title }: { children: React.ReactNode; titl
           <nav aria-label="面试导航">
             <Link href="/interview/setup">新建面试</Link>
             <Link href="/me/interviews">面试记录</Link>
-            <Link href="/interview/setup?demo=1">预设流程演示（不调用 AI）</Link>
           </nav>
         </div>
         <SessionGate>{children}</SessionGate>
@@ -43,9 +42,7 @@ export function SessionGate({ children }: { children: React.ReactNode }) {
       <Button variant="outline" onClick={() => void refresh()}>
         重新检查
       </Button>
-      <p>
-        <Link href="/interview/setup?demo=1">无需登录，体验预设流程（不调用 AI）</Link>
-      </p>
+      <p></p>
     </section>
   );
 }

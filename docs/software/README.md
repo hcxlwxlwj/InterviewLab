@@ -5,6 +5,7 @@
 | 正文 | 内容 |
 | --- | --- |
 | [系统架构](architecture.md) | 当前 Next.js 原型与独立 Fastify 目标、六模块、API/worker、事务及四阶段 |
+| [账号与访问管理](account-management.md) | 注册登录、页面弹窗、真实数据隔离、配置与验收限制 |
 | [数据与接口](data_and_interfaces.md) | 新 HTTP/实时合同、旧路径迁移、数据归属、版本/任务、权限和删除 |
 | [真实文字面试接入](interview-agent-implementation.md) | ecnu-plus 配置、Agent/知识接口、面试/报告/重练、可靠性与验收边界 |
 | [工程目录](repository_structure.md) | 课程目录、代码职责、依赖与后续接入位置 |

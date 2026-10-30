@@ -1,9 +1,2 @@
-import { Suspense } from 'react';
-import PersonalWorkspace from '../../components/personal-workspace';
-export default function Page() {
-  return (
-    <Suspense>
-      <PersonalWorkspace />
-    </Suspense>
-  );
-}
+import AccountOverview from '../../features/personal-center/live-workspace';
+export default AccountOverview;

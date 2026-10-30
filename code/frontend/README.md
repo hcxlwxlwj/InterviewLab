@@ -1,10 +1,10 @@
 # 前端公共接入
 
-未登录访问 `/me/interviews` 时展示明确标注的预设演示记录，可进入演示报告；登录后展示本人真实记录。会话读取失败仍显示错误，不切换到演示数据。真实记录接口的身份和归属校验保持有效。
+首页公开，其他业务页面由统一 AccountAccess 控制访问：未登录时回首页弹窗，登录或注册成功后恢复原目标；不挂载受保护业务组件。SessionProvider 在 401、到期、退出及跨标签页账号变化时重新确认身份，业务树按账号标识重新挂载。详见[账号与访问管理](../../docs/software/account-management.md)。
 
-业务负责人沿用现有 Next.js、HTTP 客户端和认证系统。真实 `/interview/setup`、`/interview/{id}`、`/reports/{id}`、`/me/interviews` 已通过 HTTP 接入面试闭环；对应路径的 `?demo=1` 显式保留旧演示。简历与个人 JD 等尚为演示，不自动上传。启动、模型及验收边界见[文字面试接入](../../docs/software/interview-agent-implementation.md)。
+业务负责人沿用现有 Next.js、HTTP 客户端和认证系统。真实 `/interview/setup`、`/interview/{id}`、`/reports/{id}`、`/me/interviews` 已通过 HTTP 接入面试闭环；对应路径的 `?demo=1` 显式保留旧演示。简历与个人 JD、收藏和偏好维护暂未开放，主流程显示空状态，不读取演示数据。启动、模型及验收边界见[文字面试接入](../../docs/software/interview-agent-implementation.md)。
 
-个人中心和收藏岗位的主按钮进入真实 AI 配置；简历与个人 JD 的旧流程入口明确标为预设演示。所有演示提示注明“不调用 AI”，并提供进入真实面试的链接；旧演示记录不自动转换为真实面试。入口区分截图见[入口提示](../../docs/software/prototype/screenshots/live-entry-clarity.png)。
+个人中心概览读取当前会话和真实面试列表。岗位列表、分类和详情通过 lib/api/jobs.ts 查询真实公开接口。收藏、个人 JD 保存等入口禁用并说明未开放。旧演示实现保留，正常导航不再提供演示跳转。
 
 配置和面试沿用原有页面设计。`components/interview-setup.tsx` 复用原配置页框架与选项控件，`components/interview-workspace.tsx` 复用原顶部计时、左侧面试官/题目轨迹、右侧对话/输入框；真实 HTTP 控制器和显式演示控制器共用这些视图，不再维护另外一套聊天布局。真实流程只开放已接通选项。界面证据：[原配置布局](../../docs/software/prototype/screenshots/live-original-setup.png)、[原面试布局接入 AI](../../docs/software/prototype/screenshots/live-original-interview.png)。
 
@@ -28,7 +28,7 @@
 | lib/demo-client.ts、lib/demo/ | 原同步演示客户端、标签页状态、版本迁移和重置 |
 | public/ | 素材和本地字体 |
 
-保留现有 globals.css → workspace.css → refinement.css → library.css 样式顺序，auth.css 仅补登录样式。修改前阅读本目录 AGENTS.md 和已安装 Next.js 对应文档。依赖边界检查只允许 app/api 导入后端 HTTP；新业务组件通过 HTTP 调用服务。演示客户端仍可导入公开 content/content/demo 子入口。
+保留现有 globals.css → workspace.css → refinement.css → library.css 样式顺序，auth.css 补账号表单样式。修改前阅读本目录 AGENTS.md 和已安装 Next.js 对应文档。依赖边界检查只允许 app/api 导入后端 HTTP；新业务组件通过 HTTP 调用服务。演示客户端仍可导入公开 content/content/demo 子入口。
 
 ## 启动与地址
 
@@ -38,7 +38,7 @@
 | --- | --- |
 | /api/v1/* | Next.js 同源代理到 Fastify，默认 127.0.0.1:3001 |
 | /api/demo/v1/* | 原合成接口，供显式演示使用 |
-| /login | 公共受邀账号登录、会话查看和退出页 |
+| /login | 复用公共弹窗表单的邮箱密码注册/登录入口 |
 
 Next.js 配置读取根 .env，显式环境变量优先。BACKEND_ORIGIN 是服务端代理目标，PUBLIC_ORIGIN 是后端认可的浏览器来源；必须精确匹配打开网站的协议、主机和端口。默认用 127.0.0.1，不混用 localhost。开发修改配置后重启；生产代理地址在 build 时确定，修改后重新构建部署。数据库和认证密钥不使用 NEXT_PUBLIC_ 前缀。
 
