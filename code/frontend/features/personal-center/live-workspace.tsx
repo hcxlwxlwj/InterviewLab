@@ -40,7 +40,7 @@ export default function AccountOverview() {
             <p>{state.session.user.email}</p>
           </>
         )}
-        <p className="muted">这里只展示当前账号的真实记录。简历、目标岗位和偏好维护暂未开放。</p>
+        <p className="muted">这里只展示当前账号的真实记录。可在简历管理与偏好设置中维护个人材料。</p>
       </section>
       <section className="library-panel">
         <div className="section-title-row">

@@ -15,3 +15,5 @@ export * from './voice';
 export * from './report-rubric';
 
 export * from './feedback-template';
+
+export * from './personal';

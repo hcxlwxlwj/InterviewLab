@@ -1,3 +1,6 @@
+import { settingsModule } from '../modules/accounts/settings';
+import { materialsModule } from '../modules/resumes/routes';
+import { createMaterialsService } from '../modules/resumes/service';
 import { randomUUID } from 'node:crypto';
 import Fastify from 'fastify';
 import websocket from '@fastify/websocket';
@@ -93,7 +96,10 @@ export async function buildApp(options: ApplicationOptions = {}) {
       },
       transform: jsonSchemaTransform,
     });
+    const materials = database ? createMaterialsService(database) : undefined;
     const modules = [
+      settingsModule(database, materials),
+      materialsModule(materials),
       jobsModule(createJobsService(publicCatalogRepository)),
       ...(interview?.modules ?? [interviewsModule(undefined, { config }), reportsModule()]),
       ...(options.modules ?? []),
