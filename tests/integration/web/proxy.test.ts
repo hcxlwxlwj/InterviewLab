@@ -63,7 +63,7 @@ test(
     try {
       await migrateDatabase(database);
       const email = `${randomUUID()}@example.test`;
-      const password = randomBytes(24).toString('base64url');
+      const password = randomBytes(9).toString('base64url');
       userId = (
         await createInvitedUser(database, { email, password, name: 'Synthetic proxy student' })
       ).id;

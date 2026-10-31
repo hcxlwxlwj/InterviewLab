@@ -21,7 +21,7 @@ test('built API authenticates invited users using the configured persistent data
   );
   const database = createDatabase(loadConfig({ DATABASE_URL: testUrl }));
   const email = `${randomUUID()}@example.test`;
-  const password = randomBytes(24).toString('base64url');
+  const password = randomBytes(9).toString('base64url');
   const port = await freePort();
   const origin = `http://127.0.0.1:${port}`;
   const user = await createInvitedUser(database, {

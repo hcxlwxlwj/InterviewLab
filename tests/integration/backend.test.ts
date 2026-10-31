@@ -216,7 +216,7 @@ test('unconfigured authentication is explicit and every module write shares the 
     method: 'POST',
     url: '/api/v1/auth/sign-up/email',
     headers: { origin: config.PUBLIC_ORIGIN },
-    payload: { name: 'Student', email: 'student@example.test', password: 'long-password-for-test' },
+    payload: { name: 'Student', email: 'student@example.test', password: 'Test-password-123' },
   });
   assert.equal(signup.statusCode, 501);
 

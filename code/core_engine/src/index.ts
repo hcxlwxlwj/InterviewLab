@@ -10,3 +10,5 @@ export * from './foundation';
 export * from './live-interview';
 
 export * from './interview-agent';
+
+export * from './personal';

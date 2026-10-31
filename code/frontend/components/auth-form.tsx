@@ -114,8 +114,8 @@ export function AuthForm({ onSuccess }: { onSuccess?: () => void }) {
             name="password"
             type="password"
             autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
-            minLength={mode === 'register' ? 12 : 1}
-            maxLength={128}
+            minLength={mode === 'register' ? 9 : 1}
+            maxLength={mode === 'register' ? 20 : 128}
             required
             disabled={busy}
           />
@@ -128,15 +128,13 @@ export function AuthForm({ onSuccess }: { onSuccess?: () => void }) {
                 name="confirmation"
                 type="password"
                 autoComplete="new-password"
-                minLength={12}
-                maxLength={128}
+                minLength={9}
+                maxLength={mode === 'register' ? 20 : 128}
                 required
                 disabled={busy}
               />
             </label>
-            <p className="muted">
-              密码为 12–128 字符。本阶段邮箱未经验证，请确认填写正确；暂不支持找回密码。
-            </p>
+            <p className="muted">密码为 9–20 个字符。暂不支持找回密码。</p>
           </>
         ) : (
           <label className="row-actions">

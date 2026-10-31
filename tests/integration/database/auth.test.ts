@@ -24,7 +24,7 @@ const config = loadConfig({
 });
 let database: Database;
 let app: Awaited<ReturnType<typeof buildApp>>;
-const password = randomBytes(24).toString('base64url');
+const password = randomBytes(9).toString('base64url');
 const email = `${randomUUID()}@example.test`;
 let user: Awaited<ReturnType<typeof createInvitedUser>>;
 const origin = config.PUBLIC_ORIGIN;
