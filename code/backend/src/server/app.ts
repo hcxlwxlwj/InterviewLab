@@ -98,8 +98,9 @@ export async function buildApp(options: ApplicationOptions = {}) {
     });
     const materials = database ? createMaterialsService(database) : undefined;
     const modules = [
-      settingsModule(database, materials),
-      materialsModule(materials),
+      ...[settingsModule(database, materials), materialsModule(materials)].filter(
+        module => !options.modules?.some(custom => custom.name === module.name),
+      ),
       jobsModule(createJobsService(publicCatalogRepository)),
       ...(interview?.modules ?? [interviewsModule(undefined, { config }), reportsModule()]),
       ...(options.modules ?? []),

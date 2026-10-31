@@ -38,7 +38,7 @@
 | `GET /auth/session` | 浏览器 Cookie | `AuthSession` 或 `null` |
 | `POST /auth/sign-out` | `{}`、浏览器 Cookie | `{success:true}`，撤销会话并清 Cookie |
 
-注册显示名去首尾空白后 1–100 字符；邮箱格式有效、最长 254 字符并转换为小写；密码 12–128 字符，不对密码去空白。确认密码仅在前端验证。未知字段（包括 role、owner_id、callbackURL）均被拒绝。数据库唯一约束与 Better Auth 事务保证并发重复注册不会覆盖密码或留下未关联凭据。
+注册显示名去首尾空白后 1–100 字符；邮箱格式有效、最长 254 字符并转换为小写；密码 9–20 字符，不对密码去空白。确认密码仅在前端验证。未知字段（包括 role、owner_id、callbackURL）均被拒绝。数据库唯一约束与 Better Auth 事务保证并发重复注册不会覆盖密码或留下未关联凭据。
 
 共享类型为 `SignUpInput`、`SignInInput`、`AuthSession`。浏览器通过 `authClient` 和统一 `apiRequest` 调用；不直接使用 Better Auth 原生返回值，不把密码哈希、会话 token、密钥或 provider 原始错误返回前端或日志。OpenAPI 由注册路由生成，执行 `npm run openapi:generate` 可导出。
 
