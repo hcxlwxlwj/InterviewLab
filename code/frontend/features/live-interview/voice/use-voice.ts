@@ -142,6 +142,7 @@ export function useInterviewVoice(options: {
     }
   }
   return {
+    getOutputLevel: () => client.current?.getOutputLevel() ?? 0,
     capabilities,
     display,
     muted,

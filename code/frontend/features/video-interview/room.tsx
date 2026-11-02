@@ -18,6 +18,7 @@ import type { InterviewWorkspace } from '../../components/interview-workspace';
 import type { useInterviewVoice } from '../live-interview/voice/use-voice';
 import { formatTime } from '../../components/shared';
 import { MediaPreview } from './media-preview';
+import { InterviewerAvatar } from './interviewer-avatar';
 
 type Props = ComponentProps<typeof InterviewWorkspace> & {
   voice: ReturnType<typeof useInterviewVoice>;
@@ -215,10 +216,10 @@ export function VideoInterviewWorkspace(p: Props) {
         </section>
         <aside className="video-room-sidebar">
           <div className="video-room-tile video-room-agent">
-            <Bot size={58} />
-            <strong>AI 面试官</strong>
-            <p>{p.voice.playing ? '正在提问' : p.interviewerStatus}</p>
-            <span className="video-room-tile-label">AI 面试官 · 语音驱动</span>
+            <InterviewerAvatar
+              getLevel={p.voice.getOutputLevel ?? (() => 0)}
+              status={p.voice.playing ? '正在提问' : p.interviewerStatus}
+            />
           </div>
           <div className="video-room-tile">
             {media.camera ? (

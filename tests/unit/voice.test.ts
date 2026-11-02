@@ -136,3 +136,48 @@ test('capture worklet resamples common device rates to 16kHz and emits VAD start
     assert.ok(packets.every((m) => m.pcm?.byteLength === 6400));
   }
 });
+
+test('avatar mouth follows audible PCM time, remains closed for queued audio and stops on interruption', () => {
+  const context = {
+    currentTime: 0,
+    destination: {},
+    createBuffer: (_channels: number, count: number, rate: number) => ({
+      duration: count / rate,
+      getChannelData: () => new Float32Array(count),
+    }),
+    createBufferSource: () => ({
+      connect() {},
+      disconnect() {},
+      start() {},
+      stop() {},
+      onended: null,
+    }),
+  };
+  const playback = new VoicePlayback(
+    context as unknown as AudioContext,
+    () => {},
+    () => {},
+  );
+  const bytes = Buffer.alloc(4800);
+  for (let i = 0; i < 2400; i++) bytes.writeInt16LE(i < 1200 ? 8000 : 0, i * 2);
+  playback.start('question');
+  playback.append('question', bytes.toString('base64'));
+  assert.equal(
+    playback.getLevel(),
+    0,
+    'network arrival must not open the mouth before sound plays',
+  );
+  context.currentTime = 0.04;
+  assert.ok(playback.getLevel() > 0.9);
+  playback.finish('question');
+  assert.ok(playback.getLevel() > 0.9, 'provider end must not cut off queued audible speech');
+  context.currentTime = 0.11;
+  assert.equal(playback.getLevel(), 0, 'silent PCM closes the mouth');
+  context.currentTime = 0.04;
+  playback.interrupt('old-question');
+  assert.ok(playback.getLevel() > 0.9, 'stale cancellation must not affect current mouth');
+  playback.interrupt('question');
+  assert.equal(playback.getLevel(), 0);
+  playback.append('question', bytes.toString('base64'));
+  assert.equal(playback.getLevel(), 0, 'late audio must not revive an interrupted mouth');
+});

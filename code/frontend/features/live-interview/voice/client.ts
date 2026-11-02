@@ -120,6 +120,9 @@ export class RealtimeVoiceClient {
   send(event: VoiceClientEvent) {
     if (this.socket?.readyState === WebSocket.OPEN) this.socket.send(JSON.stringify(event));
   }
+  getOutputLevel() {
+    return this.playback?.getLevel() ?? 0;
+  }
   interrupt() {
     this.playback?.stop(true);
     this.send({ type: 'interrupt' });
