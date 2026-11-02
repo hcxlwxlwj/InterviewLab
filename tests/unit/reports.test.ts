@@ -241,7 +241,7 @@ test('summary uses the shared model adapter with checked evaluations and records
                 ],
                 dimension_assessments: {
                   technical_knowledge: null,
-                  project_communication: null,
+                  project_communication: { level: 2, text: '基本回应但验证不足。' },
                   logical_expression: null,
                 },
                 limitations: [],
@@ -255,9 +255,22 @@ test('summary uses the shared model adapter with checked evaluations and records
   );
   assert.deepEqual(
     await agent.summarize([evaluation], snapshot, new AbortController().signal, false),
-    { ...summary, dimension_assessments: [] },
+    {
+      ...summary,
+      dimension_assessments: [
+        {
+          dimension: 'project_communication',
+          level: 2,
+          text: '基本回应但验证不足。',
+          evidence_refs: [
+            evaluation.strengths[0].evidence_refs[0],
+            evaluation.gaps[0].evidence_refs[0],
+          ],
+        },
+      ],
+    },
   );
-  assert.equal((logs[0] as { prompt_version: string }).prompt_version, 'text-review-v2');
+  assert.equal((logs[0] as { prompt_version: string }).prompt_version, 'text-review-v5');
 });
 
 test('AI reference scores use explicit evidence levels and equal-weight averaging, excluding unobserved skills', () => {
@@ -292,4 +305,158 @@ test('dimension scores reject unrelated evidence, duplicates and unobserved dime
   ];
   summary.dimension_assessments.push(summary.dimension_assessments[0]);
   assert.throws(() => assertSummary(summary, [evaluation]));
+});
+
+test('frontend report references cover catalog questions without guessing unknown topics', async () => {
+  const { localInterviewKnowledge } = await import(
+    '../../code/backend/src/modules/interviews/knowledge'
+  );
+  const { withFrontendReportReference } = await import(
+    '../../code/backend/src/modules/interviews/frontend-reference'
+  );
+  const state = fixture().state;
+  const knowledge = await localInterviewKnowledge.read(state.view.configuration);
+  assert.equal(knowledge.questions.length, 8);
+  for (const question of knowledge.questions) {
+    assert.equal(question.report_reference?.version, 'frontend-report-reference-v1');
+    assert.equal(question.report_reference?.review_state, 'draft');
+    assert.ok(question.report_reference?.cards.length);
+    assert.ok(question.report_reference?.cards.every((c) => c.source_urls.length));
+  }
+  const unknown = {
+    ...knowledge.questions[0],
+    topic: '未覆盖的专业主题',
+    report_reference: undefined,
+  };
+  assert.equal(withFrontendReportReference(unknown).report_reference, undefined);
+});
+
+test('report analysis sends frozen professional reference to the model', async () => {
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { localInterviewKnowledge } = await import(
+    '../../code/backend/src/modules/interviews/knowledge'
+  );
+  const { state, turn, evaluation } = fixture();
+  const knowledge = await localInterviewKnowledge.read(state.view.configuration);
+  turn.knowledge_question_id = knowledge.questions[0].id;
+  turn.topic = knowledge.questions[0].topic;
+  let received: unknown;
+  const analysis = createReportAnalysis(async (_kind, schema, input) => {
+    received = input;
+    return schema.parse({
+      ...evaluation,
+      strengths: evaluation.strengths.map((f) => ({
+        ...f,
+        evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q0' })),
+      })),
+      gaps: evaluation.gaps.map((f) => ({
+        ...f,
+        evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q1' })),
+      })),
+    });
+  });
+  await analysis.evaluate(turn, { ...snapshot, knowledge }, new AbortController().signal, false);
+  const input = received as {
+    observation_points: { report_reference?: { version: string } }[];
+    instructions: string;
+  };
+  assert.equal(
+    input.observation_points[0].report_reference?.version,
+    'frontend-report-reference-v1',
+  );
+  assert.ok(input.instructions.includes('未经专家审核'));
+});
+
+test('summary merges repeated practice targets for one turn while retaining checked evidence and scores', async () => {
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { evaluation } = fixture();
+  const analysis = createReportAnalysis(async (_kind, schema) =>
+    schema.parse({
+      overview: { text: '说明职责，验证待补充。', evidence_ids: ['e0-s0-0'] },
+      strengths: [{ text: '职责清楚。', evidence_ids: ['e0-s0-0'] }],
+      improvements: [1, 2].map(() => ({
+        text: '补充验证。',
+        turn_id: evaluation.turn_id,
+        evidence_ids: ['e0-g0-0'],
+      })),
+      dimension_assessments: {
+        technical_knowledge: null,
+        project_communication: { level: 2, text: '验证不足。' },
+        logical_expression: null,
+      },
+      limitations: ['仅依据本人陈述'],
+    }),
+  );
+  const value = await analysis.summarize(
+    [evaluation],
+    snapshot,
+    new AbortController().signal,
+    false,
+  );
+  assert.equal(value.improvements.length, 1);
+  assert.equal(value.improvements[0].retry_goal, evaluation.retry_goal);
+  assert.equal(value.dimension_assessments![0].level, 2);
+  assert.doesNotThrow(() => assertSummary(value, [evaluation]));
+});
+
+test('evaluation quotes must be exact source spans, including punctuation and revision', async () => {
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { turn, evaluation } = fixture();
+  const analysis = createReportAnalysis(async (_kind, schema) => {
+    assert.equal(
+      schema.safeParse({
+        ...evaluation,
+        strengths: [
+          {
+            text: '职责',
+            evidence_refs: [
+              { ...evaluation.strengths[0].evidence_refs[0], quote: '我主要负责接口' },
+            ],
+          },
+        ],
+      }).success,
+      false,
+    );
+    return schema.parse({
+      ...evaluation,
+      strengths: evaluation.strengths.map((f) => ({
+        ...f,
+        evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q0' })),
+      })),
+      gaps: evaluation.gaps.map((f) => ({
+        ...f,
+        evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q1' })),
+      })),
+    });
+  });
+  assert.deepEqual(
+    await analysis.evaluate(turn, snapshot, new AbortController().signal, false),
+    evaluation,
+  );
+});
+
+test('PDF print snapshot includes partial state, scores, full answers and safely escapes user/model markup', async () => {
+  const { reportExportHtml } = await import(
+    '../../code/frontend/features/live-interview/report-export'
+  );
+  const { state, task, summary } = fixture();
+  summary.dimension_assessments = [
+    { ...summary.overview, dimension: 'project_communication', level: 3 },
+  ];
+  const report = aggregateReport(
+    state,
+    { ...emptyReport(state, randomUUID()), summary, summary_status: 'ready' },
+    [task],
+  );
+  state.view.job_title = '<script>alert(1)</script>';
+  state.view.turns[0].answer_text = '<img src=x onerror=alert(2)> & 回答';
+  report.is_partial = true;
+  const html = reportExportHtml(state.view, report);
+  assert.ok(html.includes('75 / 100'));
+  assert.ok(html.includes('部分复盘'));
+  assert.ok(html.includes('未观察'));
+  assert.ok(html.includes('&lt;script&gt;'));
+  assert.ok(html.includes('&lt;img src=x onerror=alert(2)&gt; &amp; 回答'));
+  assert.ok(!html.includes('<script>'));
+  assert.ok(!html.includes('<img'));
 });

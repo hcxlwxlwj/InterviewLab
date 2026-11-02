@@ -5,6 +5,7 @@ import type {
   InterviewSnapshot,
   InterviewEvaluation,
 } from '@interviewlab/core';
+import { FRONTEND_RUBRIC_VERSION, aggregateIndicatorScores } from '@interviewlab/core';
 import { inputDigest } from '../../foundation/idempotency';
 import { REPORT_PROMPT_VERSION, REPORT_SCHEMA_VERSION, SCORING_RUBRIC_VERSION } from './analysis';
 export interface EvaluationTask {
@@ -126,7 +127,7 @@ export function aggregateReport(
         status: 'observed',
         score: null,
         evidence_refs: unique,
-        explanation: `已从 ${observed.length} 个回答回合获得本维度的文字证据；仅分析已作答内容，暂不评分。`,
+        explanation: `已从 ${observed.length} 个回答回合获得本维度的文字证据；评分将在整场总结完成后生成；仅评价已作答内容。`,
       };
   }
   const assessments = report.summary?.dimension_assessments ?? [];
@@ -152,6 +153,43 @@ export function aggregateReport(
     dimension.explanation = assessment.text;
     dimension.evidence_refs = assessment.evidence_refs;
   }
+  const barsValues = values.filter((e) => e.scoring_rubric_version === FRONTEND_RUBRIC_VERSION);
+  if (
+    barsValues.length &&
+    state.view.configuration.job === 'frontend' &&
+    state.view.configuration.career_stage === 'internship'
+  ) {
+    const indicators = aggregateIndicatorScores(barsValues);
+    // Never mix a historical holistic score with the new per-indicator standard.
+    for (const key of keys.filter((k) => k !== 'coding_ability')) {
+      const selected = indicators.filter((i) => i.dimension === key);
+      report.dimensions[key] = selected.length
+        ? {
+            status: 'observed',
+            score: Math.round(selected.reduce((sum, i) => sum + i.score, 0) / selected.length),
+            evidence_refs: [
+              ...new Map(
+                selected.flatMap((i) => i.evidence_refs).map((r) => [JSON.stringify(r), r]),
+              ).values(),
+            ],
+            explanation:
+              selected
+                .map((i) => `${i.title} ${Math.round(i.score)} 分（${i.observations} 次观察）`)
+                .join('；') + '。先按指标聚合，再对本维度已观察指标等权平均。',
+          }
+        : {
+            status: 'not_observed',
+            score: null,
+            evidence_refs: [],
+            explanation: '本标准下尚无可评分指标；未问到或证据不足不计为零分。',
+          };
+    }
+    report.analysis_metadata = {
+      ...(report.analysis_metadata ?? emptyReport(state, base.id).analysis_metadata!),
+      scoring_rubric_version: FRONTEND_RUBRIC_VERSION,
+    };
+    report.coverage += ` 行为锚定标准覆盖 ${barsValues.length}/${answered.length} 个有效回答；标准为草案，尚未人工校准。`;
+  }
   const scored = Object.values(report.dimensions).flatMap((d) =>
     d.score === null ? [] : [d.score],
   );
@@ -163,7 +201,9 @@ export function aggregateReport(
     if (report.analysis_metadata)
       report.analysis_metadata = {
         ...report.analysis_metadata,
-        scoring_rubric_version: SCORING_RUBRIC_VERSION,
+        scoring_rubric_version: barsValues.length
+          ? FRONTEND_RUBRIC_VERSION
+          : SCORING_RUBRIC_VERSION,
       };
   }
   return report;

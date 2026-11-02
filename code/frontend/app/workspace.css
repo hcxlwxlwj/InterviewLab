@@ -1839,3 +1839,110 @@
   .interviewer-foot { margin-top: 16px; }
   .answer-panel { align-self: start; }
 }
+
+/* Real reports reuse the designed report layout with live progress and evidence. */
+.real-report-page .report-sidebar > .panel,
+.real-report-page .report-detail > div > .panel,
+.real-report-page .turn-reviews > .panel:not(.turn-review) {
+  padding: 23px;
+}
+.real-report-page .report-grid {
+  margin-top: 24px;
+}
+.real-report-page .report-sidebar h3,
+.real-report-page .turn-review-body h3 {
+  margin-top: 20px;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+.real-report-page .report-sidebar p,
+.real-report-page .turn-review-body p,
+.real-report-page .turn-review-body li {
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.real-report-page .report-evidence {
+  margin: 10px 0;
+}
+.real-report-page .report-evidence > summary,
+.real-report-page .report-original-answer > summary {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #446c79;
+}
+.real-report-page .live-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 14px;
+  margin-top: 12px;
+  border-radius: 6px;
+  background: #446c79;
+  color: white;
+  font-size: 13px;
+}
+.real-report-page .live-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.real-report-page .live-button.secondary {
+  background: #e1f1f2;
+  color: #446c79;
+}
+.real-report-page details[id^='turn-'] {
+  scroll-margin-top: 90px;
+}
+.real-report-page [role='tabpanel'][hidden] {
+  display: none;
+}
+
+.real-report-page .report-overview {
+  padding: 24px;
+}
+.real-report-page .report-overview .live-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.real-report-page .report-overview p {
+  line-height: 1.8;
+}
+
+.real-report-page .report-standard {
+  padding: 24px;
+  margin-top: 24px;
+  line-height: 1.8;
+}
+.real-report-page .report-standard > details {
+  margin-top: 16px;
+}
+.real-report-page .report-standard summary,
+.real-report-page .report-indicator-ratings summary {
+  cursor: pointer;
+  color: #446c79;
+}
+.real-report-page .report-rubric-indicator,
+.real-report-page .report-indicator-ratings article {
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+.real-report-page .report-rubric-indicator ol {
+  list-style: none;
+  padding-left: 0;
+}
+.real-report-page .report-rubric-indicator li {
+  margin: 10px 0;
+}
+.real-report-page .report-indicator-ratings p,
+.real-report-page .report-standard code {
+  overflow-wrap: anywhere;
+}
+.real-report-page .report-anchor {
+  padding: 10px;
+  background: #f0f5f4;
+  border-radius: 6px;
+}

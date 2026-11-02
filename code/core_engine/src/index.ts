@@ -11,3 +11,5 @@ export * from './live-interview';
 
 export * from './interview-agent';
 export * from './voice';
+
+export * from './report-rubric';

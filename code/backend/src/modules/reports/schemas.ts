@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import type { InterviewReport, ReportRequest } from '@interviewlab/core';
-import { summaryOutput } from './analysis';
+import { summaryOutput, indicatorAssessmentOutput } from './analysis';
 const evidence = z.object({ turn_id: z.string(), revision: z.number().int(), quote: z.string() });
 const finding = z.object({ text: z.string(), evidence_refs: z.array(evidence) });
 export const reportRequestBody = z
   .object({
     version: z.number().int().positive(),
-    scope: z.enum(['missing', 'summary']).optional(),
+    scope: z.enum(['missing', 'summary', 'rubric']).optional(),
   })
   .strict() satisfies z.ZodType<ReportRequest>;
 const dimension = z.object({
@@ -33,6 +33,8 @@ export const reportSchema = z.object({
     z.object({
       turn_id: z.string(),
       revision: z.number().int(),
+      scoring_rubric_version: z.string().optional(),
+      indicator_assessments: z.array(indicatorAssessmentOutput).max(6).optional(),
       strengths: z.array(finding),
       gaps: z.array(finding),
       reference_points: z.array(z.string()),
