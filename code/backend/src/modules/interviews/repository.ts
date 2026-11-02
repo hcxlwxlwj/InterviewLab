@@ -85,7 +85,7 @@ export async function loadInterview(
         answer_text: t.answer_text,
         revision: t.revision,
         answered_at: iso(t.answered_at),
-        input_mode: 'text_fallback',
+        input_mode: t.input_mode as InterviewTurn['input_mode'],
       })),
     },
   };
@@ -143,9 +143,9 @@ export async function saveInterview(executor: Executor, state: InterviewState) {
       acknowledgement,
     } = turn;
     await executor.query(
-      `INSERT INTO interview_turns (id,interview_id,question,generation_id,main_question_index,follow_up_index,presented_at,answer_status,answer_text,revision,answered_at,knowledge_context)
-      VALUES ($1,$2,$3::jsonb,$4,$5,$6,$7,$8,$9,$10,$11,$12::jsonb) ON CONFLICT(id) DO UPDATE SET
-      presented_at=EXCLUDED.presented_at,answer_status=EXCLUDED.answer_status,answer_text=EXCLUDED.answer_text,revision=EXCLUDED.revision,answered_at=EXCLUDED.answered_at`,
+      `INSERT INTO interview_turns (id,interview_id,question,generation_id,main_question_index,follow_up_index,presented_at,answer_status,answer_text,revision,answered_at,knowledge_context,input_mode)
+      VALUES ($1,$2,$3::jsonb,$4,$5,$6,$7,$8,$9,$10,$11,$12::jsonb,$13) ON CONFLICT(id) DO UPDATE SET
+      presented_at=EXCLUDED.presented_at,answer_status=EXCLUDED.answer_status,answer_text=EXCLUDED.answer_text,revision=EXCLUDED.revision,answered_at=EXCLUDED.answered_at,input_mode=EXCLUDED.input_mode`,
       [
         turn.id,
         v.id,
@@ -168,6 +168,7 @@ export async function saveInterview(executor: Executor, state: InterviewState) {
         turn.revision,
         turn.answered_at,
         JSON.stringify(state.retrievals?.[turn.id] ?? null),
+        turn.input_mode,
       ],
     );
   }

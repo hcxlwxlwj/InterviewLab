@@ -26,6 +26,7 @@ export interface WorkspaceTurn {
   acknowledgement?: string;
   status: 'waiting' | 'answered' | 'skipped';
   answer: string | null;
+  inputMode?: 'text_fallback' | 'voice';
 }
 interface Props {
   jobTitle: string;
@@ -50,6 +51,8 @@ interface Props {
   interviewerNote: ReactNode;
   workspace?: ReactNode;
   tools?: ReactNode;
+  voiceActive?: boolean;
+  voiceView?: boolean;
   recordsHref: string;
   reportHref?: string;
   onText: (text: string) => void;
@@ -65,10 +68,14 @@ interface Props {
 /** Original interview layout shared by the HTTP and explicit demo controllers. */
 export function InterviewWorkspace(p: Props) {
   const log = useRef<HTMLDivElement>(null);
+  const history = useRef<HTMLDivElement>(null);
   const last = p.turns.at(-1);
   useEffect(() => {
     if (log.current) log.current.scrollTop = log.current.scrollHeight;
   }, [last?.id, last?.status, p.interviewerStatus, p.explanation]);
+  useEffect(() => {
+    if (history.current) history.current.scrollTop = history.current.scrollHeight;
+  }, [last?.id]);
   return (
     <div className="session-shell">
       <header className="session-header">
@@ -145,7 +152,13 @@ export function InterviewWorkspace(p: Props) {
                 </p>
               )}
             </div>
-            <div className="question-history">
+            <div
+              className="question-history"
+              ref={history}
+              role="region"
+              aria-label="题目轨迹"
+              tabIndex={0}
+            >
               <div className="panel-heading">
                 <h2>题目轨迹</h2>
                 <span>{p.turns.filter((t) => t.status !== 'waiting').length} 次已记录</span>
@@ -181,130 +194,146 @@ export function InterviewWorkspace(p: Props) {
           </aside>
           <section className="panel answer-panel">
             <div className="answer-panel-header">
-              <h2>作答记录</h2>
+              <h2>{p.voiceView ? '语音面试' : '作答记录'}</h2>
               <span>
                 <CheckCheck size={14} />
                 {p.saveLabel}
               </span>
             </div>
-            <div className="conversation" ref={log} role="log" aria-label="面试对话记录">
-              {!p.turns.some((t) => t.status !== 'waiting') && (
-                <div className="conversation-intro">
-                  <span className="badge badge-mint">从认识你开始</span>
-                  <p>
-                    准备好后，在下方输入你的回答。
-                    <br />
-                    不用追求一次说得完美。
-                  </p>
-                </div>
-              )}
-              {p.turns.map((t) => (
-                <div className="conversation-turn" key={t.id}>
-                  <div
-                    className={`message message-interviewer ${t.status === 'waiting' ? 'message-current' : ''}`}
-                  >
-                    <span className="avatar avatar-mint">面</span>
-                    <div>
-                      <small>{t.status === 'waiting' ? '当前问题' : t.label}</small>
-                      {t.acknowledgement && <p>{t.acknowledgement}</p>}
-                      <p>{t.text}</p>
-                    </div>
+            {!p.voiceView && (
+              <div className="conversation" ref={log} role="log" aria-label="面试对话记录">
+                {!p.turns.some((t) => t.status !== 'waiting') && (
+                  <div className="conversation-intro">
+                    <span className="badge badge-mint">从认识你开始</span>
+                    <p>
+                      准备好后，在下方输入你的回答。
+                      <br />
+                      不用追求一次说得完美。
+                    </p>
                   </div>
-                  {t.status !== 'waiting' && (
-                    <div className="message message-user">
-                      <span className="avatar avatar-peach">我</span>
+                )}
+                {p.turns.map((t) => (
+                  <div className="conversation-turn" key={t.id}>
+                    <div
+                      className={`message message-interviewer ${t.status === 'waiting' ? 'message-current' : ''}`}
+                    >
+                      <span className="avatar avatar-mint">面</span>
                       <div>
-                        <small>文字作答 · 已记录</small>
-                        <p>{t.status === 'skipped' ? '已跳过此题' : t.answer}</p>
+                        <small>{t.status === 'waiting' ? '当前问题' : t.label}</small>
+                        {t.acknowledgement && <p>{t.acknowledgement}</p>}
+                        <p>{t.text}</p>
                       </div>
                     </div>
-                  )}
-                </div>
-              ))}
-              {p.conversationNotice}
-              {p.paused && (
-                <div className="pause-notice" role="status">
-                  <Pause size={15} />
-                  面试已暂停，计时仍继续。点击“继续”恢复作答。
-                </div>
-              )}
-              {p.ended && (
-                <div className="notice" role="status">
-                  本场面试已结束，已提交的回答已保存。
-                </div>
-              )}
-            </div>
-            {p.workspace}
-            <form
-              className="answer-composer"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (p.canAnswer && p.draft.trim()) p.onSubmit();
-              }}
-            >
-              <div className="composer-heading">
-                <label htmlFor="answer">你的回答</label>
-                <span>文字作答 · 不采集音视频</span>
+                    {t.status !== 'waiting' && (
+                      <div className="message message-user">
+                        <span className="avatar avatar-peach">我</span>
+                        <div>
+                          <small>
+                            {t.inputMode === 'voice' ? '语音转写' : '文字作答'} · 已记录
+                          </small>
+                          <p>{t.status === 'skipped' ? '已跳过此题' : t.answer}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {p.conversationNotice}
+                {p.paused && (
+                  <div className="pause-notice" role="status">
+                    <Pause size={15} />
+                    面试已暂停，计时仍继续。点击“继续”恢复作答。
+                  </div>
+                )}
+                {p.ended && (
+                  <div className="notice" role="status">
+                    本场面试已结束，已提交的回答已保存。
+                  </div>
+                )}
               </div>
-              <textarea
-                id="answer"
-                maxLength={p.maxAnswer}
-                disabled={!p.canAnswer && !p.ended}
-                readOnly={p.ended}
-                value={p.draft}
-                onChange={(e) => p.onText(e.target.value)}
-                placeholder={
-                  p.paused ? '继续面试后即可作答' : '在这里输入回答，结合自己的经历和理解说明…'
-                }
-                onKeyDown={(e) => {
-                  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                    e.preventDefault();
-                    if (p.canAnswer && p.draft.trim()) p.onSubmit();
-                  }
+            )}
+            {p.workspace}
+            {!p.voiceView && (
+              <form
+                className="answer-composer"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (p.canAnswer && p.draft.trim()) p.onSubmit();
                 }}
-              />
-              {p.draftHint && (
-                <p className="field-help" role="status">
-                  {p.draftHint}
-                </p>
-              )}
-              <div className="composer-bottom">
-                <span>
-                  {p.draft.length}/{p.maxAnswer} <kbd>Ctrl + Enter</kbd>
-                </span>
-                <div>
-                  {p.onClarify && (
+              >
+                <div className="composer-heading">
+                  <label htmlFor="answer">你的回答</label>
+                  <span>{p.voiceActive ? '语音转写 · 麦克风已开启' : '文字作答 · 麦克风关闭'}</span>
+                </div>
+                <textarea
+                  id="answer"
+                  maxLength={p.maxAnswer}
+                  disabled={!p.canAnswer && !p.ended}
+                  readOnly={p.ended || p.voiceActive}
+                  value={p.draft}
+                  onChange={(e) => p.onText(e.target.value)}
+                  placeholder={
+                    p.paused
+                      ? '继续面试后即可作答'
+                      : p.voiceActive
+                        ? '请直接说话，实时转写将显示在这里…'
+                        : p.onStart
+                          ? '点击右上角“开始面试”后即可作答'
+                          : '在这里输入回答，结合自己的经历和理解说明…'
+                  }
+                  onKeyDown={(e) => {
+                    if (
+                      (e.ctrlKey || e.metaKey) &&
+                      e.key === 'Enter' &&
+                      !e.nativeEvent.isComposing
+                    ) {
+                      e.preventDefault();
+                      if (p.canAnswer && p.draft.trim()) p.onSubmit();
+                    }
+                  }}
+                />
+                {p.draftHint && (
+                  <p className="field-help" role="status">
+                    {p.draftHint}
+                  </p>
+                )}
+                <div className="composer-bottom">
+                  <span>
+                    {p.draft.length}/{p.maxAnswer} <kbd>Ctrl + Enter</kbd>
+                  </span>
+                  <div>
+                    {p.onClarify && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        disabled={!p.canAnswer}
+                        onClick={p.onClarify}
+                      >
+                        澄清题意
+                      </Button>
+                    )}
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       disabled={!p.canAnswer}
-                      onClick={p.onClarify}
+                      onClick={p.onSkip}
                     >
-                      澄清题意
+                      <SkipForward size={14} />
+                      跳过
                     </Button>
-                  )}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    disabled={!p.canAnswer}
-                    onClick={p.onSkip}
-                  >
-                    <SkipForward size={14} />
-                    跳过
-                  </Button>
-                  <Button type="submit" size="sm" disabled={!p.canAnswer || !p.draft.trim()}>
-                    提交回答
-                    <ArrowUp size={15} />
-                  </Button>
+                    <Button type="submit" size="sm" disabled={!p.canAnswer || !p.draft.trim()}>
+                      提交回答
+                      <ArrowUp size={15} />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </form>
+              </form>
+            )}
             <div className="session-tools">
               <span>
                 <Keyboard size={14} />
-                文字模式
+                {p.voiceView ? '语音模式' : '文字模式'}
               </span>
               {p.tools}
               <span className="device-off">

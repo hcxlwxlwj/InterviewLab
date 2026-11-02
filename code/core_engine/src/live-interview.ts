@@ -16,7 +16,7 @@ export interface InterviewConfig {
   difficulty: '基础';
   duration_minutes: 5 | 10;
   interviewer_style: '标准' | '友好' | '深入追问';
-  interaction_mode: 'text_fallback';
+  interaction_mode: 'text_fallback' | 'realtime_voice' | 'realtime_video';
 }
 export interface InterviewKnowledge {
   agent_release?: KnowledgeRelease;
@@ -70,7 +70,7 @@ export interface InterviewTurn extends InterviewQuestion {
   answer_status: 'waiting' | 'answered' | 'skipped';
   answer_text: string | null;
   revision: number;
-  input_mode: 'text_fallback';
+  input_mode: 'text_fallback' | 'voice';
   answered_at: string | null;
 }
 export interface InterviewSnapshot {
@@ -256,4 +256,9 @@ export function evidenceMatches(ref: InterviewEvidence, turns: InterviewTurn[]):
   return Boolean(
     ref.quote.trim() && turn?.answer_status === 'answered' && turn.answer_text?.includes(ref.quote),
   );
+}
+
+/** Route choice persists with the saved interaction mode. */
+export function liveInterviewPath(interview: Pick<Interview, 'id' | 'configuration'>) {
+  return `/interview/${interview.id}${interview.configuration.interaction_mode === 'realtime_video' ? '/video' : ''}`;
 }

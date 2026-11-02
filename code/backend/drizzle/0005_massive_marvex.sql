@@ -1,0 +1,2 @@
+ALTER TABLE "interview_turns" ADD COLUMN "input_mode" text DEFAULT 'text_fallback' NOT NULL;--> statement-breakpoint
+ALTER TABLE "interview_turns" ADD CONSTRAINT "interview_turn_input_mode" CHECK (input_mode IN ('text_fallback','voice'));

@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { liveInterviewPath } from '@interviewlab/core';
 import { useCallback, useState } from 'react';
 import { STATUS_LABELS, LIVE_TYPE_LABELS, type Interview } from '@interviewlab/core';
 import { EmptyState, Loading, Modal, formatDate } from '../../components/shared';
@@ -126,7 +127,7 @@ function HistoryBody() {
                               href={
                                 !isDevelopment && ['completed', 'failed'].includes(v.status)
                                   ? `/reports/${v.id}`
-                                  : `/interview/${v.id}`
+                                  : liveInterviewPath(v)
                               }
                             >
                               {['completed', 'failed'].includes(v.status)

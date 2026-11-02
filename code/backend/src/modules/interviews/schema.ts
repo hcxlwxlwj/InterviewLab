@@ -69,6 +69,7 @@ export const interviewTurns = pgTable(
     presented_at: timestamp({ withTimezone: true }),
     answer_status: text().notNull().default('waiting'),
     answer_text: text(),
+    input_mode: text().notNull().default('text_fallback'),
     revision: integer().notNull().default(0),
     answered_at: timestamp({ withTimezone: true }),
   },
@@ -87,6 +88,7 @@ export const interviewTurns = pgTable(
       'interview_turn_answer_status',
       sql.raw("answer_status IN ('waiting','answered','skipped')"),
     ),
+    check('interview_turn_input_mode', sql.raw("input_mode IN ('text_fallback','voice')")),
   ],
 );
 export const interviewEvents = pgTable('interview_events', {

@@ -6,6 +6,7 @@ import type { LiveInterviewsService } from './service';
 import * as s from './schemas';
 import { registerInterviewEvents } from './events';
 import { ServiceError } from '../../foundation/errors';
+import { registerVoiceRoutes, type VoiceOptions } from './voice/routes';
 
 export const privateErrors = {
   400: errorSchema,
@@ -20,7 +21,10 @@ export const idParams = z.object({ id: z.string().uuid() });
 export const writeHeaders = z
   .object({ 'idempotency-key': z.string().min(1).max(128) })
   .passthrough();
-export function interviewsModule(service?: LiveInterviewsService): BackendModule {
+export function interviewsModule(
+  service?: LiveInterviewsService,
+  voice?: VoiceOptions,
+): BackendModule {
   return {
     name: 'interviews',
     async register(app, context) {
@@ -32,6 +36,7 @@ export function interviewsModule(service?: LiveInterviewsService): BackendModule
         return service;
       };
       registerInterviewEvents(app, context, ready);
+      if (voice) registerVoiceRoutes(app, context, ready, voice);
       app.get<{ Querystring: { limit: number; cursor?: string; job?: string; status?: string } }>(
         '/interviews',
         {
@@ -123,6 +128,11 @@ export function interviewsModule(service?: LiveInterviewsService): BackendModule
       command('/finish', s.finishBody, (...args) => ready().finish(...args));
       command('/generation/retry', s.retryGenerationBody, (...args) =>
         ready().retryGeneration(...args),
+      );
+      command(
+        '/voice/continue',
+        s.versionBody.extend({ turn_id: z.uuid(), text: z.string().max(4000) }),
+        (identity, id, body, key) => ready().continueVoice(identity, id, body.turn_id, body, key),
       );
       app.get<{ Params: { id: string }; Querystring: { limit: number; cursor?: string } }>(
         '/interviews/:id/turns',

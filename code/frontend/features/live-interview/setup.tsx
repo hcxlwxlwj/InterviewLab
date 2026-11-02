@@ -1,11 +1,11 @@
 'use client';
 import Link from 'next/link';
-import { ArrowRight, CameraOff, Check, Keyboard, MicOff } from 'lucide-react';
+import { ArrowRight, CameraOff, Check, Keyboard, Mic, MicOff } from 'lucide-react';
 import { Choices, InterviewSetupPage } from '../../components/interview-setup';
 import { Button } from '../../components/ui/button';
 import { useCallback, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { LIVE_TYPE_LABELS, type InterviewConfig } from '@interviewlab/core';
+import { LIVE_TYPE_LABELS, liveInterviewPath, type InterviewConfig } from '@interviewlab/core';
 import { interviewsApi } from '../../lib/api/interviews';
 import { jobsApi } from '../../lib/api/jobs';
 import { Loading } from '../../components/shared';
@@ -59,7 +59,7 @@ function Form() {
         e.preventDefault();
         command.run(
           (key) => interviewsApi.create(config, key),
-          (result) => router.push(`/interview/${result.id}`),
+          (result) => router.push(liveInterviewPath(result)),
         );
       }}
     >
@@ -189,14 +189,24 @@ function Form() {
             label="交互方式"
             name="interaction-mode"
             value={config.interaction_mode}
-            options={[{ value: 'text_fallback', label: '文字作答' }]}
+            options={[
+              { value: 'text_fallback', label: '文字作答' },
+              { value: 'realtime_voice', label: '语音面试' },
+              { value: 'realtime_video', label: '视频面试' },
+            ]}
             onChange={(v) => change('interaction_mode', v)}
             disabled={command.blocked}
           />
           <div className="privacy-checks">
             <span>
-              <MicOff size={14} />
-              麦克风未采集
+              {config.interaction_mode === 'realtime_voice' ? (
+                <Mic size={14} />
+              ) : (
+                <MicOff size={14} />
+              )}
+              {config.interaction_mode === 'realtime_voice'
+                ? '开启语音时授权麦克风'
+                : '麦克风未采集'}
             </span>
             <span>
               <CameraOff size={14} />
@@ -207,6 +217,17 @@ function Form() {
               不保存音视频
             </span>
           </div>
+          {config.interaction_mode === 'realtime_video' && (
+            <p className="field-help">
+              进入独立视频面试房间，可开启本机摄像头与屏幕共享预览。画面暂不上传、不录像，语音沿用当前面试
+              Agent。
+            </p>
+          )}
+          {config.interaction_mode === 'realtime_voice' && (
+            <p className="field-help">
+              进入面试页后，点击“开始面试”，再点击“开启实时语音”。支持实时转写、自动接话和插话打断，也可以随时切回文字。
+            </p>
+          )}
         </section>
       </div>
       <aside className="panel setup-summary">
@@ -237,8 +258,16 @@ function Form() {
           <div className="summary-row">
             <span>实际作答</span>
             <strong>
-              <Keyboard size={13} />
-              文字作答
+              {config.interaction_mode === 'realtime_voice' ? (
+                <Mic size={13} />
+              ) : (
+                <Keyboard size={13} />
+              )}
+              {config.interaction_mode === 'realtime_video'
+                ? '视频面试'
+                : config.interaction_mode === 'realtime_voice'
+                  ? '语音面试'
+                  : '文字作答'}
             </strong>
           </div>
         </div>

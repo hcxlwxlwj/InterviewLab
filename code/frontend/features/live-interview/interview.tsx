@@ -9,6 +9,9 @@ import { CommandNotice, ErrorNotice, SessionGate, useLiveCommand, useLiveResourc
 import { useInterviewStream } from './stream';
 import { InterviewWorkspace } from '../../components/interview-workspace';
 import { Button } from '../../components/ui/button';
+import { useInterviewVoice } from './voice/use-voice';
+import { VoiceControls } from './voice/controls';
+import { VideoInterviewWorkspace } from '../video-interview/room';
 
 const STAGES = {
   introduction: '自我介绍',
@@ -18,7 +21,8 @@ const STAGES = {
   behavioral: '动机与协作',
   closing: '面试收尾',
 };
-function InterviewBody({ id }: { id: string }) {
+function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: boolean }) {
+  const Workspace = videoRoom ? VideoInterviewWorkspace : InterviewWorkspace;
   const { state: account, isDevelopment } = useSession();
   const load = useCallback((signal: AbortSignal) => interviewsApi.read(id, signal), [id]);
   const [streamConnected, setStreamConnected] = useState(false);
@@ -120,6 +124,13 @@ function InterviewBody({ id }: { id: string }) {
       (result) => accepted(result, submitted),
     );
   }
+  const voice = useInterviewVoice({
+    id,
+    view: v,
+    draft: text,
+    onDraft: setText,
+    onView: resource.accept,
+  });
   if (!v)
     return (
       <>
@@ -133,8 +144,15 @@ function InterviewBody({ id }: { id: string }) {
       </>
     );
   const waiting = turn?.answer_status === 'waiting';
+  const continuation =
+    turn?.answer_status === 'answered' &&
+    v.generation_status === 'idle' &&
+    v.status === 'in_progress';
   const canAnswer =
-    waiting && v.status === 'in_progress' && v.generation_status !== 'pending' && !command.blocked;
+    (waiting || continuation) &&
+    v.status === 'in_progress' &&
+    v.generation_status !== 'pending' &&
+    !command.blocked;
   const targetReached = v.target_at && now >= Date.parse(v.target_at);
   const turns = v.turns.map((t) => ({
     id: t.id,
@@ -145,6 +163,7 @@ function InterviewBody({ id }: { id: string }) {
     acknowledgement: t.acknowledgement,
     status: t.answer_status,
     answer: t.answer_text,
+    inputMode: t.input_mode,
   }));
   const seconds = v.started_at
     ? Math.min(
@@ -158,13 +177,29 @@ function InterviewBody({ id }: { id: string }) {
         ),
       )
     : 0;
-  const submit = () =>
-    act(`turns/${turn!.id}/answer`, { text }, { turnId: turn!.id, text, key: draftKey });
+  const submit = () => {
+    if (voice.active) {
+      voice.commit();
+      return;
+    }
+    if (continuation)
+      act(
+        'voice/continue',
+        { turn_id: turn!.id, text },
+        {
+          turnId: turn!.id,
+          text: [turn!.answer_text, text].filter(Boolean).join('\n'),
+          key: draftKey,
+        },
+      );
+    else act(`turns/${turn!.id}/answer`, { text }, { turnId: turn!.id, text, key: draftKey });
+  };
   const participation = v.participation;
   const participationKey = participation ? `${participation.turn_id}:${participation.level}` : '';
   return (
     <>
-      <InterviewWorkspace
+      <Workspace
+        voice={voice}
         jobTitle={v.job_title}
         typeLabel={
           v.parent_interview_id ? '单题重练' : LIVE_TYPE_LABELS[v.configuration.interview_type]
@@ -224,10 +259,32 @@ function InterviewBody({ id }: { id: string }) {
             : '草稿保留在当前标签页，提交确认后清除。')
         }
         explanation={v.clarification}
+        voiceActive={voice.active}
+        voiceView={voice.display}
+        workspace={
+          <VoiceControls
+            voice={voice}
+            preferred={v.configuration.interaction_mode === 'realtime_voice'}
+            disabled={v.status !== 'in_progress' || command.blocked || finish}
+          />
+        }
         notice={
           <>
             <ErrorNotice message={resource.error} retry={() => void resource.refresh()} />
             <CommandNotice command={command} refresh={() => void resource.refresh()} />
+            {continuation && (
+              <p className="notice" role="status">
+                旧问题生成已被你的补充打断。可继续补充回答，或{' '}
+                <button
+                  className="text-link"
+                  disabled={command.blocked || voice.active}
+                  onClick={() => act('voice/continue', { turn_id: turn!.id, text: '' })}
+                >
+                  按已保存的回答继续提问
+                </button>
+                。
+              </p>
+            )}
             {participation && (
               <p className="notice" role="status">
                 {participation.message}
@@ -238,7 +295,7 @@ function InterviewBody({ id }: { id: string }) {
                 {v.parent_interview_id
                   ? '本次重练直接回到原问题。'
                   : '从自我介绍开始，面试官将根据你的回答继续交流。'}
-                点击右上角开始后计时。
+                点击{videoRoom ? '下方' : '右上角'}开始后计时。
               </p>
             )}
             {v.retry_goal && <p className="notice">单题重练目标：{v.retry_goal}</p>}
@@ -297,13 +354,20 @@ function InterviewBody({ id }: { id: string }) {
         onText={setText}
         onSubmit={submit}
         onSkip={() => {
+          voice.stop();
           if (text.trim()) setStorageError('请先提交或清空当前草稿，再跳过本题。');
           else act(`turns/${turn!.id}/actions`, { action: 'skip' });
         }}
         onRepeat={() => act(`turns/${turn!.id}/actions`, { action: 'repeat_question' })}
         onClarify={() => act(`turns/${turn!.id}/actions`, { action: 'clarify_question' })}
-        onPause={() => act(v.status === 'paused' ? 'resume' : 'pause', {})}
-        onFinish={() => setFinish(true)}
+        onPause={() => {
+          voice.stop();
+          act(v.status === 'paused' ? 'resume' : 'pause', {});
+        }}
+        onFinish={() => {
+          voice.stop();
+          setFinish(true);
+        }}
         onStart={v.status === 'ready' ? () => act('start', {}) : undefined}
       />
       {participation && !finish && dismissedParticipation !== participationKey && (
@@ -378,7 +442,13 @@ function InterviewBody({ id }: { id: string }) {
     </>
   );
 }
-export default function LiveInterview({ id }: { id: string }) {
+export default function LiveInterview({
+  id,
+  videoRoom = false,
+}: {
+  id: string;
+  videoRoom?: boolean;
+}) {
   const { state } = useSession();
   if (state.status !== 'signed_in')
     return (
@@ -389,5 +459,5 @@ export default function LiveInterview({ id }: { id: string }) {
         </main>
       </>
     );
-  return <InterviewBody key={`${state.session.user.id}:${id}`} id={id} />;
+  return <InterviewBody key={`${state.session.user.id}:${id}`} id={id} videoRoom={videoRoom} />;
 }
