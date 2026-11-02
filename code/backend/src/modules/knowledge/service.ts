@@ -1,9 +1,11 @@
+import { withFrontendReportReference } from '../interviews/frontend-reference';
 import { Pool } from 'pg';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import type {
+  KnowledgeQuestion,
   InterviewConfig,
   InterviewKnowledge,
   InterviewKnowledgeProvider,
@@ -270,21 +272,25 @@ export function createKnowledgeService(config: BackendConfig) {
       },
       questions: seed.questions
         .filter((q) => q.types.includes(c.interview_type))
-        .map((q) => ({
-          id: q.id,
-          topic: q.topic,
-          text: q.text,
-          intent: q.goals.join(','),
-          observation_points: q.goals.map(
-            (g) => seed.competencies.find((x) => x.id === g)!.evidence_wanted,
-          ),
-          follow_ups: [q.follow_up_trigger],
-          stages: ['internship', 'campus'],
-          difficulty: '基础',
-          source_refs: q.source_refs,
-          origin: 'platform_authored',
-          version: 1,
-        })),
+        .map(
+          (q) =>
+            ({
+              id: q.id,
+              topic: q.topic,
+              text: q.text,
+              intent: q.goals.join(','),
+              observation_points: q.goals.map(
+                (g) => seed.competencies.find((x) => x.id === g)!.evidence_wanted,
+              ),
+              follow_ups: [q.follow_up_trigger],
+              stages: ['internship', 'campus'],
+              difficulty: '基础',
+              source_refs: q.source_refs,
+              origin: 'platform_authored',
+              version: 1,
+            }) satisfies KnowledgeQuestion,
+        )
+        .map(withFrontendReportReference),
       sources: seed.sources.map((s) => ({
         id: s.id,
         title: s.title,

@@ -274,7 +274,7 @@ test('evaluation schema offers only grounded dimensions to the provider', async 
         strengths: [
           {
             text: '区分了本人和团队职责。',
-            evidence_refs: [{ turn_id: turn.id, revision: 1, quote: turn.answer_text }],
+            evidence_refs: [{ turn_id: turn.id, revision: 1, quote: 'q0' }],
           },
         ],
         gaps: [],

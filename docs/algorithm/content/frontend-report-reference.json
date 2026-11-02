@@ -1,0 +1,204 @@
+{
+  "version": "frontend-report-reference-v1",
+  "review_state": "draft",
+  "limitations": "平台编写的演示参考，未经专家校准；来源是供复核的参考链接，不表示本次已逐页核验。不是官方评分量表。",
+  "cards": [
+    {
+      "id": "fe-report-closure",
+      "topics": [
+        "闭包",
+        "词法作用域"
+      ],
+      "title": "闭包与生命周期",
+      "key_points": [
+        "闭包使函数访问其定义时的词法环境，不能简单理解为复制变量的值。",
+        "异步回调读取哪个值取决于绑定及执行时机；应结合具体代码判断。"
+      ],
+      "acceptable_alternatives": [
+        "使用工厂函数、块级绑定或框架提供的最新值访问机制，需解释适用条件。"
+      ],
+      "common_errors": [
+        "闭包必然导致内存泄漏。",
+        "所有异步回调天然读取注册时的值。"
+      ],
+      "boundary": "只有涉及资源生命周期时才要求解释监听器、订阅或定时器清理。",
+      "source_urls": [
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures"
+      ]
+    },
+    {
+      "id": "fe-report-state",
+      "topics": [
+        "状态管理",
+        "状态归属",
+        "共享状态",
+        "单一数据源"
+      ],
+      "title": "状态归属与派生数据",
+      "key_points": [
+        "需要协调的共享状态可提升到共同父组件，明确单一数据源与修改入口。",
+        "能从已有状态计算的数据通常无需重复保存；重复存储需要一致性维护。"
+      ],
+      "acceptable_alternatives": [
+        "Context、状态库、组件组合均可能合理，依据共享范围、更新频率和维护成本判断。"
+      ],
+      "common_errors": [
+        "用了全局状态库就一定更好。",
+        "所有状态都应提升到应用根节点。"
+      ],
+      "boundary": "不要求学生必须使用某个状态库；仅评价题目涉及的数据流。",
+      "source_urls": [
+        "https://react.dev/learn/sharing-state-between-components"
+      ]
+    },
+    {
+      "id": "fe-report-race",
+      "topics": [
+        "异步请求",
+        "竞态",
+        "请求取消",
+        "旧请求",
+        "请求竞态"
+      ],
+      "title": "异步请求竞态",
+      "key_points": [
+        "连续请求可能乱序返回，旧响应不能覆盖最新查询结果。",
+        "可用请求序号或失效标记约束提交；AbortController 可取消支持该信号的请求。"
+      ],
+      "acceptable_alternatives": [
+        "序号检查、effect 清理中的忽略标记、具有竞态保护的数据请求库均可接受。"
+      ],
+      "common_errors": [
+        "防抖可以保证所有响应按请求顺序返回。",
+        "取消请求后不必考虑已进入后续处理的旧结果。"
+      ],
+      "boundary": "防抖解决频率，不独自解决响应乱序；不要求同时采用所有方案。",
+      "source_urls": [
+        "https://react.dev/reference/react/useEffect#fetching-data-with-effects"
+      ]
+    },
+    {
+      "id": "fe-report-render",
+      "topics": [
+        "浏览器渲染",
+        "页面卡顿",
+        "渲染性能",
+        "性能测量"
+      ],
+      "title": "渲染性能定位与验证",
+      "key_points": [
+        "先复现并记录 Performance 等测量，区分脚本、布局、绘制及网络等瓶颈。",
+        "反复交错写样式和读布局可能触发同步布局；按测量结果选择优化。"
+      ],
+      "acceptable_alternatives": [
+        "减少长任务、批量读写、虚拟列表或减少重渲染均须对应实际瓶颈。"
+      ],
+      "common_errors": [
+        "所有卡顿都由虚拟 DOM 引起。",
+        "仅凭感觉变快即可证明优化有效。"
+      ],
+      "boundary": "比较时说明设备、数据和操作条件；没有问到具体指标时不强求背诵阈值。",
+      "source_urls": [
+        "https://web.dev/articles/avoid-large-complex-layouts-and-layout-thrashing"
+      ]
+    },
+    {
+      "id": "fe-report-cache",
+      "topics": [
+        "网络缓存",
+        "HTTP 缓存",
+        "资源版本",
+        "静态资源"
+      ],
+      "title": "缓存策略与资源更新",
+      "key_points": [
+        "带内容哈希的静态资源可以使用较长缓存期，内容变更时使用新 URL。",
+        "HTML 通常需要及时更新或重新验证；no-cache 允许存储但要求复用前验证，no-store 禁止存储。"
+      ],
+      "acceptable_alternatives": [
+        "ETag 或 Last-Modified 配合条件请求可重新验证；具体策略依发布及离线需求。"
+      ],
+      "common_errors": [
+        "no-cache 表示完全不存储。",
+        "HTML 和所有静态资源都必须使用相同的永久缓存策略。"
+      ],
+      "boundary": "区分浏览器、CDN 与 Service Worker 缓存；仅在问题涉及相应层时展开。",
+      "source_urls": [
+        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching"
+      ]
+    },
+    {
+      "id": "fe-report-a11y",
+      "topics": [
+        "可访问性",
+        "弹窗",
+        "焦点管理",
+        "键盘"
+      ],
+      "title": "弹窗键盘可访问性",
+      "key_points": [
+        "模态弹窗应有可访问名称，打开时合理移动焦点，并管理弹窗内键盘导航。",
+        "通常支持 Escape 关闭及关闭后恢复合理焦点，模态期间背景不可交互。"
+      ],
+      "acceptable_alternatives": [
+        "原生 dialog 或符合模式的组件均可接受，仍需验证名称、焦点和浏览器行为。"
+      ],
+      "common_errors": [
+        "添加 role=dialog 就自动完成键盘交互。",
+        "仅用鼠标可关闭就已满足键盘使用需求。"
+      ],
+      "boundary": "焦点初始位置取决于内容和任务；不要把所有非模态弹层强制当成模态处理。",
+      "source_urls": [
+        "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/"
+      ]
+    },
+    {
+      "id": "fe-report-components",
+      "topics": [
+        "组件设计",
+        "组件拆分",
+        "组件边界"
+      ],
+      "title": "组件职责与数据依赖",
+      "key_points": [
+        "按职责、变化原因和数据依赖划分边界，明确状态所有者和组件输入输出。",
+        "筛选条件变化可能影响页码和请求，应解释状态联动及加载、空态、错误处理。"
+      ],
+      "acceptable_alternatives": [
+        "局部组件、组合、受控组件或合理共享逻辑均可，不以文件数衡量质量。"
+      ],
+      "common_errors": [
+        "组件拆得越小越好。",
+        "任何重复代码都必须立即抽象。"
+      ],
+      "boundary": "依据具体页面复杂度判断；不要求为了简单页面引入复杂架构。",
+      "source_urls": [
+        "https://react.dev/learn/thinking-in-react"
+      ]
+    },
+    {
+      "id": "fe-report-testing",
+      "topics": [
+        "测试",
+        "表单",
+        "验证表单"
+      ],
+      "title": "表单行为与异常验证",
+      "key_points": [
+        "覆盖正常提交、必填与格式错误、服务端错误和提交中状态，验证用户可观察行为。",
+        "前端校验改善体验，不能替代服务端校验；仅截图不能覆盖异步交互和数据提交。"
+      ],
+      "acceptable_alternatives": [
+        "单元、组件、端到端及人工检查可按风险组合，不要求每层重复相同用例。"
+      ],
+      "common_errors": [
+        "前端校验通过就不需要后端校验。",
+        "快照或截图测试可以证明表单完整正确。"
+      ],
+      "boundary": "重复提交是否需要幂等取决于操作风险；可访问性及安全扩展需对应题目要求。",
+      "source_urls": [
+        "https://testing-library.com/docs/guiding-principles/"
+      ]
+    }
+  ]
+}

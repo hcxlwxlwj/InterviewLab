@@ -1,3 +1,4 @@
+import { FRONTEND_RUBRIC_VERSION } from '@interviewlab/core';
 import { randomUUID } from 'node:crypto';
 import type {
   InterviewReport,
@@ -42,6 +43,11 @@ export function createReportsService(
           report_version: version,
           turn_id: turn.id,
           revision: turn.revision,
+          scoring_rubric_version:
+            state.view.configuration.job === 'frontend' &&
+            state.view.configuration.career_stage === 'internship'
+              ? FRONTEND_RUBRIC_VERSION
+              : undefined,
           input_digest: interviewInputDigest(state),
         },
       });
@@ -121,6 +127,7 @@ export function createReportsService(
       report_version: number;
       turn_id: string;
       revision: number;
+      scoring_rubric_version?: string;
       input_digest: string;
     };
     const identity = { owner_id: task.owner_id, roles: [] };
@@ -141,6 +148,7 @@ export function createReportsService(
       (t) => t.main_question_index === turn.main_question_index,
     );
     const value = await agent.evaluate(turn, state.snapshot!, signal, task.attempts > 1, {
+      scoring_rubric_version: input.scoring_rubric_version,
       main_question: group.find((t) => t.follow_up_index === 0)?.text ?? turn.text,
       earlier_answers: group
         .filter((t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered')
@@ -364,6 +372,16 @@ export function createReportsService(
           );
           // A pending summary must finish before a new report version can invalidate its input.
           if (['pending', 'generating'].includes(row.status)) return { id };
+          if (
+            body.scope === 'rubric' &&
+            (state.view.configuration.job !== 'frontend' ||
+              state.view.configuration.career_stage !== 'internship')
+          )
+            throw new ServiceError(
+              'unsupported_input',
+              400,
+              '当前行为锚定标准只适用于前端实习岗位',
+            );
           if (body.scope === 'summary') {
             if (
               (report.summary_status === 'ready' &&
@@ -371,7 +389,12 @@ export function createReportsService(
               !report.evaluations.length
             )
               return { id };
-          } else if (!report.missing_turn_ids.length && row.status !== 'failed') return { id };
+          } else if (
+            body.scope !== 'rubric' &&
+            !report.missing_turn_ids.length &&
+            row.status !== 'failed'
+          )
+            return { id };
           const version = row.version + 1;
           const next = {
             ...report,
@@ -388,7 +411,7 @@ export function createReportsService(
               state,
               row.id,
               version,
-              report.evaluations.map((e) => e.turn_id),
+              body.scope === 'rubric' ? [] : report.evaluations.map((e) => e.turn_id),
             );
           }
           await repository.updateReport(tx.client, row.id, version, next);

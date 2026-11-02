@@ -66,7 +66,7 @@ export async function putEvaluationTask(
   taskId: string,
 ) {
   await db.query(
-    'INSERT INTO report_evaluations (id,report_id,turn_id,task_id) VALUES ($1,$2,$3,$4) ON CONFLICT(report_id,turn_id) DO UPDATE SET task_id=EXCLUDED.task_id',
+    'INSERT INTO report_evaluations (id,report_id,turn_id,task_id) VALUES ($1,$2,$3,$4) ON CONFLICT(report_id,turn_id) DO UPDATE SET task_id=EXCLUDED.task_id,result=NULL',
     [id, reportId, turnId, taskId],
   );
 }

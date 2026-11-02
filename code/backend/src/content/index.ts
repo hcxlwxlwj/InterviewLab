@@ -7,3 +7,5 @@ export const JOB_CATEGORIES = categoriesData;
 export const CONTENT_SOURCES = sourcesData as ContentSource[];
 export const { ALL_JOB_TEMPLATES, JOBS, getJob, searchJobs, localKnowledgeRetriever } =
   createJobCatalog(jobsData as JobTemplate[], CONTENT_SOURCES);
+
+export { default as frontendReportReference } from '../../../../docs/algorithm/content/frontend-report-reference.json';

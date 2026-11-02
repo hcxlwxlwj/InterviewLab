@@ -120,6 +120,8 @@ export interface InterviewFinding {
   evidence_refs: InterviewEvidence[];
 }
 export interface InterviewEvaluation {
+  scoring_rubric_version?: string;
+  indicator_assessments?: import('./report-rubric').ReportIndicatorAssessment[];
   turn_id: string;
   revision: number;
   strengths: InterviewFinding[];
@@ -143,7 +145,7 @@ export interface InterviewReportSummary {
 }
 export interface ReportRequest {
   version: number;
-  scope?: 'missing' | 'summary';
+  scope?: 'missing' | 'summary' | 'rubric';
 }
 export interface InterviewReport {
   id: string;

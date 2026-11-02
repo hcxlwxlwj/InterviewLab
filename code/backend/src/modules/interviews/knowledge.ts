@@ -1,3 +1,4 @@
+import { withFrontendReportReference } from './frontend-reference';
 import type { InterviewKnowledgeProvider } from '@interviewlab/core';
 import { getJob, localKnowledgeRetriever } from '../../content/index';
 import { ServiceError } from '../../foundation/errors';
@@ -15,7 +16,8 @@ export const localInterviewKnowledge: InterviewKnowledgeProvider = {
     });
     return {
       content_version: `${job.id}:${job.version}`,
-      questions: result.items,
+      questions:
+        config.job === 'frontend' ? result.items.map(withFrontendReportReference) : result.items,
       sources: result.sources,
       missing_reason: result.items.length ? null : '暂无适用的已发布专业题目，使用通用流程提问。',
     };

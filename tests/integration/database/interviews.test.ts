@@ -1167,3 +1167,101 @@ test('setup persists text, voice and independent video interview selection', asy
     await app.close();
   }
 });
+
+test('explicit BARS upgrade replaces only derived evaluations, preserves answers, isolates ownership and publishes new indicator scores', async () => {
+  const { FRONTEND_RUBRIC_VERSION, applicableReportIndicators } = await import(
+    '@interviewlab/core'
+  );
+  let v = await started();
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: {
+        turn_id: v.turns[0].id,
+        text: '我学习软件工程，希望通过网页交互帮助使用者。我在课程项目中练习界面实现。',
+      },
+    },
+    randomUUID(),
+  );
+  await drain();
+  const before = await runtime.reports.get(identity, v.id);
+  assert.equal(before.evaluations[0].scoring_rubric_version, undefined);
+  const saved = structuredClone((await runtime.interviews.read(identity, v.id)).turns);
+  const evaluate = agent.evaluate;
+  agent.evaluate = async (turn, snapshot, signal, repair, context) => {
+    assert.equal(context?.scoring_rubric_version, FRONTEND_RUBRIC_VERSION);
+    const base = await evaluate(turn, snapshot, signal, repair, context);
+    return {
+      ...base,
+      scoring_rubric_version: FRONTEND_RUBRIC_VERSION,
+      indicator_assessments: applicableReportIndicators(turn, snapshot).map((i) => ({
+        indicator_id: i.id,
+        status: 'scored' as const,
+        level: 3,
+        text: '受控档位，不代表真实模型校准。',
+        evidence_refs: [evidence(turn)],
+      })),
+    };
+  };
+  await assert.rejects(
+    runtime.reports.request(
+      { owner_id: 'another-student', roles: [] },
+      v.id,
+      { version: before.version, scope: 'rubric' },
+      randomUUID(),
+    ),
+    (e: unknown) => e instanceof ServiceError && e.statusCode === 404,
+  );
+  const pending = await runtime.reports.request(
+    identity,
+    v.id,
+    { version: before.version, scope: 'rubric' },
+    randomUUID(),
+  );
+  assert.equal(pending.version, before.version + 1);
+  assert.equal(pending.evaluations.length, 0);
+  assert.equal(pending.overall_score, null);
+  await drain();
+  const ready = await runtime.reports.get(identity, v.id);
+  assert.equal(ready.overall_score, 75);
+  assert.equal(ready.analysis_metadata?.scoring_rubric_version, FRONTEND_RUBRIC_VERSION);
+  assert.equal(ready.evaluations[0].indicator_assessments?.length, 2);
+  assert.deepEqual((await runtime.interviews.read(identity, v.id)).turns, saved);
+  assert.equal(
+    (
+      await database.pool.query('SELECT result FROM interview_reports WHERE interview_id=$1', [
+        v.id,
+      ])
+    ).rows[0].result.overall_score,
+    75,
+  );
+});
+
+test('BARS upgrade rejects other career stages instead of applying an internship rubric', async () => {
+  let v = await started({ ...configuration, career_stage: 'campus' });
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: v.turns[0].id, text: '我负责课程项目界面。' },
+    },
+    randomUUID(),
+  );
+  await drain();
+  const before = await runtime.reports.get(identity, v.id);
+  await assert.rejects(
+    runtime.reports.request(
+      identity,
+      v.id,
+      { version: before.version, scope: 'rubric' },
+      randomUUID(),
+    ),
+    (e: unknown) => e instanceof ServiceError && e.statusCode === 400,
+  );
+  assert.equal((await runtime.reports.get(identity, v.id)).version, before.version);
+});

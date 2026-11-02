@@ -18,6 +18,22 @@ export interface KnowledgeQuestion {
   text: string;
   intent: string;
   observation_points: string[];
+  /** Optional versioned, platform-authored reference frozen with the interview. */
+  report_reference?: {
+    version: string;
+    review_state: 'draft';
+    limitations: string;
+    cards: {
+      id: string;
+      topics: string[];
+      title: string;
+      key_points: string[];
+      acceptable_alternatives: string[];
+      common_errors: string[];
+      boundary: string;
+      source_urls: string[];
+    }[];
+  };
   follow_ups: string[];
   stages: CareerStage[];
   difficulty: '基础' | '进阶' | '挑战';
