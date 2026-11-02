@@ -124,3 +124,19 @@ export function apiEvents(path: string): EventSource {
     throw new Error('Use a relative API event path');
   return new EventSource(url.pathname + url.search);
 }
+
+/** Same-origin Cookie-authenticated voice channel, through the existing API proxy. */
+export function apiVoiceSocket(path: string): WebSocket {
+  const url = new URL('/api/v1' + path, window.location.origin);
+  if (
+    !path.startsWith('/') ||
+    path.startsWith('//') ||
+    path.includes('\\') ||
+    url.hash ||
+    url.origin !== window.location.origin ||
+    !url.pathname.startsWith('/api/v1/')
+  )
+    throw new Error('Use a relative API voice path');
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+  return new WebSocket(url);
+}

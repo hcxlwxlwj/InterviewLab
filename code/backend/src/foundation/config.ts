@@ -39,6 +39,22 @@ const environmentSchema = z.object({
   LLM_MODEL: z.string().min(1).max(200).default('ecnu-plus'),
   LLM_OUTPUT_MODE: z.enum(['json_object', 'json_schema']).default('json_object'),
   LLM_TIMEOUT_MS: z.coerce.number().int().min(100).max(45000).default(25000),
+  VOICE_ENABLED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
+  VOLC_ASR_API_KEY: z
+    .string()
+    .optional()
+    .transform((v) => v?.trim()),
+  VOLC_TTS_API_KEY: z
+    .string()
+    .optional()
+    .transform((v) => v?.trim()),
+  VOLC_ASR_RESOURCE_ID: z.string().min(1).default('volc.seedasr.sauc.duration'),
+  VOLC_TTS_RESOURCE_ID: z.string().min(1).default('seed-tts-2.0'),
+  VOLC_TTS_SPEAKER: z.string().min(1).default('zh_female_vv_uranus_bigtts'),
+  VOICE_SILENCE_MS: z.coerce.number().int().min(1200).max(6000).default(3000),
 });
 export type BackendConfig = z.infer<typeof environmentSchema>;
 export class ConfigurationError extends Error {}

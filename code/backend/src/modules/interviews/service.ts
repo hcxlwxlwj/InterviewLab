@@ -11,6 +11,7 @@ import { createGenerationStreams } from './streams';
 import { randomUUID } from 'node:crypto';
 import {
   INTERVIEW_PROMPT_VERSION,
+  INTERVIEW_MAX_ANSWER,
   INTERVIEW_RUBRIC_VERSION,
   interviewDeadline,
   interviewOpening,
@@ -558,7 +559,7 @@ export function createInterviewsService(
       identity: RequestIdentity,
       id: string,
       turnId: string,
-      body: { version: number; text: string },
+      body: { version: number; text: string; input_mode?: 'text_fallback' | 'voice' },
       key: string,
     ) =>
       mutate(identity, id, `answer.${turnId}`, key, body, async (tx, state) => {
@@ -566,8 +567,72 @@ export function createInterviewsService(
           throw invalid();
         if (!body.text.trim()) throw new ServiceError('unsupported_input', 400, '回答不能为空');
         answer(state, turnId, body.text);
+        state.view.turns.at(-1)!.input_mode = body.input_mode ?? 'text_fallback';
         await advanceAfterAnswer(tx, state);
       }),
+    interruptVoice: (
+      identity: RequestIdentity,
+      id: string,
+      body: { version: number },
+      key: string,
+    ) =>
+      mutate(identity, id, 'voice-interrupt', key, body, async (tx, state) => {
+        if (
+          state.view.status !== 'in_progress' ||
+          state.view.generation_status !== 'pending' ||
+          state.view.turns.at(-1)?.answer_status !== 'answered'
+        )
+          throw invalid();
+        await cancelInterviewTasks(tx.client, id);
+        state.view.generation_id = null;
+        state.view.generation_status = 'idle';
+        state.view.task_id = null;
+        state.generationKind = null;
+        await interviewEvent(tx.client, id, 'voice_interrupt', state.view.turns.at(-1)!.id);
+      }),
+    continueVoice: (
+      identity: RequestIdentity,
+      id: string,
+      turnId: string,
+      body: { version: number; text: string },
+      key: string,
+    ) =>
+      mutate(identity, id, `voice-continue.${turnId}`, key, body, async (tx, state) => {
+        const turn = state.view.turns.at(-1);
+        if (
+          state.view.status !== 'in_progress' ||
+          state.view.generation_status !== 'idle' ||
+          turn?.id !== turnId ||
+          turn.answer_status !== 'answered'
+        )
+          throw invalid();
+        const text = [turn.answer_text, body.text.trim()].filter(Boolean).join('\n');
+        if (text.length > INTERVIEW_MAX_ANSWER)
+          throw new ServiceError(
+            'unsupported_input',
+            400,
+            '追加后回答超过字数上限，请缩短补充内容。',
+          );
+        if (body.text.trim()) {
+          turn.answer_text = text;
+          turn.input_mode = 'voice';
+          turn.revision++;
+          turn.answered_at = new Date().toISOString();
+        }
+        await advanceAfterAnswer(tx, state);
+      }),
+    async recordVoicePlayback(
+      identity: RequestIdentity,
+      id: string,
+      turnId: string,
+      value: { speech_id: string; played_ms: number; interrupted: boolean },
+    ) {
+      await database.transaction(async (tx) => {
+        const state = await loadInterview(tx.client, identity.owner_id, id, true);
+        if (!state.view.turns.some((t) => t.id === turnId)) throw invalid();
+        await interviewEvent(tx.client, id, 'voice_playback', turnId, JSON.stringify(value));
+      });
+    },
     presented: (
       identity: RequestIdentity,
       id: string,

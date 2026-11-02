@@ -10,8 +10,10 @@ import { createReportsService } from './reports/service';
 import { interviewsModule } from './interviews/routes';
 import { reportsModule } from './reports/routes';
 import type { TaskRow } from '../tasks/service';
+import type { VoiceProvider } from './interviews/voice/volcengine';
 
 export interface InterviewRuntimeOptions {
+  voiceProvider?: VoiceProvider;
   agent?: InterviewAgent;
   knowledge?: InterviewKnowledgeProvider;
   realtimeKnowledge?: InterviewKnowledgeRuntime;
@@ -46,7 +48,10 @@ export function createInterviewRuntime(
     },
     interviews,
     reports,
-    modules: [interviewsModule(interviews), reportsModule(reports)],
+    modules: [
+      interviewsModule(interviews, { config, provider: options.voiceProvider }),
+      reportsModule(reports),
+    ],
     handlers: { ...interviews.handlers, ...reports.handlers },
     async maintain() {
       await interviews.maintain();

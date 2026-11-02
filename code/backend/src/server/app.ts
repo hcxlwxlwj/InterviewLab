@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import Fastify from 'fastify';
+import websocket from '@fastify/websocket';
 import swagger from '@fastify/swagger';
 import {
   jsonSchemaTransform,
@@ -64,6 +65,7 @@ export async function buildApp(options: ApplicationOptions = {}) {
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
   installErrorHandler(app);
+  await app.register(websocket, { options: { maxPayload: 16384 } });
   app.addHook('onRequest', async (_request, reply) => {
     reply.header('X-InterviewLab-Mode', 'backend-foundation');
     reply.header('Cache-Control', 'no-store');
@@ -93,7 +95,7 @@ export async function buildApp(options: ApplicationOptions = {}) {
     });
     const modules = [
       jobsModule(createJobsService(publicCatalogRepository)),
-      ...(interview?.modules ?? [interviewsModule(), reportsModule()]),
+      ...(interview?.modules ?? [interviewsModule(undefined, { config }), reportsModule()]),
       ...(options.modules ?? []),
     ];
     validateModules(modules);

@@ -1034,3 +1034,136 @@ test('a historical ready report can add reference scores without reevaluating an
   );
   assert.equal(reused.version, ready.version);
 });
+
+test('voice interruption fences a running Agent task, appends the same answer revision, and survives an API retry', async () => {
+  let v = await started();
+  const turnId = v.turns[0].id;
+  v = await runtime.interviews.answer(
+    identity,
+    v.id,
+    turnId,
+    { version: v.version, text: '我通过测试验证缓存。', input_mode: 'voice' },
+    randomUUID(),
+  );
+  assert.equal(v.turns[0].input_mode, 'voice');
+  const previousTask = v.task_id!;
+  let release!: () => void;
+  let entered!: () => void;
+  const reached = new Promise<void>((resolve) => {
+    entered = resolve;
+  });
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const original = agent.advance;
+  agent.advance = async (...args) => {
+    entered();
+    await gate;
+    return original(...args);
+  };
+  const executing = runTask(database, previousTask, runtime.handlers);
+  await reached;
+  const interrupted = await runtime.interviews.interruptVoice(
+    identity,
+    v.id,
+    { version: v.version },
+    randomUUID(),
+  );
+  assert.equal(interrupted.generation_status, 'idle');
+  assert.equal(interrupted.generation_id, null);
+  const body = { version: interrupted.version, text: '补充一下，我还检查了缓存命中率。' };
+  const key = randomUUID();
+  const continued = await runtime.interviews.continueVoice(identity, v.id, turnId, body, key);
+  const retried = await runtime.interviews.continueVoice(identity, v.id, turnId, body, key);
+  assert.equal(retried.version, continued.version);
+  assert.equal(continued.turns[0].revision, 2);
+  assert.equal(
+    continued.turns[0].answer_text,
+    '我通过测试验证缓存。\n补充一下，我还检查了缓存命中率。',
+  );
+  assert.notEqual(continued.task_id, previousTask);
+  release();
+  await executing;
+  agent.advance = original;
+  const current = await runtime.interviews.read(identity, v.id);
+  assert.equal(current.turns.length, 1, 'cancelled generation must not append a late question');
+  assert.equal(current.generation_id, continued.generation_id);
+  assert.equal(current.turns[0].input_mode, 'voice');
+  await drain();
+  assert.equal((await runtime.interviews.read(identity, v.id)).turns.length, 2);
+});
+
+test('voice playback is owned, version-neutral and retained as an event; continuation cannot rewrite an ordinary answered turn', async () => {
+  let v = await started();
+  const receipt = { speech_id: randomUUID(), played_ms: 450, interrupted: true };
+  await runtime.interviews.recordVoicePlayback(identity, v.id, v.turns[0].id, receipt);
+  const read = await runtime.interviews.read(identity, v.id);
+  assert.equal(read.version, v.version);
+  const events = await database.pool.query(
+    'SELECT content FROM interview_events WHERE interview_id=$1 AND type=$2',
+    [v.id, 'voice_playback'],
+  );
+  assert.deepEqual(JSON.parse(events.rows[0].content), receipt);
+  await assert.rejects(
+    runtime.interviews.recordVoicePlayback(
+      { owner_id: 'other', roles: [] },
+      v.id,
+      v.turns[0].id,
+      receipt,
+    ),
+    (e: unknown) => e instanceof ServiceError && e.statusCode === 404,
+  );
+  v = await runtime.interviews.answer(
+    identity,
+    v.id,
+    v.turns[0].id,
+    { version: v.version, text: '已保存的文字回答。' },
+    randomUUID(),
+  );
+  assert.equal(v.turns[0].input_mode, 'text_fallback');
+  await assert.rejects(
+    runtime.interviews.continueVoice(
+      identity,
+      v.id,
+      v.turns[0].id,
+      { version: v.version, text: '不可直接重写' },
+      randomUUID(),
+    ),
+    (e: unknown) => e instanceof ServiceError && e.statusCode === 409,
+  );
+});
+
+test('setup persists text, voice and independent video interview selection', async () => {
+  const app = await buildApp({
+    config,
+    database,
+    logger: false,
+    identity: { authenticate: async () => identity },
+    interview: { agent },
+  });
+  try {
+    for (const mode of ['realtime_voice', 'text_fallback', 'realtime_video'] as const) {
+      const created = await app.inject({
+        method: 'POST',
+        url: '/api/v1/interviews',
+        headers: { origin: config.PUBLIC_ORIGIN, 'idempotency-key': randomUUID() },
+        payload: { ...configuration, interaction_mode: mode },
+      });
+      assert.equal(created.statusCode, 201);
+      const value = created.json<Interview>();
+      const read = await app.inject(`/api/v1/interviews/${value.id}`);
+      assert.equal(read.statusCode, 200);
+      assert.equal(read.json<Interview>().configuration.interaction_mode, mode);
+      const started = await app.inject({
+        method: 'POST',
+        url: `/api/v1/interviews/${value.id}/start`,
+        headers: { origin: config.PUBLIC_ORIGIN, 'idempotency-key': randomUUID() },
+        payload: { version: value.version },
+      });
+      assert.ok([200, 202].includes(started.statusCode));
+      assert.equal(started.json<Interview>().configuration.interaction_mode, mode);
+    }
+  } finally {
+    await app.close();
+  }
+});

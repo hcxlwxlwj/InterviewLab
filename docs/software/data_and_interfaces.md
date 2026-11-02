@@ -356,3 +356,7 @@ owner_id 使用认证模块 AuthUser.id，不信任客户端输入。公共任�
 任务 enqueueTask 接收业务事务，业务写入、tasks 和 outbox 一起提交。投递在独立事务领取 outbox，使用 FOR UPDATE SKIP LOCKED；队列不可用保留已提交任务，重投可能重复。外部调用不在业务事务里；runner 使用执行 token/60 秒租约，先调用处理器，再在短事务校验并执行结果 commit。处理器仍须检查本模块的输入版本、删除和 generation。默认最多两次实际执行（可配置 1–5），不保证外部请求严格只调用一次。
 
 InternalEvent 定义事件 ID/type/schema_version、归属、资源版本、时间、request_id 和 payload，供跨模块合同使用；具体事件生产者与消费者随业务模块添加。资料删除、派生失效和关联清理按前文规则实现，骨架没有宣称这些业务已经可用。
+
+## 实时语音开发分支接口补充
+
+2026-11-01：语音 capability、同源 WebSocket、补充回答命令及 input_mode 迁移见[实时语音面试接入](voice-interview.md)。语音仍调用相同面试服务，回答保存为原文与 revision，不保存原始录音；真实效果尚待验收。

@@ -35,13 +35,15 @@
     "knowledge": "tsx code/backend/src/modules/knowledge/command.ts",
     "test:latency": "tsx tests/support/model-latency.ts",
     "test:knowledge": "tsx tests/support/knowledge-evaluation.ts",
-    "test:realtime": "tsx tests/support/interview-realtime-smoke.ts"
+    "test:realtime": "tsx tests/support/interview-realtime-smoke.ts",
+    "voice:check": "tsx tests/support/voice-provider-smoke.ts"
   },
   "devDependencies": {
-    "drizzle-kit": "0.31.11",
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/ws": "^8.18.2",
+    "drizzle-kit": "0.31.11",
     "prettier": "3.6.2",
     "tsx": "^4.20.0",
     "typescript": "^5.9.3"

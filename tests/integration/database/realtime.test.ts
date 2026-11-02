@@ -11,6 +11,10 @@ import { readKnowledgeSeed } from '../../../code/backend/src/modules/knowledge/s
 import { buildApp } from '../../../code/backend/src/server/app';
 import { runTask } from '../../../code/backend/src/tasks/runner';
 import { loadInterview } from '../../../code/backend/src/modules/interviews/repository';
+import type { InterviewRuntimeOptions } from '../../../code/backend/src/modules/interview-runtime';
+import type { InterviewKnowledgeRuntime } from '@interviewlab/core';
+import { InterviewVoiceSession } from '../../../code/backend/src/modules/interviews/voice/session';
+import { voiceFixture, waitFor } from '../../support/voice-fixture';
 import type { InterviewConfig, InterviewKnowledge } from '@interviewlab/core';
 dotenv({ quiet: true });
 const url = process.env.TEST_DATABASE_URL;
@@ -57,7 +61,8 @@ after(async () => database?.close());
 beforeEach(async () => {
   await database.pool.query('TRUNCATE interviews,tasks,idempotency_records CASCADE');
 });
-function runtime(blocked = false) {
+function runtime(blocked = false, extra: InterviewRuntimeOptions = {}) {
+  const modelInputs: unknown[] = [];
   let release = () => {};
   const gate = new Promise<void>((r) => (release = r));
   let reached = () => {};
@@ -68,6 +73,7 @@ function runtime(blocked = false) {
     () => {},
     async (_url, init) => {
       const body = JSON.parse(init!.body as string);
+      modelInputs.push(body);
       assert.equal(body.stream, true);
       const raw = JSON.stringify({
         a: 'f',
@@ -109,12 +115,18 @@ function runtime(blocked = false) {
       return response;
     },
   );
-  const options = { agent, knowledge: { read: async () => knowledge }, onFinalize: async () => {} };
+  const options = {
+    agent,
+    knowledge: { read: async () => knowledge },
+    onFinalize: async () => {},
+    ...extra,
+  };
   return {
     value: createInterviewRuntime(database, config, options),
     options,
     release,
     previewReady,
+    modelInputs,
   };
 }
 async function ready(r: ReturnType<typeof runtime>) {
@@ -317,6 +329,82 @@ test('a substantive answer clears the warning and returns to the existing model 
     assert.equal(v.participation, null);
     assert.equal(v.status, 'in_progress');
   } finally {
+    await r.value.close();
+  }
+});
+
+test('voice answers use our existing knowledge runtime and pass its retrieved content to the original Agent', async () => {
+  const marker = 'controlled-private-course-cache-reference';
+  const answer =
+    '我在课程中做了一个校园二手交易网站，用于让同学发布和购买二手物品。我负责前端商品列表页面，使用 React 实现分页和缓存，并通过测试验证缓存命中率。';
+  const retrievedFor: string[] = [];
+  const chunk = {
+    id: marker,
+    card_id: marker,
+    release: knowledge.content_version,
+    text: '本项目知识库：缓存验证需比较命中率、正确性与失效条件。',
+    source_refs: ['course-owned-source'],
+    goals: ['verification'],
+    types: ['technical_qa' as const],
+  };
+  const ownKnowledge: InterviewKnowledgeRuntime = {
+    enabled: true,
+    read: async () => knowledge,
+    profiles: async () => ({
+      version: knowledge.content_version,
+      default_type: 'technical_qa',
+      profiles: [knowledge.agent_release!.profile],
+    }),
+    prefetch() {},
+    async context(_configuration, snapshot, _memory, text) {
+      assert.equal(snapshot.content_version, knowledge.content_version);
+      retrievedFor.push(text);
+      return {
+        release: knowledge.content_version,
+        chunks: [chunk],
+        mode: 'supplemental',
+        missing_reason: null,
+      };
+    },
+  };
+  const r = runtime(false, { realtimeKnowledge: ownKnowledge });
+  const f = voiceFixture();
+  let session: InterviewVoiceSession | undefined;
+  try {
+    let v = await r.value.interviews.create(owner, configuration, crypto.randomUUID());
+    v = await r.value.interviews.start(owner, v.id, { version: v.version }, crypto.randomUUID());
+    session = new InterviewVoiceSession(
+      v.id,
+      async () => owner,
+      r.value.interviews,
+      f.provider,
+      30,
+      (event) => f.events.push(event),
+      () => {},
+    );
+    await session.start();
+    session.control({ type: 'speech_start' });
+    f.recognize({ text: answer, final: true });
+    session.control({ type: 'speech_end' });
+    await waitFor(() =>
+      f.events.some((e) => e.type === 'interview' && e.interview.generation_status === 'pending'),
+    );
+    session.close();
+    v = await r.value.interviews.read(owner, v.id);
+    assert.equal(v.turns[0].input_mode, 'voice');
+    assert.equal(v.turns[0].answer_text, answer);
+    await runTask(database, v.task_id!, r.value.handlers);
+    assert.deepEqual(retrievedFor, [answer]);
+    assert.ok(
+      JSON.stringify(r.modelInputs).includes(marker),
+      'our knowledge must reach the original LLM request',
+    );
+    v = await r.value.interviews.read(owner, v.id);
+    assert.equal(v.generation_status, 'ready');
+    const state = await loadInterview(database.pool, owner.owner_id, v.id);
+    assert.equal(state.retrievals?.[v.turns.at(-1)!.id].chunks[0].id, marker);
+  } finally {
+    session?.close();
     await r.value.close();
   }
 });

@@ -190,3 +190,7 @@ test:web 启动真实 Next.js 生产代理和测试 API，验证 Cookie 往返�
 采用[上游问题讨论中的临时方案](https://github.com/drizzle-team/drizzle-orm/issues/4852)：保持 drizzle-kit 0.31.11 稳定版，将废弃的 @esbuild-kit/esm-loader 通过根 overrides 替换为现有维护中的 tsx 4.23.15，移除 core-utils 与 esbuild 0.18.20 依赖链。drizzle-kit 作为全项目迁移工具统一放在根 devDependencies，使本仓库 npm 11 的覆盖规则和依赖树检查正常工作；原 db:generate 命令不变。
 
 该兼容覆盖固定版本，未来升级迁移工具时应重新验证。上游稳定版移除旧加载器后，可删除 overrides，并通过 npm ci、npm audit、迁移生成及构建测试确认。没有使用 audit 忽略规则或将依赖降级到旧工具链。
+
+## 实时语音开发
+
+`feature/voice-interview` 在面试模块内增加同源 Cookie 鉴权的 WebSocket 语音入口，复用原 Agent 和事务/任务规则。新增迁移记录回答输入方式；语音 ASR/TTS 密钥均只在后端配置。配置和验收边界见[实时语音面试接入](../../docs/software/voice-interview.md)。

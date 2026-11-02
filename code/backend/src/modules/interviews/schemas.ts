@@ -20,7 +20,7 @@ export const interviewConfigSchema = z
     difficulty: z.literal('基础'),
     duration_minutes: z.union([z.literal(5), z.literal(10)]),
     interviewer_style: z.enum(['标准', '友好', '深入追问']),
-    interaction_mode: z.literal('text_fallback'),
+    interaction_mode: z.enum(['text_fallback', 'realtime_voice', 'realtime_video']),
   })
   .strict() satisfies z.ZodType<InterviewConfig>;
 export const versionBody = z.object({ version: z.number().int().positive() }).strict();
@@ -29,7 +29,10 @@ export const textAnswer = z
   .min(1)
   .max(INTERVIEW_MAX_ANSWER)
   .refine((s) => Boolean(s.trim()), '回答不能为空');
-export const answerBody = versionBody.extend({ text: textAnswer });
+export const answerBody = versionBody.extend({
+  text: textAnswer,
+  input_mode: z.enum(['text_fallback', 'voice']).optional(),
+});
 export const actionBody = versionBody.extend({
   action: z.enum(['skip', 'repeat_question', 'clarify_question']),
 });
@@ -76,7 +79,7 @@ export const turnSchema = z.object({
   answer_status: z.enum(['waiting', 'answered', 'skipped']),
   answer_text: z.string().nullable(),
   revision: z.number().int(),
-  input_mode: z.literal('text_fallback'),
+  input_mode: z.enum(['text_fallback', 'voice']),
   answered_at: z.string().nullable(),
 });
 export const interviewSchema = z.object({
