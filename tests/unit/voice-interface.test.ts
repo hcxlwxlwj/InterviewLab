@@ -103,6 +103,8 @@ test('video room renders a separate call layout without acquiring camera or repl
   );
   assert.match(html, /独立视频面试房间/);
   assert.match(html, /video-room-sidebar/);
+  assert.match(html, /interviewer-portrait-mouth/);
+  assert.match(html, /数字人 · 中文男声/);
   assert.match(html, /开启摄像头/);
   assert.match(html, /共享屏幕/);
   assert.match(html, /摄像头未开启/);

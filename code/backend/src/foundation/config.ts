@@ -53,7 +53,7 @@ const environmentSchema = z.object({
     .transform((v) => v?.trim()),
   VOLC_ASR_RESOURCE_ID: z.string().min(1).default('volc.seedasr.sauc.duration'),
   VOLC_TTS_RESOURCE_ID: z.string().min(1).default('seed-tts-2.0'),
-  VOLC_TTS_SPEAKER: z.string().min(1).default('zh_female_vv_uranus_bigtts'),
+  VOLC_TTS_SPEAKER: z.string().min(1).default('zh_male_m191_uranus_bigtts'),
   VOICE_SILENCE_MS: z.coerce.number().int().min(1200).max(6000).default(3000),
 });
 export type BackendConfig = z.infer<typeof environmentSchema>;

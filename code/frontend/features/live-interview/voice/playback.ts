@@ -3,7 +3,7 @@ export class VoicePlayback {
   private current?: {
     id: string;
     sources: Set<AudioBufferSourceNode>;
-    segments: { start: number; duration: number }[];
+    segments: { start: number; duration: number; levels: number[] }[];
     sealed: boolean;
   };
   private nextTime = 0;
@@ -34,7 +34,14 @@ export class VoicePlayback {
     source.buffer = audio;
     source.connect(this.context.destination);
     clip.sources.add(source);
-    clip.segments.push({ start, duration: audio.duration });
+    const levels: number[] = [];
+    for (let offset = 0; offset < channel.length; offset += 480) {
+      const end = Math.min(channel.length, offset + 480);
+      let power = 0;
+      for (let i = offset; i < end; i++) power += channel[i] ** 2;
+      levels.push(Math.min(1, Math.sqrt(power / (end - offset)) * 5));
+    }
+    clip.segments.push({ start, duration: audio.duration, levels });
     source.onended = () => {
       source.disconnect();
       clip.sources.delete(source);
@@ -42,6 +49,14 @@ export class VoicePlayback {
     };
     source.start(start);
     this.nextTime = start + audio.duration;
+  }
+  /** Read the currently audible envelope, not queued/network audio. */
+  getLevel() {
+    const now = this.context.currentTime;
+    const segment = this.current?.segments.find(
+      (s) => now >= s.start && now < s.start + s.duration,
+    );
+    return segment?.levels[Math.floor((now - segment.start) / 0.02)] ?? 0;
   }
   finish(id: string) {
     if (this.current?.id !== id) return;
