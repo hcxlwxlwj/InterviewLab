@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { randomUUID } from 'node:crypto';
 import {
   evidenceMatches,
+  FEEDBACK_DIMENSIONS,
   INTERVIEW_PROMPT_VERSION,
   interviewConversationHistory,
   canSuggestInterviewFinish,
@@ -343,6 +344,9 @@ export function createInterviewAgent(
         schema,
         {
           configuration: interview.configuration,
+          feedback_dimensions: FEEDBACK_DIMENSIONS.map((d) => d.short),
+          coverage_instructions:
+            '面试必须主动覆盖全部六个反馈维度，阅读完整历史识别尚缺的证据，下一题优先补充一项。项目理解问目标、本人职责与决策；逻辑思维问分析依据；岗位匹配度问岗位理解、相关准备；综合素质问具体的主动学习、反馈改进或协作行动；专业基础问岗位相关原理，表达沟通贯穿回答。不要过早结束，不反复问已答内容；尊重拒绝，用户提前结束或时间到时不强迫继续。',
           plan: interview.plan,
           history,
           knowledge: snapshot.knowledge,

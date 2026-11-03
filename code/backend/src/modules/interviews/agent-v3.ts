@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import {
   INTERVIEW_V3,
+  missingFeedbackDimensions,
+  FEEDBACK_INTERVIEW_GOALS,
   evidenceMatches,
   canSuggestInterviewFinish,
   type InterviewMemory,
@@ -61,8 +63,16 @@ export function withRealtimeAgent(
         const grounding = experiencePolicy(interview);
         const knowledgeChunks = knowledgeReady(grounding) ? context.retrieval.chunks : [];
         usedChunks = knowledgeChunks;
+        const missingFeedback = missingFeedbackDimensions(
+          context.memory,
+          interview.turns.some((t) => t.answer_status === 'answered'),
+        );
+        const hasCoverageTime =
+          last.main_question_index < 6 &&
+          (!interview.target_at || Date.parse(interview.target_at) - Date.now() > 30000);
         const canFinish =
           canSuggestInterviewFinish(interview) &&
+          (!hasCoverageTime || missingFeedback.length === 0) &&
           !preparingBackground(grounding) &&
           grounding.actual_discussion_started;
         const sourceOptions = [...new Set(knowledgeChunks.flatMap((c) => c.source_refs))];
@@ -128,6 +138,13 @@ export function withRealtimeAgent(
               !(g === 'understanding' && blocked.has('technical')),
           );
           if (!goalOptions.length) goalOptions = ['business'];
+        }
+        if (!preparingBackground(grounding) && grounding.next_step !== 'topic_transition') {
+          const missingGoals = missingFeedback.flatMap((d) => [...FEEDBACK_INTERVIEW_GOALS[d.key]]);
+          const priorityGoals = goalOptions.filter((g) =>
+            missingGoals.includes(g as (typeof missingGoals)[number]),
+          );
+          if (priorityGoals.length) goalOptions = priorityGoals;
         }
         const maxAnchor = Math.max(0, anchors.length - 1),
           maxSource = Math.max(0, sourceOptions.length - 1);
@@ -230,6 +247,12 @@ ${repair ? '上次未通过校验；检查下标、引用、题数与重复，�
                     missing_reason: context.retrieval.missing_reason,
                     source_options: sourceOptions,
                     anchors,
+                    required_feedback_coverage: missingFeedback.map((d) => ({
+                      dimension: d.short,
+                      goals: FEEDBACK_INTERVIEW_GOALS[d.key],
+                    })),
+                    coverage_instructions:
+                      '必须主动覆盖六维：专业基础、项目理解、逻辑思维、表达沟通、岗位匹配度、综合素质。required_feedback_coverage 为尚缺可观察回答的维度，优先选择其中一个，沿真实经历自然提问；项目理解问目标/职责/决策，逻辑思维问分析依据，岗位匹配度问岗位理解与准备，综合素质问一次主动学习或接收反馈的实际行动。专业基础只问岗位相关且符合候选人背景的问题。表达沟通贯穿回答，不单独考查声音。每次只问一个信息点；尊重拒绝边界，不重复逼问。覆盖尚缺时不要主动提前结束。',
                     current_question: last.text,
                     current_purpose: last.purpose,
                     current_answer: last.answer_text,

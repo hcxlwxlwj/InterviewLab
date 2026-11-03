@@ -1,4 +1,4 @@
-import { FRONTEND_RUBRIC_VERSION } from '@interviewlab/core';
+import { FRONTEND_RUBRIC_VERSION, FEEDBACK_TEMPLATE_VERSION } from '@interviewlab/core';
 import { randomUUID } from 'node:crypto';
 import type {
   InterviewReport,
@@ -385,6 +385,7 @@ export function createReportsService(
           if (body.scope === 'summary') {
             if (
               (report.summary_status === 'ready' &&
+                report.summary?.feedback_template?.version === FEEDBACK_TEMPLATE_VERSION &&
                 report.summary?.dimension_assessments !== undefined) ||
               !report.evaluations.length
             )

@@ -136,6 +136,7 @@ export interface InterviewDimensionAssessment extends InterviewFinding {
   level: 0 | 1 | 2 | 3 | 4;
 }
 export interface InterviewReportSummary {
+  feedback_template?: import('./feedback-template').FeedbackTemplate;
   /** Optional on historical reports; levels are AI estimates, not calibrated scores. */
   dimension_assessments?: InterviewDimensionAssessment[];
   overview: InterviewFinding;

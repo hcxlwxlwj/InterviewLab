@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: interviewlab_local
       POSTGRES_DB: interviewlab
     ports:
-      - "127.0.0.1:5433:5432"
+      - "127.0.0.1:5434:5432"
     volumes:
       - interviewlab_postgres:/var/lib/postgresql/data
     healthcheck:
@@ -21,7 +21,7 @@ services:
       POSTGRES_PASSWORD: interviewlab_local
       POSTGRES_DB: interviewlab_knowledge
     ports:
-      - "127.0.0.1:5434:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - interviewlab_knowledge:/var/lib/postgresql/data
     healthcheck:
