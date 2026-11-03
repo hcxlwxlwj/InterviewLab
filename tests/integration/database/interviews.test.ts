@@ -8,6 +8,7 @@ import type {
   InterviewQuestion,
   InterviewTurn,
 } from '@interviewlab/core';
+import { FEEDBACK_DIMENSIONS, FEEDBACK_TEMPLATE_VERSION } from '@interviewlab/core';
 import { loadConfig } from '../../../code/backend/src/foundation/config';
 import { createDatabase, type Database } from '../../../code/backend/src/database/connection';
 import { migrateDatabase } from '../../../code/backend/src/database/migrate';
@@ -997,12 +998,24 @@ test('a historical ready report can add reference scores without reevaluating an
   await drain();
   const before = await runtime.reports.get(identity, v.id);
   assert.equal(before.overall_score, null);
+  assert.equal(before.summary?.feedback_template, undefined);
   const summarize = agent.summarize;
   agent.evaluate = async () => {
     throw new Error('summary upgrade must not reevaluate answers');
   };
   agent.summarize = async (...args) => ({
     ...(await summarize(...args)),
+    feedback_template: {
+      version: FEEDBACK_TEMPLATE_VERSION,
+      assessments: FEEDBACK_DIMENSIONS.map((d) => ({
+        dimension: d.key,
+        score: d.key === 'communication' ? 75 : null,
+        text: d.key === 'communication' ? '回答包含可定位的个人陈述。' : '本次未覆盖此维度。',
+        evidence_refs: d.key === 'communication' ? args[0][0].strengths[0].evidence_refs : [],
+      })),
+      action_plan: [],
+      next_expectation: '下次补充验证过程及适用条件。',
+    },
     dimension_assessments: [
       {
         ...args[0][0].strengths[0],
@@ -1019,6 +1032,8 @@ test('a historical ready report can add reference scores without reevaluating an
   );
   await drain();
   const ready = await runtime.reports.get(identity, v.id);
+  assert.equal(ready.version, before.version + 1);
+  assert.equal(ready.summary?.feedback_template?.version, FEEDBACK_TEMPLATE_VERSION);
   assert.equal(ready.overall_score, 75);
   assert.equal(ready.scoring_status, 'experimental');
   assert.equal(ready.dimensions.coding_ability.score, null);
@@ -1033,6 +1048,7 @@ test('a historical ready report can add reference scores without reevaluating an
     randomUUID(),
   );
   assert.equal(reused.version, ready.version);
+  assert.deepEqual(reused.task_ids, ready.task_ids);
 });
 
 test('voice interruption fences a running Agent task, appends the same answer revision, and survives an API retry', async () => {
