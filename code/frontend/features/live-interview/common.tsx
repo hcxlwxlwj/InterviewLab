@@ -62,9 +62,12 @@ export function ErrorNotice({ message, retry }: { message: string; retry?: () =>
 export function useLiveResource<T>(
   load: (signal: AbortSignal) => Promise<T>,
   pending: (value: T) => boolean,
+  options: { retryReadErrors?: boolean } = {},
 ) {
   const [value, setValue] = useState<T | null>(null);
   const [error, setError] = useState('');
+  const [readAttempt, setReadAttempt] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
   const sequence = useRef(0);
   const active = useRef<AbortController | null>(null);
   const pendingState = value !== null && pending(value);
@@ -72,6 +75,7 @@ export function useLiveResource<T>(
   pendingRef.current = pending;
   const refresh = useCallback(async () => {
     const seq = ++sequence.current;
+    setRefreshing(true);
     active.current?.abort();
     const controller = new AbortController();
     active.current = controller;
@@ -80,10 +84,15 @@ export function useLiveResource<T>(
       if (seq === sequence.current) {
         setValue(next);
         setError('');
+        setReadAttempt(0);
       }
     } catch (e) {
-      if (!controller.signal.aborted && seq === sequence.current)
+      if (!controller.signal.aborted && seq === sequence.current) {
+        setReadAttempt((n) => n + 1);
         setError(e instanceof Error ? e.message : '读取失败');
+      }
+    } finally {
+      if (seq === sequence.current) setRefreshing(false);
     }
   }, [load]);
   const accept = useCallback((next: T) => {
@@ -91,6 +100,8 @@ export function useLiveResource<T>(
     active.current?.abort();
     setValue(next);
     setError('');
+    setReadAttempt(0);
+    setRefreshing(false);
   }, []);
   useEffect(() => {
     setValue(null);
@@ -101,16 +112,20 @@ export function useLiveResource<T>(
     };
   }, [refresh]);
   useEffect(() => {
-    if (!value || error || !pendingRef.current(value)) return;
-    const timer = setTimeout(() => void refresh(), 1000);
+    const retryError = Boolean(error && options.retryReadErrors && readAttempt <= 5);
+    if (error ? !retryError : !value || !pendingRef.current(value)) return;
+    const timer = setTimeout(
+      () => void refresh(),
+      retryError ? Math.min(1000 * 2 ** readAttempt, 10000) : 1000,
+    );
     return () => clearTimeout(timer);
-  }, [value, error, refresh, pendingState]);
+  }, [value, error, refresh, pendingState, readAttempt, options.retryReadErrors]);
   useEffect(() => {
     const focus = () => void refresh();
     window.addEventListener('focus', focus);
     return () => window.removeEventListener('focus', focus);
   }, [refresh]);
-  return { value, error, refresh, accept };
+  return { value, error, refresh, accept, refreshing };
 }
 /** Retains the exact request and idempotency key after an ambiguous transport failure. */
 export function useLiveCommand(onConflict?: () => void) {

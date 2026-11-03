@@ -5,7 +5,11 @@ import type {
   InterviewSnapshot,
   InterviewEvaluation,
 } from '@interviewlab/core';
-import { FRONTEND_RUBRIC_VERSION, aggregateIndicatorScores } from '@interviewlab/core';
+import {
+  FRONTEND_RUBRIC_VERSION,
+  aggregateIndicatorScores,
+  feedbackScore,
+} from '@interviewlab/core';
 import { inputDigest } from '../../foundation/idempotency';
 import { REPORT_PROMPT_VERSION, REPORT_SCHEMA_VERSION, SCORING_RUBRIC_VERSION } from './analysis';
 export interface EvaluationTask {
@@ -205,6 +209,10 @@ export function aggregateReport(
           ? FRONTEND_RUBRIC_VERSION
           : SCORING_RUBRIC_VERSION,
       };
+  }
+  if (report.summary?.feedback_template) {
+    report.overall_score = feedbackScore(report.summary.feedback_template).score;
+    report.scoring_status = 'experimental';
   }
   return report;
 }

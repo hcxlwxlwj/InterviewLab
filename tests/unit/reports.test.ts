@@ -270,7 +270,7 @@ test('summary uses the shared model adapter with checked evaluations and records
       ],
     },
   );
-  assert.equal((logs[0] as { prompt_version: string }).prompt_version, 'text-review-v5');
+  assert.equal((logs[0] as { prompt_version: string }).prompt_version, 'text-review-v6');
 });
 
 test('AI reference scores use explicit evidence levels and equal-weight averaging, excluding unobserved skills', () => {
@@ -459,4 +459,126 @@ test('PDF print snapshot includes partial state, scores, full answers and safely
   assert.ok(html.includes('&lt;img src=x onerror=alert(2)&gt; &amp; 回答'));
   assert.ok(!html.includes('<script>'));
   assert.ok(!html.includes('<img'));
+});
+
+test('six-dimension template uses the scoring sheet weights and normalizes observed weights without filling missing dimensions with zero', async () => {
+  const { FEEDBACK_DIMENSIONS, FEEDBACK_TEMPLATE_VERSION, feedbackScore } = await import(
+    '@interviewlab/core'
+  );
+  const { summary, evaluation } = fixture();
+  assert.deepEqual(
+    FEEDBACK_DIMENSIONS.map((d) => d.weight),
+    [25, 25, 25, 15, 5, 5],
+  );
+  const template: import('@interviewlab/core').FeedbackTemplate = {
+    version: FEEDBACK_TEMPLATE_VERSION,
+    assessments: FEEDBACK_DIMENSIONS.map((d, i) => ({
+      dimension: d.key,
+      score: [80, 80, 60, 100, 80, 100][i],
+      text: '依据具体行为',
+      evidence_refs: evaluation.strengths[0].evidence_refs,
+    })),
+    action_plan: [],
+    next_expectation: '下次明确个人职责与验证方式',
+  };
+  assert.deepEqual(feedbackScore(template), { coverage: 100, score: 79 });
+  template.assessments[0] = {
+    ...template.assessments[0],
+    score: null,
+    evidence_refs: [],
+  };
+  assert.deepEqual(feedbackScore(template), { coverage: 75, score: 79 });
+  summary.feedback_template = template;
+  assert.doesNotThrow(() => assertSummary(summary, [evaluation]));
+  assert.ok(
+    reportSchema.safeParse({ ...emptyReport(fixture().state, randomUUID()), summary }).success,
+  );
+  const fabricated = structuredClone(summary);
+  fabricated.feedback_template!.assessments[1].evidence_refs[0].quote = '没有这段话';
+  assert.throws(() => assertSummary(fabricated, [evaluation]));
+  const duplicate = structuredClone(summary);
+  duplicate.feedback_template!.assessments[5] = duplicate.feedback_template!.assessments[4];
+  assert.throws(() => assertSummary(duplicate, [evaluation]));
+  const missingEvidence = structuredClone(summary);
+  missingEvidence.feedback_template!.assessments[2].evidence_refs = [];
+  assert.throws(() => assertSummary(missingEvidence, [evaluation]));
+  const inventedAction = structuredClone(summary);
+  inventedAction.feedback_template!.action_plan.push({
+    horizon: 'short_term',
+    turn_id: 'unrelated',
+    action: '补充验证',
+    acceptance: '说明验证步骤',
+  });
+  assert.throws(() => assertSummary(inventedAction, [evaluation]));
+});
+
+test('template model scores resolve checked quote IDs and preserve actionable acceptance criteria', async () => {
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { FEEDBACK_DIMENSIONS, FEEDBACK_TEMPLATE_VERSION } = await import('@interviewlab/core');
+  const { evaluation, state, task } = fixture();
+  const analysis = createReportAnalysis(async (_kind, schema, input) => {
+    assert.deepEqual(
+      (input as { feedback_standard: { dimensions: unknown } }).feedback_standard.dimensions,
+      FEEDBACK_DIMENSIONS,
+    );
+    return schema.parse({
+      overview: { text: '职责已说明，验证待补充', evidence_ids: ['e0-s0-0'] },
+      strengths: [{ text: '说明本人职责', evidence_ids: ['e0-s0-0'] }],
+      improvements: [
+        { text: '补充验证步骤', turn_id: evaluation.turn_id, evidence_ids: ['e0-g0-0'] },
+      ],
+      dimension_assessments: {
+        technical_knowledge: null,
+        project_communication: { level: 2, text: '职责清楚，验证待补充' },
+        logical_expression: null,
+      },
+      feedback_template: {
+        version: FEEDBACK_TEMPLATE_VERSION,
+        assessments: FEEDBACK_DIMENSIONS.map((d) => ({
+          dimension: d.key,
+          score: d.key === 'project_reflection' ? 70 : null,
+          text: d.key === 'project_reflection' ? '职责清楚，缺验证' : '未问到此维度',
+          evidence_ids: d.key === 'project_reflection' ? ['e0-s0-0'] : [],
+        })),
+        action_plan: [
+          {
+            horizon: 'short_term',
+            turn_id: evaluation.turn_id,
+            action: '一周内整理本人执行的验证步骤',
+            acceptance: '重练时清楚说明一项检查方法与结果',
+          },
+        ],
+        next_expectation: '下次用具体检查结果支撑项目陈述',
+      },
+      limitations: [],
+    });
+  });
+  const summary = await analysis.summarize(
+    [evaluation],
+    snapshot,
+    new AbortController().signal,
+    false,
+  );
+  assert.deepEqual(
+    summary.feedback_template!.assessments[1].evidence_refs,
+    evaluation.strengths[0].evidence_refs,
+  );
+  assert.equal(
+    summary.feedback_template!.action_plan[0].acceptance,
+    '重练时清楚说明一项检查方法与结果',
+  );
+  const report = aggregateReport(
+    state,
+    { ...emptyReport(state, randomUUID()), summary, summary_status: 'ready' },
+    [task],
+  );
+  assert.equal(report.overall_score, 70);
+  assert.ok(reportSchema.safeParse(report).success);
+  const { reportExportHtml } = await import(
+    '../../code/frontend/features/live-interview/report-export'
+  );
+  const html = reportExportHtml(state.view, report);
+  assert.ok(html.includes('17.5 / 25'));
+  assert.ok(html.includes('验收方式'));
+  assert.ok(html.includes('六、下一步期待'));
 });

@@ -1,4 +1,6 @@
 import {
+  FEEDBACK_DIMENSIONS,
+  feedbackScore,
   DIMENSION_LABELS,
   REPORT_INDICATORS,
   REPORT_RUBRIC,
@@ -26,6 +28,17 @@ const findings = (items: InterviewFinding[]) =>
 export function reportExportHtml(interview: Interview, report: InterviewReport): string {
   const progress = report.analysis_progress;
   const summary = report.summary;
+  const feedback = summary?.feedback_template;
+  const templateTotal = feedbackScore(feedback);
+  const templateHtml = `<h2>五、评分汇总</h2><table><thead><tr><th>评价维度</th><th>权重</th><th>得分</th><th>具体行为依据</th></tr></thead><tbody>${FEEDBACK_DIMENSIONS.map(
+    (d) => {
+      const a = feedback?.assessments.find((a) => a.dimension === d.key);
+      return `<tr><td>${escape(d.label)}</td><td>${d.weight}</td><td>${a?.score == null ? '未评价' : `${Math.round(((a.score * d.weight) / 100) * 10) / 10} / ${d.weight}`}</td><td>${escape(a?.text ?? '历史报告尚未按此模板评价')}${a?.evidence_refs.map((r) => `<blockquote>回答 v${r.revision}：“${escape(r.quote)}”</blockquote>`).join('') ?? ''}</td></tr>`;
+    },
+  ).join(
+    '',
+  )}</tbody></table><p>综合分：${templateTotal.score === null ? `暂不计算（已评价权重 ${templateTotal.coverage}/100）` : `${templateTotal.score}/100（已评价权重 ${templateTotal.coverage}/100，按已评价权重归一化）`}。未评价项不补零。</p>`;
+
   return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>${escape(interview.job_title)} · 面试复盘报告</title><style>
   @page { size: A4; margin: 18mm; }
   * { box-sizing: border-box; } body { color: #202b46; font: 11pt/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; margin: 0; }
@@ -36,7 +49,13 @@ export function reportExportHtml(interview: Interview, report: InterviewReport):
   </style></head><body><header><p>InterviewLab · 面试练习室</p><h1>${escape(interview.job_title)}<br>面试复盘报告</h1><p>结束时间：${escape(interview.ended_at ? new Date(interview.ended_at).toLocaleString('zh-CN') : '未记录')} · 报告版本 ${report.version}</p></header>
   <p class="notice">基于本场回答的 AI 辅助复盘。参考评分未经人工校准，不代表招聘结论。${report.is_partial ? '本报告为部分复盘，仅反映已完成的分析。' : ''}</p>
   <p>${progress ? `有效回答 ${progress.total} 题 · 已分析 ${progress.completed} 题 · 待处理 ${progress.pending} 题 · 失败 ${progress.failed} 题` : escape(report.coverage)}</p>
-  <h2>AI 参考评分</h2><p>评分标准版本：${escape(report.analysis_metadata?.scoring_rubric_version ?? '历史规则')} · 尚未人工校准</p><p>总分：<strong>${report.overall_score === null ? '尚未生成' : `${report.overall_score} / 100`}</strong></p>
+  <h2>一、总体印象</h2>${summary ? `${findings([summary.overview])}<h3>二、做得好的地方（具体行为）</h3>${summary.strengths.length ? findings(summary.strengths) : '<p>暂无足够依据归纳优势。</p>'}<h3>三、需要提升的地方（具体、可操作）</h3>${summary.improvements.map((f) => `${findings([f])}<p>练习目标：${escape(f.retry_goal)}</p>`).join('') || '<p>暂无已确认的优先改进项。</p>'}<h3>分析局限</h3>${list(summary.limitations)}` : `<p>${report.summary_status === 'failed' ? '总结生成失败，逐题结果仍保留。' : report.summary_status === 'not_applicable' ? '暂无足够证据生成总结。' : '总结尚未生成。'}</p>`}
+  <h2>四、针对性改进建议</h2>${feedback?.action_plan.map((a) => `<h3>${{ short_term: '短期（1周）', medium_term: '中期（1月）', long_term: '长期（持续练习）' }[a.horizon]}</h3><p>${escape(a.action)}</p><p>验收方式：${escape(a.acceptance)}</p>`).join('') || '<p>按模板重新生成后提供分阶段行动步骤和验收方式。</p>'}
+  ${templateHtml}
+  <h2>六、下一步期待</h2><p>${escape(feedback?.next_expectation ?? '围绕已确认目标重练并比较回答。')}</p>
+  ${
+    !feedback
+      ? `  <h2>历史评分（旧规则，非六维模板）</h2><p>评分标准版本：${escape(report.analysis_metadata?.scoring_rubric_version ?? '历史规则')} · 尚未人工校准</p><p>总分：<strong>${report.overall_score === null ? '尚未生成' : `${report.overall_score} / 100`}</strong></p>
   <table><thead><tr><th>维度</th><th>参考分</th><th>依据说明</th></tr></thead><tbody>${Object.entries(
     report.dimensions,
   )
@@ -46,7 +65,9 @@ export function reportExportHtml(interview: Interview, report: InterviewReport):
     )
     .join('')}</tbody></table>
   <p class="muted">${report.analysis_metadata?.scoring_rubric_version === FRONTEND_RUBRIC_VERSION ? escape(REPORT_RUBRIC.rules[5]) : '评分按 0–4 档乘以 25 换算；总分为已评分维度等权平均后四舍五入。'}未观察维度不计入，不补零。没有代码考核时不评代码能力。</p>
-  <h2>整场总结</h2>${summary ? `${findings([summary.overview])}<h3>主要优势</h3>${summary.strengths.length ? findings(summary.strengths) : '<p>暂无足够依据归纳优势。</p>'}<h3>优先练习目标</h3>${summary.improvements.map((f) => `${findings([f])}<p>练习目标：${escape(f.retry_goal)}</p>`).join('') || '<p>暂无已确认的优先改进项。</p>'}<h3>分析局限</h3>${list(summary.limitations)}` : `<p>${report.summary_status === 'failed' ? '总结生成失败，逐题结果仍保留。' : report.summary_status === 'not_applicable' ? '暂无足够证据生成总结。' : '总结尚未生成。'}</p>`}
+`
+      : ''
+  }
   <h2>逐题复盘与原回答</h2>${interview.turns
     .map((turn) => {
       const e = report.evaluations.find(

@@ -13,3 +13,5 @@ export * from './interview-agent';
 export * from './voice';
 
 export * from './report-rubric';
+
+export * from './feedback-template';
