@@ -1,9 +1,10 @@
 import type { InterviewEvidence, InterviewReportSummary } from './live-interview';
 
 /** Source: 面试反馈模板.xlsx / 维度评分表 A2:F7. Percent scores are weighted in code. */
-export const FEEDBACK_TEMPLATE_VERSION = 'interview-feedback-v1';
-/** Analysis policy version; historical template DTOs remain readable. */
-export const FEEDBACK_ANALYSIS_VERSION = 'text-review-v8';
+export const FEEDBACK_TEMPLATE_VERSION = 'interview-feedback-v2';
+/** Six-dimensional scoring policy; insufficient evidence receives a fixed low score. */
+export const FEEDBACK_ANALYSIS_VERSION = 'text-review-v9';
+export const INSUFFICIENT_EVIDENCE_SCORE = 20;
 export const FEEDBACK_DIMENSIONS = [
   {
     key: 'professional_foundation',
@@ -81,7 +82,7 @@ export const FEEDBACK_DIMENSIONS = [
 export type FeedbackDimensionKey = (typeof FEEDBACK_DIMENSIONS)[number]['key'];
 export interface FeedbackAssessment {
   dimension: FeedbackDimensionKey;
-  score: number | null;
+  score: number;
   text: string;
   evidence_refs: InterviewEvidence[];
 }
@@ -96,15 +97,13 @@ export interface FeedbackTemplate {
   }[];
   next_expectation: string;
 }
-export function feedbackScore(feedback: InterviewReportSummary['feedback_template']) {
+export function feedbackScore(feedback: InterviewReportSummary['feedback_template'] | undefined) {
   const scored = FEEDBACK_DIMENSIONS.flatMap((d) => {
     const a = feedback?.assessments.find((a) => a.dimension === d.key);
-    return a && a.score !== null && a.evidence_refs.length
-      ? [{ weight: d.weight, score: a.score }]
-      : [];
+    return a ? [{ weight: d.weight, score: a.score }] : [];
   });
   const coverage = scored.reduce((sum, d) => sum + d.weight, 0);
-  // Normalize only observed weights; consumers must display coverage for partial reports.
+  // All six scores, including insufficient-evidence scores, contribute their full weight.
   return {
     coverage,
     score:

@@ -1,6 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
+import { FEEDBACK_DIMENSIONS, FEEDBACK_TEMPLATE_VERSION } from '@interviewlab/core';
+const lowScoreTemplate = (): import('@interviewlab/core').FeedbackTemplate => ({
+  version: FEEDBACK_TEMPLATE_VERSION,
+  assessments: FEEDBACK_DIMENSIONS.map((d) => ({
+    dimension: d.key,
+    score: 20,
+    text: '证据不足',
+    evidence_refs: [],
+  })),
+  action_plan: [],
+  next_expectation: '补充具体回答',
+});
+const lowScoreWire = () => ({
+  ...lowScoreTemplate(),
+  assessments: lowScoreTemplate().assessments.map(({ evidence_refs, ...a }) => ({
+    ...a,
+    evidence_ids: [],
+  })),
+});
 import type {
   InterviewEvaluation,
   InterviewReportSummary,
@@ -81,6 +100,7 @@ function fixture() {
     error_code: null,
   };
   const summary: InterviewReportSummary = {
+    feedback_template: lowScoreTemplate(),
     overview: evaluation.strengths[0],
     strengths: evaluation.strengths,
     improvements: [{ ...evaluation.gaps[0], turn_id: turn.id, retry_goal: evaluation.retry_goal }],
@@ -122,17 +142,13 @@ test('zero-answer and skipped-only interviews have no ability evaluation or summ
   assert.deepEqual(report.analysis_progress, { total: 0, completed: 0, failed: 0, pending: 0 });
   assert.ok(Object.values(report.dimensions).every((d) => d.status === 'not_observed'));
 });
-test('legacy report schema remains readable and GET projection does not silently request a summary', () => {
-  const { state, task } = fixture();
-  const report = emptyReport(state, randomUUID());
-  delete report.summary_status;
-  delete report.summary;
-  delete report.analysis_metadata;
-  report.status = 'ready';
+test('old summaries without the mandatory six-dimensional template are rejected', () => {
+  const { state, summary } = fixture();
+  const report = { ...emptyReport(state, randomUUID()), summary };
   assert.ok(reportSchema.safeParse(report).success);
-  const projected = aggregateReport(state, report, [task]);
-  assert.equal(projected.summary_status, 'not_requested');
-  assert.equal(projected.analysis_metadata, undefined);
+  const old = structuredClone(report) as unknown as { summary: Record<string, unknown> };
+  delete old.summary.feedback_template;
+  assert.equal(reportSchema.safeParse(old).success, false);
 });
 test('summary evidence must originate from checked findings, with exact revision and quote', () => {
   const { summary, evaluation } = fixture();
@@ -218,10 +234,12 @@ test('summary uses the shared model adapter with checked evaluations and records
       const body = JSON.parse(init!.body as string);
       const payload = JSON.parse(body.messages[1].content);
       assert.equal(payload.task, 'summarize');
+      assert.match(body.messages[0].content, /中文面试报告分析器/);
+      assert.doesNotMatch(body.messages[0].content, /不得泄露参考答案/);
       assert.equal(payload.input.evaluations[0].turn_id, evaluation.turn_id);
       assert.deepEqual(
         payload.input.evidence_catalog['e0-s0-0'],
-        evaluation.strengths[0].evidence_refs[0],
+        evaluation.strengths[0].evidence_refs[0].quote,
       );
       assert.equal(body.model, snapshot.model);
       return Response.json({
@@ -230,6 +248,7 @@ test('summary uses the shared model adapter with checked evaluations and records
             finish_reason: 'stop',
             message: {
               content: JSON.stringify({
+                feedback_template: lowScoreWire(),
                 overview: { text: summary.overview.text, evidence_ids: ['e0-s0-0'] },
                 strengths: [{ text: summary.strengths[0].text, evidence_ids: ['e0-s0-0'] }],
                 improvements: [
@@ -239,11 +258,6 @@ test('summary uses the shared model adapter with checked evaluations and records
                     turn_id: evaluation.turn_id,
                   },
                 ],
-                dimension_assessments: {
-                  technical_knowledge: null,
-                  project_communication: { level: 2, text: '基本回应但验证不足。' },
-                  logical_expression: null,
-                },
                 limitations: [],
               }),
             },
@@ -257,23 +271,19 @@ test('summary uses the shared model adapter with checked evaluations and records
     await agent.summarize([evaluation], snapshot, new AbortController().signal, false),
     {
       ...summary,
-      dimension_assessments: [
-        {
-          dimension: 'project_communication',
-          level: 2,
-          text: '基本回应但验证不足。',
-          evidence_refs: [
-            evaluation.strengths[0].evidence_refs[0],
-            evaluation.gaps[0].evidence_refs[0],
-          ],
-        },
-      ],
+      feedback_template: {
+        ...lowScoreTemplate(),
+        assessments: lowScoreTemplate().assessments.map((a) => ({
+          ...a,
+          text: '证据不足，按本场展示不足计低分：证据不足',
+        })),
+      },
     },
   );
-  assert.equal((logs[0] as { prompt_version: string }).prompt_version, 'text-review-v8');
+  assert.equal((logs[0] as { prompt_version: string }).prompt_version, 'text-review-v9');
 });
 
-test('AI reference scores use explicit evidence levels and equal-weight averaging, excluding unobserved skills', () => {
+test('six-dimensional total takes precedence over auxiliary per-turn scores', () => {
   const { state, task, summary } = fixture();
   task.result!.dimensions = ['project_communication', 'logical_expression'];
   summary.dimension_assessments = [
@@ -288,7 +298,7 @@ test('AI reference scores use explicit evidence levels and equal-weight averagin
   );
   assert.equal(report.dimensions.project_communication.score, 75);
   assert.equal(report.dimensions.logical_expression.score, 50);
-  assert.equal(report.overall_score, 63);
+  assert.equal(report.overall_score, 20);
   assert.equal(report.scoring_status, 'experimental');
   assert.equal(report.dimensions.technical_knowledge.score, null);
   assert.equal(report.dimensions.coding_ability.score, null);
@@ -372,6 +382,7 @@ test('summary merges repeated practice targets for one turn while retaining chec
   const { evaluation } = fixture();
   const analysis = createReportAnalysis(async (_kind, schema) =>
     schema.parse({
+      feedback_template: lowScoreWire(),
       overview: { text: '说明职责，验证待补充。', evidence_ids: ['e0-s0-0'] },
       strengths: [{ text: '职责清楚。', evidence_ids: ['e0-s0-0'] }],
       improvements: [1, 2].map(() => ({
@@ -379,11 +390,6 @@ test('summary merges repeated practice targets for one turn while retaining chec
         turn_id: evaluation.turn_id,
         evidence_ids: ['e0-g0-0'],
       })),
-      dimension_assessments: {
-        technical_knowledge: null,
-        project_communication: { level: 2, text: '验证不足。' },
-        logical_expression: null,
-      },
       limitations: ['仅依据本人陈述'],
     }),
   );
@@ -395,7 +401,7 @@ test('summary merges repeated practice targets for one turn while retaining chec
   );
   assert.equal(value.improvements.length, 1);
   assert.equal(value.improvements[0].retry_goal, evaluation.retry_goal);
-  assert.equal(value.dimension_assessments![0].level, 2);
+  assert.equal(value.dimension_assessments, undefined);
   assert.doesNotThrow(() => assertSummary(value, [evaluation]));
 });
 
@@ -452,16 +458,18 @@ test('PDF print snapshot includes partial state, scores, full answers and safely
   state.view.turns[0].answer_text = '<img src=x onerror=alert(2)> & 回答';
   report.is_partial = true;
   const html = reportExportHtml(state.view, report);
-  assert.ok(html.includes('75 / 100'));
+  assert.ok(html.includes('综合分：20/100'));
+  assert.ok(!html.includes('历史评分'));
+  assert.ok(html.includes('证据不足'));
   assert.ok(html.includes('部分复盘'));
-  assert.ok(html.includes('未观察'));
+  assert.ok(html.includes('专业基础'));
   assert.ok(html.includes('&lt;script&gt;'));
   assert.ok(html.includes('&lt;img src=x onerror=alert(2)&gt; &amp; 回答'));
   assert.ok(!html.includes('<script>'));
   assert.ok(!html.includes('<img'));
 });
 
-test('six-dimension template uses the scoring sheet weights and normalizes observed weights without filling missing dimensions with zero', async () => {
+test('six-dimension scores include insufficient evidence at 20 with the full scoring sheet weights', async () => {
   const { FEEDBACK_DIMENSIONS, FEEDBACK_TEMPLATE_VERSION, feedbackScore } = await import(
     '@interviewlab/core'
   );
@@ -484,10 +492,10 @@ test('six-dimension template uses the scoring sheet weights and normalizes obser
   assert.deepEqual(feedbackScore(template), { coverage: 100, score: 79 });
   template.assessments[0] = {
     ...template.assessments[0],
-    score: null,
+    score: 20,
     evidence_refs: [],
   };
-  assert.deepEqual(feedbackScore(template), { coverage: 75, score: 79 });
+  assert.deepEqual(feedbackScore(template), { coverage: 100, score: 64 });
   summary.feedback_template = template;
   assert.doesNotThrow(() => assertSummary(summary, [evaluation]));
   assert.ok(
@@ -527,23 +535,18 @@ test('template model scores resolve checked quote IDs and preserve actionable ac
       improvements: [
         { text: '补充验证步骤', turn_id: evaluation.turn_id, evidence_ids: ['e0-g0-0'] },
       ],
-      dimension_assessments: {
-        technical_knowledge: null,
-        project_communication: { level: 2, text: '职责清楚，验证待补充' },
-        logical_expression: null,
-      },
       feedback_template: {
         version: FEEDBACK_TEMPLATE_VERSION,
         assessments: FEEDBACK_DIMENSIONS.map((d) => ({
           dimension: d.key,
-          score: d.key === 'project_reflection' ? 70 : null,
+          score: d.key === 'project_reflection' ? 70 : 20,
           text: d.key === 'project_reflection' ? '职责清楚，缺验证' : '未问到此维度',
           evidence_ids: d.key === 'project_reflection' ? ['e0-s0-0'] : [],
         })),
         action_plan: [
           {
             horizon: 'short_term',
-            turn_id: evaluation.turn_id,
+            evidence_id: 'e0-g0-0',
             action: '一周内整理本人执行的验证步骤',
             acceptance: '重练时清楚说明一项检查方法与结果',
           },
@@ -572,7 +575,7 @@ test('template model scores resolve checked quote IDs and preserve actionable ac
     { ...emptyReport(state, randomUUID()), summary, summary_status: 'ready' },
     [task],
   );
-  assert.equal(report.overall_score, 70);
+  assert.equal(report.overall_score, 33);
   assert.ok(reportSchema.safeParse(report).success);
   const { reportExportHtml } = await import(
     '../../code/frontend/features/live-interview/report-export'
@@ -601,17 +604,12 @@ test('one original answer supports multiple feedback dimensions even outside old
       feedback_evidence_catalog: Record<string, unknown>;
     };
     assert.equal(payload.target_role.job_title, '前端');
-    assert.deepEqual(payload.feedback_evidence_catalog['a0-2'], ref);
+    assert.deepEqual(payload.feedback_evidence_catalog['a0-2'], ref.quote);
     return schema.parse({
       overview: { text: '职责已说明', evidence_ids: ['e0-s0-0'] },
       strengths: [],
       improvements: [],
       limitations: [],
-      dimension_assessments: {
-        technical_knowledge: null,
-        project_communication: { level: 2, text: '职责明确' },
-        logical_expression: null,
-      },
       feedback_template: {
         version: FEEDBACK_TEMPLATE_VERSION,
         assessments: FEEDBACK_DIMENSIONS.map((d) => ({
@@ -665,4 +663,123 @@ test('one original answer supports multiple feedback dimensions even outside old
   assert.throws(() => assertSummary(professional, [evaluation], { turns: [turn], snapshot }));
   const unreviewed = { ...turn, id: randomUUID() };
   assert.throws(() => assertSummary(result, [evaluation], { turns: [unreviewed], snapshot }));
+});
+
+test('six-dimensional ratings reject null, unsupported scores and invented evidence', () => {
+  const { summary, evaluation } = fixture();
+  assert.doesNotThrow(() => assertSummary(summary, [evaluation]));
+  for (const score of [null, 0, 40, 100]) {
+    const invalid = structuredClone(summary);
+    (invalid.feedback_template.assessments[0] as { score: unknown }).score = score;
+    assert.throws(() => assertSummary(invalid, [evaluation]));
+  }
+  const incomplete = structuredClone(summary);
+  incomplete.feedback_template.assessments.pop();
+  assert.throws(() => assertSummary(incomplete, [evaluation]));
+});
+
+test('an empty model retry goal is filled locally without another model request', async () => {
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { turn, evaluation } = fixture();
+  let calls = 0;
+  const analysis = createReportAnalysis(async (_kind, schema) => {
+    calls++;
+    return schema.parse({
+      ...evaluation,
+      retry_goal: '',
+      strengths: evaluation.strengths.map((f) => ({
+        ...f,
+        evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q0' })),
+      })),
+      gaps: [],
+    });
+  });
+  const value = await analysis.evaluate(turn, snapshot, new AbortController().signal, false);
+  assert.equal(calls, 1);
+  assert.ok(value.retry_goal.length > 0);
+  assert.deepEqual(value.strengths, evaluation.strengths);
+});
+
+test('compact summary schema rejects unknown evidence IDs after resolution', async () => {
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { evaluation } = fixture();
+  const analysis = createReportAnalysis(async (_kind, schema, input) => {
+    assert.equal('dimension_evaluations' in (input as object), false);
+    assert.equal('feedback_evidence' in (input as object), false);
+    return schema.parse({
+      feedback_template: lowScoreWire(),
+      overview: { text: '伪造引用', evidence_ids: ['unknown'] },
+      strengths: [],
+      improvements: [],
+      limitations: [],
+    });
+  });
+  await assert.rejects(
+    analysis.summarize([evaluation], snapshot, new AbortController().signal, false),
+    /未知证据编号|Invalid option/,
+  );
+});
+
+test('summary links improvements from checked gap IDs even when the model copies a wrong turn ID', async () => {
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { evaluation } = fixture();
+  const analysis = createReportAnalysis(async (_kind, schema) =>
+    schema.parse({
+      feedback_template: lowScoreWire(),
+      overview: { text: '职责已说明', evidence_ids: ['e0-s0-0'] },
+      strengths: [],
+      improvements: [{ text: '补充验证', turn_id: 'wrong-turn-id', evidence_ids: ['e0-g0-0'] }],
+      limitations: [],
+    }),
+  );
+  const value = await analysis.summarize(
+    [evaluation],
+    snapshot,
+    new AbortController().signal,
+    false,
+  );
+  assert.equal(value.improvements[0].turn_id, evaluation.turn_id);
+  assert.equal(value.improvements[0].retry_goal, evaluation.retry_goal);
+});
+
+test('summary schema stays compact as evidence grows and rejects wrong source kinds', async () => {
+  const { z } = await import('zod');
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { evaluation } = fixture();
+  const sizes: number[] = [];
+  for (const count of [1, 30]) {
+    const evaluations = Array.from({ length: count }, () => structuredClone(evaluation));
+    const analysis = createReportAnalysis(async (_kind, schema) => {
+      sizes.push(JSON.stringify(z.toJSONSchema(schema)).length);
+      const valid = {
+        feedback_template: lowScoreWire(),
+        overview: { text: '合成测试总结', evidence_ids: ['e0-s0-0'] },
+        strengths: [],
+        improvements: [],
+        limitations: [],
+      };
+      assert.equal(
+        schema.safeParse({
+          ...valid,
+          improvements: [{ text: '错用优势', evidence_ids: ['e0-s0-0'] }],
+        }).success,
+        false,
+      );
+      assert.equal(
+        schema.safeParse({ ...valid, strengths: [{ text: '错用缺口', evidence_ids: ['e0-g0-0'] }] })
+          .success,
+        false,
+      );
+      assert.equal(
+        schema.safeParse({
+          ...valid,
+          improvements: [{ text: '跨题合并缺口', evidence_ids: ['e0-g0-0', 'e1-g0-0'] }],
+        }).success,
+        false,
+      );
+      return schema.parse(valid);
+    });
+    await analysis.summarize(evaluations, snapshot, new AbortController().signal, false);
+  }
+  assert.ok(sizes[1] - sizes[0] < 1000);
 });

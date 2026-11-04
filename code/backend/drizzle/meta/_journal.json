@@ -57,6 +57,20 @@
       "when": 1793800000000,
       "tag": "0007_agent_preparation",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793836800000,
+      "tag": "0007_reset_report_scoring",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793880000000,
+      "tag": "0009_reconcile_agent_preparation",
+      "breakpoints": true
     }
   ]
 }

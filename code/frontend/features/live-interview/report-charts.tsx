@@ -77,10 +77,7 @@ export function AbilityRadar({
   const dimensions = Object.fromEntries(
     FEEDBACK_DIMENSIONS.map((d) => {
       const a = feedback?.feedback_template?.assessments.find((a) => a.dimension === d.key);
-      return [
-        d.key,
-        { score: a?.score ?? null, status: a?.score == null ? 'not_observed' : 'observed' },
-      ];
+      return [d.key, { score: a?.score ?? null }];
     }),
   );
   const labels = Object.fromEntries(FEEDBACK_DIMENSIONS.map((d) => [d.key, d.short]));
@@ -98,7 +95,7 @@ export function AbilityRadar({
         className="ability-radar"
         viewBox="0 0 520 380"
         role="img"
-        aria-label={`能力雷达图：${entries.map(([key, d]) => `${labels[key]}${d.score === null ? '未评价' : `${d.score} 分`}`).join('，')}`}
+        aria-label={`能力雷达图：${entries.map(([key, d]) => `${labels[key]}${d.score === null ? '尚未生成' : `${d.score} 分`}`).join('，')}`}
       >
         {[25, 50, 75, 100].map((level) => (
           <polygon
@@ -150,20 +147,18 @@ export function AbilityRadar({
             <text key={key} x={x} y={y} textAnchor="middle" dominantBaseline="middle">
               {labels[key]}
               <tspan x={x} dy="22" className="radar-label-score">
-                {d.score ?? (d.status === 'not_observed' ? '未观察' : '尚未评价')}
+                {d.score ?? '尚未生成'}
               </tspan>
             </text>
           );
         })}
       </svg>
-      <p className="radar-caption">
-        仅展示本场已观察能力；未评价维度不补零，数据不完整时以独立轴线展示。
-      </p>
+      <p className="radar-caption">六维均参与评分；证据不足的维度按20分计入，表示本场展示不足。</p>
       <div className="ability-chips">
         {entries.map(([key, d]) => (
           <div key={key}>
             <span>{labels[key]}</span>
-            <strong>{d.score ?? '未评价'}</strong>
+            <strong>{d.score ?? '尚未生成'}</strong>
           </div>
         ))}
       </div>
@@ -260,11 +255,11 @@ export function FeedbackScoreTable({ report }: { report: InterviewReport }) {
                   <td>{d.weight}</td>
                   <td>
                     {a?.score == null
-                      ? '未评价'
+                      ? '尚未生成'
                       : `${Math.round(((a.score * d.weight) / 100) * 10) / 10} / ${d.weight}`}
                   </td>
                   <td>
-                    {a?.text ?? '尚无此模板的评价，请按模板重新生成报告。'}
+                    {a?.text ?? '评分正在生成。'}
                     {!!a?.evidence_refs.length && (
                       <details className="report-evidence">
                         <summary>查看评分依据</summary>
@@ -288,7 +283,7 @@ export function FeedbackScoreTable({ report }: { report: InterviewReport }) {
           : `综合参考分 ${total.score} / 100${total.coverage < 100 ? `（按已评价权重 ${total.coverage}/100 归一化）` : ''}`}
       </p>
       <p className="radar-caption">
-        维度分按百分制绘图，按 25 / 25 / 25 / 15 / 5 / 5 加权。未评价项不补零。AI
+        维度分按百分制绘图，按 25 / 25 / 25 / 15 / 5 / 5 加权。证据不足按20分计入。AI
         参考评分不代表招聘结论。
       </p>
     </section>

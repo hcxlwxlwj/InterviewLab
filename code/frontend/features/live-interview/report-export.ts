@@ -1,7 +1,6 @@
 import {
   FEEDBACK_DIMENSIONS,
   feedbackScore,
-  DIMENSION_LABELS,
   REPORT_INDICATORS,
   REPORT_RUBRIC,
   FRONTEND_RUBRIC_VERSION,
@@ -33,11 +32,11 @@ export function reportExportHtml(interview: Interview, report: InterviewReport):
   const templateHtml = `<h2>五、评分汇总</h2><table><thead><tr><th>评价维度</th><th>权重</th><th>得分</th><th>具体行为依据</th></tr></thead><tbody>${FEEDBACK_DIMENSIONS.map(
     (d) => {
       const a = feedback?.assessments.find((a) => a.dimension === d.key);
-      return `<tr><td>${escape(d.label)}</td><td>${d.weight}</td><td>${a?.score == null ? '未评价' : `${Math.round(((a.score * d.weight) / 100) * 10) / 10} / ${d.weight}`}</td><td>${escape(a?.text ?? '历史报告尚未按此模板评价')}${a?.evidence_refs.map((r) => `<blockquote>回答 v${r.revision}：“${escape(r.quote)}”</blockquote>`).join('') ?? ''}</td></tr>`;
+      return `<tr><td>${escape(d.label)}</td><td>${d.weight}</td><td>${a?.score == null ? '尚未生成' : `${Math.round(((a.score * d.weight) / 100) * 10) / 10} / ${d.weight}`}</td><td>${escape(a?.text ?? '评分尚未生成')}${a?.evidence_refs.map((r) => `<blockquote>回答 v${r.revision}：“${escape(r.quote)}”</blockquote>`).join('') ?? ''}</td></tr>`;
     },
   ).join(
     '',
-  )}</tbody></table><p>综合分：${templateTotal.score === null ? `暂不计算（已评价权重 ${templateTotal.coverage}/100）` : `${templateTotal.score}/100（已评价权重 ${templateTotal.coverage}/100，按已评价权重归一化）`}。未评价项不补零。</p>`;
+  )}</tbody></table><p>综合分：${templateTotal.score === null ? `暂不计算（已评价权重 ${templateTotal.coverage}/100）` : `${templateTotal.score}/100（已评价权重 ${templateTotal.coverage}/100，按六维权重加权）`}。证据不足的维度按20分计入，表示本场展示不足。</p>`;
 
   return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>${escape(interview.job_title)} · 面试复盘报告</title><style>
   @page { size: A4; margin: 18mm; }
@@ -50,24 +49,9 @@ export function reportExportHtml(interview: Interview, report: InterviewReport):
   <p class="notice">基于本场回答的 AI 辅助复盘。参考评分未经人工校准，不代表招聘结论。${report.is_partial ? '本报告为部分复盘，仅反映已完成的分析。' : ''}</p>
   <p>${progress ? `有效回答 ${progress.total} 题 · 已分析 ${progress.completed} 题 · 待处理 ${progress.pending} 题 · 失败 ${progress.failed} 题` : escape(report.coverage)}</p>
   <h2>一、总体印象</h2>${summary ? `${findings([summary.overview])}<h3>二、做得好的地方（具体行为）</h3>${summary.strengths.length ? findings(summary.strengths) : '<p>暂无足够依据归纳优势。</p>'}<h3>三、需要提升的地方（具体、可操作）</h3>${summary.improvements.map((f) => `${findings([f])}<p>练习目标：${escape(f.retry_goal)}</p>`).join('') || '<p>暂无已确认的优先改进项。</p>'}<h3>分析局限</h3>${list(summary.limitations)}` : `<p>${report.summary_status === 'failed' ? '总结生成失败，逐题结果仍保留。' : report.summary_status === 'not_applicable' ? '暂无足够证据生成总结。' : '总结尚未生成。'}</p>`}
-  <h2>四、针对性改进建议</h2>${feedback?.action_plan.map((a) => `<h3>${{ short_term: '短期（1周）', medium_term: '中期（1月）', long_term: '长期（持续练习）' }[a.horizon]}</h3><p>${escape(a.action)}</p><p>验收方式：${escape(a.acceptance)}</p>`).join('') || '<p>按模板重新生成后提供分阶段行动步骤和验收方式。</p>'}
+  <h2>四、针对性改进建议</h2>${feedback?.action_plan.map((a) => `<h3>${{ short_term: '短期（1周）', medium_term: '中期（1月）', long_term: '长期（持续练习）' }[a.horizon]}</h3><p>${escape(a.action)}</p><p>验收方式：${escape(a.acceptance)}</p>`).join('') || '<p>暂无行动计划。</p>'}
   ${templateHtml}
   <h2>六、下一步期待</h2><p>${escape(feedback?.next_expectation ?? '围绕已确认目标重练并比较回答。')}</p>
-  ${
-    !feedback
-      ? `  <h2>历史评分（旧规则，非六维模板）</h2><p>评分标准版本：${escape(report.analysis_metadata?.scoring_rubric_version ?? '历史规则')} · 尚未人工校准</p><p>总分：<strong>${report.overall_score === null ? '尚未生成' : `${report.overall_score} / 100`}</strong></p>
-  <table><thead><tr><th>维度</th><th>参考分</th><th>依据说明</th></tr></thead><tbody>${Object.entries(
-    report.dimensions,
-  )
-    .map(
-      ([key, d]) =>
-        `<tr><td>${DIMENSION_LABELS[key as keyof typeof DIMENSION_LABELS]}</td><td>${d.score === null ? (d.status === 'observed' ? '尚未生成' : '未观察') : `${d.score} / 100`}</td><td>${escape(d.explanation)}</td></tr>`,
-    )
-    .join('')}</tbody></table>
-  <p class="muted">${report.analysis_metadata?.scoring_rubric_version === FRONTEND_RUBRIC_VERSION ? escape(REPORT_RUBRIC.rules[5]) : '评分按 0–4 档乘以 25 换算；总分为已评分维度等权平均后四舍五入。'}未观察维度不计入，不补零。没有代码考核时不评代码能力。</p>
-`
-      : ''
-  }
   <h2>逐题复盘与原回答</h2>${interview.turns
     .map((turn) => {
       const e = report.evaluations.find(
@@ -90,7 +74,7 @@ export function reportExportHtml(interview: Interview, report: InterviewReport):
     })
     .join(
       '',
-    )}${report.analysis_metadata?.scoring_rubric_version === FRONTEND_RUBRIC_VERSION ? `<h2>评分方法与适用边界</h2><p>${escape(REPORT_RUBRIC.title)} · 专家审核与人工校准待完成。</p>${list(REPORT_RUBRIC.rules)}<h3>方法来源</h3>${list(REPORT_RUBRIC.methods.map((m) => `${m.name}：${m.role} ${m.url}`))}` : ''}<footer>InterviewLab · 报告仅供个人练习复盘。包含个人回答，请妥善保存。</footer></body></html>`;
+    )}${report.analysis_metadata?.scoring_rubric_version === FRONTEND_RUBRIC_VERSION ? `<h2>评分方法与适用边界</h2><p>逐题指标版本：${escape(report.analysis_metadata?.scoring_rubric_version)}</p><p>${escape(REPORT_RUBRIC.title)} · 专家审核与人工校准待完成。</p>${list(REPORT_RUBRIC.rules)}<h3>方法来源</h3>${list(REPORT_RUBRIC.methods.map((m) => `${m.name}：${m.role} ${m.url}`))}` : ''}<footer>InterviewLab · 报告仅供个人练习复盘。包含个人回答，请妥善保存。</footer></body></html>`;
 }
 
 /** Use the browser's local PDF renderer; no private report is uploaded or persisted by an export service. */
