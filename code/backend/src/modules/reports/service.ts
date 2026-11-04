@@ -11,7 +11,7 @@ import { inputDigest, withIdempotency } from '../../foundation/idempotency';
 import { ServiceError } from '../../foundation/errors';
 import { enqueueTask, type TaskRow } from '../../tasks/service';
 import type { TaskHandler } from '../../tasks/runner';
-import type { InterviewAgent } from '../interviews/agent';
+import type { InterviewAgent } from '../interviews/model-analysis';
 import {
   assertEvaluation,
   assertSummary,
@@ -433,8 +433,8 @@ export function createReportsService(
     const row = await repository.comparisonById(database.pool, task.owner_id, input.comparison_id);
     if (row.version !== input.version || row.task_id !== task.id) return { result_ref: null };
     await interviews.readFinalized(identity, row.original_interview_id);
-    await interviews.readFinalized(identity, row.retry_interview_id);
-    const value = await agent.compare(row.input, signal, task.attempts > 1);
+    const retrySource=await interviews.readFinalized(identity, row.retry_interview_id);
+    const value = await agent.compare(row.input, signal, task.attempts > 1, {runtime_version:retrySource.snapshot!.runtime_version,model:retrySource.snapshot!.model});
     return {
       result_ref: { id: row.id, version: row.version },
       lock: async (tx) => {

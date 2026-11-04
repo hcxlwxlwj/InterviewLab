@@ -3,8 +3,8 @@ import type { InterviewKnowledgeProvider } from '@interviewlab/core';
 import { getJob, localKnowledgeRetriever } from '../../content/index';
 import { ServiceError } from '../../foundation/errors';
 
-/** Replace this injected provider when the team's knowledge service is ready. */
-export const localInterviewKnowledge: InterviewKnowledgeProvider = {
+/** Structured view of the same published catalog used to build the vector index. */
+export const structuredInterviewKnowledge: InterviewKnowledgeProvider = {
   async read(config) {
     const job = getJob(config.job);
     if (!job || !job.stages.includes(config.career_stage))

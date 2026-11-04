@@ -16,7 +16,7 @@ import {
 } from '../../code/backend/src/modules/reports/aggregate';
 import { assertSummary, assertEvaluation } from '../../code/backend/src/modules/reports/analysis';
 import { reportSchema, reportRequestBody } from '../../code/backend/src/modules/reports/schemas';
-import { createInterviewAgent } from '../../code/backend/src/modules/interviews/agent';
+import { createModelAnalysis } from '../../code/backend/src/modules/interviews/model-analysis';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 
 const snapshot: InterviewSnapshot = {
@@ -212,7 +212,7 @@ test('report retry accepts the legacy body and explicit scopes, rejecting unknow
 test('summary uses the shared model adapter with checked evaluations and records its own prompt version', async () => {
   const { summary, evaluation } = fixture();
   const logs: object[] = [];
-  const agent = createInterviewAgent(
+  const agent = createModelAnalysis(
     loadConfig({ LLM_API_KEY: 'synthetic-only' }),
     async (_url, init) => {
       const body = JSON.parse(init!.body as string);
@@ -308,14 +308,14 @@ test('dimension scores reject unrelated evidence, duplicates and unobserved dime
 });
 
 test('frontend report references cover catalog questions without guessing unknown topics', async () => {
-  const { localInterviewKnowledge } = await import(
+  const { structuredInterviewKnowledge } = await import(
     '../../code/backend/src/modules/interviews/knowledge'
   );
   const { withFrontendReportReference } = await import(
     '../../code/backend/src/modules/interviews/frontend-reference'
   );
   const state = fixture().state;
-  const knowledge = await localInterviewKnowledge.read(state.view.configuration);
+  const knowledge = await structuredInterviewKnowledge.read(state.view.configuration);
   assert.equal(knowledge.questions.length, 8);
   for (const question of knowledge.questions) {
     assert.equal(question.report_reference?.version, 'frontend-report-reference-v1');
@@ -333,11 +333,11 @@ test('frontend report references cover catalog questions without guessing unknow
 
 test('report analysis sends frozen professional reference to the model', async () => {
   const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
-  const { localInterviewKnowledge } = await import(
+  const { structuredInterviewKnowledge } = await import(
     '../../code/backend/src/modules/interviews/knowledge'
   );
   const { state, turn, evaluation } = fixture();
-  const knowledge = await localInterviewKnowledge.read(state.view.configuration);
+  const knowledge = await structuredInterviewKnowledge.read(state.view.configuration);
   turn.knowledge_question_id = knowledge.questions[0].id;
   turn.topic = knowledge.questions[0].topic;
   let received: unknown;

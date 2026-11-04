@@ -7,10 +7,8 @@ import { EmptyState, Loading, Modal, formatDate } from '../../components/shared'
 import { Button } from '../../components/ui/button';
 import { WorkspaceFrame } from '../personal-center/workspace-frame';
 import { interviewsApi } from '../../lib/api/interviews';
-import { useSession } from '../../components/session-provider';
 import { CommandNotice, ErrorNotice, SessionGate, useLiveCommand, useLiveResource } from './common';
 function HistoryBody() {
-  const { isDevelopment } = useSession();
   const [status, setStatus] = useState('');
   const [job, setJob] = useState('');
   const [cursor, setCursor] = useState('');
@@ -125,16 +123,12 @@ function HistoryBody() {
                             <Link
                               className="text-link"
                               href={
-                                !isDevelopment && ['completed', 'failed'].includes(v.status)
+                                ['completed', 'failed'].includes(v.status)
                                   ? `/reports/${v.id}`
                                   : liveInterviewPath(v)
                               }
                             >
-                              {['completed', 'failed'].includes(v.status)
-                                ? isDevelopment
-                                  ? '查看面试'
-                                  : '查看报告'
-                                : '继续面试'}
+                              {['completed', 'failed'].includes(v.status) ? '查看报告' : '继续面试'}
                             </Link>
                             <Button
                               size="sm"

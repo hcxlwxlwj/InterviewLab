@@ -7,11 +7,10 @@ import { authClient } from '../lib/api/auth';
 import { Button } from './ui/button';
 
 export function AccountControls() {
-  const { state, refresh, isDevelopment } = useSession();
+  const { state, refresh } = useSession();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  if (isDevelopment) return null;
   if (state.status !== 'signed_in')
     return (
       <Link href="/login" className="text-link">

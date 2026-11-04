@@ -29,7 +29,7 @@ import { createTaskService } from '../tasks/service';
 import { publicCatalogRepository } from '../modules/jobs/repository';
 import { createJobsService } from '../modules/jobs/service';
 import { jobsModule } from '../modules/jobs/routes';
-import { validateModules, type BackendModule, type ServiceRegistry } from '../modules/contracts';
+import { validateModules, type BackendModule } from '../modules/contracts';
 import { createInterviewRuntime, type InterviewRuntimeOptions } from '../modules/interview-runtime';
 import { interviewsModule } from '../modules/interviews/routes';
 import { reportsModule } from '../modules/reports/routes';
@@ -38,7 +38,6 @@ export interface ApplicationOptions {
   config?: BackendConfig;
   database?: Database;
   identity?: IdentityProvider;
-  services?: ServiceRegistry;
   modules?: BackendModule[];
   logger?: boolean;
   interview?: InterviewRuntimeOptions;
@@ -47,7 +46,7 @@ export async function buildApp(options: ApplicationOptions = {}) {
   const config = options.config ?? loadConfig();
   const database = options.database ?? (config.DATABASE_URL ? createDatabase(config) : undefined);
   const auth = config.AUTH_ENABLED && database ? createAuthService(database, config) : undefined;
-  const identity = options.identity ?? options.services?.accounts ?? auth;
+  const identity = options.identity ?? auth;
   const app = Fastify({
     logger:
       options.logger === false
@@ -96,7 +95,7 @@ export async function buildApp(options: ApplicationOptions = {}) {
       },
       transform: jsonSchemaTransform,
     });
-    const materials = database ? createMaterialsService(database) : undefined;
+    const materials = interview?.materials ?? (database ? createMaterialsService(database) : undefined);
     const modules = [
       ...[settingsModule(database, materials), materialsModule(materials)].filter(
         module => !options.modules?.some(custom => custom.name === module.name),

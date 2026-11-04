@@ -36,13 +36,7 @@ export function registerInterviewEvents(
     },
     async (request) => {
       const query = request.query as { job: string; career_stage: 'internship' | 'campus' };
-      return (
-        (await ready().profiles(query)) ?? {
-          version: 'legacy-v2',
-          default_type: 'technical_qa',
-          profiles: [],
-        }
-      );
+      return ready().profiles(query);
     },
   );
   app.get<{ Params: { id: string }; Querystring: { generation_id: string } }>(

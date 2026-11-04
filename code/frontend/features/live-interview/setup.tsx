@@ -4,7 +4,7 @@ import { ArrowRight, CameraOff, Check, Keyboard, Mic, MicOff } from 'lucide-reac
 import { Choices, InterviewSetupPage } from '../../components/interview-setup';
 import { Button } from '../../components/ui/button';
 import { apiRequest } from '../../lib/api/http';
-import type { PersonalMaterial, PersonalSettings } from '@interviewlab/core';
+import type { PersonalMaterial, PersonalSettings, JobTemplate } from '@interviewlab/core';
 import { useCallback, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { LIVE_TYPE_LABELS, liveInterviewPath, type InterviewConfig } from '@interviewlab/core';
@@ -12,35 +12,46 @@ import { interviewsApi } from '../../lib/api/interviews';
 import { jobsApi } from '../../lib/api/jobs';
 import { Loading } from '../../components/shared';
 import { CommandNotice, ErrorNotice, SessionGate, useLiveCommand, useLiveResource } from './common';
+import { selectInterviewJob } from './setup-state';
 
 function Form() {
-  const router = useRouter();
   const search = useSearchParams();
-  const [config, setConfig] = useState<InterviewConfig>({
-    job: search.get('job') ?? 'frontend',
+  const requestedJob = search.get('job') ?? 'frontend';
+  const load = useCallback(
+    async (signal: AbortSignal) => {
+      const page = await interviewsApi.jobs(signal);
+      const initialJob = page.items.find((job) => job.id === requestedJob || job.slug === requestedJob)
+        ?? await jobsApi.read(requestedJob, signal);
+      if (!page.items.some((job) => job.id === initialJob.id)) page.items.unshift(initialJob);
+      return { items: page.items, initialJob };
+    },
+    [requestedJob],
+  );
+  const jobs = useLiveResource(load, () => false);
+  if (!jobs.value)
+    return (
+      <>
+        <ErrorNotice message={jobs.error} retry={() => void jobs.refresh()} />
+        {!jobs.error && <Loading />}
+      </>
+    );
+  return <ConfigurationForm jobs={jobs.value.items} initialJob={jobs.value.initialJob} />;
+}
+
+function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJob: JobTemplate }) {
+  const router = useRouter();
+  const [config, setConfig] = useState<InterviewConfig>(() => selectInterviewJob({
+    job: initialJob.id,
     career_stage: 'internship',
     interview_type: 'technical_qa',
     difficulty: '基础',
     duration_minutes: 10,
     interviewer_style: '标准',
     interaction_mode: 'text_fallback',
-  });
+  }, initialJob));
   const [materials,setMaterials]=useState<PersonalMaterial[]>([]);
   const [materialError,setMaterialError]=useState('');
   useEffect(()=>{Promise.all([apiRequest<PersonalMaterial[]>('/materials'),apiRequest<PersonalSettings>('/me/settings')]).then(([m,p])=>{setMaterials(m.filter(x=>x.kind==='resume'&&x.confirmed));const selected=m.find(x=>x.id===p.default_resume_id&&x.confirmed);setConfig(c=>({...c,interviewer_style:p.interviewer_style??c.interviewer_style,...(selected?{resume_ref:{id:selected.id,version:selected.version}}:{})}));}).catch(()=>setMaterialError('简历暂时无法加载，可不带简历继续通用面试。'));},[]);
-  const requestedJob = search.get('job') ?? 'frontend';
-  const load = useCallback(
-    async (signal: AbortSignal) => {
-      const page = await interviewsApi.jobs(signal);
-      if (!page.items.some((job) => job.id === requestedJob)) {
-        const selectedJob = await jobsApi.read(requestedJob, signal);
-        page.items.unshift(selectedJob);
-      }
-      return page;
-    },
-    [requestedJob],
-  );
-  const jobs = useLiveResource(load, () => false);
   const loadProfiles = useCallback(
     (signal: AbortSignal) => interviewsApi.profiles(config.job, config.career_stage, signal),
     [config.job, config.career_stage],
@@ -49,14 +60,7 @@ function Form() {
   const command = useLiveCommand();
   const change = <K extends keyof InterviewConfig>(key: K, value: InterviewConfig[K]) =>
     setConfig((c) => ({ ...c, [key]: value }));
-  if (!jobs.value)
-    return (
-      <>
-        <ErrorNotice message={jobs.error} retry={() => void jobs.refresh()} />
-        {!jobs.error && <Loading />}
-      </>
-    );
-  const selected = jobs.value.items.find((j) => j.id === config.job);
+  const selected = jobs.find((j) => j.id === config.job);
   return (
     <form
       className="setup-grid"
@@ -86,14 +90,15 @@ function Form() {
               id="job-direction"
               value={config.job}
               disabled={command.blocked}
-              onChange={(e) =>
-                setConfig((c) => ({ ...c, job: e.target.value, interview_type: 'technical_qa' }))
-              }
+              onChange={(e) => {
+                const job = jobs.find((j) => j.id === e.target.value);
+                if (job) setConfig((c) => selectInterviewJob(c, job));
+              }}
             >
               <option value="" disabled>
                 请选择岗位
               </option>
-              {jobs.value.items.map((j) => (
+              {jobs.map((j) => (
                 <option key={j.id} value={j.id}>
                   {j.title}
                 </option>
@@ -113,9 +118,9 @@ function Form() {
             name="career-stage"
             value={config.career_stage}
             options={[
-              { value: 'internship', label: '实习' },
-              { value: 'campus', label: '校招' },
-            ]}
+              { value: 'internship' as const, label: '实习' },
+              { value: 'campus' as const, label: '校招' },
+            ].filter((option) => selected?.stages.includes(option.value))}
             onChange={(v) => change('career_stage', v)}
             disabled={command.blocked}
           />
@@ -292,7 +297,7 @@ function Form() {
         <CommandNotice command={command} />
         <Button
           type="submit"
-          disabled={command.blocked || !selected || !selected.stages.includes(config.career_stage)}
+          disabled={command.blocked || !selected || !selected.stages.includes(config.career_stage) || !profiles.value || Boolean(profiles.error)}
         >
           {command.busy ? '正在创建…' : '创建面试'}
           <ArrowRight size={17} />

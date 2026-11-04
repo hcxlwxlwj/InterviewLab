@@ -136,10 +136,7 @@ test(
       assert.match(await (await fetch(origin + '/')).text(), /面试/);
       const live = await fetch(origin + '/api/v1/health');
       assert.equal(live.headers.get('x-interviewlab-mode'), 'backend-foundation');
-      assert.equal(
-        (await (await fetch(origin + '/api/demo/v1/health')).json()).mode,
-        'interface-skeleton',
-      );
+      assert.equal((await fetch(origin + '/api/demo/v1/health')).status, 404);
       const cookies = new Map<string, string>();
       const observedCookies: string[] = [];
       const request = createApiClient(async (path, init) => {
@@ -219,7 +216,7 @@ test(
         request('/health'),
         (error) => error instanceof ApiClientError && error.status >= 500,
       );
-      assert.equal((await fetch(origin + '/api/demo/v1/health')).status, 200);
+      assert.equal((await fetch(origin + '/api/demo/v1/health')).status, 404);
     } finally {
       if (next && next.exitCode === null) {
         const stopped = once(next, 'exit');

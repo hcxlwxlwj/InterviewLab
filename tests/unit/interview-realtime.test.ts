@@ -5,16 +5,13 @@ import {
   readChatStream,
 } from '../../code/backend/src/modules/interviews/stream-parser';
 import { applyMemory, initialMemory } from '../../code/backend/src/modules/interviews/memory';
-import { withRealtimeAgent } from '../../code/backend/src/modules/interviews/agent-v3';
-import { createInterviewAgent } from '../../code/backend/src/modules/interviews/agent';
+import { createStreamingAgent } from '../../code/backend/src/modules/interviews/streaming-agent';
+import { createModelAnalysis } from '../../code/backend/src/modules/interviews/model-analysis';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
 import { loadConfig } from '../../code/backend/src/foundation/config';
-import {
-  readKnowledgeSeed,
-  createKnowledgeService,
-} from '../../code/backend/src/modules/knowledge/service';
+import { currentKnowledgeFixture } from '../support/knowledge-fixture';
 import type { InterviewSnapshot, InterviewTurn, InterviewMemoryDelta } from '@interviewlab/core';
-const seedPromise = readKnowledgeSeed();
+const knowledgeFixture = currentKnowledgeFixture();
 function stream(value: unknown, truncate = false) {
   const raw = JSON.stringify(value);
   return new Response(
@@ -59,20 +56,7 @@ test('truncated provider streams are rejected rather than treated as completed q
     ),
   );
 });
-test('draft content is explicit; seed has 8 goals, 20 sourced cards and 16 authored questions', async () => {
-  const seed = await seedPromise;
-  assert.equal(seed.review_state, 'draft');
-  assert.equal(seed.competencies.length, 8);
-  assert.equal(seed.cards.length, 20);
-  assert.equal(seed.questions.length, 16);
-  assert.throws(() => loadConfig({ NODE_ENV: 'production', KNOWLEDGE_PREVIEW: 'true' }));
-  const kb = createKnowledgeService(loadConfig({}));
-  assert.equal(
-    (await kb.profiles({ job: 'backend', career_stage: 'campus' })).version,
-    'legacy-v2',
-  );
-  await kb.close();
-});
+
 const scenarios = [
   ['technical_qa', '原理'],
   ['business_scenario', '用户目标'],
@@ -81,7 +65,7 @@ const scenarios = [
 ] as const;
 for (let n = 0; n < 30; n++)
   test(`v3 multi-turn evidence and memory case ${n + 1}`, async () => {
-    const seed = await seedPromise;
+    const seed = await knowledgeFixture;
     const [type, label] = scenarios[n % 4];
     const profile = seed.profiles.find((x) => x.type === type)!;
     const goal = profile.goals[0];
@@ -167,8 +151,8 @@ for (let n = 0; n < 30; n++)
       };
       const cfg = loadConfig({ LLM_API_KEY: 'test' });
       let calls = 0;
-      const agent = withRealtimeAgent(
-        createInterviewAgent(cfg),
+      const agent = createStreamingAgent(
+        createModelAnalysis(cfg),
         cfg,
         () => {},
         async (_url, init) => {

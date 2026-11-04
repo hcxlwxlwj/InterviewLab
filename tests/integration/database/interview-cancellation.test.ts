@@ -26,6 +26,7 @@ test('pausing cancels a running provider HTTP request; unknown worker types surf
   });
   const agent = createInterviewAgent(
     config,
+    () => {},
     async (_url, input) =>
       new Promise((_resolve, reject) => {
         entered();
@@ -55,6 +56,7 @@ test('pausing cancels a running provider HTTP request; unknown worker types surf
       },
       randomUUID(),
     );
+    v = await runtime.interviews.prepare(identity, v.id, { version: v.version, mode: 'fallback' }, randomUUID());
     v = await runtime.interviews.start(identity, v.id, { version: v.version }, randomUUID());
     v = await runtime.interviews.answer(
       identity,

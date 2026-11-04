@@ -1,8 +1,6 @@
 # 真实文字面试与 Agent 接入
 
-2026-10-26：前端岗位新增 v3 知识与流式试点，启动、接口及验证边界见[面试官 v3](interview-agent-v3.md)。旧快照仍按下文 v1/v2 路径运行。
-
-更新：2026-10-26。实现范围是基础难度、公开岗位和当场陈述的文字面试。知识库由独立负责人继续建设；本轮通过 `InterviewKnowledgeProvider` 接入已有公开内容，不要求向量数据库。简历、个人 JD、语音、摄像头、代码执行和 PDF 不进入真实流程。
+更新：2026-11-05。全岗位、结构化简历与文字/语音/视频共享同一图工作流；旧执行链和演示入口已清退。本文保留原接入文档结构，维护接入边界、能力接口和工作流。动态流式细节见[动态面试](interview-agent-v3.md)。
 
 ## 启动与模型配置
 
@@ -18,24 +16,207 @@ LLM_OUTPUT_MODE=json_object
 LLM_TIMEOUT_MS=25000
 ```
 
-地址与模型名默认采用 [ChatECNU 官方配置](https://developer.ecnu.edu.cn/vitepress/llm/index.html)。密钥仅填本机 `.env` 或服务端环境，不使用 `NEXT_PUBLIC_`。配置修改后重启 API 和 worker。兼容协议使用 `/chat/completions`，默认 JSON 对象和服务端 Zod 校验；严格 JSON Schema 只在供应商支持时显式开启。原生 fetch 不进行隐藏重试，每任务最多两次模型调用，第二次附带修复提醒。
+地址与模型名默认采用 [ChatECNU 官方配置](https://developer.ecnu.edu.cn/vitepress/llm/index.html)。密钥仅填本机 `.env` 或服务端环境，不使用 `NEXT_PUBLIC_`。配置修改后重启 API 和 worker。兼容协议使用 `/chat/completions`，默认 JSON 对象和服务端 Zod 校验；严格 JSON Schema 只在供应商支持时显式开启。LangChain SDK maxRetries=0，不进行隐藏重试，每任务最多两次模型调用，第二次附带修复提醒。
 
-打开 `/login` 登录，然后进入 `/interview/setup`。创建配置不计时，点击开始才冻结内容并计时。真实面试与报告使用 `/interview/{id}`、`/reports/{id}`，历史入口为 `/me/interviews`。旧演示在对应地址增加 `?demo=1`，合成 API 仍是 `/api/demo/v1`；真实错误不回退演示数据，不自动上传演示材料。
+打开 `/login` 登录，然后进入 `/interview/setup`。创建配置不计时，准备时冻结运行时、材料与知识，点击开始才计时。真实面试与报告使用 `/interview/{id}`、`/reports/{id}`，历史入口为 `/me/interviews`。旧演示地址和合成 API 已删除；真实错误不会回退假数据。
 
 ## Agent 与知识接口
 
-- `InterviewAgent` 的规划、推进/澄清、逐题评估、重练比较四类能力共用一个模型适配器。模型只建议动作；服务负责状态、身份、版本、预算、保存和任务发布。
+### 目标与能力合同
+
+目标是在给定岗位、类型、时长和候选人材料边界内，承接实际回答，逐步观察职责、行动、选择和验证依据。问题质量以现场相关性、事实引用、重复率和可用性验收。框架接入不是效果验收结论。
+
+| 能力 | 输入 | 输出 | 不允许的动作 |
+| --- | --- | --- | --- |
+| 简历分析 | 用户确认的指定材料版本、去联系方式字段 | 可定位事实、待澄清点 | 补写经历、跨用户复用、写入公共知识库 |
+| 面前规划 | 配置、冻结知识、可选分析 | 有限观察目标、关注点、材料依据、限制 | 固定未来题单、计时或改变评分 |
+| 单轮推进 | 当前问题、已保存回答 revision、私有记忆、规划、检索 | ask / clarify / finish 建议、受限记忆更新 | 任意工具调用、越权检索、直接正式提交 |
+| 报告与比较 | 原有证据与规则 | 原有报告与比较结构 | 将简历事实替代回答证据、改变总分公式 |
+
+### 组件与依赖
+
+```mermaid
+flowchart TB
+  S[Interview 业务服务] --> I[InterviewAgent 能力接口]
+  I --> N[graph-v1：createInterviewAgent]
+  N --> G[LangGraph：准备上下文 → 模型 → 校验]
+  G --> C[LangChain ChatOpenAI 兼容适配]
+  C --> M[ecnu-plus]
+  G --> K[公共知识检索：先过滤后混合召回]
+  G --> R[冻结简历分析与本场计划]
+  G --> P[对话 / 经历 / 参与意愿策略与引用校验]
+  P --> B[候选提问和记忆]
+  B --> S
+  S --> D[(任务及输入摘要复核后正式提交)]
+  classDef default fill:#eeebff,stroke:#9873ff,color:#222;
+```
+
+主要文件：`agent.ts` 构建唯一图运行时，`model-analysis.ts` 提供共用分析及比较；`graph.ts` 构建三节点图并记录节点耗时；`workflow-models.ts` 实现简历与准备模型；`streaming-agent.ts` 复用现有有界流式提问与记忆校验；`model.ts` 统一 LangChain 模型传输。代码位于 `code/backend/src/modules/interviews/`。
+
+### 状态与记忆
+
+- 感知：只读取用户所属面试、确认材料、已保存回合及已冻结公共知识。ASR partial 不进入模型。
+- 记忆：保留目标覆盖、当前经历、回答证据、话题拒绝和参与状态，按原私有状态持久化。材料事实使用 `material_id/version/field/quote`；回答证据使用 turn/revision/quote，互不转换。
+- 规划：观察目标允许随职责修正、拒绝话题或实际回答调整；每轮选择仍受题量、时长、重复与经历边界校验。
+- 行动：生成下一问、澄清或建议结束；业务服务拥有接受、拒绝、取消和封存权。
+
+正常单轮只有一次模型调用；一次无效输出导致本次任务失败，由任务层最多执行两次。SDK 自动重试关闭。检索和校验是程序能力，没有开放自治浏览器或无限工具循环。
+
+### 框架分工与持久化
+
+LangChain 负责兼容模型协议、结构化 JSON、流式 chunk、AbortSignal、超时和用量；LangGraph 负责三个显式、可取消、有校验节点的工作流。没有把框架对象返回前端。使用已锁定的 `@langchain/core 1.3.4`、`@langchain/openai 1.8.0`、`@langchain/langgraph 1.6.1`，升级需要回归兼容模型。
+
+LangGraph 不另建业务持久化层。业务表保存准备状态、冻结快照及记忆；tasks/outbox/pg-boss 保存重试、租约和恢复。任务失效重跑整条短图，不能将内存节点完成视作正式业务提交。
+
+
+
+### 简历分析工作流
+
+```mermaid
+flowchart TD
+  S[确认保存简历版本] --> Q[事务登记分析任务与 Outbox]
+  Q --> W[独立 preparation 队列]
+  W --> P[prepare_context：核对归属与版本、脱敏、建立原句锚点]
+  P --> M[model：选择事实类别和锚点编号]
+  M --> V[validate：编号、连续原文、字段及版本校验]
+  V --> C[租约与未删除状态复核]
+  C --> D[写入 resume_analyses 结果]
+  V -->|失败| R[任务层最多两次，耗尽后 failed]
+  classDef default fill:#eeebff,stroke:#9873ff,color:#222;
+```
+
+结果键包含用户、材料 ID/版本、输入摘要、分析版本和模型。新版材料不覆盖旧版分析。删除取消任务并清理派生分析；分析完成后的迟到提交仍须核对删除状态。具体算法见[简历分析](../algorithm/knowledge_and_agent.md)。
+
+### 面前规划工作流
+
+```mermaid
+flowchart TD
+  C[创建面试并冻结配置与知识] --> H{已选择简历？}
+  H -->|否| Q[登记 planning 任务]
+  H -->|是| A{指定版本分析已就绪？}
+  A -->|否| W[waiting_material 持久化等待]
+  W --> B[worker 维护：检查同一分析版本]
+  B -->|成功| Q
+  B -->|失败或删除| F[failed：可重试或显式简化]
+  A -->|是| Q
+  Q --> P[prepare_context：只读配置、知识、分析]
+  P --> M[model：提出观察目标和材料索引]
+  M --> V[validate：合法目标与材料引用]
+  V --> R[复核任务 ID、输入摘要、材料未删除]
+  R --> D[ready：冻结本场计划]
+  F -->|用户选择简化| X[fallback：确定性通用目标]
+  D --> S[允许开始：计时并展示自我介绍]
+  X --> S
+  classDef default fill:#eeebff,stroke:#9873ff,color:#222;
+```
+
+准备不生成固定题单，不占用面试时间。没有简历可直接规划。固定题重练保留原问题，不重新规划替换它。配置在开始前修改时取消旧任务、清空快照并重新准备；开始后快照固定。
+
+### 单轮推进工作流
+
+```mermaid
+flowchart TD
+  A[保存回答并增加 revision] --> T[原业务事务登记 generation 任务]
+  T --> P[prepare_context：确认输入摘要、目标与对话策略]
+  P --> K[按冻结版本检索岗位相关知识]
+  K --> M[model：一次调用产生受限动作、问题、记忆]
+  M --> V[validate：动作、引用、经历、边界、重复和题量]
+  V --> B[可撤回预览：沿用原 SSE 协议]
+  V --> C[业务服务复核租约、回答 revision、计划和记忆摘要]
+  C -->|有效| S[事务保存正式问题与私有记忆]
+  C -->|已取消或已变化| X[丢弃迟到结果]
+  S --> D[正式事件 / TTS]
+  classDef default fill:#eeebff,stroke:#9873ff,color:#222;
+```
+
+流式预览沿用原有有界解析；它不是正式问题。模型 finish 建议不能绕过业务时长和题量规则。检索不足时可问岗位相关经历或分析方法，必须说明检索限制，不伪造来源。
+
+### 准备状态独立于主状态
+
+```mermaid
+stateDiagram-v2
+  [*] --> pending: graph 会话创建
+  pending --> waiting_material: 依赖未完成
+  waiting_material --> pending: 分析就绪并登记规划
+  pending --> ready: 规划提交
+  pending --> failed: 耗尽重试
+  waiting_material --> failed: 分析失败或删除
+  failed --> pending: 用户重试
+  failed --> fallback: 用户显式简化
+  pending --> fallback: 用户显式简化
+  waiting_material --> fallback: 用户显式简化
+  ready --> pending: 开始前修改配置
+  fallback --> pending: 开始前修改配置
+```
+
+只有主状态为 ready 且准备为 ready/fallback 时才能开始。旧会话没有 preparation 字段，沿用旧开始条件。`generation_status` 继续只描述问题生成状态。刷新从数据库恢复，不靠页面局部状态猜测。
+
+### 续答与发布防护
+
+```mermaid
+sequenceDiagram
+  participant U as 候选人
+  participant A as 业务 API
+  participant DB as PostgreSQL
+  participant W as Worker
+  participant M as 模型
+  U->>A: 保存回答 revision n
+  A->>DB: 事务保存 + generation g1
+  W->>M: g1 输入摘要
+  U->>A: 继续补充回答
+  A->>DB: revision n+1，取消 g1，登记 g2
+  A-->>W: 取消信号
+  M-->>W: g1 迟到输出
+  W->>DB: 核对任务、revision、快照、记忆摘要
+  DB-->>W: g1 不能提交
+  W->>M: g2 使用新摘要
+  W->>DB: g2 校验后提交正式问题
+```
+
+准备、问题生成和 TTS 分别取消。暂停、结束、删除及离页继续使用现有媒体释放逻辑；播放回执只接受当前 `speech_id`，详见[语音设计](voice-interview.md)。
+
+
+- 面前规划、推进/澄清、逐题评估及比较共用 LangChain 模型传输；简历、准备、单轮由 LangGraph 短图组织。模型只建议动作；服务负责状态、身份、版本、预算、保存和任务发布。
 - 常规面试开始时由程序呈现统一的自我介绍开场，返回 200；不预生成后续问题。收到回答后才调用模型，按面试类型侧重和当场陈述决定继续深挖或转换方向。单题重练直接回到原题。
-- 完整保留自我介绍和最近三轮回答，其余回答保留最多 800 字并标明截断，全部保留稳定 ID/revision。模型可以从较早的自我介绍换到另一条线索；当前话题的追问仍要求引用当前回答。报告按题处理。
+- 当前单轮使用必要的当前回答、自我介绍线索、带证据私有记忆和少量适用检索片段，避免完整历史反复重传；回合保留稳定 ID/revision。换话题可以承接早期线索，当前话题追问仍须引用相应回答。报告按题处理。
 - 新问题携带 `stage` 和中性的 `acknowledgement`，前端以连续对话、承接语和底部输入框展示，取消主界面的题号。未达到三份有效回答、题量上限或目标时间前，模型不可主动结束；用户仍可随时明确结束。
 - 规划和追问必须引用冻结来源；追问引用当前回答；报告的优势和缺口均需逐字证据。结构、来源、revision、原文和重复题干由程序检查；事实新增、语义重复、专业正确性和答案泄露仍需人工评测，不能声称 schema 校验解决了这些问题。
 - `InterviewKnowledgeProvider.read(configuration)` 返回 `content_version/questions/sources/missing_reason`。注入点为 `createInterviewRuntime` 的 `knowledge`。本地实现只读取已发布、岗位与阶段适用的基础题；开始时冻结实际正文，后续替换 provider 无需改编排器。
-- 空知识不阻断通用流程；不能编造专业来源和结论。未接简历时项目事实标记为用户当场陈述，不能当成核实后的履历。
-- 模型使用开始时记录的模型名；新面试提示和标准分别为 `interview-conversation-v2`、`evidence-uncalibrated-v1`。历史 v1 问题缺少对话字段时仍可读取，历史报告不自动重算。密钥和提供商原始异常不进入日志，运行日志只含任务类别、模型、版本、耗时、用量和错误码。
+- 空知识不阻断通用流程；不能编造专业来源和结论。无简历时项目事实标记为用户当场陈述，不能当成核实后的履历。
+- 模型使用准备快照记录的模型名；新面试提示和标准分别为 `interview-graph-v1`、`evidence-uncalibrated-v1`。历史 v1 问题缺少对话字段时仍可读取，历史报告不自动重算。密钥和提供商原始异常不进入日志，运行日志只含任务类别、模型、版本、耗时、用量和错误码。
 
 ## 数据、接口与一致性
 
-迁移 `0002_futuristic_genesis.sql` 新增六张模块表：面试、问题/回答、动作事件、报告、逐题评估、比较。问题独立存在，跳过与未提交不伪造有效回答。真实 DTO 位于 `core_engine/src/live-interview.ts`，原演示 `Session` 与同步 `DataClient` 保持独立。
+当前数据与外部接口以[数据与接口](data_and_interfaces.md)为准；本节只说明 Agent 的模型和发布边界。
+
+
+更新：2026-11-04。本文只维护模型协议；框架选择见[调研](../algorithm/research.md)。
+
+`model.ts` 用 LangChain ChatOpenAI 接入现有 `LLM_BASE_URL` 的 Chat Completions 兼容协议，保持 `ecnu-plus` 默认模型，不使用 Responses API。单轮、简历分析、准备、报告和比较统一走此传输边界。旧记录保留读取，不再执行旧 Agent。报告和比较继续使用原 schema、证据输入及评分规则。
+
+| 项目 | 实现约束 |
+| --- | --- |
+| 输出 | 支持 json_object / json_schema，Zod 校验结构；finish_reason 必须 stop；截断不能当完整成功 |
+| 流式 | LangChain chunk 转为已有 SSE 解析合同，保留结束原因及用量；正文上限 65536 字符 |
+| 取消与超时 | AbortSignal 贯穿图、模型与流；LLM_TIMEOUT_MS；错误统一脱敏 |
+| 重试 | ChatOpenAI maxRetries=0；任务 max_attempts=2，避免嵌套重试扩大费用 |
+| 冻结 | 会话快照冻结模型；分析键包含模型；重启或修改默认配置不改变既有准备输入 |
+| 用量与日志 | 只记录任务/节点、耗时、用量、错误码和必要标识，不记录简历或模型全文 |
+
+```mermaid
+flowchart LR
+  B[业务能力] --> L[LangChain ChatOpenAI]
+  L --> P[兼容 Chat Completions]
+  P --> J[JSON 或流式 chunk]
+  J --> V[既有结构与引用校验]
+  V --> S[任务发布防护]
+  classDef default fill:#eeebff,stroke:#9873ff,color:#222;
+```
+
+单轮不增加第二次模型规划调用，准备在独立队列预先完成。模型提出动作，业务规则决定能否提交。服务不可用时返回明确错误与重试入口；不得以演示回答冒充真实模型。
+
+
+迁移 `0002_futuristic_genesis.sql` 新增六张模块表：面试、问题/回答、动作事件、报告、逐题评估、比较。问题独立存在，跳过与未提交不伪造有效回答。真实 DTO 位于 `core_engine/src/live-interview.ts`，旧演示 Session/DataClient 已清退。
 
 HTTP 使用 `/api/v1`、公共 Cookie 身份和写入 Origin 检查。创建、开始、状态控制、提交、生成及删除携带 `Idempotency-Key`，已有对象写入携带 `version`。幂等响应仅存最小结果引用，重放再检查资源可用性，删除后不能重建或读回原文。
 
@@ -60,6 +241,9 @@ worker 注册规划、推进、逐题评估和比较处理器，单进程最多�
 删除立即撤销读取并清理本场问题、回答、事件、报告、比较和关联任务。独立重练回答保留，来源关系解除。当前项目没有实现备份系统或备份清理，不能把在线删除宣称为备份立即抹除。
 
 ## 验证与未完成验收
+
+本节后续带 v2/旧日期的记录仅用于追溯，不能作为当前执行链。当前旧 Agent 和旧启动器已经清退；运行、质量缺口和验证记录分别见[运行指南](development.md)、[评测](../algorithm/evaluation.md)。
+
 
 自动验证包括模型协议/取消/超时、题量与原文引用、真实 PostgreSQL、幂等及删除、模型迟到、硬时限、报告重试、固定题重练、比较和 worker 重启。普通检查与数据库/进程/代理测试分开；测试库必须命名为 `interviewlab_test*`。
 
@@ -98,7 +282,7 @@ worker 注册规划、推进、逐题评估和比较处理器，单进程最多�
 
 本轮 `npm run check` 的 60 项常规测试、16 项面试相关 PostgreSQL 测试及前后端构建通过。`npm run test:llm` 用真实 ecnu-plus 完成面试推进、报告、单题重练报告及比较，4 次实际调用通过；统一开场不调用模型。浏览器另完成自我介绍、基于回答提问、连续回答、原子提交最终草稿及三题复盘。
 
-`npm run test:llm:conversation` 的真实模型定向检查：相同后端岗位下，预约项目介绍引出并发冲突处理问题；仅 React 经历引出接口对接困难；给出数据库约束和 409 处理流程后，模型继续询问本机如何验证并发效果。三个场景引用校验通过，人工检查本次输出符合上述线索。该检查使用合成输入，不代表 30 组专业质量评审已经完成。
+`npm run test:llm` 的真实模型定向检查：相同后端岗位下，预约项目介绍引出并发冲突处理问题；仅 React 经历引出接口对接困难；给出数据库约束和 409 处理流程后，模型继续询问本机如何验证并发效果。三个场景引用校验通过，人工检查本次输出符合上述线索。该检查使用合成输入，不代表 30 组专业质量评审已经完成。
 
 重启后浏览器另用“只有 React 搜索页经历、没有后端项目”的介绍复测，模型继续询问搜索页在接口失败时如何展示，没有假设候选人实现过后端接口。实际界面见[对话式面试截图](prototype/screenshots/live-conversation-v2.png)，内容为合成案例。
 

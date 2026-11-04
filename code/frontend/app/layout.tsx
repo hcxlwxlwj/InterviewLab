@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { SessionProvider } from '../components/session-provider';
 import { AccountAccess } from '../components/account-access';
-import { interviewDevelopmentSession } from '../lib/development-session';
 import './globals.css';
 import './workspace.css';
 import './refinement.css';
@@ -29,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a className="skip-link" href="#main-content">
           跳到主要内容
         </a>
-        <SessionProvider developmentSession={interviewDevelopmentSession(process.env)}>
+        <SessionProvider>
           <AccountAccess>{children}</AccountAccess>
         </SessionProvider>
       </body>

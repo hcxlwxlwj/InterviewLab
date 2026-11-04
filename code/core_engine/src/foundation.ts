@@ -1,4 +1,14 @@
 /** Public contracts shared by real services. No framework, storage or provider dependencies. */
+export interface ApiError {
+  code: string;
+  message: string;
+  retryable: boolean;
+  request_id: string;
+}
+export interface PageResult<T> {
+  items: T[];
+  next_cursor: string | null;
+}
 export type MemberRole = 'student' | 'content_maintainer' | 'operator';
 export interface RequestIdentity {
   owner_id: string;

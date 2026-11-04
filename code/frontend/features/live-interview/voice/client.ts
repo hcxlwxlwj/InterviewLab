@@ -14,6 +14,9 @@ export class RealtimeVoiceClient {
   private muted = false;
   private aliveTimer?: ReturnType<typeof setInterval>;
   private timeout?: ReturnType<typeof setTimeout>;
+  private captureTimeout?: ReturnType<typeof setTimeout>;
+  private captured = false;
+  private readyEvent?: Extract<VoiceServerEvent, { type: 'ready' }>;
   constructor(
     private readonly id: string,
     private readonly event: (event: VoiceServerEvent) => void,
@@ -47,6 +50,12 @@ export class RealtimeVoiceClient {
         this.media.getTracks().forEach((t) => t.stop());
         return;
       }
+      const microphone = this.media.getAudioTracks()[0];
+      if (!microphone) throw new Error('浏览器未提供麦克风音轨，请选择其他输入设备。');
+      // Permission/device setup can interrupt the context after the initial user gesture.
+      await this.context.resume();
+      if (this.context.state !== 'running')
+        throw new Error('浏览器音频采集尚未启动，请重新开启语音。');
       await this.context.audioWorklet.addModule('/voice-capture.worklet.js');
       if (this.closed) return;
       this.playback = new VoicePlayback(
@@ -56,15 +65,26 @@ export class RealtimeVoiceClient {
         this.playing,
       );
       this.capture = new AudioWorkletNode(this.context, 'interview-voice-capture');
+      this.capture.onprocessorerror = () => this.fail('麦克风音频处理失败，请重新连接语音。');
       this.source = this.context.createMediaStreamSource(this.media);
       this.source.connect(this.capture);
       this.capture.connect(this.context.destination);
       const socket = (this.socket = apiVoiceSocket(`/interviews/${this.id}/voice`));
+      this.captureTimeout = setTimeout(() => {
+        if (!this.closed && !this.captured)
+          this.fail('浏览器已授权，但没有产生麦克风音频。请更换输入设备后重新连接。');
+      }, 5000);
       this.capture.port.onmessage = ({
         data,
       }: MessageEvent<
         { type: 'audio'; pcm: ArrayBuffer } | { type: 'speech_start' | 'speech_end' }
       >) => {
+        if (this.closed) return;
+        if (data.type === 'audio') {
+          this.captured = true;
+          clearTimeout(this.captureTimeout);
+          this.publishReady();
+        }
         if (!this.ready || socket.readyState !== WebSocket.OPEN) return;
         if (data.type === 'audio') {
           if (socket.bufferedAmount > 128000) {
@@ -87,6 +107,9 @@ export class RealtimeVoiceClient {
           if (event.type === 'ready') {
             this.ready = true;
             clearTimeout(this.timeout);
+            this.readyEvent = event;
+            this.publishReady();
+            return;
           }
           if (event.type === 'speech_start') this.playback?.start(event.speech_id);
           if (event.type === 'audio') this.playback?.append(event.speech_id, event.pcm);
@@ -110,11 +133,28 @@ export class RealtimeVoiceClient {
           if (!this.closed) this.fail('麦克风已断开，文字草稿仍保留。');
         }),
       );
+      this.context.onstatechange = () => {
+        if (!this.closed && this.context?.state !== 'running')
+          this.fail('浏览器音频采集已暂停，请重新开启语音。');
+      };
     } catch (error) {
       this.stop();
       if (error instanceof DOMException && error.name === 'NotAllowedError')
         throw new Error('未获得麦克风权限，请在浏览器地址栏允许麦克风后重试。');
+      if (error instanceof DOMException && error.name === 'NotFoundError')
+        throw new Error('找不到所选麦克风，请选择其他输入设备后重试。');
+      if (error instanceof DOMException && error.name === 'NotReadableError')
+        throw new Error('浏览器无法读取麦克风，请检查设备占用并重新选择输入设备。');
+      if (error instanceof DOMException && error.name === 'OverconstrainedError')
+        throw new Error('所选麦克风已不可用，请选择其他输入设备后重试。');
       throw error instanceof Error ? error : new Error('无法启动麦克风。');
+    }
+  }
+  private publishReady() {
+    if (this.readyEvent && this.captured) {
+      const event = this.readyEvent;
+      this.readyEvent = undefined;
+      this.event(event);
     }
   }
   send(event: VoiceClientEvent) {
@@ -149,6 +189,8 @@ export class RealtimeVoiceClient {
     this.ready = false;
     clearInterval(this.aliveTimer);
     clearTimeout(this.timeout);
+    clearTimeout(this.captureTimeout);
+    this.readyEvent = undefined;
     this.playback?.stop(true);
     this.socket?.close();
     if (this.capture) {

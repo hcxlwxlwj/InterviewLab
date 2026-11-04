@@ -112,7 +112,7 @@ export function interviewsModule(
               request.body as B,
               request.headers['idempotency-key'] as string,
             );
-            return reply.code(result.generation_status === 'pending' ? 202 : 200).send(result);
+            return reply.code(result.generation_status === 'pending' || (path === '/prepare' && ['pending','waiting_material'].includes(result.preparation?.status ?? '')) ? 202 : 200).send(result);
           },
         });
       }
@@ -122,6 +122,7 @@ export function interviewsModule(
         (...args) => ready().patch(...args),
         'patch',
       );
+      command('/prepare', s.preparationBody, (...args) => ready().prepare(...args));
       command('/start', s.versionBody, (...args) => ready().start(...args));
       command('/pause', s.versionBody, (...args) => ready().pause(...args));
       command('/resume', s.versionBody, (...args) => ready().resume(...args));
@@ -214,7 +215,7 @@ export function interviewsModule(
               request.body as B,
               request.headers['idempotency-key'] as string,
             );
-            return reply.code(result.generation_status === 'pending' ? 202 : 200).send(result);
+            return reply.code(result.generation_status === 'pending' || (path === '/prepare' && ['pending','waiting_material'].includes(result.preparation?.status ?? '')) ? 202 : 200).send(result);
           },
         );
       }

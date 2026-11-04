@@ -14,7 +14,7 @@ import { createDatabase, type Database } from '../../../code/backend/src/databas
 import { migrateDatabase } from '../../../code/backend/src/database/migrate';
 import { buildApp } from '../../../code/backend/src/server/app';
 import { createInterviewRuntime } from '../../../code/backend/src/modules/interview-runtime';
-import type { InterviewAgent } from '../../../code/backend/src/modules/interviews/agent';
+import type { InterviewAgent } from '../../../code/backend/src/modules/interviews/model-analysis';
 import { runTask, TaskDeliveryError } from '../../../code/backend/src/tasks/runner';
 import { ServiceError } from '../../../code/backend/src/foundation/errors';
 import { inputDigest } from '../../../code/backend/src/foundation/idempotency';
@@ -64,22 +64,6 @@ function fakeAgent(): InterviewAgent {
   return {
     available: true,
     model: 'controlled-test-only',
-    async plan(_v, snapshot) {
-      const q = snapshot.knowledge.questions[0];
-      return {
-        topics: [q?.topic ?? '通用经历'],
-        question: q
-          ? {
-              text: q.text,
-              topic: q.topic,
-              purpose: q.intent,
-              knowledge_question_id: q.id,
-              source_refs: q.source_refs,
-              evidence_refs: [],
-            }
-          : question('请介绍你的学习经历。'),
-      };
-    },
     async advance(v, _snapshot, clarify) {
       const last = v.turns.at(-1)!;
       if (clarify)
@@ -183,7 +167,8 @@ async function drain() {
   await runtime.maintain();
 }
 async function started(configInput = configuration): Promise<Interview> {
-  const v = await runtime.interviews.create(identity, configInput, randomUUID());
+  let v = await runtime.interviews.create(identity, configInput, randomUUID());
+  v = await runtime.interviews.prepare(identity, v.id, { version: v.version, mode: 'fallback' }, randomUUID());
   const s = await runtime.interviews.start(identity, v.id, { version: v.version }, randomUUID());
   await drain();
   return runtime.interviews.read(identity, s.id);
@@ -205,8 +190,11 @@ test('real routes run the text interview, report, fixed-question retry and evide
       payload: configuration,
     });
     assert.equal(created.statusCode, 201);
-    const draft: Interview = created.json();
+    let draft: Interview = created.json();
     assert.equal(draft.started_at, null);
+    const prepared = await app.inject({ method:'POST',url:`/api/v1/interviews/${draft.id}/prepare`,headers:{...headers,'idempotency-key':randomUUID()},payload:{version:draft.version,mode:'fallback'} });
+    assert.equal(prepared.statusCode,200);
+    draft=prepared.json();
     const beginning = await app.inject({
       method: 'POST',
       url: `/api/v1/interviews/${draft.id}/start`,
@@ -726,6 +714,7 @@ test('history pagination stays isolated and malformed typed cursors return input
 });
 test('durable outbox survives worker restart and advertises registered business handlers', async () => {
   let v = await runtime.interviews.create(identity, configuration, randomUUID());
+  v = await runtime.interviews.prepare(identity, v.id, { version: v.version, mode: 'fallback' }, randomUUID());
   v = await runtime.interviews.start(identity, v.id, { version: v.version }, randomUUID());
   v = await runtime.interviews.answer(
     identity,
@@ -1166,7 +1155,14 @@ test('setup persists text, voice and independent video interview selection', asy
         payload: { ...configuration, interaction_mode: mode },
       });
       assert.equal(created.statusCode, 201);
-      const value = created.json<Interview>();
+      let value = created.json<Interview>();
+      const prepared = await app.inject({
+        method: 'POST', url: `/api/v1/interviews/${value.id}/prepare`,
+        headers: { origin: config.PUBLIC_ORIGIN, 'idempotency-key': randomUUID() },
+        payload: { version: value.version, mode: 'fallback' },
+      });
+      assert.equal(prepared.statusCode, 200);
+      value = prepared.json<Interview>();
       const read = await app.inject(`/api/v1/interviews/${value.id}`);
       assert.equal(read.statusCode, 200);
       assert.equal(read.json<Interview>().configuration.interaction_mode, mode);

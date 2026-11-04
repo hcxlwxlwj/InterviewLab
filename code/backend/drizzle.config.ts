@@ -8,6 +8,7 @@ export default defineConfig({
     './src/modules/accounts/auth-schema.ts',
     './src/modules/interviews/schema.ts',
     './src/modules/reports/schema.ts',
+    './src/modules/resumes/schema.ts',
   ],
   out: './drizzle',
   dbCredentials: { url: process.env.DATABASE_URL ?? '' },

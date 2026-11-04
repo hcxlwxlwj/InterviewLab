@@ -1,11 +1,14 @@
+import { createAllRoleKnowledge } from './knowledge/all-roles';
+import { createResumeAnalysis } from './resumes/analysis';
+import { createWorkflowModels, type WorkflowModels } from './interviews/workflow-models';
+import { createInterviewPreparation } from './interviews/preparation';
+import { createInterviewAgent } from './interviews/agent';
 import { createMaterialsService } from './resumes/service';
-import { createKnowledgeService } from './knowledge/service';
-import { withRealtimeAgent } from './interviews/agent-v3';
 import type { InterviewKnowledgeProvider, InterviewKnowledgeRuntime } from '@interviewlab/core';
 import type { Database } from '../database/connection';
 import type { BackendConfig } from '../foundation/config';
 import { ServiceError } from '../foundation/errors';
-import { createInterviewAgent, type InterviewAgent } from './interviews/agent';
+import type { InterviewAgent } from './interviews/model-analysis';
 import { createInterviewsService, type InterviewReportHooks } from './interviews/service';
 import { createReportsService } from './reports/service';
 import { interviewsModule } from './interviews/routes';
@@ -14,6 +17,7 @@ import type { TaskRow } from '../tasks/service';
 import type { VoiceProvider } from './interviews/voice/volcengine';
 
 export interface InterviewRuntimeOptions {
+  workflowModels?: WorkflowModels;
   voiceProvider?: VoiceProvider;
   agent?: InterviewAgent;
   knowledge?: InterviewKnowledgeProvider;
@@ -26,25 +30,41 @@ export function createInterviewRuntime(
   config: BackendConfig,
   options: InterviewRuntimeOptions = {},
 ) {
-  const knowledge = createKnowledgeService(config);
+  const knowledge = createAllRoleKnowledge(config);
+  const content = options.knowledge ?? options.realtimeKnowledge ?? knowledge;
+  const models = options.workflowModels ?? createWorkflowModels(config, fetch, options.log);
+  const resumeAnalysis = createResumeAnalysis(database, config, models);
+  const materials = createMaterialsService(database, resumeAnalysis, true);
   const agent =
     options.agent ??
-    withRealtimeAgent(createInterviewAgent(config, fetch, options.log), config, options.log);
+    createInterviewAgent(config, options.log);
   const interviews = createInterviewsService(
     database,
-    options.knowledge ?? options.realtimeKnowledge ?? knowledge,
+    content,
     agent,
     {
       prepare: options.onFinalize ? undefined : (tx, state) => reports.prepare(tx, state),
       seal: options.onFinalize ?? ((tx, state) => reports.seal(tx, state)),
       erase: (tx, owner, id) => reports.erase(tx, owner, id),
     },
-    options.realtimeKnowledge ?? knowledge,
-    async (owner,id,version)=>{const versions=await createMaterialsService(database).versions(owner,id);const material=versions.find(v=>v.version===version&&v.kind==='resume'&&v.confirmed);if(!material)throw new ServiceError('unsupported_input',400,'请选择本人已确认的简历版本');return material;},
+    options.realtimeKnowledge ?? {
+      ...knowledge,
+      read: (c) => knowledge.read(c),
+      profiles: (c) => knowledge.profiles(c),
+      prefetch: (c,k,m) => knowledge.prefetch(c,k,m),
+      context: (c,k,m,a,s) => knowledge.context(c,k,m,a,s),
+    },
+    async (owner,id,version)=>{const versions=await materials.versions(owner,id);const material=versions.find(v=>v.version===version&&v.kind==='resume'&&v.confirmed);if(!material)throw new ServiceError('unsupported_input',400,'请选择本人已确认的简历版本');return material;},
+    {
+      initialize: (identity,id) => preparation.initialize(identity,id),
+      request: (identity,id,body,key) => preparation.request(identity,id,body,key),
+    },
   );
+  const preparation=createInterviewPreparation(database,config,content,materials,resumeAnalysis,models);
   const reports = createReportsService(database, interviews, agent);
   return {
     agent,
+    materials,
     close: async () => {
       await interviews.streams.close();
       await knowledge.close();
@@ -55,8 +75,9 @@ export function createInterviewRuntime(
       interviewsModule(interviews, { config, provider: options.voiceProvider }),
       reportsModule(reports),
     ],
-    handlers: { ...interviews.handlers, ...reports.handlers },
+    handlers: { ...interviews.handlers, ...reports.handlers, ...resumeAnalysis.handlers, ...preparation.handlers },
     async maintain() {
+      await preparation.maintain();
       await interviews.maintain();
       await reports.maintain();
     },
@@ -70,6 +91,10 @@ export function createInterviewRuntime(
         version?: number;
       };
       try {
+        if (task.type === 'preparation.plan.v1' && input.interview_id) {
+          const state=await interviews.read({owner_id:task.owner_id,roles:[]},input.interview_id);
+          return state.status !== 'ready' || state.preparation?.task_id !== task.id;
+        }
         if (input.interview_id) {
           if (task.type === 'reports.evaluate.v1') return await reports.isEvaluationCancelled(task);
           const current = await interviews.read(

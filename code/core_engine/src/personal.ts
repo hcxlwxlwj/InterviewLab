@@ -12,6 +12,7 @@ export interface PersonalSettings {
   default_resume_id: string | null;
 }
 export interface PersonalMaterial {
+  analysis?: import('./agent-workflow').MaterialAnalysisStatus;
   id: string;
   kind: 'resume' | 'experience';
   version: number;

@@ -1,16 +1,4 @@
-import type {
-  Configuration,
-  DimensionKey,
-  InterviewType,
-  Preferences,
-  SessionStatus,
-} from './domain/interview';
-export const TYPE_LABELS: Record<InterviewType, string> = {
-  project_deep_dive: '项目深挖',
-  technical_qa: '专业问答',
-  hr: 'HR 面试',
-  mixed: '综合面试',
-};
+import type { SessionStatus, DimensionKey } from './domain/interview';
 export const STATUS_LABELS: Record<SessionStatus, string> = {
   draft: '配置中',
   ready: '待开始',
@@ -26,25 +14,3 @@ export const DIMENSION_LABELS: Record<DimensionKey, string> = {
   coding_ability: '代码能力',
   logical_expression: '逻辑表达',
 };
-export const DEFAULT_PREFERENCES: Preferences = {
-  interaction_mode: 'realtime_voice',
-  editor_theme: 'system',
-  default_job_direction: '',
-  version: 1,
-};
-export function defaultConfiguration(job = 'frontend'): Configuration {
-  return {
-    job,
-    interview_type: 'project_deep_dive',
-    difficulty: '基础',
-    jd_text: '',
-    duration_minutes: 10,
-    interviewer_style: '标准',
-    code_assessment_enabled: false,
-    interaction_mode: 'realtime_voice',
-    camera_enabled: false,
-    review_media_enabled: false,
-    resume_document_id: 'resume-frontend',
-    focus_experience_ids: ['exp-market'],
-  };
-}

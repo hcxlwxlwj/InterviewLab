@@ -5,9 +5,9 @@ import { loadConfig } from '../../../code/backend/src/foundation/config';
 import { createDatabase, type Database } from '../../../code/backend/src/database/connection';
 import { migrateDatabase } from '../../../code/backend/src/database/migrate';
 import { createInterviewRuntime } from '../../../code/backend/src/modules/interview-runtime';
-import { createInterviewAgent } from '../../../code/backend/src/modules/interviews/agent';
-import { withRealtimeAgent } from '../../../code/backend/src/modules/interviews/agent-v3';
-import { readKnowledgeSeed } from '../../../code/backend/src/modules/knowledge/service';
+import { createModelAnalysis } from '../../../code/backend/src/modules/interviews/model-analysis';
+import { createStreamingAgent } from '../../../code/backend/src/modules/interviews/streaming-agent';
+import { currentKnowledgeFixture } from '../../support/knowledge-fixture';
 import { buildApp } from '../../../code/backend/src/server/app';
 import { runTask } from '../../../code/backend/src/tasks/runner';
 import { loadInterview } from '../../../code/backend/src/modules/interviews/repository';
@@ -42,7 +42,7 @@ const configuration: InterviewConfig = {
 before(async () => {
   database = createDatabase(config);
   await migrateDatabase(database);
-  const seed = await readKnowledgeSeed();
+  const seed = await currentKnowledgeFixture();
   knowledge = {
     content_version: seed.id,
     questions: [],
@@ -67,8 +67,8 @@ function runtime(blocked = false, extra: InterviewRuntimeOptions = {}) {
   const gate = new Promise<void>((r) => (release = r));
   let reached = () => {};
   const previewReady = new Promise<void>((r) => (reached = r));
-  const agent = withRealtimeAgent(
-    createInterviewAgent(config),
+  const agent = createStreamingAgent(
+    createModelAnalysis(config),
     config,
     () => {},
     async (_url, init) => {
@@ -82,6 +82,7 @@ function runtime(blocked = false, extra: InterviewRuntimeOptions = {}) {
         o: 0,
         q: '你提到缓存，如何验证数据仍然正确？',
         s: [],
+        r: [],
       });
       let cancelled = false;
       const response = new Response(
@@ -131,6 +132,7 @@ function runtime(blocked = false, extra: InterviewRuntimeOptions = {}) {
 }
 async function ready(r: ReturnType<typeof runtime>) {
   let v = await r.value.interviews.create(owner, configuration, crypto.randomUUID());
+  v = await r.value.interviews.prepare(owner, v.id, { version: v.version, mode: 'fallback' }, crypto.randomUUID());
   v = await r.value.interviews.start(owner, v.id, { version: v.version }, crypto.randomUUID());
   v = await r.value.interviews.answer(
     owner,
@@ -250,6 +252,7 @@ test('participation reminders, confirmation and sealing are atomic, durable and 
   const r = runtime();
   try {
     let v = await r.value.interviews.create(owner, configuration, crypto.randomUUID());
+    v = await r.value.interviews.prepare(owner, v.id, { version: v.version, mode: 'fallback' }, crypto.randomUUID());
     v = await r.value.interviews.start(owner, v.id, { version: v.version }, crypto.randomUUID());
     const firstTurn = v.turns.at(-1)!;
     const firstBody = { version: v.version, text: '我不配合' };
@@ -306,6 +309,7 @@ test('a substantive answer clears the warning and returns to the existing model 
   const r = runtime();
   try {
     let v = await r.value.interviews.create(owner, configuration, crypto.randomUUID());
+    v = await r.value.interviews.prepare(owner, v.id, { version: v.version, mode: 'fallback' }, crypto.randomUUID());
     v = await r.value.interviews.start(owner, v.id, { version: v.version }, crypto.randomUUID());
     v = await r.value.interviews.answer(
       owner,
@@ -372,6 +376,7 @@ test('voice answers use our existing knowledge runtime and pass its retrieved co
   let session: InterviewVoiceSession | undefined;
   try {
     let v = await r.value.interviews.create(owner, configuration, crypto.randomUUID());
+    v = await r.value.interviews.prepare(owner, v.id, { version: v.version, mode: 'fallback' }, crypto.randomUUID());
     v = await r.value.interviews.start(owner, v.id, { version: v.version }, crypto.randomUUID());
     session = new InterviewVoiceSession(
       v.id,

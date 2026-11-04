@@ -1,6 +1,6 @@
 # 工程目录与职责
 
-更新：2026-10-25。独立 Fastify/worker 骨架、公共迁移和岗位只读模块已实现；其他业务按模块接入。产品架构见[总体架构](architecture.md)。
+更新：2026-10-25。当前账号、材料、全岗位面试、报告与异步任务已接入，旧演示执行链已清退。产品架构见[总体架构](architecture.md)。
 
 ## 与课程模板的对应
 
@@ -13,7 +13,7 @@ InterviewLab/
 │   └── scripts/            # 内容、依赖和文档检查
 ├── code/
 │   ├── backend/            # HTTP 接口、服务合同、src/content 公开适配
-│   ├── frontend/           # 页面、组件、演示客户端
+│   ├── frontend/           # 页面、组件、同源 HTTP 客户端
 │   └── core_engine/        # 共享类型、纯规则及端口
 ├── docs/
 │   ├── requirements/       # 问题定义、功能、非功能、用户故事
@@ -34,36 +34,35 @@ InterviewLab/
 
 ## 当前运行和依赖关系
 
-`npm run dev` 只启动 Next.js；真实 `/api/v1` 同源代理到 npm run dev:api 启动的 Fastify。原 Route Handlers 合成接口迁至 `/api/demo/v1`。真实账号、岗位、文字面试与报告已通过 HTTP 接入；未实现的个人材料维护显示空状态。旧演示客户端保留，正常导航不再使用其个人数据。
+`npm run dev` 只启动 Next.js；真实 `/api/v1` 同源代理到 npm run dev:api 启动的 Fastify。旧演示 Route Handlers、浏览器假会话及非流式 Agent 已删除；当前材料、面试与报告均读取本人真实 HTTP 数据。
 
 ```text
 浏览器 lib/api → Next.js /api/v1 代理 → Fastify → 模块服务
-Next.js app/api/demo → 旧合成 HTTP → core / backend 内容模块
-Next.js 页面/演示客户端 → backend 的公开 content 子入口 / core
+Next.js 页面 → core 共享合同 / 必要的公开 content
 backend/src/content/index.ts → docs/algorithm/content/*.json
-backend/src/content/demo.ts → 合成样例与演示报告
+LangGraph Agent → LangChain 模型适配 / 全岗位知识服务
 ```
 
-核心仅定义和执行规则。`buildQuestions` 接收显式模板；`createJobCatalog` 接收模板与来源集合，不导入文件或全局题库。数据库、身份、模型、语音和代码执行通过核心接口由后端适配，不能倒向依赖 UI。
+核心仅定义和执行规则。`createJobCatalog` 接收模板与来源集合，不导入文件或全局题库。数据库、身份、模型、语音和代码执行通过核心接口由后端适配，不能倒向依赖 UI。
 
-公开子入口 `@interviewlab/backend/content` 和 `/content/demo` 可被浏览器使用，只依赖领域核心和公开 JSON。前端只有 `app/api/` 可以导入后端 HTTP 入口；内容模块禁止导入服务端实现。`npm run boundaries:check` 与 CI 检查上述依赖约束。
+公开子入口 `@interviewlab/backend/content` 可被浏览器使用，只依赖领域核心和公开 JSON。前端只有 `app/api/` 可以导入后端 HTTP 入口；内容模块禁止导入服务端实现。`npm run boundaries:check` 与 CI 检查上述依赖约束。
 
 ## 修改任务应落在哪里
 
-独立后端由 npm run dev:api / dev:worker 启动，不经过旧演示路由。src/server 负责装配，src/modules/jobs 为完整示例，src/foundation/database/tasks 是公共基础，src/modules/accounts 包含认证适配与表，src/entrypoints 为命令。前端 lib/api 和 SessionProvider 由公共负责人维护，业务页面由模块负责人迁移。新 schema 不放入旧演示 src/http。成员流程见[后端 README](../../code/backend/README.md)及[前端接入](../../code/frontend/README.md)。
+独立后端由 npm run dev:api / dev:worker 启动，不经过旧演示路由。src/server 负责装配，src/modules/jobs 为完整示例，src/foundation/database/tasks 是公共基础，src/modules/accounts 包含认证适配与表，src/entrypoints 为命令。前端 lib/api 和 SessionProvider 由公共负责人维护，业务页面由模块负责人迁移。输入输出 schema 放在实际业务模块，不再使用已删除的演示 src/http。成员流程见[后端 README](../../code/backend/README.md)及[前端接入](../../code/frontend/README.md)。
 
 | 任务 | 代码位置 | 同步文档 / 验证 |
 | --- | --- | --- |
 | 个人中心布局与筛选 | `frontend/features/personal-center` | 原型说明、浏览器回归 |
-| 简历、收藏、个人 JD 演示操作 | `frontend/lib/demo` | 数据合同、客户端单元测试 |
+| 确认简历、版本与分析 | `backend/src/modules/resumes`、`frontend/features/personal-center` | 数据合同、材料/准备/删除回归 |
 | 会话规则、预算与汇总 | `core_engine/src` | 功能需求、规则单元测试 |
-| HTTP 字段和错误 | `backend/src/http` | 数据与接口、接口测试 |
+| HTTP 字段和错误 | `backend/src/modules/*/routes.ts`、`schemas.ts` | 数据与接口、接口测试 |
 | 岗位正文、问题、来源与版本 | `docs/algorithm/content` | 内容维护说明、内容检查 |
 | 本地公开内容加载 | `backend/src/content` | 检索与模板测试 |
-| 数据库与真实身份（后续） | `backend` 的仓储/服务适配 | 归属、并发、删除与集成测试 |
-| 模型与向量检索（后续） | `backend` 的供应商/知识适配 | Agent 权限、引用与效果评测 |
+| 数据库与真实身份 | `backend` 的仓储/服务适配 | 归属、并发、删除与集成测试 |
+| 模型与全岗位向量检索 | `backend` 的供应商/知识适配 | Agent 权限、引用与效果评测 |
 
-目录内说明见[代码导航](../../code/README.md)及[测试导航](../../tests/README.md)。已有路由和组件兼容入口保留；文档只维护当前正文，旧目录由 Git 历史追溯。
+目录内说明见[代码导航](../../code/README.md)及[测试导航](../../tests/README.md)。历史记录读取保留，旧演示和运行时执行入口已清退；文档只维护当前正文，旧目录由 Git 历史追溯。
 
 ## 当前文档与历史记录
 
@@ -94,7 +93,7 @@ backend/src/content/demo.ts → 合成样例与演示报告
 
 - 共享核心保持纯类型与规则，不引入 Zod、框架、数据库或供应商。Zod schema 留在后端并与公共 DTO 做类型一致检查；依赖边界不放开。
 - 后端实现依赖核心；前端正式客户端只依赖核心 DTO 和 HTTP/实时协议，不导入 backend 运行入口、Drizzle、Better Auth 配置或模型适配器。
-- 当前 `/content` 与 `/content/demo` 是已验证的公开静态过渡入口，本轮保留。真实模式通过岗位 API 获取内容，演示样例继续单独标记；私有服务不得通过公开子入口泄漏到浏览器。
+- 当前仅保留 `/content` 公开岗位入口，业务页面通过岗位 API 获取内容；私有服务不得通过公开子入口泄漏到浏览器。
 - 同步 `DataClient` 保留为演示合同，不强行将真实请求伪装成同步接口。新建异步客户端，页面显式处理加载、错误、任务轮询和版本冲突，再整体迁移旧 `/sessions`、`/resume-documents` 等路径。
 - 现有 `Session`、`ResumeDocument` 和 `StreamEvent.session_id` 是原型类型；目标 HTTP 使用 Interview、Resume 及 interview_id，迁移时显式映射，不能只改字段名称却遗漏状态语义。
 - 保留演示入口与当前标签页资料，不将资料自动上传到受邀账号。真实模式不读取演示固定分数，未接入能力返回明确状态。

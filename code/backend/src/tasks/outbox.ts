@@ -1,5 +1,5 @@
 import type { Database } from '../database/connection';
-import { TASK_QUEUE, REPORT_QUEUE } from './queue';
+import { TASK_QUEUE, REPORT_QUEUE, PREPARATION_QUEUE } from './queue';
 export interface QueuePublisher {
   send(
     name: string,
@@ -28,7 +28,7 @@ export async function dispatchOutbox(database: Database, queue: QueuePublisher, 
         const id = await queue.send(
           row.type.startsWith('reports.') || row.type.startsWith('comparisons.')
             ? REPORT_QUEUE
-            : TASK_QUEUE,
+            : row.type.startsWith('resumes.') || row.type.startsWith('preparation.') ? PREPARATION_QUEUE : TASK_QUEUE,
           { task_id: row.task_id },
           {
             // Extra deliveries allow recovery after a lost lease. The task table bounds actual calls.

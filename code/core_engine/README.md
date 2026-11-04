@@ -1,22 +1,12 @@
-# 领域核心 · @interviewlab/core
+# 领域核心
 
-此包提供与框架、存储和供应商无关的类型与规则。仅允许相对引用本包源码，不从外部包或内容 JSON 读取数据。
+只维护当前共享 DTO、岗位内容结构、面试题量与证据规则、简历结构、语音协议和报告规则。核心不依赖框架、Node 或外部内容文件。
 
-| 文件 | 职责 |
-| --- | --- |
-| `src/domain/interview.ts` | 配置、简历、经历、会话、回答、报告等共享对象 |
-| `src/domain/knowledge.ts` | 岗位、来源、知识、查询及检索接口 |
-| `src/ports.ts` | 模型、语音、执行、存储、会话仓储与演示数据客户端合同 |
-| `src/live-interview.ts` | 真实文字面试 DTO、知识端口、证据与未校准报告/比较、题量规则；独立于演示 Session |
-| `src/configuration.ts` | 默认配置与显示标签 |
-| `src/questions.ts` | 根据传入的模板生成预设题目，控制主问题/追问预算 |
-| `src/session.ts` | 提交幂等、暂停、结束及 12 分钟安全上限 |
-| `src/report.ts` | 仅对已观察且非空维度汇总分数 |
-| `src/knowledge.ts` | 使用调用方传入数据建立注册表、筛选及确定性检索 |
-| `src/index.ts` | 稳定的公共导出入口 |
+- live-interview.ts、agent-workflow.ts、interview-agent.ts：当前面试、准备、规划、记忆与检索合同。
+- domain/knowledge.ts、knowledge.ts：已发布岗位、原创问题及来源的结构化查询。
+- foundation.ts：身份、任务、分页和错误合同。
+- personal.ts、resume-template.ts：本人材料版本和确认后的简历结构。
+- feedback-template.ts、report-rubric.ts：当前报告及历史报告的可读评分规则。
+- voice.ts：共享媒体事件；configuration.ts 只维护显示标签。
 
-`buildQuestions(configuration, template)` 显式接收模板；新面试由内容适配器解析岗位，历史面试使用被冻结的内容，不读取不断变化的全局题库。默认配置沿用原型初始值；前端演示客户端会按当前简历和偏好重新选择材料。
-
-合成简历、示例会话与演示报告已移到 `@interviewlab/backend/content/demo`。此处定义的 `DataClient` 是同步演示合同，不是已完成的 HTTP 客户端；真实服务需要独立的异步合同、加载及错误处理。
-
-在仓库根目录执行 `npm test` 和 `npm run boundaries:check`。规则测试在[单元测试目录](../../tests/unit)。
+已删除同步演示 Session、预设题单、假报告计算及 DataClient 端口。npm run boundaries:check 和 npm test 验证依赖边界及领域规则。

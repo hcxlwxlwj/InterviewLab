@@ -30,6 +30,8 @@ async function main() {
         pcm16.writeInt16LE(Math.round(a * (1 - fraction) + b * fraction), i * 2);
       }
       let resolve!: () => void, reject!: (reason?: unknown) => void;
+      let finalSent = false,
+        streamingResponse = false;
       const recognized = new Promise<void>((r, j) => {
         resolve = r;
         reject = j;
@@ -39,6 +41,7 @@ async function main() {
       try {
         stream = await provider.recognize(
           (result) => {
+            if (!finalSent && result.text.trim()) streamingResponse = true;
             if (result.final && /面试|项目/.test(result.text)) resolve();
           },
           () => reject(new Error()),
@@ -51,8 +54,10 @@ async function main() {
           stream.write(Buffer.alloc(6400));
           await new Promise((r) => setTimeout(r, 200));
         }
+        finalSent = true;
         stream.finish();
         await recognized;
+        if (!streamingResponse) throw new Error('No streaming recognition before final packet');
       } finally {
         clearTimeout(timeout);
       }
@@ -60,6 +65,7 @@ async function main() {
         JSON.stringify({
           tts_audio: true,
           asr_recognized_test_sentence: true,
+          asr_streaming_before_finish: streamingResponse,
           elapsed_ms: Math.round(performance.now() - started),
         }),
       );

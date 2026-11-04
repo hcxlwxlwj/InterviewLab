@@ -1,0 +1,47 @@
+{
+  "limitations": "合成脚本固定回答；未测真实语音；独立人工审查待完成；此对照不包含向量检索",
+  "records": [
+    {
+      "family": "data",
+      "variant": 0,
+      "runtime": "graph",
+      "round": 0,
+      "answer": "我做了用于分析课程选课记录的作业，本人负责清洗数据和SQL查询。",
+      "question": "清洗数据时，你具体处理了哪些异常或格式问题？",
+      "action": "follow_up",
+      "attempts": 1,
+      "prepare_ms": 25738.852000000003,
+      "first_ms": 2069.8244000000013,
+      "complete_ms": 3018.3403,
+      "semantic_review": null
+    },
+    {
+      "family": "data",
+      "variant": 0,
+      "runtime": "graph",
+      "round": 1,
+      "answer": "我先检查缺失值和重复记录，再按课程统计人数。",
+      "question": "统计人数时，你如何确认SQL查询结果准确？",
+      "action": "follow_up",
+      "attempts": 1,
+      "prepare_ms": 25738.852000000003,
+      "first_ms": 1519.5234999999993,
+      "complete_ms": 2472.2492999999995,
+      "semantic_review": null
+    },
+    {
+      "family": "data",
+      "variant": 0,
+      "runtime": "graph",
+      "round": 2,
+      "answer": "我抽样对照原始记录，检查聚合后的总数是否一致。",
+      "question": "抽样对照时，你具体选取了哪些记录作为样本？",
+      "action": "follow_up",
+      "attempts": 1,
+      "prepare_ms": 25738.852000000003,
+      "first_ms": 1238.193800000001,
+      "complete_ms": 2607.8429000000033,
+      "semantic_review": null
+    }
+  ]
+}

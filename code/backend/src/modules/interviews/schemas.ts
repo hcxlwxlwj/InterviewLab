@@ -83,7 +83,9 @@ export const turnSchema = z.object({
   input_mode: z.enum(['text_fallback', 'voice']),
   answered_at: z.string().nullable(),
 });
+export const preparationBody=versionBody.extend({mode:z.enum(['personalized','fallback']).default('personalized')});
 export const interviewSchema = z.object({
+  preparation:z.object({status:z.enum(['waiting_material','pending','ready','failed','fallback']),task_id:z.string().nullable(),error_code:z.string().nullable()}).optional(),
   id: z.string(),
   version: z.number().int(),
   configuration: interviewConfigSchema,

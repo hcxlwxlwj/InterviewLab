@@ -26,7 +26,7 @@ npm run dev:api
 
 需要应用新增迁移 `0004_text_report_summary.sql`，为报告添加 summary_task_id 与 summary_input_digest。应先部署迁移，再同时更新 API 与 worker，旧 worker 不认识新任务类型。
 
-`npm run dev:interview` 是面试模块专用联调：其 onFinalize 明确不生成报告，不能用它验收自动报告闭环。报告联调使用上述完整组合；已有专用联调记录也可以在具备相同身份的完整组合中显式请求报告。
+报告联调使用上述完整组合，登录后完成面试并验证自动报告闭环。实时性评测脚本仍通过测试专用 `onFinalize` 隔离报告任务，仅用于面试性能测量，不能用它验收报告闭环。
 
 ## HTTP 合同
 

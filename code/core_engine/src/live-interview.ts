@@ -8,7 +8,7 @@ import type {
 import type { DimensionKey, SessionStatus } from './domain/interview';
 import type { ContentSource, KnowledgeQuestion } from './domain/knowledge';
 
-/** Real HTTP DTOs. The synchronous demo Session remains a separate contract. */
+/** Shared DTOs for the HTTP interview workflow. */
 export interface InterviewConfig {
   resume_ref?: {id:string;version:number};
   job: string;
@@ -75,6 +75,9 @@ export interface InterviewTurn extends InterviewQuestion {
   answered_at: string | null;
 }
 export interface InterviewSnapshot {
+  runtime_version?: 'graph-v1';
+  resume_analysis?: import('./agent-workflow').ResumeAnalysis;
+  preparation_plan?: import('./agent-workflow').InterviewPreparationPlan;
   personal_material?: import('./personal').PersonalMaterial;
   job_title: string;
   knowledge: InterviewKnowledge;
@@ -94,6 +97,7 @@ export interface InterviewParticipation {
   message: string;
 }
 export interface Interview {
+  preparation?: import('./agent-workflow').PreparationStatus;
   id: string;
   version: number;
   configuration: InterviewConfig;
