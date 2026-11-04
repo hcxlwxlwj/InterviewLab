@@ -51,9 +51,11 @@ export async function evaluationRows(db: Executor, reportId: string) {
         attempts: number;
         max_attempts: number;
         error_code: string | null;
+        evaluation_input_digest: string | null;
+        report_version: number | null;
       }
     >(
-      'SELECT e.*,t.status AS task_status,t.attempts,t.max_attempts,t.error_code FROM report_evaluations e LEFT JOIN tasks t ON t.id=e.task_id WHERE e.report_id=$1 ORDER BY e.turn_id',
+      `SELECT e.*,t.status AS task_status,t.attempts,t.max_attempts,t.error_code,t.payload->>'evaluation_input_digest' AS evaluation_input_digest,(t.payload->>'report_version')::integer AS report_version FROM report_evaluations e LEFT JOIN tasks t ON t.id=e.task_id WHERE e.report_id=$1 ORDER BY e.turn_id`,
       [reportId],
     )
   ).rows;
@@ -203,4 +205,12 @@ export async function eraseReports(db: Executor, owner: string, interviewId: str
     owner,
     interviewId,
   ]);
+}
+
+/** Internal drafts are hidden by readFinalized and excluded from final-report maintenance. */
+export async function markDraft(db: Executor, reportId: string) {
+  await db.query("UPDATE interview_reports SET status='draft' WHERE id=$1", [reportId]);
+}
+export async function updateInputDigest(db: Executor, reportId: string, digest: string) {
+  await db.query('UPDATE interview_reports SET input_digest=$2 WHERE id=$1', [reportId, digest]);
 }

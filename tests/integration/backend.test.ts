@@ -258,6 +258,10 @@ test('unconfigured authentication is explicit and every module write shares the 
 
 test('configuration rejects invalid values without disclosing secrets; digest canonicalizes JSON', () => {
   assert.throws(() => loadConfig({ API_PORT: 0 }), /API_PORT/);
+  assert.equal(loadConfig({}).WORKER_REPORT_CONCURRENCY, 3);
+  assert.equal(loadConfig({ WORKER_REPORT_CONCURRENCY: 6 }).WORKER_REPORT_CONCURRENCY, 6);
+  assert.throws(() => loadConfig({ WORKER_REPORT_CONCURRENCY: 0 }), /WORKER_REPORT_CONCURRENCY/);
+  assert.throws(() => loadConfig({ WORKER_CONCURRENCY: 33 }), /WORKER_CONCURRENCY/);
   assert.throws(
     () => loadConfig({ DATABASE_URL: 'mysql://user:secret@host/database' }),
     /must use PostgreSQL/,

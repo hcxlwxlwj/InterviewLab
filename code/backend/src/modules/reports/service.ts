@@ -9,10 +9,15 @@ import type {
 import type { Database, Transaction } from '../../database/connection';
 import { inputDigest, withIdempotency } from '../../foundation/idempotency';
 import { ServiceError } from '../../foundation/errors';
-import { enqueueTask } from '../../tasks/service';
+import { enqueueTask, type TaskRow } from '../../tasks/service';
 import type { TaskHandler } from '../../tasks/runner';
 import type { InterviewAgent } from '../interviews/agent';
-import { assertEvaluation, assertSummary } from './analysis';
+import {
+  assertEvaluation,
+  assertSummary,
+  REPORT_PROMPT_VERSION,
+  REPORT_SCHEMA_VERSION,
+} from './analysis';
 import { aggregateReport, emptyReport, evaluationDigest, taskSettled } from './aggregate';
 import type { InterviewState } from '../interviews/repository';
 import { interviewInputDigest, type LiveInterviewsService } from '../interviews/service';
@@ -23,6 +28,43 @@ export function createReportsService(
   interviews: LiveInterviewsService,
   agent: InterviewAgent,
 ) {
+  function evaluationContext(state: InterviewState, turn: InterviewState['view']['turns'][number]) {
+    const group = state.view.turns.filter(
+      (t) => t.main_question_index === turn.main_question_index,
+    );
+    return {
+      scoring_rubric_version:
+        state.view.configuration.job === 'frontend' &&
+        state.view.configuration.career_stage === 'internship'
+          ? FRONTEND_RUBRIC_VERSION
+          : undefined,
+      main_question: group.find((t) => t.follow_up_index === 0)?.text ?? turn.text,
+      earlier_answers: group
+        .filter((t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered')
+        .map((t) => ({ question: t.text, answer: t.answer_text! })),
+    };
+  }
+  function turnDigest(state: InterviewState, turn: InterviewState['view']['turns'][number]) {
+    return inputDigest({
+      turn: {
+        id: turn.id,
+        revision: turn.revision,
+        text: turn.text,
+        answer_text: turn.answer_text,
+        answer_status: turn.answer_status,
+        stage: turn.stage,
+        topic: turn.topic,
+        purpose: turn.purpose,
+        knowledge_question_id: turn.knowledge_question_id,
+        main_question_index: turn.main_question_index,
+        follow_up_index: turn.follow_up_index,
+      },
+      snapshot: state.snapshot,
+      context: evaluationContext(state, turn),
+      prompt: REPORT_PROMPT_VERSION,
+      schema: REPORT_SCHEMA_VERSION,
+    });
+  }
   async function queueEvaluations(
     tx: Transaction,
     state: InterviewState,
@@ -30,13 +72,17 @@ export function createReportsService(
     version: number,
     completed: string[] = [],
   ) {
+    const existing = await repository.evaluationRows(tx.client, reportId);
     for (const turn of state.view.turns.filter(
       (t) => t.answer_status === 'answered' && !completed.includes(t.id),
     )) {
+      const digest = turnDigest(state, turn);
+      const prior = existing.find((e) => e.turn_id === turn.id);
+      if (prior?.evaluation_input_digest === digest && prior.report_version === version) continue;
       const task = await enqueueTask(tx, {
         owner_id: state.owner,
         type: 'reports.evaluate.v1',
-        key: `${reportId}:${version}:${turn.id}`,
+        key: inputDigest({ reportId, version, turnId: turn.id, digest }),
         input: {
           interview_id: state.view.id,
           report_id: reportId,
@@ -49,13 +95,49 @@ export function createReportsService(
               ? FRONTEND_RUBRIC_VERSION
               : undefined,
           input_digest: interviewInputDigest(state),
+          evaluation_input_digest: digest,
         },
       });
       await repository.putEvaluationTask(tx.client, randomUUID(), reportId, turn.id, task.id);
     }
   }
+  async function prepare(tx: Transaction, state: InterviewState) {
+    if (!state.snapshot || !state.view.turns.some((t) => t.answer_status === 'answered')) return;
+    let row = await repository.reportByInterview(tx.client, state.owner, state.view.id, true);
+    if (!row) {
+      const id = randomUUID();
+      await repository.insertReport(
+        tx.client,
+        id,
+        state.owner,
+        state.view.id,
+        interviewInputDigest(state),
+        emptyReport(state, id),
+      );
+      row = await repository.reportByInterview(tx.client, state.owner, state.view.id);
+    }
+    await queueEvaluations(tx, state, row!.id, row!.version);
+    await repository.markDraft(tx.client, row!.id);
+  }
   async function seal(tx: Transaction, state: InterviewState) {
-    if (await repository.reportByInterview(tx.client, state.owner, state.view.id)) return;
+    const existing = await repository.reportByInterview(
+      tx.client,
+      state.owner,
+      state.view.id,
+      true,
+    );
+    if (existing) {
+      await queueEvaluations(tx, state, existing.id, existing.version);
+      await repository.updateInputDigest(tx.client, existing.id, interviewInputDigest(state));
+      const report = aggregateReport(
+        state,
+        { ...emptyReport(state, existing.id), version: existing.version },
+        await repository.evaluationRows(tx.client, existing.id),
+      );
+      await startSummaryIfReady(tx, state, report, existing.summary_task_id);
+      await repository.updateReport(tx.client, existing.id, existing.version, report);
+      return;
+    }
     const id = randomUUID();
     const result = emptyReport(state, id);
     await repository.insertReport(
@@ -69,7 +151,8 @@ export function createReportsService(
     if (result.status !== 'ready') await queueEvaluations(tx, state, id, 1);
   }
   async function get(identity: RequestIdentity, interviewId: string): Promise<InterviewReport> {
-    const state = await interviews.readFinalized(identity, interviewId);
+    await interviews.readFinalized(identity, interviewId);
+    const state = await interviews.readReportState(identity, interviewId);
     const row = await repository.reportByInterview(database.pool, identity.owner_id, interviewId);
     if (!row?.result) throw new ServiceError('not_found', 404, '报告尚未请求');
     const report = aggregateReport(
@@ -77,6 +160,7 @@ export function createReportsService(
       { ...row.result, version: row.version, status: row.status as InterviewReport['status'] },
       await repository.evaluationRows(database.pool, row.id),
     );
+    report.needs_refresh = row.input_digest !== interviewInputDigest(state);
     if (row.summary_task_id) report.task_ids.push(row.summary_task_id);
     return report;
   }
@@ -97,6 +181,21 @@ export function createReportsService(
     await repository.setSummaryTask(tx.client, report.id, task.id, digest);
     report.summary_status = 'pending';
     report.status = 'generating';
+  }
+  async function startSummaryIfReady(
+    tx: Transaction,
+    state: InterviewState,
+    report: InterviewReport,
+    summaryTaskId: string | null,
+  ) {
+    if (
+      ['completed', 'failed'].includes(state.view.status) &&
+      !summaryTaskId &&
+      !report.analysis_progress?.pending &&
+      report.evaluations.some((e) => e.strengths.length || e.gaps.length)
+    ) {
+      await queueSummary(tx, state, report);
+    }
   }
   async function lockSources(
     tx: Transaction,
@@ -129,14 +228,24 @@ export function createReportsService(
       revision: number;
       scoring_rubric_version?: string;
       input_digest: string;
+      evaluation_input_digest?: string;
     };
     const identity = { owner_id: task.owner_id, roles: [] };
-    const state = await interviews.readFinalized(identity, input.interview_id);
+    const state = input.evaluation_input_digest
+      ? await interviews.readAnalysisState(identity, input.interview_id)
+      : await interviews.readReportState(identity, input.interview_id);
     const turn = state.view.turns.find(
       (t) =>
         t.id === input.turn_id && t.revision === input.revision && t.answer_status === 'answered',
     );
-    if (!turn || interviewInputDigest(state) !== input.input_digest) return { result_ref: null };
+    if (
+      !turn ||
+      !state.snapshot ||
+      (input.evaluation_input_digest
+        ? turnDigest(state, turn) !== input.evaluation_input_digest
+        : interviewInputDigest(state) !== input.input_digest)
+    )
+      return { result_ref: null };
     const active = await repository.reportByInterview(
       database.pool,
       task.owner_id,
@@ -173,7 +282,8 @@ export function createReportsService(
         }
       },
       commit: async (tx) => {
-        const fresh = await interviews.lock(tx, identity, input.interview_id);
+        await interviews.lock(tx, identity, input.interview_id);
+        const fresh = await interviews.readReportState(identity, input.interview_id, tx);
         const report = await repository.reportByInterview(
           tx.client,
           task.owner_id,
@@ -184,10 +294,27 @@ export function createReportsService(
           !report ||
           report.id !== input.report_id ||
           report.version !== input.report_version ||
-          interviewInputDigest(fresh) !== input.input_digest
+          (fresh.answerSources?.length && report.input_digest !== interviewInputDigest(fresh)) ||
+          (input.evaluation_input_digest
+            ? !fresh.view.turns.some(
+                (t) =>
+                  t.id === input.turn_id &&
+                  t.answer_status === 'answered' &&
+                  turnDigest(fresh, t) === input.evaluation_input_digest,
+              )
+            : interviewInputDigest(fresh) !== input.input_digest)
         )
           return false;
         await repository.putEvaluationResult(tx.client, report.id, turn.id, task.id, value);
+        const next = aggregateReport(
+          fresh,
+          { ...report.result!, version: report.version },
+          await repository.evaluationRows(tx.client, report.id),
+        );
+        await startSummaryIfReady(tx, fresh, next, report.summary_task_id);
+        await repository.updateReport(tx.client, report.id, report.version, next);
+        if (!['completed', 'failed'].includes(fresh.view.status))
+          await repository.markDraft(tx.client, report.id);
       },
     };
   };
@@ -200,7 +327,7 @@ export function createReportsService(
       evaluations_digest: string;
     };
     const identity = { owner_id: task.owner_id, roles: [] };
-    const state = await interviews.readFinalized(identity, input.interview_id);
+    const state = await interviews.readReportState(identity, input.interview_id);
     const row = await repository.reportByInterview(
       database.pool,
       task.owner_id,
@@ -231,8 +358,12 @@ export function createReportsService(
       state.snapshot!,
       signal,
       task.attempts > 1,
+      { turns: state.view.turns },
     );
-    assertSummary(value, report.evaluations);
+    assertSummary(value, report.evaluations, {
+      turns: state.view.turns,
+      snapshot: state.snapshot!,
+    });
     return {
       result_ref: { id: row.id, version: row.version },
       lock: async (tx) => {
@@ -244,7 +375,8 @@ export function createReportsService(
         }
       },
       commit: async (tx) => {
-        const fresh = await interviews.lock(tx, identity, input.interview_id);
+        await interviews.lock(tx, identity, input.interview_id);
+        const fresh = await interviews.readReportState(identity, input.interview_id, tx);
         const current = await repository.reportByInterview(
           tx.client,
           task.owner_id,
@@ -283,6 +415,7 @@ export function createReportsService(
             ]),
           ].slice(0, 12),
         };
+        if (next.analysis_metadata) next.analysis_metadata.prompt_version = REPORT_PROMPT_VERSION;
         next.summary_status = 'ready';
         next.status = 'ready';
         await repository.updateReport(
@@ -343,13 +476,46 @@ export function createReportsService(
     erase: (tx: Transaction, owner: string, id: string) =>
       repository.eraseReports(tx.client, owner, id),
     get,
+    prepare,
+    async isEvaluationCancelled(task: Readonly<TaskRow>) {
+      const input = task.payload as {
+        interview_id: string;
+        report_id: string;
+        report_version: number;
+        turn_id: string;
+        evaluation_input_digest?: string;
+        input_digest: string;
+      };
+      const state = await interviews.readAnalysisState(
+        { owner_id: task.owner_id, roles: [] },
+        input.interview_id,
+      );
+      const row = await repository.reportByInterview(
+        database.pool,
+        task.owner_id,
+        input.interview_id,
+      );
+      const turn = state.view.turns.find(
+        (t) => t.id === input.turn_id && t.answer_status === 'answered',
+      );
+      return (
+        !row ||
+        row.id !== input.report_id ||
+        row.version !== input.report_version ||
+        !turn ||
+        (input.evaluation_input_digest
+          ? turnDigest(state, turn) !== input.evaluation_input_digest
+          : interviewInputDigest(state) !== input.input_digest)
+      );
+    },
     getComparison,
     async request(identity: RequestIdentity, id: string, body: ReportRequest, key: string) {
       await withIdempotency(
         database,
         { owner_id: identity.owner_id, operation: `reports.${id}.request`, key, input: body },
         async (tx) => {
-          const state = await interviews.lock(tx, identity, id);
+          await interviews.lock(tx, identity, id);
+          const state = await interviews.readReportState(identity, id, tx);
           if (!['completed', 'failed'].includes(state.view.status) || !state.snapshot)
             throw new ServiceError('invalid_state', 409, '请先结束面试');
           let row = await repository.reportByInterview(tx.client, identity.owner_id, id, true);
@@ -370,6 +536,31 @@ export function createReportsService(
             },
             results,
           );
+          if (body.scope === 'latest') {
+            const digest = interviewInputDigest(state);
+            if (row.input_digest === digest) return { id };
+            const version = row.version + 1;
+            const next = { ...emptyReport(state, row.id), version };
+            // Reuse only unchanged answer contexts; a rewritten main answer also invalidates follow-up analysis.
+            const reusable = results.filter(
+              (r) =>
+                r.result &&
+                state.view.turns.some(
+                  (t) => t.id === r.turn_id && r.evaluation_input_digest === turnDigest(state, t),
+                ),
+            );
+            await repository.setSummaryTask(tx.client, row.id, null, null);
+            await repository.updateInputDigest(tx.client, row.id, digest);
+            await queueEvaluations(
+              tx,
+              state,
+              row.id,
+              version,
+              reusable.map((r) => r.turn_id),
+            );
+            await repository.updateReport(tx.client, row.id, version, next);
+            return { id };
+          }
           // A pending summary must finish before a new report version can invalidate its input.
           if (['pending', 'generating'].includes(row.status)) return { id };
           if (
@@ -385,6 +576,7 @@ export function createReportsService(
           if (body.scope === 'summary') {
             if (
               (report.summary_status === 'ready' &&
+                report.analysis_metadata?.prompt_version === REPORT_PROMPT_VERSION &&
                 report.summary?.feedback_template?.version === FEEDBACK_TEMPLATE_VERSION &&
                 report.summary?.dimension_assessments !== undefined) ||
               !report.evaluations.length
@@ -565,13 +757,24 @@ export function createReportsService(
             if (e instanceof ServiceError && e.statusCode === 404) return;
             throw e;
           }
+          if (!['completed', 'failed'].includes(state.view.status)) return;
+          state = await interviews.readReportState(
+            { owner_id: row.owner_id, roles: [] },
+            row.interview_id,
+            tx,
+          );
           const current = await repository.reportByInterview(
             tx.client,
             row.owner_id,
             row.interview_id,
             true,
           );
-          if (!current || !['pending', 'generating'].includes(current.status)) return;
+          if (
+            !current ||
+            !['pending', 'generating'].includes(current.status) ||
+            current.input_digest !== interviewInputDigest(state)
+          )
+            return;
           const evaluations = await repository.evaluationRows(tx.client, row.id);
           const report = aggregateReport(
             state,

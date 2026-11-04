@@ -16,6 +16,7 @@ import { INTERVIEW_V3 } from '@interviewlab/core';
 
 export type Executor = Pick<PoolClient, 'query'>;
 export interface InterviewState {
+  answerSources?: import('@interviewlab/core').InterviewReport['answer_sources'];
   owner: string;
   view: Interview;
   snapshot: InterviewSnapshot | null;
@@ -220,7 +221,7 @@ export async function interviewEvent(
 }
 export async function cancelInterviewTasks(executor: Executor, id: string) {
   await executor.query(
-    `UPDATE tasks SET status='cancelled',execution_token=NULL,lease_until=NULL WHERE payload->>'interview_id'=$1 AND status IN ('queued','running','failed')`,
+    `UPDATE tasks SET status='cancelled',execution_token=NULL,lease_until=NULL WHERE payload->>'interview_id'=$1 AND type IN ('interviews.plan.v1','interviews.advance.v1') AND status IN ('queued','running','failed')`,
     [id],
   );
 }
@@ -238,4 +239,16 @@ export async function eraseInterview(executor: Executor, owner: string, id: stri
     [id],
   );
   await executor.query('DELETE FROM interviews WHERE id=$1 AND owner_id=$2', [id, owner]);
+}
+
+export async function completedRetryIds(db: Executor, owner: string, interviewId: string) {
+  return (
+    await db.query<{ id: string }>(
+      `SELECT i.id FROM interviews i WHERE i.owner_id=$1 AND i.parent_interview_id=$2
+     AND i.deleted_at IS NULL AND i.status='completed'
+     AND EXISTS (SELECT 1 FROM interview_turns t WHERE t.interview_id=i.id AND t.answer_status='answered')
+     ORDER BY i.ended_at DESC,i.created_at DESC,i.id DESC`,
+      [owner, interviewId],
+    )
+  ).rows;
 }

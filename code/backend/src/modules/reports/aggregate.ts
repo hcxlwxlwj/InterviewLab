@@ -45,7 +45,11 @@ const keys: DimensionKey[] = [
   'logical_expression',
 ];
 export function emptyReport(
-  state: { view: Interview; snapshot?: InterviewSnapshot | null },
+  state: {
+    view: Interview;
+    snapshot?: InterviewSnapshot | null;
+    answerSources?: InterviewReport['answer_sources'];
+  },
   id: string,
 ): InterviewReport {
   const answered = state.view.turns.some((t) => t.answer_status === 'answered');
@@ -57,6 +61,7 @@ export function emptyReport(
   });
   return {
     id,
+    answer_sources: state.answerSources ?? [],
     interview_id: state.view.id,
     version: 1,
     task_ids: [],
@@ -91,7 +96,11 @@ export function emptyReport(
 
 /** Read-only projection, also used by GET so successful turns are visible before the whole job settles. */
 export function aggregateReport(
-  state: { view: Interview; snapshot?: InterviewSnapshot | null },
+  state: {
+    view: Interview;
+    snapshot?: InterviewSnapshot | null;
+    answerSources?: InterviewReport['answer_sources'];
+  },
   base: InterviewReport,
   tasks: EvaluationTask[],
 ): InterviewReport {

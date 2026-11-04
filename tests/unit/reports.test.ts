@@ -270,7 +270,7 @@ test('summary uses the shared model adapter with checked evaluations and records
       ],
     },
   );
-  assert.equal((logs[0] as { prompt_version: string }).prompt_version, 'text-review-v6');
+  assert.equal((logs[0] as { prompt_version: string }).prompt_version, 'text-review-v8');
 });
 
 test('AI reference scores use explicit evidence levels and equal-weight averaging, excluding unobserved skills', () => {
@@ -581,4 +581,88 @@ test('template model scores resolve checked quote IDs and preserve actionable ac
   assert.ok(html.includes('17.5 / 25'));
   assert.ok(html.includes('验收方式'));
   assert.ok(html.includes('六、下一步期待'));
+});
+
+test('one original answer supports multiple feedback dimensions even outside old tags and extracted findings', async () => {
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { FEEDBACK_DIMENSIONS, FEEDBACK_TEMPLATE_VERSION } = await import('@interviewlab/core');
+  const { evaluation, state } = fixture();
+  const turn = state.view.turns[0];
+  turn.answer_text +=
+    '我采用单向数据流，让组件订阅状态变化，并比较两种方案再验证边界，根据反馈修正前端交互。';
+  const ref = {
+    turn_id: turn.id,
+    revision: turn.revision,
+    quote: '我采用单向数据流，让组件订阅状态变化，并比较两种方案再验证边界，根据反馈修正前端交互。',
+  };
+  const analysis = createReportAnalysis(async (_kind, schema, input) => {
+    const payload = input as {
+      target_role: { job_title: string };
+      feedback_evidence_catalog: Record<string, unknown>;
+    };
+    assert.equal(payload.target_role.job_title, '前端');
+    assert.deepEqual(payload.feedback_evidence_catalog['a0-2'], ref);
+    return schema.parse({
+      overview: { text: '职责已说明', evidence_ids: ['e0-s0-0'] },
+      strengths: [],
+      improvements: [],
+      limitations: [],
+      dimension_assessments: {
+        technical_knowledge: null,
+        project_communication: { level: 2, text: '职责明确' },
+        logical_expression: null,
+      },
+      feedback_template: {
+        version: FEEDBACK_TEMPLATE_VERSION,
+        assessments: FEEDBACK_DIMENSIONS.map((d) => ({
+          dimension: d.key,
+          score: 75,
+          text:
+            d.key === 'professional_foundation'
+              ? '解释了单向数据流与状态订阅机制'
+              : d.key === 'motivation'
+                ? '体现前端交互验证的岗位相关做法'
+                : '比较、验证和依据反馈调整方案',
+          evidence_ids: ['a0-2'],
+        })),
+        action_plan: [],
+        next_expectation: '补充验证结果',
+      },
+    });
+  });
+  const result = await analysis.summarize(
+    [evaluation],
+    snapshot,
+    new AbortController().signal,
+    false,
+    { turns: [turn] },
+  );
+  for (const rating of result.feedback_template!.assessments) {
+    assert.equal(rating.score, 75);
+    assert.deepEqual(rating.evidence_refs, [ref]);
+  }
+  assert.doesNotThrow(() => assertSummary(result, [evaluation], { turns: [turn], snapshot }));
+  // No raw answer context means these new references cannot be accepted.
+  assert.throws(() => assertSummary(result, [evaluation]));
+  const fabricated = structuredClone(result);
+  fabricated.feedback_template!.assessments[2].evidence_refs[0].quote = '不存在的推理';
+  assert.throws(() => assertSummary(fabricated, [evaluation], { turns: [turn], snapshot }));
+  const revised = { ...turn, revision: turn.revision + 1 };
+  assert.throws(() => assertSummary(result, [evaluation], { turns: [revised], snapshot }));
+  const professional = structuredClone(result);
+  professional.feedback_template!.assessments[0] = {
+    dimension: 'professional_foundation',
+    score: 75,
+    text: '解释了单向数据流和状态订阅机制',
+    evidence_refs: [ref],
+  };
+  // Original technical explanation remains valid without a bank match or technical tag.
+  assert.equal(snapshot.knowledge.questions.length, 0);
+  assert.ok(!evaluation.dimensions.includes('technical_knowledge'));
+  assert.doesNotThrow(() => assertSummary(professional, [evaluation], { turns: [turn], snapshot }));
+  assert.throws(() => assertSummary(professional, [evaluation]));
+  professional.feedback_template!.assessments[0].evidence_refs[0].quote = '不存在的技术解释';
+  assert.throws(() => assertSummary(professional, [evaluation], { turns: [turn], snapshot }));
+  const unreviewed = { ...turn, id: randomUUID() };
+  assert.throws(() => assertSummary(result, [evaluation], { turns: [unreviewed], snapshot }));
 });

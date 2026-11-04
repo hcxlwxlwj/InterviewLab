@@ -33,6 +33,7 @@ import { getJob } from '../../content/index';
 import type { InterviewAgent } from './agent';
 import { assertQuestion } from './agent';
 import {
+  completedRetryIds,
   cancelInterviewTasks,
   eraseInterview,
   interviewEvent,
@@ -43,6 +44,7 @@ import {
 } from './repository';
 
 export interface InterviewReportHooks {
+  prepare?(tx: Transaction, state: InterviewState): Promise<void>;
   seal(tx: Transaction, state: InterviewState): Promise<void>;
   erase(tx: Transaction, owner: string, id: string): Promise<void>;
 }
@@ -313,6 +315,36 @@ export function createInterviewsService(
       }
     });
   }
+  async function readReportState(identity: RequestIdentity, id: string, tx?: Transaction) {
+    const db = tx?.client ?? database.pool;
+    const state = await loadInterview(db, identity.owner_id, id);
+    state.answerSources = [];
+    if (!ended(state)) return state;
+    for (const { id: retryId } of await completedRetryIds(db, identity.owner_id, id)) {
+      const retry = await loadInterview(db, identity.owner_id, retryId);
+      const original = state.view.turns.find(
+        (t) => t.id === retry.view.parent_turn_id && t.revision === retry.view.parent_revision,
+      );
+      if (!original || state.answerSources.some((s) => s.original_turn_id === original.id))
+        continue;
+      const answer = retry.view.turns.find((t) => t.answer_status === 'answered');
+      if (!answer || answer.text !== original.text) continue;
+      const turn = {
+        ...answer,
+        main_question_index: original.main_question_index,
+        follow_up_index: original.follow_up_index,
+      };
+      state.answerSources.push({
+        original_turn_id: original.id,
+        retry_interview_id: retryId,
+        turn,
+      });
+    }
+    state.view.turns = state.view.turns.map(
+      (t) => state.answerSources!.find((s) => s.original_turn_id === t.id)?.turn ?? t,
+    );
+    return state;
+  }
   async function readFinalized(identity: RequestIdentity, id: string) {
     const state = await loadInterview(database.pool, identity.owner_id, id);
     if (!ended(state) || !state.snapshot) throw invalid('面试尚未结束');
@@ -465,6 +497,8 @@ export function createInterviewsService(
     create,
     start,
     readFinalized,
+    readReportState,
+    readAnalysisState: readReportState,
     lock: (tx: Transaction, identity: RequestIdentity, id: string) =>
       loadInterview(tx.client, identity.owner_id, id, true),
     async list(
@@ -568,6 +602,7 @@ export function createInterviewsService(
         if (!body.text.trim()) throw new ServiceError('unsupported_input', 400, '回答不能为空');
         answer(state, turnId, body.text);
         state.view.turns.at(-1)!.input_mode = body.input_mode ?? 'text_fallback';
+        await reports.prepare?.(tx, state);
         await advanceAfterAnswer(tx, state);
       }),
     interruptVoice: (
@@ -619,6 +654,7 @@ export function createInterviewsService(
           turn.revision++;
           turn.answered_at = new Date().toISOString();
         }
+        await reports.prepare?.(tx, state);
         await advanceAfterAnswer(tx, state);
       }),
     async recordVoicePlayback(
@@ -712,7 +748,8 @@ export function createInterviewsService(
       body: { turn_id: string; revision: number; goal: string },
       key: string,
     ) {
-      const original = await readFinalized(identity, id);
+      const original = await readReportState(identity, id);
+      if (!ended(original) || !original.snapshot) throw invalid('面试尚未结束');
       const turn = original.view.turns.find(
         (t) =>
           t.id === body.turn_id && t.revision === body.revision && t.answer_status === 'answered',
@@ -736,8 +773,14 @@ export function createInterviewsService(
             evidence_refs: [],
           };
           state.view.parent_interview_id = id;
-          state.view.parent_turn_id = turn.id;
-          state.view.parent_revision = turn.revision;
+          const source = original.answerSources?.find((s) => s.turn.id === turn.id);
+          const rootTurn = source
+            ? (await loadInterview(tx.client, identity.owner_id, id)).view.turns.find(
+                (t) => t.id === source.original_turn_id,
+              )!
+            : turn;
+          state.view.parent_turn_id = rootTurn.id;
+          state.view.parent_revision = rootTurn.revision;
           state.view.retry_goal = body.goal;
           await saveInterview(tx.client, state);
           return { id: state.view.id };

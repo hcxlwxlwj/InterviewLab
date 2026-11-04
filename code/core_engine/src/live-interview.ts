@@ -146,9 +146,12 @@ export interface InterviewReportSummary {
 }
 export interface ReportRequest {
   version: number;
-  scope?: 'missing' | 'summary' | 'rubric';
+  scope?: 'missing' | 'summary' | 'rubric' | 'latest';
 }
 export interface InterviewReport {
+  /** Latest completed retries used by this report; original interviews are immutable. */
+  answer_sources?: { original_turn_id: string; retry_interview_id: string; turn: InterviewTurn }[];
+  needs_refresh?: boolean;
   id: string;
   interview_id: string;
   version: number;
