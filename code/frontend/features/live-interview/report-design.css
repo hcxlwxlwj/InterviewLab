@@ -533,3 +533,7 @@
     flex-wrap: wrap;
   }
 }
+
+.report-practice-page { padding-block: 12px 40px; }
+.report-practice-page .report-dialog-heading { flex-wrap: wrap; }
+.report-practice-page .turn-review { scroll-margin-top: 24px; }

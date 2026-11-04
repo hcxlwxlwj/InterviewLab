@@ -3,6 +3,7 @@ import {
   evidenceMatches,
   FEEDBACK_DIMENSIONS,
   FEEDBACK_TEMPLATE_VERSION,
+  FEEDBACK_ANALYSIS_VERSION,
   FRONTEND_RUBRIC_VERSION,
   REPORT_INDICATORS,
   applicableReportIndicators,
@@ -14,7 +15,7 @@ import {
   type InterviewEvidence,
 } from '@interviewlab/core';
 import { ServiceError } from '../../foundation/errors';
-export const REPORT_PROMPT_VERSION = 'text-review-v6';
+export const REPORT_PROMPT_VERSION = FEEDBACK_ANALYSIS_VERSION;
 export const REPORT_SCHEMA_VERSION = 'text-review-v2';
 const evidence = z
   .object({
@@ -175,7 +176,11 @@ export function assertEvaluation(
 
 const evidenceKey = (r: InterviewEvidence) => JSON.stringify([r.turn_id, r.revision, r.quote]);
 /** Quotes must already support a checked per-turn finding, not merely occur somewhere in the interview. */
-export function assertSummary(value: InterviewReportSummary, evaluations: InterviewEvaluation[]) {
+export function assertSummary(
+  value: InterviewReportSummary,
+  evaluations: InterviewEvaluation[],
+  context?: { turns: InterviewTurn[]; snapshot: InterviewSnapshot },
+) {
   summaryOutput.parse(value);
   const assessments = value.dimension_assessments ?? [];
   if (
@@ -207,12 +212,19 @@ export function assertSummary(value: InterviewReportSummary, evaluations: Interv
   const template = value.feedback_template;
   if (template) {
     const ratings = template.assessments;
+    const reviewedTurns = (context?.turns ?? []).filter(
+      (t) =>
+        t.answer_status === 'answered' &&
+        evaluations.some((e) => e.turn_id === t.id && e.revision === t.revision),
+    );
+    const validFeedbackRef = (ref: InterviewEvidence) =>
+      allowed.has(evidenceKey(ref)) || evidenceMatches(ref, reviewedTurns);
     if (
       new Set(ratings.map((a) => a.dimension)).size !== 6 ||
       ratings.some((a) =>
         a.score === null
           ? a.evidence_refs.length !== 0
-          : !a.evidence_refs.length || a.evidence_refs.some((r) => !allowed.has(evidenceKey(r))),
+          : !a.evidence_refs.length || a.evidence_refs.some((r) => !validFeedbackRef(r)),
       ) ||
       template.action_plan.some(
         (a) => !evaluations.some((e) => e.turn_id === a.turn_id && e.gaps.length),
@@ -222,20 +234,6 @@ export function assertSummary(value: InterviewReportSummary, evaluations: Interv
         'invalid_model_output',
         502,
         '模板评分需要已校验的行为证据，行动建议必须关联缺口题目',
-      );
-    const professional = ratings.find((a) => a.dimension === 'professional_foundation')!;
-    const technicalRefs = new Set(
-      evaluations
-        .filter((e) => e.dimensions.includes('technical_knowledge'))
-        .flatMap((e) =>
-          [...e.strengths, ...e.gaps].flatMap((f) => f.evidence_refs.map(evidenceKey)),
-        ),
-    );
-    if (professional.evidence_refs.some((r) => !technicalRefs.has(evidenceKey(r))))
-      throw new ServiceError(
-        'invalid_model_output',
-        502,
-        '专业基础评分不能引用无专业评估依据的回答',
       );
   }
   const strengths = new Set(
@@ -444,6 +442,7 @@ export function createReportAnalysis(
       snapshot: InterviewSnapshot,
       signal: AbortSignal,
       repair: boolean,
+      context?: { turns: InterviewTurn[] },
     ): Promise<InterviewReportSummary> {
       const catalog = new Map<string, InterviewEvidence>();
       const indexed = evaluations.map((e, index) => {
@@ -465,6 +464,38 @@ export function createReportAnalysis(
           limitations: e.limitations,
         };
       });
+      // Six-dimensional review also sees original answer spans that short per-turn findings omitted.
+      const reviewedTurns = (context?.turns ?? []).filter(
+        (t) =>
+          t.answer_status === 'answered' &&
+          evaluations.some((e) => e.turn_id === t.id && e.revision === t.revision),
+      );
+      const feedbackCatalog = new Map(catalog);
+      const feedbackAnswers = reviewedTurns.map((turn, i) => {
+        const spans = (turn.answer_text ?? '').match(/[^。！？；\n]+[。！？；]?/gu) ?? [];
+        const evidenceIds: string[] = [];
+        for (const sentence of spans) {
+          for (let j = 0; j < sentence.length; j += 180) {
+            const id = `a${i}-${evidenceIds.length}`;
+            feedbackCatalog.set(id, {
+              turn_id: turn.id,
+              revision: turn.revision,
+              quote: sentence.slice(j, j + 180),
+            });
+            evidenceIds.push(id);
+          }
+        }
+        const references = snapshot.knowledge.questions.filter(
+          (q) => q.id === turn.knowledge_question_id || q.topic === turn.topic,
+        );
+        return {
+          turn_id: turn.id,
+          question: turn.text,
+          evidence_ids: evidenceIds,
+          professional_references: references,
+        };
+      });
+      const feedbackIds = [...feedbackCatalog.keys()];
       const ids = [...catalog.keys()];
       if (!ids.length)
         throw new ServiceError('insufficient_material', 409, '没有可供总结的逐题证据');
@@ -527,7 +558,7 @@ export function createReportAnalysis(
                       dimension: z.enum(FEEDBACK_DIMENSIONS.map((d) => d.key)),
                       score: z.number().int().min(0).max(100).nullable(),
                       text: z.string().min(1).max(160),
-                      evidence_ids: z.array(z.enum(ids)).max(2),
+                      evidence_ids: z.array(z.enum(feedbackIds)).max(2),
                     })
                     .strict(),
                 )
@@ -552,12 +583,15 @@ export function createReportAnalysis(
         'summarize',
         wireSchema,
         {
+          target_role: { job_title: snapshot.job_title, rubric_version: snapshot.rubric_version },
+          feedback_answers: feedbackAnswers,
+          feedback_evidence_catalog: Object.fromEntries(feedbackCatalog),
           feedback_standard: {
             version: FEEDBACK_TEMPLATE_VERSION,
             dimensions: FEEDBACK_DIMENSIONS,
             bands: ['差：[0,40)', '中：[40,70)', '良：[70,90)', '优：[90,100]'],
             instructions:
-              '必须输出 feedback_template，assessments 按六维各一项。score 是本维0-100的整数百分分，由程序按25/25/25/15/5/5加权；无直接依据或未问到则score=null,evidence_ids=[]，text说明原因。评分只引用evidence_catalog中具体行为，不能复用旧维度分冒充新维度。专业基础仅用technical_knowledge证据；项目复盘只看经历理解、职责、结果与反思；问题拆解看分析过程与取舍；表达沟通只看文字组织，不从转写推断语速、口音或紧张；方向动机只看本人明确表达的目标和准备；综合素质只看本场明确可观察的主动提问、反思与学习行动，不推断人格、情绪、抗压或长期稳定，不以沉默/不会/缺经历认定态度差。缺少依据宁可未评价。优势和缺口尽可能兼顾约2:1，但不凑数或编造。action_plan按短期一周、中期一月、长期持续练习给可执行步骤和验收方式，只关联存在gaps的turn_id；没有缺口可为空。next_expectation写下次可验证的成长目标。每维理由控制在60字以内；行动计划最多三项，每项action与acceptance各不超过80字；总体印象、每条优势和缺口各不超过100字。仅引用最直接的证据，不重复输出长文。不要给录用、淘汰、真实性或招聘适配结论。模板示例的五项计分存在冲突，严格以此六维评分表为准。',
+              '必须输出 feedback_template，assessments 按六维各一项。score 是本维0-100的整数百分分，由程序按25/25/25/15/5/5加权；仅在完整回答确无可用行为依据时score=null,evidence_ids=[]，text具体说明缺少什么；不能仅因未专门提问就判为未观察。六维评分引用feedback_evidence_catalog中的原文，不直接套用旧维度分数。专业基础直接审视原回答中技术概念的准确性、原理解释、因果关系、方案适用边界与取舍；不受旧technical_knowledge标签、题目类型或题库匹配限制。professional_references仅是辅助参考，不是评分前提；没有参考也要基于通用专业知识评价有实质技术解释的回答，注明AI判断未经专家校准。不将术语堆砌或课程清单自动视为掌握原理，不从项目陈述推断实际熟练度；项目复盘只看经历理解、职责、结果与反思；问题拆解看分析过程与取舍；表达沟通只看文字组织，不从转写推断语速、口音或紧张；岗位匹配度结合target_role，从回答体现的岗位相关知识、职责、技术选择、处理问题的方式和业务约束判断，明确目标和准备也是证据，但不要求必须讲求职动机，不推断录用结果；综合素质只看本场明确可观察的主动提问、反思与学习行动，不推断人格、情绪、抗压或长期稳定，不以沉默/不会/缺经历认定态度差。每段回答都检查六维；同一原文可支持多个维度，但每维须说明不同的行为依据。不要为凑齐六维编造分数。优势和缺口尽可能兼顾约2:1，但不凑数或编造。action_plan按短期一周、中期一月、长期持续练习给可执行步骤和验收方式，只关联存在gaps的turn_id；没有缺口可为空。next_expectation写下次可验证的成长目标。每维理由控制在60字以内；行动计划最多三项，每项action与acceptance各不超过80字；总体印象、每条优势和缺口各不超过100字。仅引用最直接的证据，不重复输出长文。不要给录用、淘汰或真实性结论；岗位匹配度仅指本次回答体现的岗位相关能力。模板示例的五项计分存在冲突，严格以此六维评分表为准。',
           },
           feedback_evidence: indexed.map((e) => ({
             turn_id: e.turn_id,
@@ -565,7 +599,7 @@ export function createReportAnalysis(
             gaps: e.gaps,
           })),
           feedback_coverage_instructions:
-            '逐一检查六个模板维度。feedback_evidence 是全部已校验行为证据，不按旧 dimensions 分类限制新模板：职责与决策可支持项目理解，区分情况与解释因果可支持逻辑思维，主动发现并修正问题可支持综合素质，明确岗位目标与准备可支持岗位匹配度。不能因为旧维度未列出某项就判定没有依据；有直接行为证据必须评分并关联编号。专业基础仍仅用有专业评估依据的材料，不凭空补分。确实未问到或未回答时明确具体缺少什么证据。',
+            '逐段审视feedback_answers及feedback_evidence，从六个维度分别寻找证据，不按题目类型、旧dimensions标签或是否专门提问筛除维度。一道题可同时体现多维，同一证据编号允许被多维复用，理由必须分别解释相关行为。解释因果、比较方案、约束取舍、验证过程可体现逻辑思维；相关职责、专业判断与解决问题的方式可体现岗位匹配度，无须明确说求职动机；主动定位问题、依据反馈调整和总结教训可体现综合素质。原回答中未被逐题优缺点摘录的内容也必须检查。有依据就评分；确实无依据才返回null，不能仅写“未专门问到”。专业基础允许引用所有已核对原文的技术解释；缺少专业参考不等于未观察。有概念、原理、数据流、技术取舍或性能分析等实质说明时应评分并说明深度及局限；仅提技术名词且无法判断理解时可未评价，但不能以未匹配题库或旧标签为理由。六维评分用feedback_evidence_catalog；overview、strengths、improvements及旧dimension_assessments仍只用原有逐题证据，不混用原回答编号。',
           evaluations: indexed,
           evidence_catalog: Object.fromEntries(catalog),
           dimension_evaluations: dimensionEvaluations,
@@ -608,7 +642,7 @@ export function createReportAnalysis(
                   dimension: a.dimension,
                   score: a.score,
                   text: a.text,
-                  evidence_refs: a.evidence_ids.map((id) => catalog.get(id)!),
+                  evidence_refs: a.evidence_ids.map((id) => feedbackCatalog.get(id)!),
                 })),
                 action_plan: output.feedback_template.action_plan,
                 next_expectation: output.feedback_template.next_expectation,
@@ -642,7 +676,7 @@ export function createReportAnalysis(
         limitations: output.limitations,
       };
       try {
-        assertSummary(value, evaluations);
+        assertSummary(value, evaluations, context ? { ...context, snapshot } : undefined);
       } catch (error) {
         log({
           task: 'summarize',

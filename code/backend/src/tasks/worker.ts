@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 import type { BackendConfig } from '../foundation/config';
 import { createDatabase, type Database } from '../database/connection';
-import { createQueue, TASK_QUEUE } from './queue';
+import { createQueue, TASK_QUEUE, REPORT_QUEUE } from './queue';
 import { dispatchOutbox } from './outbox';
 import { runTask, type TaskHandlers } from './runner';
 import type { TaskRow } from './service';
@@ -47,15 +47,20 @@ export async function startWorker(config: BackendConfig, options: WorkerOptions 
   try {
     await database.pool.query('SELECT id FROM tasks LIMIT 0');
     await boss.start();
-    await boss.createQueue(TASK_QUEUE);
-    await boss.work<{ task_id: string }>(
-      TASK_QUEUE,
-      { batchSize: 1, pollingIntervalSeconds: 0.5, localConcurrency: 3 },
-      async (jobs) => {
-        for (const job of jobs)
-          await runTask(database, job.data.task_id, handlers, 60000, options.isCancelled);
-      },
-    );
+    for (const [queue, concurrency] of [
+      [TASK_QUEUE, config.WORKER_CONCURRENCY],
+      [REPORT_QUEUE, config.WORKER_REPORT_CONCURRENCY],
+    ] as const) {
+      await boss.createQueue(queue);
+      await boss.work<{ task_id: string }>(
+        queue,
+        { batchSize: 1, pollingIntervalSeconds: 0.5, localConcurrency: concurrency },
+        async (jobs) => {
+          for (const job of jobs)
+            await runTask(database, job.data.task_id, handlers, 60000, options.isCancelled);
+        },
+      );
+    }
     wakeClient = new Client(database.pool.options);
     await wakeClient.connect();
     wakeClient.on('notification', wake);

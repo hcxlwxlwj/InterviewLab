@@ -34,6 +34,7 @@ export function createInterviewRuntime(
     options.knowledge ?? options.realtimeKnowledge ?? knowledge,
     agent,
     {
+      prepare: options.onFinalize ? undefined : (tx, state) => reports.prepare(tx, state),
       seal: options.onFinalize ?? ((tx, state) => reports.seal(tx, state)),
       erase: (tx, owner, id) => reports.erase(tx, owner, id),
     },
@@ -68,6 +69,7 @@ export function createInterviewRuntime(
       };
       try {
         if (input.interview_id) {
+          if (task.type === 'reports.evaluate.v1') return await reports.isEvaluationCancelled(task);
           const current = await interviews.read(
             { owner_id: task.owner_id, roles: [] },
             input.interview_id,

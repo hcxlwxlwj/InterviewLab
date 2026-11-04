@@ -2,6 +2,7 @@ import { PgBoss } from 'pg-boss';
 import type { BackendConfig } from '../foundation/config';
 /** One durable queue; the application registry chooses the versioned task handler. */
 export const TASK_QUEUE = 'interviewlab-tasks-v1';
+export const REPORT_QUEUE = 'interviewlab-reports-v1';
 export function createQueue(config: BackendConfig) {
   if (!config.DATABASE_URL) throw new Error('DATABASE_URL is required for the worker');
   return new PgBoss({

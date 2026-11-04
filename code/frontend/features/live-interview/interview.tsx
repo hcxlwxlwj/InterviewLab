@@ -350,7 +350,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
           </>
         }
         recordsHref="/me/interviews"
-        reportHref={isDevelopment ? undefined : `/reports/${id}`}
+        reportHref={isDevelopment ? undefined : `/reports/${v.parent_interview_id ?? id}`}
         onText={setText}
         onSubmit={submit}
         onSkip={() => {

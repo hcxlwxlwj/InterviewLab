@@ -308,3 +308,66 @@ test('real pg-boss worker delivers tasks and readiness follows stop/restart and 
   await disconnected.close();
   assert.deepEqual(await disconnected.ready(1000), { database: false, worker: false });
 });
+
+test('outbox routes report and comparison tasks separately from live interview generation', async () => {
+  await reset();
+  const expected = new Map<string, string>();
+  for (const type of [
+    'interviews.advance.v1',
+    'reports.evaluate.v1',
+    'reports.summarize.v1',
+    'comparisons.generate.v1',
+  ]) {
+    const task = await createTaskService(database).enqueue(taskInput(randomUUID(), type));
+    expected.set(
+      task.id,
+      type.startsWith('interviews.') ? 'interviewlab-tasks-v1' : 'interviewlab-reports-v1',
+    );
+  }
+  const actual = new Map<string, string>();
+  await dispatchOutbox(database, {
+    send: async (queue, data) => {
+      actual.set(data.task_id, queue);
+      return randomUUID();
+    },
+  });
+  assert.deepEqual(actual, expected);
+});
+
+test('a saturated report queue leaves live interview processing available', async () => {
+  await reset();
+  let release!: () => void;
+  const blocked = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let reportStarted = false;
+  const worker = await startWorker(
+    { ...config, WORKER_CONCURRENCY: 1, WORKER_REPORT_CONCURRENCY: 1 },
+    {
+      database,
+      handlers: {
+        'reports.evaluate.v1': async () => {
+          reportStarted = true;
+          await blocked;
+          return { result_ref: null };
+        },
+        'interviews.advance.v1': async () => ({ result_ref: null }),
+      },
+    },
+  );
+  try {
+    await createTaskService(database).enqueue(taskInput(randomUUID(), 'reports.evaluate.v1'));
+    await until(async () => reportStarted);
+    const live = await createTaskService(database).enqueue(
+      taskInput(randomUUID(), 'interviews.advance.v1'),
+    );
+    await until(
+      async () =>
+        (await database.pool.query('SELECT status FROM tasks WHERE id=$1', [live.id])).rows[0]
+          .status === 'succeeded',
+    );
+  } finally {
+    release();
+    await worker.close();
+  }
+});

@@ -28,6 +28,8 @@ const environmentSchema = z.object({
   DATABASE_POOL_SIZE: z.coerce.number().int().min(1).max(50).default(10),
   DATABASE_CONNECT_TIMEOUT_MS: z.coerce.number().int().min(100).max(30000).default(3000),
   BODY_LIMIT_BYTES: z.coerce.number().int().min(1024).max(10485760).default(1048576),
+  WORKER_CONCURRENCY: z.coerce.number().int().min(1).max(32).default(3),
+  WORKER_REPORT_CONCURRENCY: z.coerce.number().int().min(1).max(32).default(3),
   WORKER_POLL_MS: z.coerce.number().int().min(100).max(60000).default(1000),
   WORKER_HEARTBEAT_MS: z.coerce.number().int().min(100).max(30000).default(5000),
   WORKER_STALE_MS: z.coerce.number().int().min(1000).max(300000).default(30000),

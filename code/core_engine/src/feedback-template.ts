@@ -2,6 +2,8 @@ import type { InterviewEvidence, InterviewReportSummary } from './live-interview
 
 /** Source: 面试反馈模板.xlsx / 维度评分表 A2:F7. Percent scores are weighted in code. */
 export const FEEDBACK_TEMPLATE_VERSION = 'interview-feedback-v1';
+/** Analysis policy version; historical template DTOs remain readable. */
+export const FEEDBACK_ANALYSIS_VERSION = 'text-review-v8';
 export const FEEDBACK_DIMENSIONS = [
   {
     key: 'professional_foundation',
@@ -57,22 +59,22 @@ export const FEEDBACK_DIMENSIONS = [
     short: '岗位匹配度',
     weight: 5,
     anchors: [
-      '动机模糊，方向不匹配',
-      '目标一般，匹配度中等',
-      '兴趣明确，经历相关',
-      '目标清晰，主动了解岗位并规划',
+      '回答体现的知识或做法与岗位要求有明确偏差',
+      '体现部分岗位相关知识或实践，适用理解有限',
+      '知识、职责或解决问题的方式与岗位要求相关',
+      '能结合岗位目标与约束说明选择、验证和改进',
     ],
   },
   {
     key: 'learning_initiative',
-    label: '综合素质（主动/抗压/稳定）',
+    label: '综合素质（学习与反思）',
     short: '综合素质',
     weight: 5,
     anchors: [
-      '态度浮躁或回避问题',
-      '中规中矩，缺乏主动',
-      '学习意愿强，抗压好',
-      '主动反思、乐于补短板',
+      '对已讨论的问题未能解释学习或调整方法',
+      '能说明学习、协作或改进的基本做法',
+      '能识别不足并主动验证或调整做法',
+      '能结合反馈复盘并提出可验证的改进行动',
     ],
   },
 ] as const;

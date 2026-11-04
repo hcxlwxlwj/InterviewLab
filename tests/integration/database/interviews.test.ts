@@ -1281,3 +1281,258 @@ test('BARS upgrade rejects other career stages instead of applying an internship
   );
   assert.equal((await runtime.reports.get(identity, v.id)).version, before.version);
 });
+
+test('answers are analyzed before finish and finalization reuses them without another model call', async () => {
+  let calls = 0;
+  const evaluate = agent.evaluate;
+  agent.evaluate = async (...args) => {
+    calls++;
+    return evaluate(...args);
+  };
+  let v = await started();
+  v = await runtime.interviews.answer(
+    identity,
+    v.id,
+    v.turns.at(-1)!.id,
+    { version: v.version, text: '我通过测试验证自己的思路。' },
+    randomUUID(),
+  );
+  const task = (
+    await database.pool.query(
+      "SELECT * FROM tasks WHERE type='reports.evaluate.v1' AND payload->>'interview_id'=$1",
+      [v.id],
+    )
+  ).rows[0];
+  assert.ok(task);
+  assert.equal(await runtime.isCancelled(task), false);
+  await runTask(database, task.id, runtime.handlers, 60000, runtime.isCancelled);
+  assert.equal(calls, 1);
+  await runtime.reports.maintain();
+  assert.equal(
+    (await database.pool.query("SELECT count(*) FROM tasks WHERE type='reports.summarize.v1'", []))
+      .rows[0].count,
+    '0',
+  );
+  await assert.rejects(runtime.reports.get(identity, v.id), /面试尚未结束/);
+  v = await runtime.interviews.read(identity, v.id);
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    { version: v.version, reason: 'user_finished' },
+    randomUUID(),
+  );
+  // Summary is queued by finalization itself, without waiting for maintenance.
+  assert.equal(
+    (await database.pool.query("SELECT count(*) FROM tasks WHERE type='reports.summarize.v1'", []))
+      .rows[0].count,
+    '1',
+  );
+  await drain();
+  const report = await runtime.reports.get(identity, v.id);
+  assert.equal(report.status, 'ready');
+  assert.equal(report.evaluations.length, 1);
+  assert.equal(calls, 1);
+});
+
+test('voice supplements invalidate a running analysis and only the new revision is published', async () => {
+  let v = await started();
+  const turnId = v.turns.at(-1)!.id;
+  v = await runtime.interviews.answer(
+    identity,
+    v.id,
+    turnId,
+    { version: v.version, text: '我会测试。' },
+    randomUUID(),
+  );
+  const old = (
+    await database.pool.query(
+      "SELECT * FROM tasks WHERE type='reports.evaluate.v1' AND payload->>'interview_id'=$1",
+      [v.id],
+    )
+  ).rows[0];
+  const evaluate = agent.evaluate;
+  agent.evaluate = async (...args) => {
+    const result = await evaluate(...args);
+    let current = await runtime.interviews.read(identity, v.id);
+    current = await runtime.interviews.interruptVoice(
+      identity,
+      v.id,
+      { version: current.version },
+      randomUUID(),
+    );
+    await runtime.interviews.continueVoice(
+      identity,
+      v.id,
+      turnId,
+      { version: current.version, text: '补充：我还会验证边界条件。' },
+      randomUUID(),
+    );
+    return result;
+  };
+  await runTask(database, old.id, runtime.handlers);
+  agent.evaluate = evaluate;
+  assert.equal(await runtime.isCancelled(old), true);
+  const cancelled = (await database.pool.query('SELECT status FROM tasks WHERE id=$1', [old.id]))
+    .rows[0];
+  assert.equal(cancelled.status, 'cancelled');
+  v = await runtime.interviews.read(identity, v.id);
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    { version: v.version, reason: 'user_finished' },
+    randomUUID(),
+  );
+  await drain();
+  const report = await runtime.reports.get(identity, v.id);
+  assert.equal(report.evaluations.length, 1);
+  assert.equal(report.evaluations[0].revision, 2);
+});
+
+test('finishing an interview preserves queued early analysis and triggers summary on its commit', async () => {
+  let v = await started();
+  v = await runtime.interviews.answer(
+    identity,
+    v.id,
+    v.turns.at(-1)!.id,
+    { version: v.version, text: '我会检查输入边界。' },
+    randomUUID(),
+  );
+  const task = (
+    await database.pool.query(
+      "SELECT * FROM tasks WHERE type='reports.evaluate.v1' AND payload->>'interview_id'=$1",
+      [v.id],
+    )
+  ).rows[0];
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    { version: v.version, reason: 'user_finished' },
+    randomUUID(),
+  );
+  assert.equal(
+    (await database.pool.query('SELECT status FROM tasks WHERE id=$1', [task.id])).rows[0].status,
+    'queued',
+  );
+  assert.equal(await runtime.isCancelled(task), false);
+  await runTask(database, task.id, runtime.handlers, 60000, runtime.isCancelled);
+  assert.equal(
+    (await database.pool.query("SELECT count(*) FROM tasks WHERE type='reports.summarize.v1'", []))
+      .rows[0].count,
+    '1',
+  );
+});
+
+test('historical six-dimensional summaries can upgrade without reevaluating answers', async () => {
+  let v = await started();
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: v.turns[0].id, text: '我先比较方案，再验证边界并根据反馈调整。' },
+    },
+    randomUUID(),
+  );
+  await drain();
+  const before = await runtime.reports.get(identity, v.id);
+  await database.pool.query(
+    "UPDATE interview_reports SET result=jsonb_set(result,'{analysis_metadata,prompt_version}',to_jsonb('text-review-v6'::text)) WHERE interview_id=$1",
+    [v.id],
+  );
+  agent.evaluate = async () => {
+    throw new Error('upgrade must reuse per-turn analysis');
+  };
+  const summarize = agent.summarize;
+  agent.summarize = async (...args) => {
+    assert.equal(args[4]?.turns[0].answer_text, v.turns[0].answer_text);
+    return summarize(...args);
+  };
+  const queued = await runtime.reports.request(
+    identity,
+    v.id,
+    { version: before.version, scope: 'summary' },
+    randomUUID(),
+  );
+  assert.equal(queued.version, before.version + 1);
+  await drain();
+  const ready = await runtime.reports.get(identity, v.id);
+  assert.equal(ready.summary_status, 'ready');
+  assert.equal(ready.analysis_metadata?.prompt_version, 'text-review-v8');
+  assert.equal(ready.evaluations.length, 1);
+});
+
+test('latest-answer report uses a completed retry while retaining originals and allows another retry', async () => {
+  let v = await started();
+  const originalTurn = v.turns[0];
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: originalTurn.id, text: '首次回答：我负责接口。' },
+    },
+    randomUUID(),
+  );
+  await drain();
+  const before = await runtime.reports.get(identity, v.id);
+  let retry = await runtime.interviews.createRetry(
+    identity,
+    v.id,
+    { turn_id: originalTurn.id, revision: 1, goal: '补充验证方式' },
+    randomUUID(),
+  );
+  retry = await runtime.interviews.start(
+    identity,
+    retry.id,
+    { version: retry.version },
+    randomUUID(),
+  );
+  assert.equal((await runtime.reports.get(identity, v.id)).needs_refresh, false);
+  retry = await runtime.interviews.finish(
+    identity,
+    retry.id,
+    {
+      version: retry.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: retry.turns[0].id, text: '最新回答：我通过边界用例验证接口行为。' },
+    },
+    randomUUID(),
+  );
+  await drain();
+  assert.equal((await runtime.reports.get(identity, v.id)).needs_refresh, true);
+  const queued = await runtime.reports.request(
+    identity,
+    v.id,
+    { version: before.version, scope: 'latest' },
+    randomUUID(),
+  );
+  assert.equal(queued.version, before.version + 1);
+  await drain();
+  const updated = await runtime.reports.get(identity, v.id);
+  assert.equal(updated.needs_refresh, false);
+  assert.equal(updated.status, 'ready');
+  assert.equal(updated.answer_sources?.[0].retry_interview_id, retry.id);
+  assert.equal(updated.evaluations[0].turn_id, retry.turns[0].id);
+  assert.equal(
+    (await runtime.interviews.read(identity, v.id)).turns[0].answer_text,
+    '首次回答：我负责接口。',
+  );
+  const again = await runtime.interviews.createRetry(
+    identity,
+    v.id,
+    { turn_id: retry.turns[0].id, revision: retry.turns[0].revision, goal: '继续完善' },
+    randomUUID(),
+  );
+  assert.equal(again.parent_turn_id, originalTurn.id);
+  const noChange = await runtime.reports.request(
+    identity,
+    v.id,
+    { version: updated.version, scope: 'latest' },
+    randomUUID(),
+  );
+  assert.equal(noChange.version, updated.version);
+  await runtime.interviews.delete(identity, retry.id, { version: retry.version }, randomUUID());
+  assert.equal((await runtime.reports.get(identity, v.id)).needs_refresh, true);
+});

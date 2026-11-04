@@ -1,12 +1,13 @@
 import { z } from 'zod';
 import type { InterviewReport, ReportRequest } from '@interviewlab/core';
 import { summaryOutput, indicatorAssessmentOutput } from './analysis';
+import { turnSchema } from '../interviews/schemas';
 const evidence = z.object({ turn_id: z.string(), revision: z.number().int(), quote: z.string() });
 const finding = z.object({ text: z.string(), evidence_refs: z.array(evidence) });
 export const reportRequestBody = z
   .object({
     version: z.number().int().positive(),
-    scope: z.enum(['missing', 'summary', 'rubric']).optional(),
+    scope: z.enum(['missing', 'summary', 'rubric', 'latest']).optional(),
   })
   .strict() satisfies z.ZodType<ReportRequest>;
 const dimension = z.object({
@@ -16,6 +17,16 @@ const dimension = z.object({
   explanation: z.string(),
 });
 export const reportSchema = z.object({
+  answer_sources: z
+    .array(
+      z.object({
+        original_turn_id: z.string(),
+        retry_interview_id: z.string(),
+        turn: z.lazy(() => turnSchema),
+      }),
+    )
+    .optional(),
+  needs_refresh: z.boolean().optional(),
   id: z.string(),
   interview_id: z.string(),
   version: z.number().int(),
