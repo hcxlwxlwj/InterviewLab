@@ -121,16 +121,22 @@ async function main() {
       } else if (task === 'summarize') {
         const evaluations = input.evaluations;
         value = {
+          feedback_template: {
+            version: input.feedback_standard.version,
+            assessments: input.feedback_standard.dimensions.map((d: { key: string }) => ({
+              dimension: d.key,
+              score: 20,
+              text: '受控测试缺少能力证据',
+              evidence_ids: [],
+            })),
+            action_plan: [],
+            next_expectation: '补充具体行动和验证过程',
+          },
           overview: evaluations[0].strengths[0],
           strengths: evaluations
             .slice(0, 3)
             .flatMap((e: { strengths: unknown[] }) => e.strengths.slice(0, 1)),
           improvements: [],
-          dimension_assessments: {
-            technical_knowledge: null,
-            project_communication: null,
-            logical_expression: { text: '本次合成回答说明了个人行动。', level: 3 },
-          },
           limitations: ['受控测试模型仅验证界面流程，不代表实际分析质量。'],
         };
       } else if (task === 'compare')

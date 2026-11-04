@@ -1,6 +1,7 @@
 import { after, before, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import { config as dotenv } from 'dotenv';
 import type {
   Interview,
@@ -115,6 +116,17 @@ function fakeAgent(): InterviewAgent {
     },
     async summarize(evaluations) {
       return {
+        feedback_template: {
+          version: FEEDBACK_TEMPLATE_VERSION,
+          assessments: FEEDBACK_DIMENSIONS.map((d) => ({
+            dimension: d.key,
+            score: 20,
+            text: '证据不足',
+            evidence_refs: [],
+          })),
+          action_plan: [],
+          next_expectation: '补充验证过程',
+        },
         overview: evaluations[0].strengths[0],
         strengths: evaluations.slice(0, 3).flatMap((e) => e.strengths.slice(0, 1)),
         improvements: [],
@@ -255,7 +267,7 @@ test('real routes run the text interview, report, fixed-question retry and evide
     assert.equal(v.status, 'completed');
     const report = await runtime.reports.get(identity, v.id);
     assert.equal(report.status, 'ready');
-    assert.equal(report.overall_score, null);
+    assert.equal(report.overall_score, 20);
     assert.equal(report.dimensions.coding_ability.status, 'not_observed');
     assert.equal(report.evaluations.length, 3);
     const retry = await runtime.interviews.createRetry(
@@ -983,7 +995,7 @@ test('a summary computed for an obsolete report version is cancelled instead of 
   assert.equal(task.result_ref, null);
 });
 
-test('a historical ready report can add reference scores without reevaluating answers and persists the computed total', async () => {
+test('ready reports already contain six numeric scores and do not run legacy summary upgrades', async () => {
   let v = await started();
   v = await runtime.interviews.finish(
     identity,
@@ -997,58 +1009,16 @@ test('a historical ready report can add reference scores without reevaluating an
   );
   await drain();
   const before = await runtime.reports.get(identity, v.id);
-  assert.equal(before.overall_score, null);
-  assert.equal(before.summary?.feedback_template, undefined);
-  const summarize = agent.summarize;
-  agent.evaluate = async () => {
-    throw new Error('summary upgrade must not reevaluate answers');
-  };
-  agent.summarize = async (...args) => ({
-    ...(await summarize(...args)),
-    feedback_template: {
-      version: FEEDBACK_TEMPLATE_VERSION,
-      assessments: FEEDBACK_DIMENSIONS.map((d) => ({
-        dimension: d.key,
-        score: d.key === 'communication' ? 75 : null,
-        text: d.key === 'communication' ? '回答包含可定位的个人陈述。' : '本次未覆盖此维度。',
-        evidence_refs: d.key === 'communication' ? args[0][0].strengths[0].evidence_refs : [],
-      })),
-      action_plan: [],
-      next_expectation: '下次补充验证过程及适用条件。',
-    },
-    dimension_assessments: [
-      {
-        ...args[0][0].strengths[0],
-        dimension: 'logical_expression',
-        level: 3,
-      },
-    ],
-  });
-  await runtime.reports.request(
+  assert.equal(before.overall_score, 20);
+  assert.equal(before.summary?.feedback_template.version, FEEDBACK_TEMPLATE_VERSION);
+  assert.equal(before.summary?.feedback_template.assessments.length, 6);
+  const reused = await runtime.reports.request(
     identity,
     v.id,
     { version: before.version, scope: 'summary' },
     randomUUID(),
   );
-  await drain();
-  const ready = await runtime.reports.get(identity, v.id);
-  assert.equal(ready.version, before.version + 1);
-  assert.equal(ready.summary?.feedback_template?.version, FEEDBACK_TEMPLATE_VERSION);
-  assert.equal(ready.overall_score, 75);
-  assert.equal(ready.scoring_status, 'experimental');
-  assert.equal(ready.dimensions.coding_ability.score, null);
-  const row = (
-    await database.pool.query('SELECT result FROM interview_reports WHERE interview_id=$1', [v.id])
-  ).rows[0];
-  assert.equal(row.result.overall_score, 75);
-  const reused = await runtime.reports.request(
-    identity,
-    v.id,
-    { version: ready.version, scope: 'summary' },
-    randomUUID(),
-  );
-  assert.equal(reused.version, ready.version);
-  assert.deepEqual(reused.task_ids, ready.task_ids);
+  assert.equal(reused.version, before.version);
 });
 
 test('voice interruption fences a running Agent task, appends the same answer revision, and survives an API retry', async () => {
@@ -1242,7 +1212,7 @@ test('explicit BARS upgrade replaces only derived evaluations, preserves answers
   assert.equal(pending.overall_score, null);
   await drain();
   const ready = await runtime.reports.get(identity, v.id);
-  assert.equal(ready.overall_score, 75);
+  assert.equal(ready.overall_score, 20);
   assert.equal(ready.analysis_metadata?.scoring_rubric_version, FRONTEND_RUBRIC_VERSION);
   assert.equal(ready.evaluations[0].indicator_assessments?.length, 2);
   assert.deepEqual((await runtime.interviews.read(identity, v.id)).turns, saved);
@@ -1252,7 +1222,7 @@ test('explicit BARS upgrade replaces only derived evaluations, preserves answers
         v.id,
       ])
     ).rows[0].result.overall_score,
-    75,
+    20,
   );
 });
 
@@ -1422,7 +1392,7 @@ test('finishing an interview preserves queued early analysis and triggers summar
   );
 });
 
-test('historical six-dimensional summaries can upgrade without reevaluating answers', async () => {
+test('report reset migration deletes reports, evaluation tasks and request keys while preserving answers', async () => {
   let v = await started();
   v = await runtime.interviews.finish(
     identity,
@@ -1430,36 +1400,49 @@ test('historical six-dimensional summaries can upgrade without reevaluating answ
     {
       version: v.version,
       reason: 'user_finished',
-      final_answer: { turn_id: v.turns[0].id, text: '我先比较方案，再验证边界并根据反馈调整。' },
+      final_answer: { turn_id: v.turns[0].id, text: '我先比较方案，再验证边界。' },
     },
     randomUUID(),
   );
   await drain();
   const before = await runtime.reports.get(identity, v.id);
-  await database.pool.query(
-    "UPDATE interview_reports SET result=jsonb_set(result,'{analysis_metadata,prompt_version}',to_jsonb('text-review-v6'::text)) WHERE interview_id=$1",
-    [v.id],
-  );
-  agent.evaluate = async () => {
-    throw new Error('upgrade must reuse per-turn analysis');
-  };
-  const summarize = agent.summarize;
-  agent.summarize = async (...args) => {
-    assert.equal(args[4]?.turns[0].answer_text, v.turns[0].answer_text);
-    return summarize(...args);
-  };
-  const queued = await runtime.reports.request(
+  await runtime.reports.request(
     identity,
     v.id,
     { version: before.version, scope: 'summary' },
     randomUUID(),
   );
-  assert.equal(queued.version, before.version + 1);
+  const saved = structuredClone((await runtime.interviews.read(identity, v.id)).turns);
+  const sql = await readFile(
+    new URL('../../../code/backend/drizzle/0007_reset_report_scoring.sql', import.meta.url),
+    'utf8',
+  );
+  await database.transaction(async (tx) => {
+    await tx.client.query(sql);
+  });
+  for (const table of ['interview_reports', 'report_evaluations']) {
+    assert.equal((await database.pool.query(`SELECT count(*) FROM ${table}`)).rows[0].count, '0');
+  }
+  assert.equal(
+    (await database.pool.query("SELECT count(*) FROM tasks WHERE type LIKE 'reports.%'")).rows[0]
+      .count,
+    '0',
+  );
+  assert.equal(
+    (
+      await database.pool.query(
+        "SELECT count(*) FROM idempotency_records WHERE operation LIKE 'reports.%'",
+      )
+    ).rows[0].count,
+    '0',
+  );
+  assert.deepEqual((await runtime.interviews.read(identity, v.id)).turns, saved);
+  await runtime.reports.request(identity, v.id, { version: 1 }, randomUUID());
   await drain();
-  const ready = await runtime.reports.get(identity, v.id);
-  assert.equal(ready.summary_status, 'ready');
-  assert.equal(ready.analysis_metadata?.prompt_version, 'text-review-v8');
-  assert.equal(ready.evaluations.length, 1);
+  assert.equal(
+    (await runtime.reports.get(identity, v.id)).summary?.feedback_template.version,
+    FEEDBACK_TEMPLATE_VERSION,
+  );
 });
 
 test('latest-answer report uses a completed retry while retaining originals and allows another retry', async () => {

@@ -50,6 +50,13 @@
       "when": 1793740000000,
       "tag": "0006_personal_materials",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793836800000,
+      "tag": "0007_reset_report_scoring",
+      "breakpoints": true
     }
   ]
 }

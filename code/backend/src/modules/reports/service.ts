@@ -1,4 +1,4 @@
-import { FRONTEND_RUBRIC_VERSION, FEEDBACK_TEMPLATE_VERSION } from '@interviewlab/core';
+import { FRONTEND_RUBRIC_VERSION } from '@interviewlab/core';
 import { randomUUID } from 'node:crypto';
 import type {
   InterviewReport,
@@ -574,14 +574,7 @@ export function createReportsService(
               '当前行为锚定标准只适用于前端实习岗位',
             );
           if (body.scope === 'summary') {
-            if (
-              (report.summary_status === 'ready' &&
-                report.analysis_metadata?.prompt_version === REPORT_PROMPT_VERSION &&
-                report.summary?.feedback_template?.version === FEEDBACK_TEMPLATE_VERSION &&
-                report.summary?.dimension_assessments !== undefined) ||
-              !report.evaluations.length
-            )
-              return { id };
+            if (report.summary_status === 'ready' || !report.evaluations.length) return { id };
           } else if (
             body.scope !== 'rubric' &&
             !report.missing_turn_ids.length &&

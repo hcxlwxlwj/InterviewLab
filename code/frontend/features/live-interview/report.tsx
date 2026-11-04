@@ -16,7 +16,6 @@ import { Button } from '../../components/ui/button';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   FEEDBACK_DIMENSIONS,
-  FEEDBACK_ANALYSIS_VERSION,
   feedbackScore,
   FRONTEND_RUBRIC_VERSION,
   type InterviewReport,
@@ -325,34 +324,6 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                   <h2>
                     <FileText size={22} /> 面试反馈报告
                   </h2>
-                  {(!report.summary?.feedback_template ||
-                    report.analysis_metadata?.prompt_version !== FEEDBACK_ANALYSIS_VERSION) &&
-                    !reportPending &&
-                    report.evaluations.length > 0 && (
-                      <div className="template-upgrade">
-                        <p>
-                          六维评价规则已更新，可结合完整回答识别同一道题体现的多项能力。重新分析会保留原回答。
-                        </p>
-                        <button
-                          className="live-button"
-                          disabled={command.blocked}
-                          onClick={() =>
-                            command.run(
-                              (key) =>
-                                interviewsApi.retryReport(id, report.version, key, 'summary'),
-                              (result) =>
-                                resource.accept({
-                                  interview,
-                                  originalInterview: data.originalInterview,
-                                  report: result,
-                                }),
-                            )
-                          }
-                        >
-                          更新六维分析
-                        </button>
-                      </div>
-                    )}
                   {report.summary ? (
                     <>
                       <h3>一、总体印象</h3>
@@ -431,7 +402,7 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                       {report.summary_status === 'failed'
                         ? '整场总结生成失败，已完成的逐题复盘仍可查看。'
                         : report.summary_status === 'not_requested' || !report.summary_status
-                          ? '这份历史报告尚未生成整场总结。'
+                          ? '整场总结尚未生成。'
                           : report.summary_status === 'not_applicable'
                             ? '本次没有足够的评价证据生成整场总结，可查看原回答和逐题分析。'
                             : report.status === 'failed'
