@@ -4,7 +4,7 @@
 
 - [系统架构](architecture.md)：保留原六层结构、章节编号、表格及绘图样式，更新实际组件和边界。
 - [数据与接口](data_and_interfaces.md)：当前/目标合同、业务与知识 ER、字段、状态、事务、权限、删除及 HTTP/SSE/WS。
-- [Agent 接入](interview-agent-implementation.md)：模型与框架分工、简历/准备/单轮工作流、准备状态及发布控制。
+- [智能体架构](interview-agent-implementation.md)：按老师模板维护六层职责、框架分工、三类工作流、状态与发布边界及工程自查。
 - [动态面试](interview-agent-v3.md)：流式问题、受限动作、私有记忆、经历/话题边界和取消；保留有日期的历史验证。
 - [个人材料](personal-materials-implementation.md)：导入、核对、版本、个人设置与派生分析。
 - [实时语音与视频](voice-interview.md)：ASR/TTS、端点、打断、默认设备与本机视频房间。
