@@ -10,6 +10,7 @@ import type { ContentSource, KnowledgeQuestion } from './domain/knowledge';
 
 /** Real HTTP DTOs. The synchronous demo Session remains a separate contract. */
 export interface InterviewConfig {
+  resume_ref?: {id:string;version:number};
   job: string;
   career_stage: 'internship' | 'campus';
   interview_type: LiveInterviewType;
@@ -74,6 +75,7 @@ export interface InterviewTurn extends InterviewQuestion {
   answered_at: string | null;
 }
 export interface InterviewSnapshot {
+  personal_material?: import('./personal').PersonalMaterial;
   job_title: string;
   knowledge: InterviewKnowledge;
   prompt_version: string;

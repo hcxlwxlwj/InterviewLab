@@ -230,6 +230,7 @@ ${repair ? '上次未通过校验；检查下标、引用、题数与重复，�
                           ? '本轮是业务面，围绕用户任务、优先级、约束与结果，不考察代码实现。'
                           : '依据当前目标自然交流',
                     experience_context: grounding,
+                    confirmed_resume: snapshot.personal_material,
                     goal_options: goalOptions,
                     competencies: release.competencies.filter((x) => goalOptions.includes(x.id)),
                     memory: context.memory

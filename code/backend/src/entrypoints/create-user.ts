@@ -24,7 +24,7 @@ if (!process.stdin.isTTY || !process.stdout.isTTY) {
       (value) => value === (requestedRole || 'student'),
     );
     if (!role) throw new Error('Invalid role');
-    const password = randomBytes(24).toString('base64url');
+    const password = randomBytes(15).toString('base64url');
     database = createDatabase(config);
     await createInvitedUser(database, { email, name, password, role });
     // This is the sole intentional credential output, only in the administrator's local TTY.

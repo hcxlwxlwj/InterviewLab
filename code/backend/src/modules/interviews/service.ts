@@ -122,6 +122,7 @@ export function createInterviewsService(
   agent: InterviewAgent,
   reports: InterviewReportHooks,
   realtimeKnowledge?: InterviewKnowledgeRuntime,
+  readMaterial?: (owner:string,id:string,version:number)=>Promise<import('@interviewlab/core').PersonalMaterial>,
 ) {
   const streams = createGenerationStreams(database);
   async function seal(tx: Transaction, state: InterviewState, reason: string) {
@@ -283,6 +284,7 @@ export function createInterviewsService(
     const before = await loadInterview(database.pool, identity.owner_id, id);
     // Knowledge I/O must never hold the business transaction open.
     const frozen = before.snapshot ?? {
+      personal_material: before.view.configuration.resume_ref && readMaterial ? await readMaterial(identity.owner_id,before.view.configuration.resume_ref.id,before.view.configuration.resume_ref.version) : undefined,
       job_title: getJob(before.view.configuration.job)?.title ?? before.view.configuration.job,
       knowledge: await knowledge.read(before.view.configuration),
       prompt_version: INTERVIEW_PROMPT_VERSION,

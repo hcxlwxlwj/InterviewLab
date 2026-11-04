@@ -32,8 +32,8 @@ export function createAuthService(database: Database, config: BackendConfig) {
       enabled: true,
       disableSignUp: false,
       autoSignIn: true,
-      minPasswordLength: 12,
-      maxPasswordLength: 128,
+      minPasswordLength: 9,
+      maxPasswordLength: 20,
     },
     trustedOrigins: [config.PUBLIC_ORIGIN],
     user: {

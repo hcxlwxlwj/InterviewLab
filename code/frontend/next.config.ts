@@ -8,6 +8,7 @@ const target = new URL(backendOrigin);
 if (!['http:', 'https:'].includes(target.protocol) || target.origin !== backendOrigin)
   throw new Error('BACKEND_ORIGIN must be an HTTP origin without a path');
 const config: NextConfig = {
+  allowedDevOrigins: ['127.0.0.1'],
   transpilePackages: ['@interviewlab/core', '@interviewlab/backend'],
   devIndicators: false,
   async rewrites() {

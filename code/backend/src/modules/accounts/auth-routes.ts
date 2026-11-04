@@ -25,7 +25,7 @@ export const signUpSchema = z.strictObject({
     .email()
     .max(254)
     .transform((email) => email.toLowerCase()),
-  password: z.string().min(12).max(128),
+  password: z.string().min(9).max(20),
 }) satisfies z.ZodType<SignUpInput>;
 
 export async function registerAuthRoutes(instance: FastifyInstance, auth?: AuthService) {

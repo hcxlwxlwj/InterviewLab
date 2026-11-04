@@ -1,3 +1,4 @@
+import { createMaterialsService } from './resumes/service';
 import { createKnowledgeService } from './knowledge/service';
 import { withRealtimeAgent } from './interviews/agent-v3';
 import type { InterviewKnowledgeProvider, InterviewKnowledgeRuntime } from '@interviewlab/core';
@@ -39,6 +40,7 @@ export function createInterviewRuntime(
       erase: (tx, owner, id) => reports.erase(tx, owner, id),
     },
     options.realtimeKnowledge ?? knowledge,
+    async (owner,id,version)=>{const versions=await createMaterialsService(database).versions(owner,id);const material=versions.find(v=>v.version===version&&v.kind==='resume'&&v.confirmed);if(!material)throw new ServiceError('unsupported_input',400,'请选择本人已确认的简历版本');return material;},
   );
   const reports = createReportsService(database, interviews, agent);
   return {
