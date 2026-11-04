@@ -23,10 +23,11 @@ export function createMaterialsService(database: Database) {
   }
   async function save(
     owner: string,
-    input: Pick<PersonalMaterial, 'kind' | 'title' | 'text' | 'confirmed'>,
+    input: Pick<PersonalMaterial, 'kind' | 'title' | 'text' | 'confirmed' | 'structure'>,
     id?: string,
     expected?: number,
   ) {
+    if (!input.text.trim() && !Object.values(input.structure ?? {}).some(value=>value.trim())) throw new ServiceError('unsupported_input',400,'请填写简历内容');
     return database.transaction(async ({ client }) => {
       const materialId = id ?? randomUUID();
       let version = 1;
@@ -53,6 +54,7 @@ export function createMaterialsService(database: Database) {
           input.kind,
         ]);
       const data: PersonalMaterial = {
+        structure: input.structure,
         kind: input.kind,
         title: input.title,
         text: input.text,

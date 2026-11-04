@@ -17,3 +17,4 @@ export * from './report-rubric';
 export * from './feedback-template';
 
 export * from './personal';
+export * from './resume-template';

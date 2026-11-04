@@ -8,8 +8,9 @@ const input = z
   .object({
     kind: z.enum(['resume', 'experience']),
     title: z.string().trim().min(1).max(200),
-    text: z.string().trim().min(1).max(100000),
+    text: z.string().trim().max(100000),
     confirmed: z.boolean(),
+    structure: z.object({full_name:z.string().max(15000),phone:z.string().max(15000),email:z.string().max(15000),city:z.string().max(15000),education:z.string().max(15000),skills:z.string().max(15000),projects:z.string().max(15000),internships:z.string().max(15000),awards:z.string().max(15000),summary:z.string().max(15000)}).optional(),
   })
   .strict();
 const material = input.extend({

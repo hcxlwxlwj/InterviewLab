@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import ProfileOverview from './profile-overview';
 import { useCallback } from 'react';
 import { STATUS_LABELS } from '@interviewlab/core';
 import { useSession } from '../../components/session-provider';
@@ -32,6 +33,7 @@ export default function AccountOverview() {
   const resource = useLiveResource(load, () => false);
   return (
     <WorkspaceFrame section="overview">
+      <ProfileOverview />
       <section className="library-panel">
         <h1>我的账号</h1>
         {state.status === 'signed_in' && (

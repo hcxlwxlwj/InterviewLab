@@ -5,7 +5,7 @@ import type { Database } from '../../database/connection';
 import type { MaterialsService } from '../resumes/service';
 import type { BackendModule } from '../contracts';
 import { unavailable } from '../../foundation/errors';
-const settings=z.object({display_name:z.string().trim().max(80),bio:z.string().max(1000),target_role:z.string().max(100),practice_minutes:z.number().int().min(5).max(120),default_resume_id:z.string().uuid().nullable()}).strict() satisfies z.ZodType<PersonalSettings>;
+const settings=z.object({city:z.string().max(100).optional(),career_stage:z.string().max(100).optional(),strengths:z.string().max(3000).optional(),learning_goals:z.string().max(3000).optional(),interaction_mode:z.enum(['text_fallback','realtime_voice']).optional(),interviewer_style:z.enum(['标准','友好','深入追问']).optional(),display_name:z.string().trim().max(80),bio:z.string().max(1000),target_role:z.string().max(100),practice_minutes:z.number().int().min(5).max(120),default_resume_id:z.string().uuid().nullable()}).strict() satisfies z.ZodType<PersonalSettings>;
 const defaults: PersonalSettings={display_name:'',bio:'',target_role:'',practice_minutes:20,default_resume_id:null};
 export function settingsModule(database?: Database,materials?: MaterialsService): BackendModule {
  return {name:'accounts',async register(instance,context){

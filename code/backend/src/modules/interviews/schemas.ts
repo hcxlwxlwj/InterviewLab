@@ -8,6 +8,7 @@ import {
 
 export const interviewConfigSchema = z
   .object({
+    resume_ref: z.object({id:z.string().uuid(),version:z.number().int().positive()}).optional(),
     job: z.string().min(1).max(100),
     career_stage: z.enum(['internship', 'campus']),
     interview_type: z.enum([

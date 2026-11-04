@@ -1,10 +1,11 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
+import { RESUME_FIELDS, emptyResumeTemplate, extractResumeTemplate } from '@interviewlab/core';
 import type { PersonalMaterial, PersonalSettings } from '@interviewlab/core';
 import { apiRequest } from '../../lib/api/http';
 import { WorkspaceFrame } from './workspace-frame';
-const empty = { title: '', text: '', kind: 'resume' as 'resume' | 'experience', confirmed: false };
-export default function MaterialsWorkspace({ settingsOnly = false }: { settingsOnly?: boolean }) {
+const empty = { structure: emptyResumeTemplate(), title: '', text: '', kind: 'resume' as 'resume' | 'experience', confirmed: false };
+export default function MaterialsWorkspace({ settingsOnly = false, targetsOnly = false }: { settingsOnly?: boolean; targetsOnly?: boolean }) {
   const uploadRef = useRef<HTMLInputElement>(null);
   const [filename, setFilename] = useState('');
   const [importing, setImporting] = useState(false);
@@ -49,9 +50,9 @@ export default function MaterialsWorkspace({ settingsOnly = false }: { settingsO
     }
   }
   return (
-    <WorkspaceFrame section={settingsOnly ? 'preferences' : 'resumes'}>
+    <WorkspaceFrame section={targetsOnly ? 'saved-jobs' : settingsOnly ? 'preferences' : 'resumes'}>
       <section className="library-panel material-workspace">
-        <h1>{settingsOnly ? '账号与个人设置' : '简历与经历'}</h1>
+        <h1>{targetsOnly ? '目标岗位与求职方向' : settingsOnly ? '账号与个人设置' : '简历与经历'}</h1>
         {error && (
           <p role="alert">
             {error} <button onClick={() => void load()}>重试</button>
@@ -83,6 +84,9 @@ export default function MaterialsWorkspace({ settingsOnly = false }: { settingsO
                 onChange={(e) => setSettings({ ...settings, bio: e.target.value })}
               />
             </label>
+            <h2>求职方向与个人画像</h2>{[['city','所在城市'],['career_stage','求职阶段（实习 / 校招 / 社招）'],['strengths','个人优势（本人填写）'],['learning_goals','希望重点练习的内容']].map(([key,label])=><label key={key}>{label}<textarea rows={3} maxLength={key==='city'||key==='career_stage'?100:3000} value={String(settings[key as keyof PersonalSettings]??'')} onChange={e=>setSettings({...settings,[key]:e.target.value})}/></label>)}
+            <label>默认作答方式<select value={settings.interaction_mode??'text_fallback'} onChange={e=>setSettings({...settings,interaction_mode:e.target.value as 'text_fallback'|'realtime_voice'})}><option value="text_fallback">文字作答</option><option value="realtime_voice">语音作答</option></select></label>
+            <label>面试官风格<select value={settings.interviewer_style??'标准'} onChange={e=>setSettings({...settings,interviewer_style:e.target.value as '标准'|'友好'|'深入追问'})}><option>标准</option><option>友好</option><option>深入追问</option></select></label>
             <label>
               目标岗位
               <input
@@ -126,7 +130,7 @@ export default function MaterialsWorkspace({ settingsOnly = false }: { settingsO
         )}
         {loaded && !settingsOnly && (
           <>
-            <p>材料只属于当前账号。导入的文本是候选内容，请核对后确认；每次保存生成独立版本。</p>
+            <p>可分别创建“前端实习版”“后端校招版”等多份简历。每次模拟面试可单独选择一份；导入内容需核对确认。</p>
             <form
               className="material-form"
               onSubmit={(e) => {
@@ -212,6 +216,7 @@ export default function MaterialsWorkspace({ settingsOnly = false }: { settingsO
                         ...current,
                         title: current.title || file.name.replace(/\.[^.]+$/, ''),
                         text,
+                        structure: extractResumeTemplate(text),
                         confirmed: false,
                       }));
                       setFilename(file.name);
@@ -233,11 +238,11 @@ export default function MaterialsWorkspace({ settingsOnly = false }: { settingsO
                 </button>
                 {filename && <span className="material-filename">已导入：{filename}</span>}
               </div>
+            <section className="resume-template"><h2>标准简历 · 信息核对</h2><p>从文件提取的候选信息需要逐项核对。未识别的内容请根据原文补充，系统不会补写事实。</p><button type="button" disabled={busy||importing||!draft.text.trim()} onClick={()=>{setDraft({...draft,structure:extractResumeTemplate(draft.text),confirmed:false});setNotice('已从原文重新提取，请逐项核对。');}}>从原文重新填入模板</button>{Object.entries(RESUME_FIELDS).map(([key,label])=><label key={key}>{label}<textarea rows={key==='projects'?6:3} value={draft.structure[key as keyof typeof draft.structure]} onChange={e=>setDraft({...draft,confirmed:false,structure:{...draft.structure,[key]:e.target.value}})} /></label>)}</section>
               <label>
-                内容
+                原始文本（供核对，可选）
                 <textarea
-                  required
-                  rows={14}
+                  rows={8}
                   maxLength={100000}
                   value={draft.text}
                   onChange={(e) => setDraft({ ...draft, text: e.target.value, confirmed: false })}
@@ -251,7 +256,7 @@ export default function MaterialsWorkspace({ settingsOnly = false }: { settingsO
                 />
                 我已核对以上内容，确认其为本人真实材料
               </label>
-              <button disabled={busy || importing}>{editing ? '保存新版本' : '创建材料'}</button>
+              <button disabled={busy || importing}>{editing ? '保存标准简历版本' : '保存为一份新简历 / 经历'}</button>
               <button
                 type="button"
                 onClick={() => {
@@ -265,6 +270,7 @@ export default function MaterialsWorkspace({ settingsOnly = false }: { settingsO
               </button>
             </form>
             {!items.length && <p>还没有简历或经历，可以在上方创建。</p>}
+            <h2>我的简历与经历（{items.length}）</h2><p><a className="text-link" href="/interview/setup">选择一份简历开始模拟面试 →</a></p>
             {items.map((item) => (
               <article key={item.id} className="resume-summary-row">
                 <div>
@@ -274,6 +280,7 @@ export default function MaterialsWorkspace({ settingsOnly = false }: { settingsO
                     {item.confirmed ? '已确认' : '待确认'}
                   </p>
                 </div>
+                {item.kind==='resume' && <button type="button" disabled={busy||importing} onClick={()=>{setEditing(undefined);setDraft({title:item.title+'（新岗位版）',text:item.text,kind:item.kind,structure:item.structure??extractResumeTemplate(item.text),confirmed:false});setHistory([]);setNotice('已复制为新简历草稿，请修改岗位相关内容并确认保存。');window.scrollTo({top:0,behavior:'smooth'});}}>复制为新岗位版</button>}
                 <button
                   disabled={busy || importing}
                   onClick={() => {
@@ -282,7 +289,8 @@ export default function MaterialsWorkspace({ settingsOnly = false }: { settingsO
                       title: item.title,
                       text: item.text,
                       kind: item.kind,
-                      confirmed: item.confirmed,
+                      structure: item.structure ?? extractResumeTemplate(item.text),
+                    confirmed: item.confirmed,
                     });
                     setHistory([]);
                   }}

@@ -351,6 +351,7 @@ export function createInterviewAgent(
           history,
           knowledge: snapshot.knowledge,
           job_title: snapshot.job_title,
+          confirmed_resume: snapshot.personal_material,
           conversation_guidance: conversational
             ? `你正在与候选人面对面进行文字面试，不是在主持问卷。开场自我介绍已经完成，不得再次要求完整自我介绍。
 先阅读自我介绍和全部历史，识别候选人真实说过的经历、本人职责、技术选择、兴趣和未展开的细节，再选择一个值得了解的点。

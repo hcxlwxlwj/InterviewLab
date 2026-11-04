@@ -3,7 +3,9 @@ import Link from 'next/link';
 import { ArrowRight, CameraOff, Check, Keyboard, Mic, MicOff } from 'lucide-react';
 import { Choices, InterviewSetupPage } from '../../components/interview-setup';
 import { Button } from '../../components/ui/button';
-import { useCallback, useState } from 'react';
+import { apiRequest } from '../../lib/api/http';
+import type { PersonalMaterial, PersonalSettings } from '@interviewlab/core';
+import { useCallback, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { LIVE_TYPE_LABELS, liveInterviewPath, type InterviewConfig } from '@interviewlab/core';
 import { interviewsApi } from '../../lib/api/interviews';
@@ -23,6 +25,9 @@ function Form() {
     interviewer_style: '标准',
     interaction_mode: 'text_fallback',
   });
+  const [materials,setMaterials]=useState<PersonalMaterial[]>([]);
+  const [materialError,setMaterialError]=useState('');
+  useEffect(()=>{Promise.all([apiRequest<PersonalMaterial[]>('/materials'),apiRequest<PersonalSettings>('/me/settings')]).then(([m,p])=>{setMaterials(m.filter(x=>x.kind==='resume'&&x.confirmed));const selected=m.find(x=>x.id===p.default_resume_id&&x.confirmed);setConfig(c=>({...c,interviewer_style:p.interviewer_style??c.interviewer_style,...(selected?{resume_ref:{id:selected.id,version:selected.version}}:{})}));}).catch(()=>setMaterialError('简历暂时无法加载，可不带简历继续通用面试。'));},[]);
   const requestedJob = search.get('job') ?? 'frontend';
   const load = useCallback(
     async (signal: AbortSignal) => {
@@ -63,6 +68,8 @@ function Form() {
         );
       }}
     >
+
+
       <div className="setup-panels">
         <section className="panel form-panel">
           <div className="form-panel-title">
@@ -174,9 +181,16 @@ function Form() {
               <h2>简历与重点经历</h2>
             </div>
           </div>
-          <p className="field-help">
-            本轮从自我介绍了解你的背景，不读取简历或个人 JD。项目交流依据你在面试中提供的信息展开。
-          </p>
+          <p className="field-help">你可以为不同岗位保存多份简历，每次面试单独选择其中一份。只有已确认的简历可以使用。</p>
+          {materialError && <p role="alert">{materialError}</p>}
+          <label className="field-label" htmlFor="interview-resume">本次面试使用的简历</label>
+          <select id="interview-resume" disabled={command.blocked} value={config.resume_ref?.id??''} onChange={e=>{const m=materials.find(x=>x.id===e.target.value);setConfig(c=>({...c,resume_ref:m?{id:m.id,version:m.version}:undefined}));}}>
+            <option value="">不使用简历，进行通用面试</option>
+            {materials.map(m=><option key={m.id} value={m.id}>{m.title} · v{m.version}</option>)}
+          </select>
+          {config.resume_ref && <div className="resume-selection-summary"><strong>本次已选：{materials.find(m=>m.id===config.resume_ref?.id)?.title}</strong><p>版本 v{config.resume_ref.version} · 开始后冻结，之后修改简历不会影响本次面试。</p></div>}
+          {!materials.length && !materialError && <p className="field-help">还没有已确认简历。请先创建并核对简历，再回来选择。</p>}
+          <Link href="/me/resumes" className="text-link">管理多份简历 / 新增岗位版简历 →</Link>
         </section>
         <section className="panel form-panel">
           <div className="form-panel-title">
