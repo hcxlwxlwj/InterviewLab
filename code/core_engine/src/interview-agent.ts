@@ -25,6 +25,8 @@ export interface InterviewProfile {
   goals: string[];
 }
 export interface KnowledgeChunk {
+  kind?: 'job_profile' | 'question' | 'professional' | 'interview_method' | 'evaluation_reference';
+  evidence_level?: 'platform_authored' | 'source_summary';
   id: string;
   card_id: string;
   release: string;
@@ -91,6 +93,7 @@ export interface InterviewMemoryDelta {
   claims: InterviewMemory['claims'];
 }
 export interface InterviewRetrieval {
+  material_refs?: import('./agent-workflow').MaterialEvidence[];
   release: string;
   chunks: KnowledgeChunk[];
   missing_reason: string | null;

@@ -4,8 +4,9 @@ import type { BackendConfig } from '../foundation/config';
 import * as foundationSchema from './schema';
 import * as authSchema from '../modules/accounts/auth-schema';
 import * as interviewSchema from '../modules/interviews/schema';
+import * as materialSchema from '../modules/resumes/schema';
 import * as reportSchema from '../modules/reports/schema';
-const schema = { ...foundationSchema, ...authSchema, ...interviewSchema, ...reportSchema };
+const schema = { ...foundationSchema, ...authSchema, ...interviewSchema, ...reportSchema, ...materialSchema };
 export interface Transaction {
   client: PoolClient;
   db: NodePgDatabase<typeof schema>;

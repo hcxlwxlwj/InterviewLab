@@ -12,29 +12,14 @@ type SessionState =
 const SessionContext = createContext<{
   state: SessionState;
   refresh(): Promise<AuthSession | null>;
-  isDevelopment: boolean;
 } | null>(null);
-export function SessionProvider({
-  children,
-  developmentSession,
-}: {
-  children: React.ReactNode;
-  developmentSession?: AuthSession;
-}) {
-  const [state, setState] = useState<SessionState>(
-    developmentSession
-      ? { status: 'signed_in', session: developmentSession }
-      : { status: 'loading', session: null },
-  );
+export function SessionProvider({ children }: { children: React.ReactNode }) {
+  const [state, setState] = useState<SessionState>({ status: 'loading', session: null });
   const sequence = useRef(0);
   const pending = useRef<AbortController | null>(null);
   const refresh = useCallback(async () => {
     const current = ++sequence.current;
     pending.current?.abort();
-    if (developmentSession) {
-      setState({ status: 'signed_in', session: developmentSession });
-      return developmentSession;
-    }
     const controller = new AbortController();
     pending.current = controller;
     try {
@@ -56,7 +41,7 @@ export function SessionProvider({
       });
       return null;
     }
-  }, [developmentSession]);
+  }, []);
   useEffect(() => {
     const update = () => {
       void refresh();
@@ -82,7 +67,7 @@ export function SessionProvider({
     };
   }, [refresh]);
   useEffect(() => {
-    if (state.status !== 'signed_in' || developmentSession) return;
+    if (state.status !== 'signed_in') return;
     const remaining = Date.parse(state.session.expires_at) - Date.now();
     const timer = setTimeout(
       () => {
@@ -92,12 +77,8 @@ export function SessionProvider({
       Math.max(0, Math.min(remaining, 2147483647)),
     );
     return () => clearTimeout(timer);
-  }, [state, developmentSession, refresh]);
-  return (
-    <SessionContext.Provider value={{ state, refresh, isDevelopment: Boolean(developmentSession) }}>
-      {children}
-    </SessionContext.Provider>
-  );
+  }, [state, refresh]);
+  return <SessionContext.Provider value={{ state, refresh }}>{children}</SessionContext.Provider>;
 }
 export function useSession() {
   const context = useContext(SessionContext);

@@ -1,8 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import type { PersonalMaterial } from '@interviewlab/core';
 import type { Database } from '../../database/connection';
+import type { ResumeAnalysisService } from './analysis';
 import { ServiceError } from '../../foundation/errors';
-export function createMaterialsService(database: Database) {
+export function createMaterialsService(database: Database, analysis?: ResumeAnalysisService, autoAnalyze = false) {
   async function list(owner: string): Promise<PersonalMaterial[]> {
     const result = await database.pool.query(
       `SELECT v.data FROM resume_materials m JOIN LATERAL
@@ -10,7 +11,7 @@ export function createMaterialsService(database: Database) {
       WHERE m.owner_id=$1 AND NOT m.deleted ORDER BY m.id`,
       [owner],
     );
-    return result.rows.map((row) => row.data);
+    return Promise.all(result.rows.map(async (row) => ({...row.data, ...(analysis ? {analysis:await analysis.status(owner,row.data)} : {})})));
   }
   async function versions(owner: string, id: string): Promise<PersonalMaterial[]> {
     const result = await database.pool.query(
@@ -19,7 +20,7 @@ export function createMaterialsService(database: Database) {
       [id, owner],
     );
     if (!result.rows.length) throw new ServiceError('not_found', 404, '材料不存在');
-    return result.rows.map((row) => row.data);
+    return Promise.all(result.rows.map(async (row) => ({...row.data, ...(analysis ? {analysis:await analysis.status(owner,row.data)} : {})})));
   }
   async function save(
     owner: string,
@@ -28,7 +29,8 @@ export function createMaterialsService(database: Database) {
     expected?: number,
   ) {
     if (!input.text.trim() && !Object.values(input.structure ?? {}).some(value=>value.trim())) throw new ServiceError('unsupported_input',400,'请填写简历内容');
-    return database.transaction(async ({ client }) => {
+    return database.transaction(async (tx) => {
+      const {client}=tx;
       const materialId = id ?? randomUUID();
       let version = 1;
       if (id) {
@@ -68,21 +70,30 @@ export function createMaterialsService(database: Database) {
         version,
         JSON.stringify(data),
       ]);
+      if(autoAnalyze)await analysis?.enqueue(tx,owner,data);
       return data;
     });
   }
   async function remove(owner: string, id: string) {
-    const result = await database.pool.query(
-      'UPDATE resume_materials SET deleted=true WHERE id=$1 AND owner_id=$2 AND NOT deleted',
-      [id, owner],
-    );
-    if (!result.rowCount) throw new ServiceError('not_found', 404, '材料不存在');
+    await database.transaction(async(tx)=>{
+      const result=await tx.client.query('UPDATE resume_materials SET deleted=true WHERE id=$1 AND owner_id=$2 AND NOT deleted RETURNING id',[id,owner]);
+      if(!result.rowCount)throw new ServiceError('not_found',404,'材料不存在');
+      await tx.client.query("UPDATE tasks SET status='cancelled',execution_token=NULL,lease_until=NULL WHERE owner_id=$1 AND type='resumes.analyze.v1' AND payload->>'material_id'=$2 AND status IN ('queued','running','failed')",[owner,id]);
+      await tx.client.query('DELETE FROM resume_analyses WHERE owner_id=$1 AND material_id=$2',[owner,id]);
+    });
   }
   async function requireResume(owner: string, id: string) {
     const [latest] = await versions(owner, id);
     if (latest.kind !== 'resume' || !latest.confirmed)
       throw new ServiceError('unsupported_input', 400, '请选择已确认的简历');
   }
-  return { list, versions, save, remove, requireResume };
+  return { list, versions, save, remove, requireResume,
+    async analyze(owner:string,id:string,version:number,key:string) {
+      if(!analysis)throw new ServiceError('capability_unavailable',501,'简历分析未启用');
+      const material=(await versions(owner,id)).find(m=>m.version===version);
+      if(!material)throw new ServiceError('not_found',404,'简历版本不存在');
+      return analysis.request(owner,material,key);
+    },
+  };
 }
 export type MaterialsService = ReturnType<typeof createMaterialsService>;

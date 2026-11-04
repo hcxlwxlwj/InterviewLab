@@ -35,6 +35,11 @@ export default function MaterialsWorkspace({ settingsOnly = false, targetsOnly =
   useEffect(() => {
     void load();
   }, []);
+  useEffect(()=>{
+    if(!items.some(item=>item.analysis?.status==='pending'))return;
+    const timer=setTimeout(()=>void load(),1500);
+    return ()=>clearTimeout(timer);
+  },[items]);
   async function action(work: () => Promise<unknown>) {
     setBusy(true);
     setError('');
@@ -278,8 +283,10 @@ export default function MaterialsWorkspace({ settingsOnly = false, targetsOnly =
                   <p>
                     {item.kind === 'resume' ? '简历' : '经历'} · v{item.version} ·{' '}
                     {item.confirmed ? '已确认' : '待确认'}
+                    {item.analysis && ` · ${{pending:'面试线索分析中',ready:'面试线索已准备',failed:'分析失败',unavailable:'尚未分析'}[item.analysis.status]}`}
                   </p>
                 </div>
+                {item.kind==='resume' && item.confirmed && item.analysis && ['failed','unavailable'].includes(item.analysis.status) && <button type="button" disabled={busy} onClick={()=>void action(()=>apiRequest(`/materials/${item.id}/analysis`,{method:'POST',body:{version:item.version},idempotencyKey:crypto.randomUUID()}))}>准备面试线索</button>}
                 {item.kind==='resume' && <button type="button" disabled={busy||importing} onClick={()=>{setEditing(undefined);setDraft({title:item.title+'（新岗位版）',text:item.text,kind:item.kind,structure:item.structure??extractResumeTemplate(item.text),confirmed:false});setHistory([]);setNotice('已复制为新简历草稿，请修改岗位相关内容并确认保存。');window.scrollTo({top:0,behavior:'smooth'});}}>复制为新岗位版</button>}
                 <button
                   disabled={busy || importing}

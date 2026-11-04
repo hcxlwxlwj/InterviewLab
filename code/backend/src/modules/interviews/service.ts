@@ -1,3 +1,4 @@
+import type { InterviewPreparationService } from './preparation';
 import { experiencePolicy, knowledgeReady } from './experience';
 import {
   participationPolicy,
@@ -30,8 +31,8 @@ import { ServiceError } from '../../foundation/errors';
 import { enqueueTask } from '../../tasks/service';
 import type { TaskHandler } from '../../tasks/runner';
 import { getJob } from '../../content/index';
-import type { InterviewAgent } from './agent';
-import { assertQuestion } from './agent';
+import type { InterviewAgent } from './model-analysis';
+import { assertQuestion } from './model-analysis';
 import {
   completedRetryIds,
   cancelInterviewTasks,
@@ -55,7 +56,7 @@ export function interviewInputDigest(state: InterviewState) {
   return inputDigest({
     configuration: state.view.configuration,
     snapshot: state.snapshot,
-    ...(state.snapshot?.prompt_version === INTERVIEW_V3 ? { memory: state.memory ?? null } : {}),
+    ...((state.snapshot?.prompt_version === INTERVIEW_V3 || state.snapshot?.runtime_version === 'graph-v1') ? { memory: state.memory ?? null } : {}),
     plan: state.view.plan,
     turns: state.view.turns.map((t) => ({
       id: t.id,
@@ -123,6 +124,7 @@ export function createInterviewsService(
   reports: InterviewReportHooks,
   realtimeKnowledge?: InterviewKnowledgeRuntime,
   readMaterial?: (owner:string,id:string,version:number)=>Promise<import('@interviewlab/core').PersonalMaterial>,
+  workflow?: {initialize:InterviewPreparationService['initialize'];request:InterviewPreparationService['request']},
 ) {
   const streams = createGenerationStreams(database);
   async function seal(tx: Transaction, state: InterviewState, reason: string) {
@@ -229,7 +231,7 @@ export function createInterviewsService(
       await seal(tx, state, state.retryQuestion ? 'single_retry_complete' : 'target_reached');
     else {
       const notice =
-        state.snapshot?.prompt_version === INTERVIEW_V3 ? participationPolicy(state.view) : null;
+        (state.snapshot?.prompt_version === INTERVIEW_V3 || state.snapshot?.runtime_version === 'graph-v1') ? participationPolicy(state.view) : null;
       if (notice?.level === 'ended') {
         await seal(tx, state, `participation:${notice.reason}`);
       } else if (notice) {
@@ -256,11 +258,6 @@ export function createInterviewsService(
     }
   }
   async function create(identity: RequestIdentity, config: InterviewConfig, key: string) {
-    if (
-      config.interview_type === 'business_scenario' &&
-      (config.job !== 'frontend' || !realtimeKnowledge?.enabled)
-    )
-      throw new ServiceError('unsupported_input', 400, '该岗位尚未开放业务面');
     const job = getJob(config.job);
     if (!job || !job.stages.includes(config.career_stage))
       throw new ServiceError('unsupported_input', 400, '岗位或阶段不可用');
@@ -269,11 +266,12 @@ export function createInterviewsService(
       { owner_id: identity.owner_id, operation: 'interviews.create', key, input: config },
       async (tx) => {
         const state = newInterviewState(identity.owner_id, config);
+        if(workflow)state.view.preparation={status:'pending',task_id:null,error_code:null};
         await saveInterview(tx.client, state);
         return { id: state.view.id };
       },
     );
-    return read(identity, ref.id);
+    return workflow ? workflow.initialize(identity,ref.id) : read(identity, ref.id);
   }
   async function start(
     identity: RequestIdentity,
@@ -282,6 +280,7 @@ export function createInterviewsService(
     key: string,
   ) {
     const before = await loadInterview(database.pool, identity.owner_id, id);
+    if(before.view.preparation && !['ready','fallback'].includes(before.view.preparation.status))throw invalid('面试仍在准备，请等待或选择简化流程');
     // Knowledge I/O must never hold the business transaction open.
     const frozen = before.snapshot ?? {
       personal_material: before.view.configuration.resume_ref && readMaterial ? await readMaterial(identity.owner_id,before.view.configuration.resume_ref.id,before.view.configuration.resume_ref.version) : undefined,
@@ -291,12 +290,14 @@ export function createInterviewsService(
       rubric_version: INTERVIEW_RUBRIC_VERSION,
       model: agent.model,
     };
-    if (frozen.knowledge.agent_release) frozen.prompt_version = INTERVIEW_V3;
+    if (frozen.knowledge.agent_release && !frozen.runtime_version) frozen.prompt_version = INTERVIEW_V3;
     return mutate(identity, id, 'start', key, body, async (_tx, state) => {
       if (state.view.status !== 'ready') throw invalid();
+      if(state.view.preparation && !['ready','fallback'].includes(state.view.preparation.status))throw invalid('面试准备尚未完成');
+      if(frozen.runtime_version==='graph-v1' && frozen.personal_material && !(await _tx.client.query('SELECT id FROM resume_materials WHERE id=$1 AND owner_id=$2 AND NOT deleted FOR SHARE',[frozen.personal_material.id,identity.owner_id])).rowCount)throw new ServiceError('not_found',404,'简历已不可用');
       if (!agent.available) throw new ServiceError('capability_unavailable', 501, '模型尚未配置');
       state.snapshot = frozen;
-      if (frozen.prompt_version === INTERVIEW_V3) state.memory = initialMemory();
+      if (frozen.prompt_version === INTERVIEW_V3 || frozen.runtime_version === 'graph-v1') state.memory = initialMemory();
       state.view.job_title = frozen.job_title;
       state.view.started_at = new Date().toISOString();
       state.view.target_at = new Date(
@@ -312,7 +313,7 @@ export function createInterviewsService(
         // The opening is protocol, not a pre-generated question sequence. Subsequent
         // questions are generated only after the candidate has actually answered.
         state.view.generation_id = randomUUID();
-        state.view.plan = ['了解候选人', '根据当场陈述展开交流', '结合岗位交流与收尾'];
+        state.view.plan = frozen.preparation_plan?.goals.map(g=>g.focus) ?? ['了解候选人', '根据当场陈述展开交流', '结合岗位交流与收尾'];
         addQuestion(state, interviewOpening(frozen.job_title), false);
       }
     });
@@ -370,8 +371,8 @@ export function createInterviewsService(
       return { result_ref: null };
     const retrievalStarted = performance.now();
     const retrieval =
-      state.snapshot.prompt_version === INTERVIEW_V3 && realtimeKnowledge
-        ? !knowledgeReady(experiencePolicy(state.view))
+      (state.snapshot.prompt_version === INTERVIEW_V3 || state.snapshot.runtime_version === 'graph-v1') && realtimeKnowledge
+        ? !knowledgeReady(experiencePolicy(state.view)) && !state.snapshot.resume_analysis?.facts.length
           ? {
               release: state.snapshot.knowledge.content_version,
               chunks: [],
@@ -401,13 +402,9 @@ export function createInterviewsService(
           },
         }
       : undefined;
-    const plan =
-      input.kind === 'plan'
-        ? await agent.plan(state.view, state.snapshot, signal, task.attempts > 1)
-        : null;
-    const next = plan
-      ? null
-      : await agent.advance(
+    if (input.kind === 'plan')
+      throw new ServiceError('unsupported_input', 409, '旧版出题任务已停用，请新建面试');
+    const next = await agent.advance(
           state.view,
           state.snapshot,
           input.kind === 'clarify',
@@ -415,11 +412,10 @@ export function createInterviewsService(
           task.attempts > 1,
           context,
         );
-    if (plan) assertQuestion(plan.question, state.snapshot, state.view.turns);
     if (next?.question) assertQuestion(next.question, state.snapshot, state.view.turns);
     if (
       next?.action === 'finish' &&
-      [INTERVIEW_PROMPT_VERSION, INTERVIEW_V3].includes(state.snapshot.prompt_version) &&
+      ([INTERVIEW_PROMPT_VERSION, INTERVIEW_V3].includes(state.snapshot.prompt_version) || state.snapshot.runtime_version === 'graph-v1') &&
       !canSuggestInterviewFinish(state.view)
     )
       throw new ServiceError('invalid_model_output', 502, '交流尚未展开，不能提前结束');
@@ -461,10 +457,7 @@ export function createInterviewsService(
           await seal(tx, fresh, 'target_reached');
           return;
         }
-        if (plan) {
-          fresh.view.plan = plan.topics;
-          addQuestion(fresh, plan.question, false);
-        } else if (next?.action === 'clarify') {
+        if (next?.action === 'clarify') {
           fresh.view.clarification = next.clarification;
           fresh.view.generation_status = 'ready';
           await interviewEvent(
@@ -498,6 +491,10 @@ export function createInterviewsService(
     read,
     create,
     start,
+    prepare: (identity:RequestIdentity,id:string,body:{version:number;mode:'personalized'|'fallback'},key:string) => {
+      if(!workflow)throw new ServiceError('capability_unavailable',501,'准备能力未接入');
+      return workflow.request(identity,id,body,key);
+    },
     readFinalized,
     readReportState,
     readAnalysisState: readReportState,
@@ -558,14 +555,12 @@ export function createInterviewsService(
     ) =>
       mutate(identity, id, 'patch', key, body, async (_tx, state) => {
         if (!['draft', 'ready'].includes(state.view.status) || state.retryQuestion) throw invalid();
-        if (
-          body.configuration.interview_type === 'business_scenario' &&
-          (body.configuration.job !== 'frontend' || !realtimeKnowledge?.enabled)
-        )
-          throw new ServiceError('unsupported_input', 400, '该岗位尚未开放业务面');
         const job = getJob(body.configuration.job);
         if (!job || !job.stages.includes(body.configuration.career_stage))
           throw new ServiceError('unsupported_input', 400, '岗位或阶段不可用');
+        await cancelInterviewTasks(_tx.client,id);
+        state.snapshot=null;
+        if(state.view.preparation)state.view.preparation={status:'pending',task_id:null,error_code:null};
         state.view.configuration = body.configuration;
       }),
     pause: (identity: RequestIdentity, id: string, body: { version: number }, key: string) =>
@@ -765,6 +760,7 @@ export function createInterviewsService(
           await loadInterview(tx.client, identity.owner_id, id, true);
           const state = newInterviewState(identity.owner_id, original.view.configuration);
           state.snapshot = original.snapshot;
+          if(original.snapshot?.runtime_version==='graph-v1')state.view.preparation={status:'ready',task_id:null,error_code:null};
           state.retryQuestion = {
             stage: turn.stage,
             text: turn.text,

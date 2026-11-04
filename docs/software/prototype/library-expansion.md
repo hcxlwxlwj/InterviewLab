@@ -1,5 +1,7 @@
 # 个人工作区与岗位知识库实现
 
+> 历史原型/交互设计记录，保留当时截图与方案。当前真实能力和 Agent 以[系统架构](../architecture.md)、[工作流](../interview-agent-implementation.md)与[评测](../../algorithm/evaluation.md)为准；下文旧阶段“未接入”不代表当前状态。
+
 日期：2026-10-19。此文记录第二轮功能扩展，首轮视觉与验证记录继续保留在[实现说明](implementation.md)。
 
 ## 当前能力

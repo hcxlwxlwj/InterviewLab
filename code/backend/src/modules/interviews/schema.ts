@@ -25,6 +25,7 @@ export const interviews = pgTable(
     owner_id: text().notNull(),
     version: integer().notNull().default(1),
     status: text().notNull().default('ready'),
+    preparation: jsonb().$type<import('@interviewlab/core').PreparationStatus>(),
     configuration: jsonb().$type<InterviewConfig>().notNull(),
     snapshot: jsonb().$type<InterviewSnapshot>(),
     agent_memory: jsonb().$type<InterviewMemory>(),

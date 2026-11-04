@@ -78,6 +78,7 @@ test('call UI has a voice orb, 3-second automatic turn hint, real mute control a
   assert.match(html, /<details class="voice-call-transcript">/);
   assert.doesNotMatch(html, /<details[^>]* open/);
   assert.match(html, /尚未提交的转写/);
+  assert.doesNotMatch(html, /麦克风输入设备|麦克风输入音量|实时转写：/);
   assert.equal(loadConfig({}).VOICE_SILENCE_MS, 3000);
 });
 test('mute toggles the actual microphone track and ends local speech activity without closing the call', () => {

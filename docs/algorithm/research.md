@@ -88,3 +88,32 @@
 这些是项目设计取舍，不是对特定框架或供应商性能的保证。保留服务商适配、内容版本和评测记录，后续根据实际质量、时延、费用及数据处理条件决定选型，不以新功能数量作为竞争力的替代指标。
 
 实施顺序为阶段 A 基础闭环与文本联调、阶段 B 首版核心实时语音与基础多模态、阶段 C 对照评测与学生试用。A 的过渡文本链路不能被描述为目标实时体验已完成，B 的可选摄像头也不变成学生必须开启的条件。自动同类新题与 3D 角色另列后续范围。
+
+
+## 6. 本次 Agent 框架选型增量（2026-11-05）
+
+### 问题与约束
+
+现有 Agent 已具有流式输出、问题校验、对话策略、私有记忆和数据库任务。需要补足全岗位目标、简历分析和准备工作流，且保留文字、语音、视频协议与报告语义。不能为了展示框架重写已验证的保存、取消和终态逻辑。
+
+| 方案 | 优点 | 代价 | 本次结论 |
+| --- | --- | --- | --- |
+| 继续纯手写 | 无新增框架依赖，适配已有协议 | 模型和工作流边界分散，扩展多条准备链不直观 | 仅作为历史对照方案；当前执行器已清退 |
+| 只用 LangChain | 模型、消息、结构及流式统一 | 业务状态和跨阶段工作流仍需手工表达 | 作为模型适配层 |
+| LangChain + LangGraph | 在统一模型接口之上显式表达节点、校验及取消 | 需要锁定版本、验证兼容端点；不能自动保证质量 | 用于简历、准备、单轮三条短图 |
+| 自治多 Agent / 无限工具循环 | 适合开放探索 | 调用次数、延迟、材料权限和媒体取消难控制 | 不纳入本次实时面试 |
+
+### 决策
+
+选择有界工作流：程序拥有授权、检索、数据与发布权，模型只理解内容并提出受限建议。单轮一次模型调用，准备后台执行。LangGraph 负责节点编排，pg-boss 与业务库负责持久化重试；不引入第二套会话状态机或 checkpoint 数据库。
+
+知识服务继续使用 PostgreSQL/pgvector、现有嵌入模型和 1024 维空间。岗位页仍结构化读取；同源知识按用途和适用范围区分，不复制维护两套正文。
+
+这些是工程取舍，不能推断“用了 LangGraph 就更智能”或“向量化就能专业评分”。旧实现按用户决定清退；问题质量和 P95 未过门槛仍记录为未验收，代码恢复使用清退前版本，不重新引入在线切换分支。结果与未验收内容见[评测](evaluation.md)。
+
+### 一手资料
+
+- [LangChain JavaScript 安装与模型集成](https://docs.langchain.com/oss/javascript/langchain/install)：模型层依赖与集成入口。
+- [ChatOpenAI 集成](https://docs.langchain.com/oss/javascript/integrations/chat/openai)：兼容配置、流式及用量信息；实际兼容性另由项目测试确认。
+- [LangGraph JavaScript 概览](https://docs.langchain.com/oss/javascript/langgraph/overview)：显式图、状态与执行概念；本项目持久化仍由原业务设施承担。
+- [老师 Agent 概念](https://github.com/bettermorn/AIAgent/blob/main/docs/AIAgentConcept.md)、[功能模板](https://github.com/bettermorn/AIAgent/blob/main/docs/AIAgentFunSpec.md)、[数据库模板](https://github.com/bettermorn/AIAgent/blob/main/docs/AIAgent_DB_design.md)：借鉴目标、模块、接口、数据与验收分开表达的组织方式，不照搬示例业务或表名。

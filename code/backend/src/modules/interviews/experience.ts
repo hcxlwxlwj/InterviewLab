@@ -9,6 +9,7 @@ import type {
   InterviewEvidence,
   InterviewExperienceGrounding,
   InterviewConversationState,
+  ResumeAnalysis,
 } from '@interviewlab/core';
 import { ServiceError } from '../../foundation/errors';
 
@@ -18,7 +19,7 @@ const switches =
 const purpose =
   /玩法|玩家|用户(?:可以|需要|能够|通过)|用于|用来|目的是|目标是|解决.{1,20}(?:问题|需求)|支持.{1,25}(?:浏览|选课|下单|预约|聊天|上传|查询|闯关)|控制.{1,20}(?:角色|小球|人物)|跑酷|闯关/;
 const ownership =
-  /我(?:本人|自己|主要|独立)?(?:负责|承担|实现|编写|设计|开发|搭建)|(?:^|[，,；;])(?:自己|本人)(?:负责|承担|实现|编写|设计|开发|搭建)|由我|我一个人|我独立|都是我|个人项目/;
+  /我(?:本人|自己|主要|独立|只|仅|仅仅)?(?:负责|承担|实现|编写|设计|开发|搭建)|(?:^|[，,；;])(?:自己|本人)(?:负责|承担|实现|编写|设计|开发|搭建)|由我|我一个人|我独立|都是我|个人项目/;
 const generic = /(?:很多|多个|几个|一些|不少|各种)(?:的)?项目/;
 function bareLabel(text: string) {
   const value = text.replace(/[\s。！？!?，,]/g, '');
@@ -45,7 +46,7 @@ function hasRole(quote: string) {
 function explicitlyUnavailable(text: string) {
   if (/(?:但|不过|只是).{0,20}(?:做过|有|参与).{0,12}(?:项目|练习|课程设计)/.test(text))
     return false;
-  return /(?:没有|没做过|没参与过|还没做过)[^，,。；;]{0,12}(?:任何项目|相关项目|项目经历|实际项目|项目|相关实践|相关经历)|不想.{0,6}(?:聊项目|谈项目)/.test(
+  return /(?:没有|没做过|没参与过|还没做过)[^，,。；;]{0,12}(?:任何项目|相关项目|项目经历|实际项目|项目|相关实践|相关经历|完整(?:的)?(?:系统|应用)|相关(?:系统|应用))|不想.{0,6}(?:聊项目|谈项目)/.test(
     text,
   );
 }
@@ -251,10 +252,17 @@ export function experiencePolicy(interview: Interview): ExperiencePolicy {
     user_requested_scenario: !declinesScenario(latest) && userRequested,
   };
 }
+/** Materials can fill known context slots, but never become answer evidence. */
+export function applyResumeExperience(policy:ExperiencePolicy,analysis:ResumeAnalysis|undefined,answer:string,question:string) {
+  if(policy.next_step!=='project_discovery'||switches.test(answer)||switches.test(question))return;
+  const facts=analysis?.facts.filter(f=>['experience','role','action'].includes(f.kind)&&(['projects','internships','text'].includes(f.evidence.field)))??[];
+  policy.missing=policy.missing.filter(slot=>!facts.some(f=>slot==='project_description'?hasDescription(f.evidence.quote):hasRole(f.evidence.quote)));
+  if(!policy.missing.length){policy.discovery_required=false;policy.next_step='interview';}
+}
 const hypothetical =
   /假设|假如|设想|如果(?:要|让|需|有|你|这)|若(?:要|需)|(?:如果|若).{0,15}(?:加入|新增|支持|扩展)|(?:加入|新增|扩展).{0,12}你会/;
 const scopeQuestion =
-  /什么(?:功能|玩法|项目|内容)|(?:玩法|用途|目标|功能|内容).{0,12}(?:是什么|有哪些|什么|是啥|介绍|说明)|(?:介绍|说说|描述).{0,12}(?:游戏|项目|功能)|(?:是|做|开发).{0,6}什么|(?:游戏|项目).{0,12}(?:怎么玩|做什么|用来)|主要.{0,8}(?:做什么|解决)|哪个项目|哪一个项目|面向什么|什么样的|(?:项目|游戏).{0,12}(?:介绍|讲讲|说说)|(?:选|挑).{0,12}(?:项目|游戏)/;
+  /什么(?:功能|玩法|项目|内容)|哪些(?:功能|模块|内容)|(?:玩法|用途|目标|功能|内容).{0,12}(?:是什么|有哪些|什么|是啥|介绍|说明)|(?:介绍|说说|描述).{0,12}(?:游戏|项目|功能)|(?:是|做|开发).{0,6}什么|(?:游戏|项目).{0,12}(?:怎么玩|做什么|用来)|主要.{0,8}(?:做什么|解决)|哪个项目|哪一个项目|面向什么|什么样的|(?:项目|游戏).{0,12}(?:介绍|讲讲|说说)|(?:选|挑).{0,12}(?:项目|游戏)/;
 const roleQuestion = /负责|职责|分工|承担|个人.{0,8}(?:工作|贡献)|亲自|你做了(?:什么|哪些)/;
 export function assertExperienceQuestion(
   text: string,

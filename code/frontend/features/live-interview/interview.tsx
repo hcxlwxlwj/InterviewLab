@@ -23,12 +23,12 @@ const STAGES = {
 };
 function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: boolean }) {
   const Workspace = videoRoom ? VideoInterviewWorkspace : InterviewWorkspace;
-  const { state: account, isDevelopment } = useSession();
+  const { state: account } = useSession();
   const load = useCallback((signal: AbortSignal) => interviewsApi.read(id, signal), [id]);
   const [streamConnected, setStreamConnected] = useState(false);
   const resource = useLiveResource(
     load,
-    (v) => v.generation_status === 'pending' && !streamConnected,
+    (v) => (v.generation_status === 'pending' && !streamConnected) || ['pending','waiting_material'].includes(v.preparation?.status ?? ''),
   );
   const stream = useInterviewStream(id, resource.value, resource.accept, resource.refresh);
   useEffect(() => setStreamConnected(stream.connected), [stream.connected]);
@@ -42,6 +42,13 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
   const deadlineChecked = useRef(false);
   const v = resource.value;
   const turn = v?.turns.at(-1);
+  const preparationRequested=useRef(new Set<number>());
+  useEffect(()=>{
+    if(v?.status==='ready'&&v.preparation?.status==='pending'&&!v.preparation.task_id&&!command.blocked&&!preparationRequested.current.has(v.version)){
+      preparationRequested.current.add(v.version);
+      command.run(key=>interviewsApi.command(id,'prepare',{version:v.version,mode:'personalized'},key),resource.accept);
+    }
+  },[v,id,command.blocked]);
   const terminal = v?.status === 'completed' || v?.status === 'failed';
   const userId = account.status === 'signed_in' ? account.session.user.id : '';
   const draftKey = userId && turn ? `interviewlab:live:${userId}:${id}:${turn.id}` : '';
@@ -246,7 +253,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
         draft={text}
         maxAnswer={INTERVIEW_MAX_ANSWER}
         canAnswer={Boolean(canAnswer)}
-        blocked={command.blocked}
+        blocked={command.blocked || Boolean(v.preparation && !['ready','fallback'].includes(v.preparation.status))}
         paused={v.status === 'paused'}
         ended={Boolean(terminal)}
         saveLabel={
@@ -272,6 +279,16 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
           <>
             <ErrorNotice message={resource.error} retry={() => void resource.refresh()} />
             <CommandNotice command={command} refresh={() => void resource.refresh()} />
+            {v.status==='ready'&&v.preparation&&<section className="notice" aria-live="polite">
+              <strong>{{waiting_material:'正在分析所选简历',pending:'正在准备本场面试',ready:'面试准备完成',failed:'面试准备暂时失败',fallback:'已选择简化面试流程'}[v.preparation.status]}</strong>
+              <p>准备阶段不计时。正式开始后从自我介绍进入交流。</p>
+              {v.preparation.status==='failed'&&<div className="row-actions">
+                <button type="button" className="button button-outline" disabled={command.blocked} onClick={()=>act('prepare',{mode:'personalized'})}>重试准备</button>
+                <button type="button" className="button button-outline" disabled={command.blocked} onClick={()=>act('prepare',{mode:'fallback'})}>使用简化流程开始</button>
+              </div>}
+            </section>}
+
+
             {continuation && (
               <p className="notice" role="status">
                 旧问题生成已被你的补充打断。可继续补充回答，或{' '}
@@ -350,7 +367,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
           </>
         }
         recordsHref="/me/interviews"
-        reportHref={isDevelopment ? undefined : `/reports/${v.parent_interview_id ?? id}`}
+        reportHref={`/reports/${v.parent_interview_id ?? id}`}
         onText={setText}
         onSubmit={submit}
         onSkip={() => {
@@ -406,12 +423,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
       )}
       {finish && (
         <Modal open={finish} onOpenChange={setFinish} title="结束本场面试">
-          <p>
-            {isDevelopment
-              ? '本次联调只保存回答并封存面试，不生成报告。'
-              : '已提交的回答会保留并生成复盘。'}
-            未提交的草稿不会自动保存。
-          </p>
+          <p>已提交的回答会保留并生成复盘。未提交的草稿不会自动保存。</p>
           <div className="dialog-actions">
             <button
               className="button button-outline"

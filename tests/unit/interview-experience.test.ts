@@ -13,14 +13,15 @@ import {
 } from '@interviewlab/core';
 import {
   experiencePolicy,
+  applyResumeExperience,
   assertExperienceQuestion,
 } from '../../code/backend/src/modules/interviews/experience';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
-import { readKnowledgeSeed } from '../../code/backend/src/modules/knowledge/service';
-import { createInterviewAgent } from '../../code/backend/src/modules/interviews/agent';
-import { withRealtimeAgent } from '../../code/backend/src/modules/interviews/agent-v3';
+import { currentKnowledgeFixture } from '../support/knowledge-fixture';
+import { createModelAnalysis } from '../../code/backend/src/modules/interviews/model-analysis';
+import { createStreamingAgent } from '../../code/backend/src/modules/interviews/streaming-agent';
 import { loadConfig } from '../../code/backend/src/foundation/config';
-const seedPromise = readKnowledgeSeed();
+const knowledgeFixture = currentKnowledgeFixture();
 function interview(answers: string[]): Interview {
   const state = newInterviewState('controlled', {
     job: 'frontend',
@@ -131,6 +132,35 @@ test('absence of internship is not absence of projects; no-experience alone does
     assertExperienceQuestion('假设要做一个待办页面，你会先考虑什么？', requested, false, true),
   );
 });
+
+test('denying a complete system is not treated as claiming a project', () => {
+  const policy = experiencePolicy(interview(['我学过相关基础，但没有做过完整系统，也没有实习。']));
+  assert.equal(policy.next_step, 'learning_basics');
+  assert.equal(policy.discovery_required, false);
+  assert.equal(policy.user_requested_scenario, false);
+});
+
+test('limited personal ownership is known and a genuine module-scope question is valid context discovery',()=>{
+  const known=experiencePolicy(interview(['团队四个人，我只负责搜索页面。']));
+  assert.ok(known.experience.personal_role);assert.ok(!known.missing.includes('personal_role'));
+  const unknown=experiencePolicy(interview(['我做了一个系统。']));
+  assert.doesNotThrow(()=>assertExperienceQuestion('这个系统具体包含哪些功能模块？',unknown,false,true));
+  assert.throws(()=>assertExperienceQuestion('这个系统如何处理异步请求竞态？',unknown,false,true));
+});
+
+test('resume context only fills demonstrated project slots and never overrides no-experience or project switches',()=>{
+  const analysis=(quote:string,field='projects')=>({facts:[{kind:'experience' as const,text:quote,evidence:{material_id:'synthetic',version:1,field,quote}}],clarification_points:[]});
+  const v=interview(['我做了一个系统。']);
+  const partial=experiencePolicy(v);applyResumeExperience(partial,analysis('本人负责接口。'),v.turns[0].answer_text!,v.turns[0].text);
+  assert.deepEqual(partial.missing,['project_description']);assert.equal(partial.discovery_required,true);
+  const education=experiencePolicy(v);applyResumeExperience(education,analysis('系统用于同学预约教室，本人负责接口。','education'),v.turns[0].answer_text!,v.turns[0].text);
+  assert.equal(education.discovery_required,true);
+  const complete=experiencePolicy(v);applyResumeExperience(complete,analysis('系统用于同学预约教室，本人负责接口。'),v.turns[0].answer_text!,v.turns[0].text);
+  assert.equal(complete.discovery_required,false);assert.equal(complete.next_step,'interview');assert.equal(complete.experience.description,null);
+  const denied=experiencePolicy(interview(['我没有做过完整系统。']));const prior=denied.next_step;
+  applyResumeExperience(denied,analysis('系统用于同学预约教室，本人负责接口。'),'我没有做过完整系统。','请介绍经历');assert.equal(denied.next_step,prior);
+  const switched=experiencePolicy(v);applyResumeExperience(switched,analysis('系统用于同学预约教室，本人负责接口。'),'换个项目','请介绍经历');assert.equal(switched.discovery_required,true);
+});
 test('explicitly declining hypothetical questions is not parsed as a request for them', () => {
   for (const answer of [
     '请不要给我假设题，先聊项目。',
@@ -185,7 +215,7 @@ async function run(
   memory: InterviewMemory | null = null,
   expectedStep = 'project_discovery',
 ) {
-  const seed = await seedPromise;
+  const seed = await knowledgeFixture;
   const snapshot: InterviewSnapshot = {
     job_title: '前端',
     model: 'ecnu-plus',
@@ -208,8 +238,8 @@ async function run(
   const cfg = loadConfig({ LLM_API_KEY: 'controlled' });
   const previews: string[] = [];
   let calls = 0;
-  const agent = withRealtimeAgent(
-    createInterviewAgent(cfg),
+  const agent = createStreamingAgent(
+    createModelAnalysis(cfg),
     cfg,
     () => {},
     async (_url, init) => {

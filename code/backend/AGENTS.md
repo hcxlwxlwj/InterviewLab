@@ -15,6 +15,6 @@ Read README.md, ../../docs/software/architecture.md and ../../docs/software/data
 - Delivery is at least once. Handlers obey cancellation and external idempotency. Return database-only publication via TaskOutcome.commit; recheck source versions/deletion/generation before writes.
 - Unknown task types fail explicitly. Register handlers in src/entrypoints/worker.ts before enabling producers. Worker heartbeat does not mean a business handler exists.
 - Add migrations instead of editing applied ones. Explain changes to shared types, schema, dependencies and service contracts in the PR.
-- Preserve legacy synthetic APIs and public content exports. Never import demo fixtures into real runtime services.
+- Preserve current public content exports and historical data reads. Synthetic APIs and the legacy interviewer are retired; do not reintroduce them.
 - Run npm run check and npm run build:backend. test:db and test:process require a dedicated interviewlab_test* database and fail rather than skip when unavailable.
 - Never commit secrets, .env, private content, dist or database volumes. Do not install skills, push or deploy unless requested.

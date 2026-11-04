@@ -256,11 +256,11 @@ test('rubric upgrade is explicit and historical reports are never silently conve
 });
 
 test('professional indicators require a matching frozen reference and an explicit technical question', async () => {
-  const { localInterviewKnowledge } = await import(
+  const { structuredInterviewKnowledge } = await import(
     '../../code/backend/src/modules/interviews/knowledge'
   );
   const { state, turn, snapshot } = fixture();
-  const knowledge = await localInterviewKnowledge.read(state.view.configuration);
+  const knowledge = await structuredInterviewKnowledge.read(state.view.configuration);
   const question = knowledge.questions.find((q) => q.report_reference?.cards.length)!;
   assert.ok(question);
   const technical = {

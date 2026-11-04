@@ -1,0 +1,60 @@
+{
+  "release": "all-roles-embedding-smoke-1793803754717",
+  "limitations": "九类基础摘要的真实嵌入冒烟，不代表1000岗位专业语义质量验收；不激活发布版本。",
+  "records": [
+    {
+      "family": "software",
+      "expected": "foundation-software-transactions-v1",
+      "hit": true,
+      "elapsed_ms": 310.19419999999946
+    },
+    {
+      "family": "ai",
+      "expected": "foundation-ai-leakage-v1",
+      "hit": true,
+      "elapsed_ms": 335.0048999999999
+    },
+    {
+      "family": "data",
+      "expected": "foundation-data-constraints-v1",
+      "hit": true,
+      "elapsed_ms": 2365.7655999999997
+    },
+    {
+      "family": "quality",
+      "expected": "foundation-quality-isolation-v1",
+      "hit": true,
+      "elapsed_ms": 204.02070000000003
+    },
+    {
+      "family": "infra",
+      "expected": "foundation-infra-resources-v1",
+      "hit": true,
+      "elapsed_ms": 218.15239999999994
+    },
+    {
+      "family": "embedded",
+      "expected": "foundation-embedded-scheduling-v1",
+      "hit": true,
+      "elapsed_ms": 250.15480000000025
+    },
+    {
+      "family": "game",
+      "expected": "foundation-game-collision-v1",
+      "hit": true,
+      "elapsed_ms": 676.3240999999998
+    },
+    {
+      "family": "product",
+      "expected": "foundation-product-discovery-v1",
+      "hit": true,
+      "elapsed_ms": 214.09320000000116
+    },
+    {
+      "family": "design",
+      "expected": "foundation-design-accessibility-v1",
+      "hit": true,
+      "elapsed_ms": 224.6198000000004
+    }
+  ]
+}

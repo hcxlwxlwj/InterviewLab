@@ -1,18 +1,15 @@
-# 软件设计
+# 软件设计文档
 
-更新：2026-10-25。这里只维护架构、数据、接口、工程边界和原型；功能行为及验收分别维护在 requirements 的[功能规格](../requirements/functional_spec.md)与[用户故事](../requirements/user_stories.md)。
+保留远端原有主文档，按责任组织，不按子功能继续拆文件。
 
-| 正文 | 内容 |
-| --- | --- |
-| [系统架构](architecture.md) | 当前 Next.js 原型与独立 Fastify 目标、六模块、API/worker、事务及四阶段 |
-| [账号与访问管理](account-management.md) | 注册登录、页面弹窗、真实数据隔离、配置与验收限制 |
-| [数据与接口](data_and_interfaces.md) | 新 HTTP/实时合同、旧路径迁移、数据归属、版本/任务、权限和删除 |
-| [真实文字面试接入](interview-agent-implementation.md) | ecnu-plus 配置、Agent/知识接口、面试/报告/重练、可靠性与验收边界 |
-| [工程目录](repository_structure.md) | 课程目录、代码职责、依赖与后续接入位置 |
-| [原型设计](prototype/README.md) | 页面、交互和状态 |
-| [首轮实现记录](prototype/implementation.md) | 设计参考、本地运行和阶段截图 |
-| [个人中心/岗位库扩展](prototype/library-expansion.md) | 后续页面、1000 个岗位内容及原型验证 |
+- [系统架构](architecture.md)：保留原六层结构、章节编号、表格及绘图样式，更新实际组件和边界。
+- [数据与接口](data_and_interfaces.md)：当前/目标合同、业务与知识 ER、字段、状态、事务、权限、删除及 HTTP/SSE/WS。
+- [智能体架构](interview-agent-implementation.md)：按老师模板维护六层职责、框架分工、三类工作流、状态与发布边界及工程自查。
+- [动态面试](interview-agent-v3.md)：流式问题、受限动作、私有记忆、经历/话题边界和取消；保留有日期的历史验证。
+- [个人材料](personal-materials-implementation.md)：导入、核对、版本、个人设置与派生分析。
+- [实时语音与视频](voice-interview.md)：ASR/TTS、端点、打断、默认设备与本机视频房间。
+- [账号管理](account-management.md)：认证、页面访问与会话变化。
+- [运行指南](development.md)：统一维护启动、知识构建发布、验证与回退命令。
+- [工程目录](repository_structure.md)、[原型](prototype/README.md)：源码归属及界面设计证据。
 
-当前公开岗位、独立后端和真实文字面试/报告/重练均可运行，ecnu-plus 真实效果需密钥配置后单独验收。其他规划业务不表示已实现，详见文字面试接入。成员从[后端 README](../../code/backend/README.md)开始接入。原 modules 文档已按性质并入需求、算法及本目录接口合同，不另保留副本。
-
-实时语音开发与配置见[实时语音面试接入](voice-interview.md)，真实麦克风和供应商效果待验收。
+算法细节和质量记录分别见[知识与 Agent](../algorithm/knowledge_and_agent.md)、[评测](../algorithm/evaluation.md)，不在多份软件文档复制参数和结果。

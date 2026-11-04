@@ -55,7 +55,7 @@ for (const name of packages) {
         if (
           name === 'frontend' &&
           specifier.startsWith('@interviewlab/backend') &&
-          !['@interviewlab/backend/content', '@interviewlab/backend/content/demo'].includes(
+          !['@interviewlab/backend/content'].includes(
             specifier,
           ) &&
           !location.startsWith('code/frontend/app/api/')

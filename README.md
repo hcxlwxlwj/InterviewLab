@@ -1,92 +1,57 @@
 # InterviewLab · 面试练习室
 
-面向高校学生的模拟面试与复盘 Web 应用。围绕课程项目、竞赛、科研、毕设及实习经历练习岗位问答，讲清个人贡献、方案取舍与验证过程。
+面向高校学生的岗位模拟面试与复盘应用，围绕课程、比赛、科研、毕设和实习经历练习个人贡献、方案选择与验证过程。
 
-**当前阶段：真实文字面试闭环、公开岗位内容及独立后端。** 已实现邮箱密码注册与登录账号、持久化面试、动态 Agent 提问、证据报告、单题重练、比较与历史，以及可配置的 ecnu-plus 兼容适配器；单案例真实模型闭环已通过，质量评审仍待完成。使用时需在本机配置密钥；简历/个人 JD 仍为演示，语音、上传、代码执行和 PDF 未接入。详细范围与验证边界见[文字面试接入](docs/software/interview-agent-implementation.md)。
+当前已有真实账号、持久化文字面试、动态提问、报告、重练、比较和历史；支持结构化文本简历及可配置语音/视频呈现。本次新增全岗位 Agent 工作流、简历事实分析、面前规划和全岗位知识索引流水线，统一使用新 Agent，旧执行链与演示入口已清退。专业内容覆盖、人工质量门槛与真实媒体效果尚未完全验收，见[验证结果](docs/algorithm/evaluation.md)。
 
 ## 本地运行
 
-已使用 Node.js 24、npm 11 验证，当前原型已合入 `main`。
+Node.js 24 / npm 11。在根目录安装依赖，根据 `.env.example` 配置本机数据库、认证和模型密钥。不要覆盖已有 `.env` 或提交私有数据。
 
 ```bash
-git clone https://github.com/hcxlwxlwj/InterviewLab.git
-cd InterviewLab
 npm ci
-npm run dev
+npm run db:migrate
+npm run dev:api
 ```
 
-已有仓库先保存自己的改动，再执行 `git fetch origin`、`git switch main`、`git pull --ff-only`，然后安装依赖并启动。无需数据库、Docker、供应商密钥或 `.env`。
+另开两个终端运行 `npm run dev:worker`、`npm run dev`，访问 [本机首页](http://127.0.0.1:3000/) 注册或登录。首页可单独浏览，业务页面需要真实登录与数据库。完整配置、索引构建及回退只在[运行指南](docs/software/development.md)维护；语音供应商配置见[语音设计](docs/software/voice-interview.md)。
 
-上面的命令可单独浏览首页。首页以外的业务页面需要登录；注册登录需要启用认证并连接数据库。真实面试需配置数据库、认证及 LLM_API_KEY，执行 `npm run db:migrate` 后另开终端运行 `npm run dev:api` 和 `npm run dev:worker`；浏览器通过 `/api/v1` 同源访问。默认模型为 ecnu-plus，见[完整启动与模型配置](docs/software/interview-agent-implementation.md)。
+## 能力与边界
 
-打开 [首页](http://127.0.0.1:3000/)、[岗位库](http://127.0.0.1:3000/jobs)或[个人中心](http://127.0.0.1:3000/me)。协作者各自在自己的电脑执行上述命令；localhost 不是可分享给其他电脑的在线预览地址，共享访问需要另行部署。
-
-## 实时语音开发分支
-
-`feature/voice-interview` 新增火山引擎流式识别 → 现有面试 Agent → 流式合成，支持自动提交、插话打断及文字兜底。需单独开通语音服务并在本机配置密钥；代码和受控测试不等于真实语音体验已验收。配置、运行及验证边界见[实时语音面试接入](docs/software/voice-interview.md)。
-
-## 当前可以使用
-
-首页公开，其他业务页面先弹窗登录；登录后只展示当前账号的真实数据。直接访问业务地址也先回首页登录，再恢复原目标。注册不验证邮箱，暂不支持找回密码。
-
-| 模块 | 当前真实能力 |
+| 模块 | 当前状态 |
 | --- | --- |
-| 账号 | 邮箱密码注册、自动登录、Cookie 会话、退出、当前身份与跨标签页同步 |
-| 岗位库 | 1000 个公开岗位模板，经真实 API 搜索、分类、阶段筛选与分页，查看 JD、题目和来源 |
-| 个人中心 | 当前账号姓名、邮箱和最近的真实面试；新账号为空记录 |
-| 模拟面试 | 持久化配置、真实 Agent 提问、文字回答、暂停、跳过、结束与草稿 |
-| 报告与重练 | 本人证据报告、单题重练、两次回答比较、历史和删除 |
-| 尚未开放 | 简历、个人 JD、收藏、偏好维护、上传、语音和 PDF；页面明确留空或禁用 |
+| 账号 | 邮箱密码注册/登录、Cookie、退出、本人数据隔离 |
+| 岗位 | 1000 模板、8000 原创问题、搜索/分类/阶段/详情及来源 |
+| 材料 | 文本和结构化简历维护、确认与版本选择；新 Agent 分析状态和重试 |
+| Agent | graph-v1 唯一运行时，使用 LangChain 模型层、LangGraph 三条有界工作流，准备失败可显式简化 |
+| 知识 | 同源内容、类型与适用绑定、混合检索、断点构建/发布/回退；正式真实全量向量版本未在日常库发布 |
+| 面试 | 文字、语音、视频共享准备/回答/提问；视频仅本机摄像头/屏幕预览和语音驱动形象 |
+| 面后 | 原证据报告、同题重练、比较、历史及删除；不按简历增加分数 |
+| 后续 | 文件上传/OCR、PDF 导出、代码执行、视觉分析、完整声学指标、全岗位专家评分校准 |
 
-真实路径：注册/登录 → 岗位库 → 配置 → 文字面试 → 报告 → 重练/比较 → 本人历史。
+“全岗位”表示统一流程、现有内容接入和可追溯提问。九类基础资料不构成 1000 个细分岗位的完整专业知识；框架和向量接通不代表效果验收通过。业务仅保留真实账号与 HTTP 流程，演示入口已删除。
 
-旧演示代码与显式 `?demo=1` 地址保留，但主流程不展示演示个人资料，也不自动上传。首页的合成界面示意不属于账号数据。详细配置、接口、隔离与限制见[账号与访问管理](docs/software/account-management.md)。
-
-## 仓库结构
-
-采用 [IntelligentSWEPractice 课程模板](https://github.com/bettermorn/IntelligentSWEPractice#课程成果)的文档、代码与测试分层；根目录按课程结构收拢，运行必需的 npm/TypeScript 配置保留。
+## 工程与文档
 
 ```text
-docs/              requirements / algorithm（含 content）/ software / mgmt / retrospection
-code/frontend/     Next.js 页面、组件与标签页演示客户端
-code/backend/      HTTP 接口、服务合同、公开内容适配
-code/core_engine/  不依赖框架或存储的共享类型与领域规则
-tests/             unit / integration
-.github/           workflows、scripts 与协作模板
+docs/              requirements / algorithm / software / mgmt / retrospection
+code/backend/      Fastify、Drizzle/PostgreSQL、任务、Agent 与模型适配
+code/frontend/     Next.js 页面、同源客户端、媒体呈现
+code/core_engine/  无框架依赖的共享 DTO、领域规则与端口
+tests/             unit / integration / support
 ```
 
-开始修改前阅读[工程目录与职责](docs/software/repository_structure.md)。[代码导航](code/README.md)、[测试导航](tests/README.md)和[内容维护](docs/algorithm/content/README.md)分别说明修改入口、验证范围和审核流程。
+按老师模板整理，代码目录保持现有布局。[文档总导航](docs/README.md)包含“需求 → 工作流 → 接口与数据 → 测试证据”对应表。建议先读[系统架构](docs/software/architecture.md)、[Agent 架构](docs/software/interview-agent-implementation.md)、[工作流](docs/software/interview-agent-implementation.md)、[数据库](docs/software/data_and_interfaces.md)。
 
-## 文档入口
-
-| 课程成果 | 当前正文 |
-| --- | --- |
-| 需求 | [问题定义与 5W1H](docs/requirements/problem_definition.md)、[功能](docs/requirements/functional_spec.md)、[非功能](docs/requirements/nonfunctional_spec.md)、[用户故事](docs/requirements/user_stories.md) |
-| 算法与研究 | [技术/竞品调研](docs/algorithm/research.md)、[知识与 Agent](docs/algorithm/knowledge_and_agent.md)、[评测](docs/algorithm/evaluation.md) |
-| 软件设计 | [架构](docs/software/architecture.md)、[数据与接口](docs/software/data_and_interfaces.md)、[原型](docs/software/prototype/README.md)、[软件设计索引](docs/software/README.md) |
-| 项目管理 | [团队计划](docs/mgmt/team_plan.md)、[沟通](docs/mgmt/communication_mgmt_plan.md)、[风险](docs/mgmt/risk_mgmt_plan.md)、[教师反馈](docs/retrospection/teacher_feedback.md) |
-| 复盘 | [日期索引与历史记录](docs/retrospection/README.md) |
-
-总入口为[文档导航](docs/README.md)。设计正文持续修订，过程与复盘保留发生日期；功能行为与验收统一维护在 requirements，旧模块与重复导航文件已移除。文档中的目标服务不等于当前已验收能力。
-
-## 检查与生产启动
+## 检查与协作
 
 ```bash
 npm run check
+npm run build:backend
 npm run build
-npm start
+npm run openapi:generate
 ```
 
-`check` 包括依赖边界、类型、内容、单元/接口测试和文档检查；文档检查需要 Python 3。单独命令为 `npm run boundaries:check`、`npm run typecheck`、`npm run content:check`、`npm test`、`npm run docs:check`。提交前再运行 `git diff --check`。代码格式使用 `npm run format:code`。
+数据库、进程、代理和真实模型检查见[测试说明](tests/README.md)，仅使用显式 `interviewlab_test*`；它们会清理测试数据。Next 开发和生产构建不要同时占用同一 `.next`。
 
-开发服务与生产构建共用 `.next`，不要在同一目录同时运行。构建与规则测试不能替代真实服务、浏览器主路径或 AI 效果验收。
-
-## 后续接入与协作
-
-独立后端采用 TypeScript/Node 模块化单体：Fastify + Zod/OpenAPI、Drizzle/PostgreSQL、pg-boss worker。公共基础、认证、岗位读取、真实文字面试/报告和模型适配已实现；简历/JD、pgvector、多模态等按阶段接入。知识库通过版本化接口注入，无需等待新知识库完成才能联调面试流程。详见[后端启动与成员接入](code/backend/README.md)。
-
-后续按四阶段实施：1 真实文字闭环，2 文件/内容/检索及评分校准，3 实时语音与独立语音观测，4 可选代码/镜头/复盘媒体/管理页面；各阶段回归，稳定后做对照与试用。保留显式演示入口，个人材料不自动上传。模块职责见[架构](docs/software/architecture.md)，新 HTTP 及旧路径迁移、材料快照和删除规则见[数据合同](docs/software/data_and_interfaces.md)。本轮已新增独立后端命令、依赖、迁移与测试；原型启动方式保持兼容。
-
-任务分支经 PR 合入 `develop`，阶段验收后再合入 `main`；操作及检查见[协作须知](docs/mgmt/COLLABORATION.md)。[第一周提交记录](docs/retrospection/week1_submission.md)保留此前交付证据，不倒写为本次结果。
-
-不提交密钥、真实简历、录音和用户记录。公开岗位属于平台原创整理的通用参考，题目不标为企业真实面试题；来源与素材使用依据在内容和原型文档维护。
+本次保护点、改动、实际测试与未验收项见[实施记录](docs/retrospection/2026-11-04-agent-engineering.md)。既有改动已备份，专用 `codex/` 分支开发，没有推送或部署。协作规则见[协作须知](docs/mgmt/COLLABORATION.md)。

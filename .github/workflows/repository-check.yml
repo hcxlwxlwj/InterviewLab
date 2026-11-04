@@ -49,7 +49,7 @@ jobs:
     timeout-minutes: 10
     services:
       postgres:
-        image: postgres:16
+        image: pgvector/pgvector:0.8.7-pg16
         env:
           POSTGRES_USER: interviewlab
           POSTGRES_PASSWORD: ci_only

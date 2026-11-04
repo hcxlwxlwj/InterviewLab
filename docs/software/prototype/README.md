@@ -1,5 +1,7 @@
 # 六界面单元与交互原型说明
 
+> 历史原型/交互设计记录，保留当时截图与方案。当前真实能力和 Agent 以[系统架构](../architecture.md)、[工作流](../interview-agent-implementation.md)与[评测](../../algorithm/evaluation.md)为准；下文旧阶段“未接入”不代表当前状态。
+
 版本：v0.3 · 日期：2026-10-19 · 状态：下文保留完整产品规格；本轮已实现高保真演示子集，实际边界见[首轮实现说明](implementation.md)。
 
 ## 1. 体验目标与信息架构

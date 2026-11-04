@@ -1,6 +1,6 @@
 # 统一后端 · @interviewlab/backend
 
-Fastify API 与 pg-boss worker 共用一个后端包。公共基础统一维护，各成员负责自己模块的业务、迁移、测试和前后端联调。原 Next.js 演示接口继续保留，不自动上传浏览器数据。
+Fastify API 与 pg-boss worker 共用一个后端包。公共基础统一维护，各成员负责自己模块的业务、迁移、测试和前后端联调。旧演示接口已删除。
 
 ## 实现状态
 
@@ -14,9 +14,10 @@ Fastify API 与 pg-boss worker 共用一个后端包。公共基础统一维护�
 | 任务查询 | 已实现 Cookie 身份和资源归属校验 |
 | 真实文字面试、证据报告、单题重练、比较、历史和删除 | 已实现，真实模型效果单独验收 |
 | ecnu-plus 兼容模型适配、冻结知识接口、本地公开内容适配 | 已实现；须配置本机 LLM_API_KEY，真实效果尚待验收 |
-| 账号资料编辑/偏好、简历、个人 JD/收藏、内容维护业务 | 待模块负责人实现 |
-| pgvector 混合检索、目标记忆与流式面试 | 前端岗位 v3 联调试点，草案待人工审核；见[说明](../../docs/software/interview-agent-v3.md) |
-| 私有文件、语音 | 尚未接通 |
+| 账号设置、结构化文本简历及版本 | 已实现，当前工作流增加分析任务与准备状态 |
+| 个人 JD/收藏、文件上传 | 不属于本次新增能力 |
+| 全岗位知识、LangChain/LangGraph、简历及准备 | graph 唯一运行时；全量编译/索引流水线已实现，真实正式索引与人工效果待验收；见[Agent 架构](../../docs/software/interview-agent-implementation.md) |
+| 实时语音/视频 | 保留 ASR/TTS 与本机视频预览；真实媒体体验单独验收，文件未接通 |
 
 [架构](../../docs/software/architecture.md)和[数据合同](../../docs/software/data_and_interfaces.md)区分当前能力与目标方案；规划接口不等于已实现接口。
 
@@ -69,9 +70,9 @@ npm run dev:worker
 
 PostgreSQL 16 仅映射本机 5433。示例是公开本地凭证，生产必须替换并通过环境注入。API/worker 各自使用连接池，部署时合计连接预算。
 
-入口从仓库根 .env 加载，显式环境变量优先；范围见 src/foundation/config.ts。API 启动不迁移应用表。五张基础表通过 db:migrate 建立；首次 worker 启动会初始化/升级 pg-boss 自有 pgboss schema，部署升级前应审核版本。
+入口从仓库根 .env 加载，显式环境变量优先；范围见 src/foundation/config.ts。API 启动不迁移应用表。应用表通过追加迁移 db:migrate 建立；首次 worker 启动会初始化/升级 pg-boss 自有 pgboss schema，部署升级前应审核版本。
 
-worker 入口已注册面试规划/推进、逐题报告和比较处理器，并每秒处理期限、最终失败和报告汇总。默认 ecnu-plus，配置项及真实/演示入口见[文字面试接入](../../docs/software/interview-agent-implementation.md)。没有 LLM_API_KEY 时能力明确不可用，不能把心跳当成模型成功。未注册类型仍显式失败。
+worker 入口已注册面试规划/推进、逐题报告、比较，以及独立队列的简历分析/面前规划处理器，并每秒处理期限、最终失败和报告汇总。默认 ecnu-plus，配置项及真实/演示入口见[文字面试接入](../../docs/software/interview-agent-implementation.md)。没有 LLM_API_KEY 时能力明确不可用，不能把心跳当成模型成功。未注册类型仍显式失败。
 
 停止本项目数据库可执行 docker compose -f code/backend/compose.yaml stop；卷保留。不要删除其他成员的数据库或使用生产数据测试。
 
@@ -194,3 +195,5 @@ test:web 启动真实 Next.js 生产代理和测试 API，验证 Cookie 往返�
 ## 实时语音开发
 
 `feature/voice-interview` 在面试模块内增加同源 Cookie 鉴权的 WebSocket 语音入口，复用原 Agent 和事务/任务规则。新增迁移记录回答输入方式；语音 ASR/TTS 密钥均只在后端配置。配置和验收边界见[实时语音面试接入](../../docs/software/voice-interview.md)。
+
+本次运行时开关、知识 v2 构建、全量导入及回退步骤统一见[运行指南](../../docs/software/development.md)，数据库结构见[数据库设计](../../docs/software/data_and_interfaces.md)。

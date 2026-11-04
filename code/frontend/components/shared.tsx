@@ -8,16 +8,13 @@ import {
   Code2,
   Database,
   FlaskConical,
-  Info,
   Menu,
   UserRound,
   X,
 } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from './ui/button';
-import { readDemo, storageAvailable, type DemoState } from '../lib/demo-client';
-import { useSession } from './session-provider';
 import { AccountControls } from './account-controls';
 export function Brand() {
   return (
@@ -35,7 +32,6 @@ export function Brand() {
 }
 export function Header() {
   const path = usePathname();
-  const { isDevelopment } = useSession();
   const [open, setOpen] = useState(false);
   return (
     <header className="site-header">
@@ -64,13 +60,11 @@ export function Header() {
           </Link>
         </nav>
         <div className="header-actions">
-          <span className="badge badge-yellow">
-            {isDevelopment ? '面试流程联调' : '文字面试 Beta'}
-          </span>
+          <span className="badge badge-yellow">文字面试 Beta</span>
           <AccountControls />
-          <Link href={isDevelopment ? '/me/interviews' : '/me'} className="user-link">
+          <Link href="/me" className="user-link">
             <UserRound size={17} />
-            <span>{isDevelopment ? '面试记录' : '个人中心'}</span>
+            <span>个人中心</span>
             <ChevronRight size={14} />
           </Link>
           <button
@@ -107,29 +101,6 @@ export function Breadcrumb({ items }: { items: string[] }) {
           {item}
         </span>
       ))}
-    </div>
-  );
-}
-export function DemoNotice({ compact = false }: { compact?: boolean }) {
-  const [available, setAvailable] = useState(true);
-  useEffect(() => {
-    const update = () => setAvailable(storageAvailable());
-    update();
-    window.addEventListener('interviewlab-change', update);
-    return () => window.removeEventListener('interviewlab-change', update);
-  }, []);
-  return (
-    <div className={`notice ${compact ? 'notice-compact' : ''}`} role="note">
-      <Info size={16} />
-      <span>
-        {available
-          ? '旧版预设流程演示（不调用 AI）：请使用虚构内容。记录仅保留在当前标签页。'
-          : '旧版预设流程演示（不调用 AI）：浏览器存储不可用，刷新后记录可能丢失。'}
-        {!compact && ' 尚未接入真实评估。'}
-      </span>
-      <Link className="text-link" href="/interview/setup">
-        进入 AI 面试 →
-      </Link>
     </div>
   );
 }
@@ -234,16 +205,6 @@ export function Modal({
       </Dialog.Portal>
     </Dialog.Root>
   );
-}
-export function useDemoState(): DemoState | null {
-  const [state, setState] = useState<DemoState | null>(null);
-  useEffect(() => {
-    const update = () => setState(readDemo());
-    update();
-    window.addEventListener('interviewlab-change', update);
-    return () => window.removeEventListener('interviewlab-change', update);
-  }, []);
-  return state;
 }
 export function Loading() {
   return (

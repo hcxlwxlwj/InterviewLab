@@ -56,6 +56,7 @@ export async function loadInterview(
       id: row.id,
       version: row.version,
       configuration: row.configuration,
+      ...(row.preparation ? { preparation: row.preparation } : {}),
       status: row.status as Interview['status'],
       created_at: row.created_at.toISOString(),
       started_at: started,
@@ -91,19 +92,19 @@ export async function loadInterview(
     },
   };
   state.view.participation =
-    row.snapshot?.prompt_version === INTERVIEW_V3 ? participationPolicy(state.view) : null;
+    (row.snapshot?.prompt_version === INTERVIEW_V3 || row.snapshot?.runtime_version === 'graph-v1') ? participationPolicy(state.view) : null;
   return state;
 }
 export async function saveInterview(executor: Executor, state: InterviewState) {
   const v = state.view;
   await executor.query(
     `INSERT INTO interviews (id,owner_id,configuration,version,status,snapshot,plan,generation_id,generation_kind,generation_status,task_id,clarification,
-    parent_interview_id,parent_turn_id,parent_revision,retry_question,retry_goal,created_at,started_at,ended_at,end_reason,agent_memory)
-    VALUES ($1,$2,$3::jsonb,$4,$5,$6::jsonb,$7::jsonb,$8,$9,$10,$11,$12,$13,$14,$15,$16::jsonb,$17,$18,$19,$20,$21,$22::jsonb)
+    parent_interview_id,parent_turn_id,parent_revision,retry_question,retry_goal,created_at,started_at,ended_at,end_reason,agent_memory,preparation)
+    VALUES ($1,$2,$3::jsonb,$4,$5,$6::jsonb,$7::jsonb,$8,$9,$10,$11,$12,$13,$14,$15,$16::jsonb,$17,$18,$19,$20,$21,$22::jsonb,$23::jsonb)
     ON CONFLICT(id) DO UPDATE SET configuration=EXCLUDED.configuration,version=EXCLUDED.version,status=EXCLUDED.status,snapshot=EXCLUDED.snapshot,plan=EXCLUDED.plan,
       generation_id=EXCLUDED.generation_id,generation_kind=EXCLUDED.generation_kind,generation_status=EXCLUDED.generation_status,task_id=EXCLUDED.task_id,clarification=EXCLUDED.clarification,
       parent_interview_id=EXCLUDED.parent_interview_id,parent_turn_id=EXCLUDED.parent_turn_id,parent_revision=EXCLUDED.parent_revision,retry_question=EXCLUDED.retry_question,
-      retry_goal=EXCLUDED.retry_goal,started_at=EXCLUDED.started_at,ended_at=EXCLUDED.ended_at,end_reason=EXCLUDED.end_reason,agent_memory=EXCLUDED.agent_memory`,
+      retry_goal=EXCLUDED.retry_goal,started_at=EXCLUDED.started_at,ended_at=EXCLUDED.ended_at,end_reason=EXCLUDED.end_reason,agent_memory=EXCLUDED.agent_memory,preparation=EXCLUDED.preparation`,
     [
       v.id,
       state.owner,
@@ -127,6 +128,7 @@ export async function saveInterview(executor: Executor, state: InterviewState) {
       v.ended_at,
       v.end_reason,
       JSON.stringify(state.memory ?? null),
+      JSON.stringify(v.preparation ?? null),
     ],
   );
   if (v.generation_status !== 'pending')
@@ -221,7 +223,7 @@ export async function interviewEvent(
 }
 export async function cancelInterviewTasks(executor: Executor, id: string) {
   await executor.query(
-    `UPDATE tasks SET status='cancelled',execution_token=NULL,lease_until=NULL WHERE payload->>'interview_id'=$1 AND type IN ('interviews.plan.v1','interviews.advance.v1') AND status IN ('queued','running','failed')`,
+    `UPDATE tasks SET status='cancelled',execution_token=NULL,lease_until=NULL WHERE payload->>'interview_id'=$1 AND type IN ('interviews.plan.v1','interviews.advance.v1','preparation.plan.v1') AND status IN ('queued','running','failed')`,
     [id],
   );
 }

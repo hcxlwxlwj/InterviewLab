@@ -1,5 +1,7 @@
 # 首轮高保真原型与工程骨架
 
+> 历史原型/交互设计记录，保留当时截图与方案。当前真实能力和 Agent 以[系统架构](../architecture.md)、[工作流](../interview-agent-implementation.md)与[评测](../../algorithm/evaluation.md)为准；下文旧阶段“未接入”不代表当前状态。
+
 日期：2026-10-19。当前为本地交互演示，真实产品规格仍见[六界面说明](README.md)及[数据合同](../data_and_interfaces.md)。
 
 本页保留首轮实现与验证记录。个人中心、多简历、岗位库和内容维护的后续实现见[扩展记录](library-expansion.md)，不再以本页首轮三分区为当前个人中心结构。

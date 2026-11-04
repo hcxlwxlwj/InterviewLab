@@ -13,7 +13,9 @@ const input = z
     structure: z.object({full_name:z.string().max(15000),phone:z.string().max(15000),email:z.string().max(15000),city:z.string().max(15000),education:z.string().max(15000),skills:z.string().max(15000),projects:z.string().max(15000),internships:z.string().max(15000),awards:z.string().max(15000),summary:z.string().max(15000)}).optional(),
   })
   .strict();
+const analysisStatus=z.object({status:z.enum(['pending','ready','failed','unavailable']),task_id:z.string().nullable()});
 const material = input.extend({
+  analysis:analysisStatus.optional(),
   id: z.string().uuid(),
   version: z.number().int().positive(),
   created_at: z.string(),
@@ -49,6 +51,7 @@ export function materialsModule(service?: MaterialsService): BackendModule {
         if (!service) throw unavailable('Database');
         return service;
       };
+      app.post('/materials/:id/analysis', {schema:{params,headers:z.object({'idempotency-key':z.string().min(1).max(200)}).passthrough(),body:z.object({version:z.number().int().positive()}).strict(),response:{202:analysisStatus}}},async(request,reply)=>reply.code(202).send(await get().analyze((await context.requireIdentity(request)).owner_id,request.params.id,request.body.version,request.headers['idempotency-key'] as string)));
       app.get('/materials', { schema: { response: { 200: z.array(material) } } }, async (request) =>
         get().list((await context.requireIdentity(request)).owner_id),
       );

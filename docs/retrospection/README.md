@@ -37,3 +37,9 @@
 - [2026-10-19 文档归入课程五类目录](2026-10-19-docs-consolidation.md)
 - [教师反馈记录](teacher_feedback.md)
 - [第一周提交证据](week1_submission.md)
+
+## 2026-11-04 Agent 工程化
+
+- [实施、测试及回退记录](2026-11-04-agent-engineering.md)。
+- [2026-11-05：旧运行时清退与最终检查](2026-11-05-runtime-cleanup.md)。
+- 改造前未提交正文及本次整理前原稿完整保存在仓库外保护目录 `E:/Research/ECNU/InterviewLab-backups/`；远端已提交版本由 Git 历史追溯，不再为每份文档维护一份全文副本。

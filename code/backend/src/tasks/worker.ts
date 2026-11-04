@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 import type { BackendConfig } from '../foundation/config';
 import { createDatabase, type Database } from '../database/connection';
-import { createQueue, TASK_QUEUE, REPORT_QUEUE } from './queue';
+import { createQueue, TASK_QUEUE, REPORT_QUEUE, PREPARATION_QUEUE } from './queue';
 import { dispatchOutbox } from './outbox';
 import { runTask, type TaskHandlers } from './runner';
 import type { TaskRow } from './service';
@@ -50,6 +50,7 @@ export async function startWorker(config: BackendConfig, options: WorkerOptions 
     for (const [queue, concurrency] of [
       [TASK_QUEUE, config.WORKER_CONCURRENCY],
       [REPORT_QUEUE, config.WORKER_REPORT_CONCURRENCY],
+      [PREPARATION_QUEUE, config.WORKER_PREPARATION_CONCURRENCY],
     ] as const) {
       await boss.createQueue(queue);
       await boss.work<{ task_id: string }>(

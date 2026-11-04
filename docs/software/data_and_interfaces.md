@@ -1,10 +1,25 @@
 # 数据与接口合同
 
-版本：v0.6 · 更新：2026-10-25 · 状态：公共骨架、同源接入、认证和岗位只读 HTTP 已实现，业务合同仍按阶段落地。
+版本：v0.7 · 更新：2026-11-05 · 状态：保留原产品目标与编号；当前实现、待实现合同及历史骨架分别注明。
 
 ## 0. 当前接口与目标合同
 
-原同步演示客户端继续保留，Next.js 合成接口为 /api/demo/v1。真实 /api/v1 提供公开岗位、认证、任务及文字面试/报告/重练/比较；OpenAPI 只列注册路由。除公共与认证表外，迁移 0002 新增六张面试/报告模块表。真实 DTO 使用独立 Interview，支持未校准证据报告及任务引用；原 Session 和 DataClient 仅供演示。当前实现、接口补充及未验收范围见[文字面试接入](interview-agent-implementation.md)。
+**2026-11-05 当前实现说明：** 本文保留原编号和完整产品目标。当前真实接口以注册 schema/OpenAPI 为准；第 4 节中独立经历、收藏、私有文件、ASR 纠错及视觉观察等未接通项仍是目标合同，不能按表格推断已经可调用。旧演示 Session/DataClient、合成 API 和非流式 Agent 执行链已删除，历史数据读取保留。
+
+本次新增接口如下，准备状态与面试主状态、generation_status 分开维护：
+
+| 方法 / 路径 | 请求与状态 | 语义 |
+| --- | --- | --- |
+| POST `/materials/import-pdf` | 已登录；base64 文字版 PDF，最大 5MB/30 页 | 返回提取文本供本人核对，不自动保存/确认，不提供 OCR 或文件存储 |
+| GET `/materials`、`/materials/{id}/versions` | 仅本人；版本附 analysis 状态 | analysis 为 pending/ready/failed/unavailable，含 task_id，不公开分析事实正文 |
+| POST `/materials/{id}/analysis` | `{version}`、幂等键；202 | 本人已确认简历补分析/失败重试，同版本同模型及分析版本复用 |
+| POST `/interviews/{id}/prepare` | `{version,mode:"personalized"或"fallback"}`、幂等键 | 等待/生成返回 202，就绪或显式简化返回 200；仅开始前使用 |
+| GET `/interviews/{id}` | 原 DTO 增加可选 preparation | waiting_material/pending/ready/failed/fallback、task_id、error_code；不返回内部计划 |
+
+创建后的准备不计时，不开媒体；ready/fallback 后仍需 start 才计时。配置修改、材料删除和输入版本变化会取消或隔离旧任务。固定题重练保留原题，不用新计划替换。
+
+
+原同步演示客户端与 /api/demo/v1 已清退。真实 /api/v1 提供公开岗位、认证、任务及文字面试/报告/重练/比较；OpenAPI 只列注册路由。除公共与认证表外，迁移 0002 新增六张面试/报告模块表。真实 DTO 使用独立 Interview，支持未校准证据报告及任务引用；原 Session/DataClient 合同已清退；历史说明不作为当前可调用接口。当前实现、接口补充及未验收范围见[文字面试接入](interview-agent-implementation.md)。
 
 当前账号访问及错误细节见[账号与访问管理](account-management.md)。本文第 1–9 节保留全产品合同；已实现范围见后端 README 及下方骨架说明。原 API_CONTRACT、Session 和同步 DataClient 属于演示合同，不能当作新的真实 HTTP 客户端。
 
@@ -25,7 +40,7 @@
 | `/job-templates/{id}/sources` | 模板详情内的来源 | 正式客户端读取详情即可；现有来源路由仅属于原型 |
 | 预先约定的一组 `/admin` 路径 | 首轮授权命令与内部服务 | 不先设计通用内容 CRUD 或管理页面；后续按明确内容类型开放 |
 
-真实服务与新异步客户端在同一阶段迁移，不维护两套私有业务实现。保留显式演示模式，旧浏览器 schema=2 的资料不自动上传，也不伪造为真实账号数据。旧页面链接与四类历史岗位 ID 保留兼容；HTTP 草案允许调整，不承诺尚未实现接口的别名。
+真实服务与新异步客户端在同一阶段迁移，不维护两套私有业务实现。旧演示执行已删除，原浏览器资料不自动上传，也不伪造为真实账号数据。旧页面链接与四类历史岗位 ID 保留兼容；HTTP 草案允许调整，不承诺尚未实现接口的别名。
 
 ## 1. 公共协议与权限
 
@@ -39,6 +54,100 @@
 - 面试进行中不得返回面后评分、参考要点或表达反馈；限制在服务端执行。岗位库中的公开准备资料与当前面试的私有分析是不同读取边界。
 
 ## 2. 数据模型与业务归属
+
+当前新增 `interviews.preparation` 与 `resume_analyses`；材料仍使用 `resume_materials / resume_material_versions`，既有任务、报告表不另建平行实现。下面的 ER 是当前物理表与逻辑归属的说明；USER 表示账号归属，不声称 owner_id 处处具有数据库外键。
+
+
+```mermaid
+erDiagram
+  USER ||--o{ RESUME_MATERIALS : owns
+  USER ||--o{ INTERVIEWS : owns
+  RESUME_MATERIALS ||--|{ RESUME_MATERIAL_VERSIONS : versions
+  RESUME_MATERIALS ||--o{ RESUME_ANALYSES : derived
+  TASKS ||--o| RESUME_ANALYSES : produces
+  INTERVIEWS ||--o{ INTERVIEW_TURNS : contains
+  INTERVIEWS ||--o{ INTERVIEW_EVENTS : streams
+  INTERVIEWS ||--o{ INTERVIEW_REPORTS : analyzed
+  TASKS ||--o{ OUTBOX_EVENTS : delivered
+  INTERVIEWS {
+    uuid id PK
+    text owner_id
+    integer version
+    text status
+    jsonb preparation
+    jsonb configuration
+    jsonb snapshot
+    jsonb agent_memory
+    text generation_status
+    uuid task_id
+  }
+  RESUME_MATERIAL_VERSIONS {
+    uuid id PK
+    integer version PK
+    jsonb data
+  }
+  RESUME_ANALYSES {
+    uuid id PK
+    text owner_id
+    uuid material_id FK
+    integer material_version
+    text input_digest
+    text model
+    text prompt_version
+    uuid task_id
+    jsonb result
+  }
+```
+
+`interviews.snapshot` 是内部冻结快照：runtime_version、prompt_version、model、知识版本、personal_material、resume_analysis、preparation_plan；不经公开 DTO 返回。`agent_memory` 与每轮 `knowledge_context` 同样是内部依据。`preparation` 只暴露状态、task_id 和错误码，不暴露简历原文或计划。
+
+分析唯一键为 owner/material/version/input_digest/model/prompt_version。分析 task_id 关联受控任务，结果与任务完成状态在短事务中共同发布。现有 resume_materials/version/account_settings 原由手写迁移创建，本次补齐 Drizzle 定义，不重建旧表。
+
+新增迁移 `0007_agent_preparation.sql` 仅加 interviews.preparation、resume_analyses 和索引；已应用的 0000～0006 不改写。Drizzle 0006/0007 快照补全后生成检查无差异。旧记录 preparation 为 NULL，保持可读。
+
+### 独立公共知识库
+
+```mermaid
+erDiagram
+  KNOWLEDGE_V2_RELEASES ||--o{ KNOWLEDGE_V2_CHUNKS : freezes
+  KNOWLEDGE_V2_CHUNKS ||--o{ KNOWLEDGE_V2_BINDINGS : applies
+  KNOWLEDGE_V2_VECTORS ||--o{ KNOWLEDGE_V2_CHUNKS : reused
+  KNOWLEDGE_V2_RELEASES {
+    text id PK
+    text checksum
+    jsonb manifest
+    text status
+    boolean active
+  }
+  KNOWLEDGE_V2_VECTORS {
+    text hash PK
+    text model PK
+    vector embedding
+  }
+  KNOWLEDGE_V2_CHUNKS {
+    text release PK
+    text id PK
+    text hash FK
+    text model FK
+    text card_id
+    text kind
+    text body
+    text evidence_level
+  }
+  KNOWLEDGE_V2_BINDINGS {
+    text release PK
+    text chunk_id PK
+    text job PK
+    text_array stages
+    text_array types
+    text_array goals
+  }
+```
+
+维度保持 1024。原有前端专属知识表不变；v2 使用新表和 `all-roles-*` release，向量按正文摘要与模型复用。共享正文通过 binding 关联多岗位。active 唯一索引限制只有一个当前指针；历史面试按冻结 release 读取，retired 不删除片段。新建完整 draft 后才能预览或发布，发布切换在事务中完成。
+
+数据源与向量来源关系见[知识检索](../algorithm/knowledge_and_agent.md)。正文与适用关系由源文件编译，向量不是另一份人工正文。
+
 
 普通列表、过滤和关联使用可查询字段与关系表，不把所有数据塞进一个用户 JSON。冻结输入和结构化模型输出可用 JSONB，但保留对象 ID、版本摘要、状态和归属等索引字段。下列名称是目标逻辑实体，不代表数据库迁移已经建立。
 
@@ -66,7 +175,7 @@
 | Invocation/Audit/Deletion | 调用标识、模型/提示版本、耗时、用量、错误；操作人与结果；删除范围和清理状态 | 日志无私有正文和密钥，删除阻止在途任务重建数据 |
 | 可选观测/媒体/代码 | 回答/提交版本、质量、授权、期限、执行限额与运行依据 | 单独生命周期，不能替代专业事实证据 |
 
-`Interview.mode=mock`；面试类型为 `technical_qa/project_deep_dive/hr/mixed`。配置包括岗位或个人 JD 及其版本、可选简历/经历版本、难度、时长 5/10 分钟（默认 10）、风格、代码开关、实际交互模式。目标支持实时语音，第一阶段真实入口明确使用 `text_fallback`，不得仅改标签宣称实时可用。摄像头及复盘媒体初始均关闭，启用须核对能力和当场授权。
+原目标合同使用 `Interview.mode=mock`；当前 InterviewConfig 不使用该字段，面试类型为 `technical_qa/project_deep_dive/hr/mixed/business_scenario`。配置包括岗位或个人 JD 及其版本、可选简历/经历版本、难度、时长 5/10 分钟（默认 10）、风格、代码开关、实际交互模式。目标支持实时语音，当前接口支持 text_fallback、realtime_voice 和 realtime_video；运行体验仍须实际设备验收。摄像头及复盘媒体初始均关闭，启用须核对能力和当场授权。
 
 简历切换清除不属于新版本且未明确补充的经历；只选择当前用户已确认材料。删除默认简历置空，不自动另选。临时文件过期不能转入库；确认经历不代表系统核实真实性。
 
@@ -79,6 +188,9 @@
 引用包含对象/回答 ID、明确 revision、片段/字符范围和必要摘录；发布前核对原文存在及结论支持。语音/视觉独立展示，不参与专业总分。
 
 ## 3. 状态与任务一致性
+
+**本次准备状态扩展：** preparation 与原 status/generation_status 正交。waiting_material 依赖简历分析，pending 表示规划排队/执行；ready/fallback 允许开始；failed 可重试或显式简化。LangGraph 内部节点不是持久业务状态。业务写入、task 和 Outbox 同事务；模型在事务外运行，发布时重检归属、删除、租约、输入摘要及版本。新迁移 0007 仅追加准备字段、分析表及唯一索引；0000～0006 不改写。
+
 
 | 对象 | 状态与规则 |
 | --- | --- |
@@ -234,6 +346,9 @@ Agent 不是浏览器可任意调用的总入口。简历提取、JD 分析、�
 
 ## 7. 保存、权限与删除
 
+**本次分析删除规则：** 简历更新形成新版本，旧分析不能覆盖新版。删除先取消相关任务并清理派生分析，迟到输出不能复活材料；历史面试的冻结内容不因软删除被静默改写，删除面试是独立操作。分析唯一键包含 owner/material/version/input_digest/model/prompt_version，不能跨用户复用。
+
+
 
 身份采用 Better Auth 的邮箱密码注册/受邀账号与服务端登录会话，生产使用 HttpOnly/Secure Cookie；写接口检查同源/CSRF，退出与过期立即失效。文件默认上限 10 MiB，仅可提取文本 PDF/DOCX，检查扩展名、实际类型与结构；拒绝密码文件、损坏文件、异常压缩，禁宏/脚本/外链加载，解析任务受资源限制。OCR 后续扩展，失败给手填入口。预览转换在受限进程进行。
 
@@ -276,86 +391,26 @@ Fastify、Zod/OpenAPI、Drizzle/PostgreSQL、pg-boss worker、同源代理与 Be
 
 ## 10. 已实现的公共骨架（2026-10-25）
 
-Fastify 独立监听 3001；浏览器经 Next.js /api/v1 同源代理调用，原演示显式改为 /api/demo/v1。公共响应保留错误/分页合同；岗位游标绑定筛选、稳定排序及内容版本，正文和来源来自同一发布内容。
-
-当前注册：GET /health、/health/ready、/capabilities、/job-categories、/job-templates、/job-templates/{id}、/tasks/{id}；development 另有 /openapi.json。任务查询需注入身份服务，未接入返回 501；身份服务确认未登录返回 401，他人和不存在任务统一 404。业务目标路由尚未批量注册。
+本节标题保留原编号，2026-10-25 是基础设施落地时间；以下更新为当前组合方式。旧合成 HTTP、同步 DataClient 和旧 Agent 已清退。
 
 ### 模块数据归属与依赖
 
-| 模块 | 主要实体 | 跨模块约定 |
-| --- | --- | --- |
-| accounts | 身份、角色、设置、默认简历指针 | 提供经过验证的身份；默认简历必须由 resumes 校验 |
-| resumes | 简历/经历版本、文件、候选与确认 | 只提供本人选择的已确认版本；更新不改历史快照 |
-| jobs | 个人 JD/分析、收藏 | 平台模板和来源由 knowledge 维护，jobs 只读查询 |
-| interviews | 会话、快照、问题回合、回答 revision/片段、封存 | 唯一状态写入口；按版本读取材料，向 reports 提供封存输入 |
-| reports | 报告版本、重练关联、比较、导出 | 读取封存输入；创建重练调用 interviews，不直接改会话表 |
-| knowledge | 模板/来源/知识/题目/标准和索引版本 | 仅发布内容进入读取；个人材料不进入共享检索库 |
+| 组合点 | 当前职责 |
+| --- | --- |
+| server/app.ts | Fastify、共享身份/Origin、模块注册和错误/OpenAPI |
+| modules/interview-runtime.ts | 注入唯一 Agent、全岗位知识、材料分析、准备及报告服务 |
+| interviews/service.ts | 配置、准备门槛、回合/计时/保存、取消及终态 |
+| resumes/service.ts、analysis.ts | 本人材料版本、分析任务与删除 |
+| reports/service.ts | 逐题、汇总、重练比较和输入版本发布 |
+| knowledge/catalog-command.ts | 公共知识构建、预览、审核署名发布及回退 |
 
-以下为逻辑 ER，五个公共实体和 AuthUser/AuthSession/AuthAccount/AuthVerification/AuthRateLimit 已迁移，其余业务表随模块建立；虚线表示跨模块的版本化服务引用，不要求现在创建跨模块 FK。Identity 对应已验证的 AuthUser 标识。
-
-~~~mermaid
-erDiagram
-    AuthUser ||--o{ AuthSession : authenticates
-    AuthUser ||--o{ AuthAccount : credentials
-    AuthUser ||..|| Identity : provides
-    AuthVerification {
-        text id PK
-        text identifier
-        timestamptz expires_at
-    }
-    AuthRateLimit {
-        text id PK
-        text key UK
-        integer count
-        bigint last_request
-    }
-    Identity ||--o{ Resume : owns
-    Resume ||--|{ ResumeVersion : versions
-    ResumeVersion }o--o{ ExperienceVersion : selects
-    Identity ||--o{ JobTarget : owns
-    Identity ||--o{ Bookmark : owns
-    Bookmark }o..|| JobTemplateVersion : references
-    JobTemplateVersion }o--o{ SourceVersion : cites
-    JobTemplateVersion ||--o{ KnowledgeChunk : scopes
-    Identity ||--o{ Interview : owns
-    Interview ||--o| MaterialSnapshot : freezes_on_start
-    MaterialSnapshot }o..o| ResumeVersion : freezes
-    MaterialSnapshot }o..o| JobTarget : freezes_version
-    MaterialSnapshot }o..o{ ExperienceVersion : freezes
-    MaterialSnapshot }o..o{ JobTemplateVersion : freezes
-    Interview ||--o{ InterviewTurn : asks
-    InterviewTurn ||--o{ AnswerRevision : records
-    AnswerRevision ||--o{ AnswerSegment : preserves
-    Interview ||..o{ ReportVersion : sealed_input
-    ReportVersion }o..o{ AnswerRevision : cites
-    Interview ||..o{ RetryRelation : source
-    RetryRelation }o..|| Interview : retry
-    AnswerRevision }o..o{ Comparison : compares
-    ReportVersion ||--o{ Export : renders
-    Task ||--|| OutboxEvent : dispatches
-    Identity ||..o{ Task : owner_reference
-    Identity ||..o{ IdempotencyRecord : scopes
-    Identity ||..o{ AuditEvent : actor_reference
-    WorkerHeartbeat {
-        uuid id PK
-        json supported_types
-        timestamptz last_seen_at
-    }
-~~~
+跨模块通过显式服务协作，模型没有 SQL、文件系统或高权限工具入口。共享 DTO 位于 core_engine，Zod/供应商/存储实现保留在后端。
 
 ### 五张基础表和可靠性
 
-- tasks：用户、版本化任务类型、业务键、输入摘要、必要 payload、状态、实际尝试次数/上限、结果引用、执行 token/租约和时间；(owner_id,type,key) 唯一。
-- outbox_events：任务引用、pending/published、投递尝试、重试时间和发布时间；与 tasks 同事务，每任务一个 outbox。当前承载任务投递，尚非通用事件订阅系统。
-- idempotency_records：用户、操作、键、输入摘要和响应；同作用域唯一。事务级 advisory lock 串行化同键请求，失败整体回滚。
-- audit_events：操作者、动作、资源 ID、请求 ID、结果和时间；不存私有全文或原始错误。
-- worker_heartbeats：实例 ID、支持任务类型、启动及最近心跳。仅表示进程存活，不承诺任何业务能力已接通。
+tasks、outbox_events、idempotency_records、worker_heartbeats 等原基础设施继续承担投递、重试、租约和就绪判断；pg-boss 队列不替代业务任务表。任务结果发布与 succeeded 同事务完成。版本冲突、越权、重复请求、删除竞态、重启和取消必须回归；HTTP GET 不隐式触发模型。
 
-owner_id 使用认证模块 AuthUser.id，不信任客户端输入。公共任务表暂不增加用户 FK，兼容内部处理和既有任务；业务表按模块需求增加约束。auth_users 保存邮箱、显示名和服务端角色；auth_accounts 保存 Better Auth 密码哈希；auth_sessions 保存到期会话；auth_verifications 预留组件核心 schema；auth_rate_limits 保存跨实例限流计数。内部实体采用服务端 UUID 和 UTC 时间。
-
-任务 enqueueTask 接收业务事务，业务写入、tasks 和 outbox 一起提交。投递在独立事务领取 outbox，使用 FOR UPDATE SKIP LOCKED；队列不可用保留已提交任务，重投可能重复。外部调用不在业务事务里；runner 使用执行 token/60 秒租约，先调用处理器，再在短事务校验并执行结果 commit。处理器仍须检查本模块的输入版本、删除和 generation。默认最多两次实际执行（可配置 1–5），不保证外部请求严格只调用一次。
-
-InternalEvent 定义事件 ID/type/schema_version、归属、资源版本、时间、request_id 和 payload，供跨模块合同使用；具体事件生产者与消费者随业务模块添加。资料删除、派生失效和关联清理按前文规则实现，骨架没有宣称这些业务已经可用。
+语音 WS、续答与播放回执仍按第 5 节合同执行，准备接口不替代媒体协议。实际运行与迁移命令统一见[运行指南](development.md)。
 
 ## 实时语音开发分支接口补充
 
