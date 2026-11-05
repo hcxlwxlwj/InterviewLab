@@ -1,3 +1,5 @@
+import {registerBookmarks} from './bookmarks';
+import type {Database} from '../../database/connection';
 import { z } from 'zod';
 import type { JobTemplate, ContentSource } from '@interviewlab/core';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
@@ -58,10 +60,11 @@ export const jobSchema = z.object({
   jd_note: z.string(),
 }) satisfies z.ZodType<JobTemplate>;
 
-export function jobsModule(service: JobsService): BackendModule {
+export function jobsModule(service: JobsService, database?:Database): BackendModule {
   return {
     name: 'jobs',
-    async register(instance) {
+    async register(instance,context) {
+      await registerBookmarks(instance,context,service,database);
       const app = instance.withTypeProvider<ZodTypeProvider>();
       app.get(
         '/job-categories',

@@ -1,2 +1,2 @@
-import MaterialsWorkspace from '../../../features/personal-center/materials-workspace';
-export default function Page(){return <MaterialsWorkspace settingsOnly targetsOnly />;}
+import SavedJobs from '../../../features/personal-center/saved-jobs-live';
+export default SavedJobs;
