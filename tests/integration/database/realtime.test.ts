@@ -388,6 +388,23 @@ test('voice answers use our existing knowledge runtime and pass its retrieved co
       () => {},
     );
     await session.start();
+    const speech = f.events.find((event) => event.type === 'speech_start');
+    assert.ok(speech?.type === 'speech_start');
+    session.control({ type: 'speech_start' });
+    f.recognize({ text: '这段背景声不能成为回答。', final: true });
+    session.control({ type: 'speech_end' });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    assert.equal(f.speeches[0].signal.aborted, false);
+    assert.ok(!f.events.some((event) => event.type === 'transcript'));
+    assert.equal((await r.value.interviews.read(owner, v.id)).turns[0].answer_text, null);
+    const recognitionCloses = f.metrics().closes;
+    session.control({
+      type: 'playback',
+      speech_id: speech.speech_id,
+      played_ms: 0,
+      interrupted: false,
+    });
+    await waitFor(() => f.metrics().closes > recognitionCloses);
     session.control({ type: 'speech_start' });
     f.recognize({ text: answer, final: true });
     session.control({ type: 'speech_end' });
