@@ -1,3 +1,5 @@
+import { evaluationWire } from '../support/report-wire';
+import { FEEDBACK_DIMENSIONS } from '@interviewlab/core';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
@@ -30,21 +32,35 @@ import { interviewInputDigest } from '../../code/backend/src/modules/interviews/
 const config = loadConfig({ LLM_API_KEY: 'synthetic-key' });
 test('retired interview snapshots never invoke a fallback model or rewrite the stored snapshot', async () => {
   let calls = 0;
-  const agent = createInterviewAgent(config, () => {}, async () => {
-    calls++;
-    throw new Error('Retired snapshots must not execute');
-  });
+  const agent = createInterviewAgent(
+    config,
+    () => {},
+    async () => {
+      calls++;
+      throw new Error('Retired snapshots must not execute');
+    },
+  );
   const state = newInterviewState('synthetic', {
-    job: 'backend', career_stage: 'internship', interview_type: 'technical_qa',
-    difficulty: '基础', duration_minutes: 5, interviewer_style: '标准', interaction_mode: 'text_fallback',
+    job: 'backend',
+    career_stage: 'internship',
+    interview_type: 'technical_qa',
+    difficulty: '基础',
+    duration_minutes: 5,
+    interviewer_style: '标准',
+    interaction_mode: 'text_fallback',
   });
   const snapshot: InterviewSnapshot = {
-    job_title: '后端', model: 'ecnu-plus', prompt_version: 'historical', rubric_version: 'historical',
+    job_title: '后端',
+    model: 'ecnu-plus',
+    prompt_version: 'historical',
+    rubric_version: 'historical',
     knowledge: { content_version: 'historical', questions: [], sources: [], missing_reason: null },
   };
   const before = structuredClone(snapshot);
-  await assert.rejects(agent.advance(state.view, snapshot, false, new AbortController().signal, false),
-    (error: { code?: string }) => error.code === 'unsupported_input');
+  await assert.rejects(
+    agent.advance(state.view, snapshot, false, new AbortController().signal, false),
+    (error: { code?: string }) => error.code === 'unsupported_input',
+  );
   assert.equal(calls, 0);
   assert.deepEqual(snapshot, before);
 });
@@ -75,7 +91,7 @@ const response = (value: unknown, finish = 'stop') =>
         {
           index: 0,
           finish_reason: finish,
-          message: { role: 'assistant', content: JSON.stringify(value) },
+          message: { role: 'assistant', content: JSON.stringify(evaluationWire(value)) },
         },
       ],
       usage: { prompt_tokens: 10, completion_tokens: 10, total_tokens: 20 },
@@ -88,10 +104,16 @@ test('all 1000 roles and 8000 original questions have applicable typed records, 
   const documents = buildCatalog(),
     manifest = catalogManifest(documents);
   assert.equal(manifest.jobs, 1000);
-  assert.equal(manifest.lineage.length,1000);
-  assert.equal(manifest.lineage[0].review_method,JOBS[0].review_method);
-  assert.equal(manifest.lineage.reduce((n,j)=>n+j.question_ids.length,0),8000);
-  assert.ok(manifest.sources.some(s=>s.verification==='search_index'),'old source verification is preserved');
+  assert.equal(manifest.lineage.length, 1000);
+  assert.equal(manifest.lineage[0].review_method, JOBS[0].review_method);
+  assert.equal(
+    manifest.lineage.reduce((n, j) => n + j.question_ids.length, 0),
+    8000,
+  );
+  assert.ok(
+    manifest.sources.some((s) => s.verification === 'search_index'),
+    'old source verification is preserved',
+  );
   assert.ok(catalogTerms('数仓 数据约束 机器人 可用性 state effect').includes('state'));
   assert.ok(!catalogTerms('state effect').includes('副作用'));
   assert.equal(manifest.questions, 8000);
@@ -345,10 +367,16 @@ test('LangChain report and comparison preserve the legacy input, output, evidenc
         task = JSON.parse(request.messages[1].content);
       assert.equal(request.model, 'frozen-model');
       requests.push(task);
-      if (task.input.allowed_quotes)
+      if (task.task === 'evaluate')
         return response({
           turn_id: turn.id,
           revision: 1,
+          six_scores: Object.fromEntries(
+            FEEDBACK_DIMENSIONS.map((d) => [
+              d.key,
+              { score: 0, text: '本次未体现', evidence_ids: [] },
+            ]),
+          ),
           strengths: [
             { text: '说明职责', evidence_refs: [{ turn_id: turn.id, revision: 1, quote: 'q0' }] },
           ],

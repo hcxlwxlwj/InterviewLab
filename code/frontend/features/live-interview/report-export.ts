@@ -1,6 +1,6 @@
 import {
   FEEDBACK_DIMENSIONS,
-  feedbackScore,
+  reportFeedback,
   REPORT_INDICATORS,
   REPORT_RUBRIC,
   FRONTEND_RUBRIC_VERSION,
@@ -27,8 +27,8 @@ const findings = (items: InterviewFinding[]) =>
 export function reportExportHtml(interview: Interview, report: InterviewReport): string {
   const progress = report.analysis_progress;
   const summary = report.summary;
-  const feedback = summary?.feedback_template;
-  const templateTotal = feedbackScore(feedback);
+  const feedback = reportFeedback(report);
+  const templateTotal = { score: report.overall_score, coverage: 100 };
   const templateHtml = `<h2>五、评分汇总</h2><table><thead><tr><th>评价维度</th><th>权重</th><th>得分</th><th>具体行为依据</th></tr></thead><tbody>${FEEDBACK_DIMENSIONS.map(
     (d) => {
       const a = feedback?.assessments.find((a) => a.dimension === d.key);
@@ -36,7 +36,7 @@ export function reportExportHtml(interview: Interview, report: InterviewReport):
     },
   ).join(
     '',
-  )}</tbody></table><p>综合分：${templateTotal.score === null ? `暂不计算（已评价权重 ${templateTotal.coverage}/100）` : `${templateTotal.score}/100（已评价权重 ${templateTotal.coverage}/100，按六维权重加权）`}。证据不足的维度按20分计入，表示本场展示不足。</p>`;
+  )}</tbody></table><p>综合分：${templateTotal.score === null ? `暂不计算（已评价权重 ${templateTotal.coverage}/100）` : `${templateTotal.score}/100（已评价权重 ${templateTotal.coverage}/100，按六维权重加权）`}。六维全部计分，完全未体现可为0分。</p>`;
 
   return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>${escape(interview.job_title)} · 面试复盘报告</title><style>
   @page { size: A4; margin: 18mm; }
@@ -52,6 +52,8 @@ export function reportExportHtml(interview: Interview, report: InterviewReport):
   <h2>四、针对性改进建议</h2>${feedback?.action_plan.map((a) => `<h3>${{ short_term: '短期（1周）', medium_term: '中期（1月）', long_term: '长期（持续练习）' }[a.horizon]}</h3><p>${escape(a.action)}</p><p>验收方式：${escape(a.acceptance)}</p>`).join('') || '<p>暂无行动计划。</p>'}
   ${templateHtml}
   <h2>六、下一步期待</h2><p>${escape(feedback?.next_expectation ?? '围绕已确认目标重练并比较回答。')}</p>
+  <h2>逐题得分</h2>${(report.question_scores ?? []).map((q) => `<h3>第 ${q.main_question_index} 题：${Math.round(q.score)} / 100</h3><p>主问题及追问合并评分</p><table><tbody>${q.assessments.map((a) => `<tr><td>${escape(FEEDBACK_DIMENSIONS.find((d) => d.key === a.dimension)?.short ?? a.dimension)}</td><td>${Math.round(a.score)}</td><td>${escape(a.text)}</td></tr>`).join('')}</tbody></table>`).join('')}
+  <h2>下一步建议</h2>${list(report.next_steps ?? [])}
   <h2>逐题复盘与原回答</h2>${interview.turns
     .map((turn) => {
       const e = report.evaluations.find(

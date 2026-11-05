@@ -537,3 +537,5 @@
 .report-practice-page { padding-block: 12px 40px; }
 .report-practice-page .report-dialog-heading { flex-wrap: wrap; }
 .report-practice-page .turn-review { scroll-margin-top: 24px; }
+
+.question-scorecard {padding:18px 0;border-bottom:1px solid #e1e6e8;margin-bottom:18px}.question-scorecard h3 strong {color:#d8754a;margin-left:14px}.question-scorecard summary {cursor:pointer}.practice-history {margin:20px 0;overflow-wrap:anywhere}.practice-history select {margin-left:8px;padding:6px;border:1px solid #dce5e7;border-radius:6px}.practice-trend {width:100%;min-width:260px;max-height:260px;margin-top:16px}.practice-trend text {font-size:12px;fill:#42546a}.practice-history small {color:var(--muted)}

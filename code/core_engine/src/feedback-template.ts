@@ -2,9 +2,8 @@ import type { InterviewEvidence, InterviewReportSummary } from './live-interview
 
 /** Source: 面试反馈模板.xlsx / 维度评分表 A2:F7. Percent scores are weighted in code. */
 export const FEEDBACK_TEMPLATE_VERSION = 'interview-feedback-v2';
-/** Six-dimensional scoring policy; insufficient evidence receives a fixed low score. */
-export const FEEDBACK_ANALYSIS_VERSION = 'text-review-v9';
-export const INSUFFICIENT_EVIDENCE_SCORE = 20;
+/** Six-dimensional scoring policy; every question has all six scores. */
+export const FEEDBACK_ANALYSIS_VERSION = 'text-review-v11';
 export const FEEDBACK_DIMENSIONS = [
   {
     key: 'professional_foundation',

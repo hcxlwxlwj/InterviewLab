@@ -1,9 +1,9 @@
 'use client';
 
 import {
-  DIMENSION_LABELS,
+  reportFeedback,
+  type QuestionScore,
   FEEDBACK_DIMENSIONS,
-  feedbackScore,
   type InterviewReport,
   type InterviewEvaluation,
 } from '@interviewlab/core';
@@ -63,11 +63,13 @@ export function ReportDistribution({ report }: { report: InterviewReport }) {
 export function AbilityRadar({
   feedback,
   pending = false,
+  assessments,
 }: {
+  assessments?: import('@interviewlab/core').FeedbackAssessment[];
   feedback: InterviewReport['summary'];
   pending?: boolean;
 }) {
-  if (pending && !feedback?.feedback_template)
+  if (pending && !feedback?.feedback_template && !assessments?.length)
     return (
       <div className="radar-pending" role="status">
         <strong>能力画像正在整理</strong>
@@ -76,7 +78,9 @@ export function AbilityRadar({
     );
   const dimensions = Object.fromEntries(
     FEEDBACK_DIMENSIONS.map((d) => {
-      const a = feedback?.feedback_template?.assessments.find((a) => a.dimension === d.key);
+      const a = (assessments ?? feedback?.feedback_template?.assessments)?.find(
+        (a) => a.dimension === d.key,
+      );
       return [d.key, { score: a?.score ?? null }];
     }),
   );
@@ -153,7 +157,9 @@ export function AbilityRadar({
           );
         })}
       </svg>
-      <p className="radar-caption">六维均参与评分；证据不足的维度按20分计入，表示本场展示不足。</p>
+      <p className="radar-caption">
+        六维全部计分；展示不足给低分，完全未体现可为0分。评分反映本场回答表现。
+      </p>
       <div className="ability-chips">
         {entries.map(([key, d]) => (
           <div key={key}>
@@ -172,6 +178,7 @@ export function QuestionCoverage({
   onSelect,
   pending = false,
   failedIds = [],
+  scores = [],
 }: {
   turns: {
     id: string;
@@ -181,30 +188,44 @@ export function QuestionCoverage({
     answer_status: string;
   }[];
   evaluations: InterviewEvaluation[];
+  scores?: QuestionScore[];
   pending?: boolean;
   failedIds?: string[];
   onSelect: (id: string) => void;
 }) {
   if (!turns.length) return null;
+  const groups = [
+    ...new Map(
+      turns.map((t) => [
+        t.main_question_index,
+        turns.find((v) => v.main_question_index === t.main_question_index)!,
+      ]),
+    ).values(),
+  ];
   return (
     <section className="panel question-coverage">
-      <h2>逐题分析覆盖</h2>
-      <p>柱形高度表示已观察的能力维度数量，不代表单题得分。点击查看详情。</p>
+      <h2>逐题得分</h2>
+      <p>0–100分；每题合并主问题与追问评价，点击查看得分依据。</p>
       <div className="question-chart" role="group" aria-label="按题目查看分析详情">
-        {turns.map((turn) => {
+        {groups.map((turn) => {
           const evaluation = evaluations.find(
             (e) => e.turn_id === turn.id && e.revision === turn.revision,
           );
-          const count = new Set(evaluation?.dimensions ?? []).size;
-          const state = evaluation
-            ? `${count} 个维度`
-            : turn.answer_status === 'answered'
-              ? failedIds.includes(turn.id)
-                ? '分析失败'
-                : pending
-                  ? '分析中'
-                  : '尚未分析'
-              : '未作答';
+          const score = scores.find(
+            (s) => s.main_question_index === turn.main_question_index,
+          )?.score;
+          const state =
+            score !== undefined
+              ? `${Math.round(score)} 分`
+              : evaluation
+                ? '历史报告无单题分'
+                : turn.answer_status === 'answered'
+                  ? failedIds.includes(turn.id)
+                    ? '分析失败'
+                    : pending
+                      ? '分析中'
+                      : '尚未分析'
+                  : '未作答';
           return (
             <button
               key={turn.id}
@@ -213,8 +234,8 @@ export function QuestionCoverage({
             >
               <span className="question-chart-track">
                 <span
-                  className={`question-chart-bar ${evaluation ? '' : 'unscored'}`}
-                  style={{ height: `${(count / Object.keys(DIMENSION_LABELS).length) * 100}%` }}
+                  className={`question-chart-bar ${score !== undefined ? '' : 'unscored'}`}
+                  style={{ height: `${score ?? 0}%` }}
                 />
                 <strong>{state}</strong>
               </span>
@@ -231,8 +252,8 @@ export function QuestionCoverage({
 }
 
 export function FeedbackScoreTable({ report }: { report: InterviewReport }) {
-  const feedback = report.summary?.feedback_template;
-  const total = feedbackScore(feedback);
+  const feedback = reportFeedback(report);
+  const total = { score: report.overall_score, coverage: 100 };
   return (
     <section className="template-score-summary">
       <h3>五、评分汇总</h3>
@@ -283,7 +304,7 @@ export function FeedbackScoreTable({ report }: { report: InterviewReport }) {
           : `综合参考分 ${total.score} / 100${total.coverage < 100 ? `（按已评价权重 ${total.coverage}/100 归一化）` : ''}`}
       </p>
       <p className="radar-caption">
-        维度分按百分制绘图，按 25 / 25 / 25 / 15 / 5 / 5 加权。证据不足按20分计入。AI
+        维度分按百分制绘图，按 25 / 25 / 25 / 15 / 5 / 5 加权。每维均给分，完全未体现可为0分。AI
         参考评分不代表招聘结论。
       </p>
     </section>

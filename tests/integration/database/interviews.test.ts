@@ -104,7 +104,7 @@ function fakeAgent(): InterviewAgent {
           version: FEEDBACK_TEMPLATE_VERSION,
           assessments: FEEDBACK_DIMENSIONS.map((d) => ({
             dimension: d.key,
-            score: 20,
+            score: 0,
             text: '证据不足',
             evidence_refs: [],
           })),
@@ -180,7 +180,12 @@ async function drain() {
 }
 async function started(configInput = configuration): Promise<Interview> {
   let v = await runtime.interviews.create(identity, configInput, randomUUID());
-  v = await runtime.interviews.prepare(identity, v.id, { version: v.version, mode: 'fallback' }, randomUUID());
+  v = await runtime.interviews.prepare(
+    identity,
+    v.id,
+    { version: v.version, mode: 'fallback' },
+    randomUUID(),
+  );
   const s = await runtime.interviews.start(identity, v.id, { version: v.version }, randomUUID());
   await drain();
   return runtime.interviews.read(identity, s.id);
@@ -204,9 +209,14 @@ test('real routes run the text interview, report, fixed-question retry and evide
     assert.equal(created.statusCode, 201);
     let draft: Interview = created.json();
     assert.equal(draft.started_at, null);
-    const prepared = await app.inject({ method:'POST',url:`/api/v1/interviews/${draft.id}/prepare`,headers:{...headers,'idempotency-key':randomUUID()},payload:{version:draft.version,mode:'fallback'} });
-    assert.equal(prepared.statusCode,200);
-    draft=prepared.json();
+    const prepared = await app.inject({
+      method: 'POST',
+      url: `/api/v1/interviews/${draft.id}/prepare`,
+      headers: { ...headers, 'idempotency-key': randomUUID() },
+      payload: { version: draft.version, mode: 'fallback' },
+    });
+    assert.equal(prepared.statusCode, 200);
+    draft = prepared.json();
     const beginning = await app.inject({
       method: 'POST',
       url: `/api/v1/interviews/${draft.id}/start`,
@@ -255,7 +265,7 @@ test('real routes run the text interview, report, fixed-question retry and evide
     assert.equal(v.status, 'completed');
     const report = await runtime.reports.get(identity, v.id);
     assert.equal(report.status, 'ready');
-    assert.equal(report.overall_score, 20);
+    assert.equal(report.overall_score, 0);
     assert.equal(report.dimensions.coding_ability.status, 'not_observed');
     assert.equal(report.evaluations.length, 3);
     const retry = await runtime.interviews.createRetry(
@@ -270,7 +280,8 @@ test('real routes run the text interview, report, fixed-question retry and evide
       { version: retry.version },
       randomUUID(),
     );
-    assert.equal(retryStarted.turns[0].text, first.text);
+    assert.ok(retryStarted.turns[0].text.startsWith(first.text));
+    assert.ok(retryStarted.turns[0].text.includes('请结合原题追问完善回答'));
     retryStarted = await runtime.interviews.answer(
       identity,
       retry.id,
@@ -726,7 +737,12 @@ test('history pagination stays isolated and malformed typed cursors return input
 });
 test('durable outbox survives worker restart and advertises registered business handlers', async () => {
   let v = await runtime.interviews.create(identity, configuration, randomUUID());
-  v = await runtime.interviews.prepare(identity, v.id, { version: v.version, mode: 'fallback' }, randomUUID());
+  v = await runtime.interviews.prepare(
+    identity,
+    v.id,
+    { version: v.version, mode: 'fallback' },
+    randomUUID(),
+  );
   v = await runtime.interviews.start(identity, v.id, { version: v.version }, randomUUID());
   v = await runtime.interviews.answer(
     identity,
@@ -998,7 +1014,7 @@ test('ready reports already contain six numeric scores and do not run legacy sum
   );
   await drain();
   const before = await runtime.reports.get(identity, v.id);
-  assert.equal(before.overall_score, 20);
+  assert.equal(before.overall_score, 0);
   assert.equal(before.summary?.feedback_template.version, FEEDBACK_TEMPLATE_VERSION);
   assert.equal(before.summary?.feedback_template.assessments.length, 6);
   const reused = await runtime.reports.request(
@@ -1127,7 +1143,8 @@ test('setup persists text, voice and independent video interview selection', asy
       assert.equal(created.statusCode, 201);
       let value = created.json<Interview>();
       const prepared = await app.inject({
-        method: 'POST', url: `/api/v1/interviews/${value.id}/prepare`,
+        method: 'POST',
+        url: `/api/v1/interviews/${value.id}/prepare`,
         headers: { origin: config.PUBLIC_ORIGIN, 'idempotency-key': randomUUID() },
         payload: { version: value.version, mode: 'fallback' },
       });
@@ -1148,104 +1165,6 @@ test('setup persists text, voice and independent video interview selection', asy
   } finally {
     await app.close();
   }
-});
-
-test('explicit BARS upgrade replaces only derived evaluations, preserves answers, isolates ownership and publishes new indicator scores', async () => {
-  const { FRONTEND_RUBRIC_VERSION, applicableReportIndicators } = await import(
-    '@interviewlab/core'
-  );
-  let v = await started();
-  v = await runtime.interviews.finish(
-    identity,
-    v.id,
-    {
-      version: v.version,
-      reason: 'user_finished',
-      final_answer: {
-        turn_id: v.turns[0].id,
-        text: '我学习软件工程，希望通过网页交互帮助使用者。我在课程项目中练习界面实现。',
-      },
-    },
-    randomUUID(),
-  );
-  await drain();
-  const before = await runtime.reports.get(identity, v.id);
-  assert.equal(before.evaluations[0].scoring_rubric_version, undefined);
-  const saved = structuredClone((await runtime.interviews.read(identity, v.id)).turns);
-  const evaluate = agent.evaluate;
-  agent.evaluate = async (turn, snapshot, signal, repair, context) => {
-    assert.equal(context?.scoring_rubric_version, FRONTEND_RUBRIC_VERSION);
-    const base = await evaluate(turn, snapshot, signal, repair, context);
-    return {
-      ...base,
-      scoring_rubric_version: FRONTEND_RUBRIC_VERSION,
-      indicator_assessments: applicableReportIndicators(turn, snapshot).map((i) => ({
-        indicator_id: i.id,
-        status: 'scored' as const,
-        level: 3,
-        text: '受控档位，不代表真实模型校准。',
-        evidence_refs: [evidence(turn)],
-      })),
-    };
-  };
-  await assert.rejects(
-    runtime.reports.request(
-      { owner_id: 'another-student', roles: [] },
-      v.id,
-      { version: before.version, scope: 'rubric' },
-      randomUUID(),
-    ),
-    (e: unknown) => e instanceof ServiceError && e.statusCode === 404,
-  );
-  const pending = await runtime.reports.request(
-    identity,
-    v.id,
-    { version: before.version, scope: 'rubric' },
-    randomUUID(),
-  );
-  assert.equal(pending.version, before.version + 1);
-  assert.equal(pending.evaluations.length, 0);
-  assert.equal(pending.overall_score, null);
-  await drain();
-  const ready = await runtime.reports.get(identity, v.id);
-  assert.equal(ready.overall_score, 20);
-  assert.equal(ready.analysis_metadata?.scoring_rubric_version, FRONTEND_RUBRIC_VERSION);
-  assert.equal(ready.evaluations[0].indicator_assessments?.length, 2);
-  assert.deepEqual((await runtime.interviews.read(identity, v.id)).turns, saved);
-  assert.equal(
-    (
-      await database.pool.query('SELECT result FROM interview_reports WHERE interview_id=$1', [
-        v.id,
-      ])
-    ).rows[0].result.overall_score,
-    20,
-  );
-});
-
-test('BARS upgrade rejects other career stages instead of applying an internship rubric', async () => {
-  let v = await started({ ...configuration, career_stage: 'campus' });
-  v = await runtime.interviews.finish(
-    identity,
-    v.id,
-    {
-      version: v.version,
-      reason: 'user_finished',
-      final_answer: { turn_id: v.turns[0].id, text: '我负责课程项目界面。' },
-    },
-    randomUUID(),
-  );
-  await drain();
-  const before = await runtime.reports.get(identity, v.id);
-  await assert.rejects(
-    runtime.reports.request(
-      identity,
-      v.id,
-      { version: before.version, scope: 'rubric' },
-      randomUUID(),
-    ),
-    (e: unknown) => e instanceof ServiceError && e.statusCode === 400,
-  );
-  assert.equal((await runtime.reports.get(identity, v.id)).version, before.version);
 });
 
 test('answers are analyzed before finish and finalization reuses them without another model call', async () => {
@@ -1441,7 +1360,7 @@ test('report reset migration deletes reports, evaluation tasks and request keys 
   );
 });
 
-test('latest-answer report uses a completed retry while retaining originals and allows another retry', async () => {
+test('practice preserves the original report and repeated requests cannot replace its answers', async () => {
   let v = await started();
   const originalTurn = v.turns[0];
   v = await runtime.interviews.finish(
@@ -1480,20 +1399,23 @@ test('latest-answer report uses a completed retry while retaining originals and 
     randomUUID(),
   );
   await drain();
-  assert.equal((await runtime.reports.get(identity, v.id)).needs_refresh, true);
+  assert.equal((await runtime.reports.get(identity, v.id)).needs_refresh, false);
   const queued = await runtime.reports.request(
     identity,
     v.id,
-    { version: before.version, scope: 'latest' },
+    { version: before.version },
     randomUUID(),
   );
-  assert.equal(queued.version, before.version + 1);
+  assert.equal(queued.version, before.version);
   await drain();
   const updated = await runtime.reports.get(identity, v.id);
   assert.equal(updated.needs_refresh, false);
   assert.equal(updated.status, 'ready');
-  assert.equal(updated.answer_sources?.[0].retry_interview_id, retry.id);
-  assert.equal(updated.evaluations[0].turn_id, retry.turns[0].id);
+  assert.equal(updated.answer_sources?.length, 0);
+  assert.equal(updated.practice_history?.at(-1)?.interview_id, retry.id);
+  assert.equal((await runtime.reports.get(identity, retry.id)).summary_status, 'not_applicable');
+  assert.equal(updated.evaluations[0].turn_id, originalTurn.id);
+  assert.equal(updated.overall_score, before.overall_score);
   assert.equal(
     (await runtime.interviews.read(identity, v.id)).turns[0].answer_text,
     '首次回答：我负责接口。',
@@ -1501,17 +1423,123 @@ test('latest-answer report uses a completed retry while retaining originals and 
   const again = await runtime.interviews.createRetry(
     identity,
     v.id,
-    { turn_id: retry.turns[0].id, revision: retry.turns[0].revision, goal: '继续完善' },
+    { turn_id: originalTurn.id, revision: 1, goal: '继续完善' },
     randomUUID(),
   );
   assert.equal(again.parent_turn_id, originalTurn.id);
   const noChange = await runtime.reports.request(
     identity,
     v.id,
-    { version: updated.version, scope: 'latest' },
+    { version: updated.version },
     randomUUID(),
   );
   assert.equal(noChange.version, updated.version);
   await runtime.interviews.delete(identity, retry.id, { version: retry.version }, randomUUID());
-  assert.equal((await runtime.reports.get(identity, v.id)).needs_refresh, true);
+  assert.equal((await runtime.reports.get(identity, v.id)).needs_refresh, false);
+});
+
+test('six-dimensional scores survive advice failure and practice never queues a whole report summary', async () => {
+  const { QUESTION_SCORING_VERSION } = await import('@interviewlab/core');
+  const evaluate = agent.evaluate;
+  const summarize = agent.summarize;
+  let score = 70,
+    summaryCalls = 0,
+    adviceFails = true;
+  agent.evaluate = async (...args) => {
+    const base = await evaluate(...args);
+    return {
+      ...base,
+      question_scoring_version: QUESTION_SCORING_VERSION,
+      feedback_assessments: FEEDBACK_DIMENSIONS.map((d) => ({
+        dimension: d.key,
+        score,
+        text: '受控回答评分',
+        evidence_refs: [evidence(args[0])],
+      })),
+    };
+  };
+  agent.summarize = async (...args) => {
+    summaryCalls++;
+    const value = await summarize(...args);
+    return {
+      ...value,
+      feedback_template: {
+        ...value.feedback_template,
+        assessments: args[0][0].feedback_assessments!,
+      },
+    };
+  };
+  agent.suggest = async () => {
+    if (adviceFails) throw new ServiceError('provider_error', 502, '受控建议失败', true);
+    return { next_steps: ['补充边界测试并记录失败率'] };
+  };
+  let v = await started();
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: v.turns[0].id, text: '我负责接口并测试了边界条件。' },
+    },
+    randomUUID(),
+  );
+  await drain();
+  const before = await runtime.reports.get(identity, v.id);
+  assert.equal(before.overall_score, 70);
+  assert.equal(before.advice_status, 'failed');
+  assert.equal(before.summary_status, 'ready');
+  assert.equal(summaryCalls, 1);
+  adviceFails = false;
+  score = 90;
+  let retry = await runtime.interviews.createRetry(
+    identity,
+    v.id,
+    { turn_id: v.turns[0].id, revision: 1, goal: '补充验证结果' },
+    randomUUID(),
+  );
+  retry = await runtime.interviews.start(
+    identity,
+    retry.id,
+    { version: retry.version },
+    randomUUID(),
+  );
+  retry = await runtime.interviews.finish(
+    identity,
+    retry.id,
+    {
+      version: retry.version,
+      reason: 'user_finished',
+      final_answer: {
+        turn_id: retry.turns[0].id,
+        text: '我增加并发和边界测试，并记录失败率和响应时间。',
+      },
+    },
+    randomUUID(),
+  );
+  await drain();
+  const practiced = await runtime.reports.get(identity, retry.id);
+  assert.equal(practiced.overall_score, 90);
+  assert.equal(practiced.summary_status, 'not_applicable');
+  assert.equal(practiced.summary, null);
+  assert.equal(practiced.advice_status, 'ready');
+  assert.deepEqual(practiced.next_steps, ['补充边界测试并记录失败率']);
+  assert.equal(summaryCalls, 1);
+  const after = await runtime.reports.get(identity, v.id);
+  assert.equal(after.version, before.version);
+  assert.equal(after.overall_score, before.overall_score);
+  assert.deepEqual(after.evaluations, before.evaluations);
+  assert.deepEqual(after.summary, before.summary);
+  assert.deepEqual(
+    after.practice_history?.map((e) => e.score),
+    [70, 90],
+  );
+  await assert.rejects(
+    runtime.reports.get({ owner_id: 'another-student', roles: [] }, retry.id),
+    (e: unknown) => e instanceof ServiceError && e.statusCode === 404,
+  );
+  await runtime.interviews.delete(identity, retry.id, { version: retry.version }, randomUUID());
+  const deleted = await runtime.reports.get(identity, v.id);
+  assert.equal(deleted.practice_history?.length, 1);
+  assert.equal(deleted.overall_score, 70);
 });

@@ -1,3 +1,4 @@
+import { evaluationWire } from '../support/report-wire';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
@@ -6,7 +7,7 @@ const lowScoreTemplate = (): import('@interviewlab/core').FeedbackTemplate => ({
   version: FEEDBACK_TEMPLATE_VERSION,
   assessments: FEEDBACK_DIMENSIONS.map((d) => ({
     dimension: d.key,
-    score: 20,
+    score: 0,
     text: '证据不足',
     evidence_refs: [],
   })),
@@ -280,7 +281,10 @@ test('summary uses the shared model adapter with checked evaluations and records
       },
     },
   );
-  assert.equal((logs[0] as { prompt_version: string }).prompt_version, 'text-review-v9');
+  assert.equal(
+    (logs.find((e) => 'invocation_id' in e) as unknown as { prompt_version: string }).prompt_version,
+    'text-review-v11',
+  );
 });
 
 test('six-dimensional total takes precedence over auxiliary per-turn scores', () => {
@@ -298,7 +302,7 @@ test('six-dimensional total takes precedence over auxiliary per-turn scores', ()
   );
   assert.equal(report.dimensions.project_communication.score, 75);
   assert.equal(report.dimensions.logical_expression.score, 50);
-  assert.equal(report.overall_score, 20);
+  assert.equal(report.overall_score, 0);
   assert.equal(report.scoring_status, 'experimental');
   assert.equal(report.dimensions.technical_knowledge.score, null);
   assert.equal(report.dimensions.coding_ability.score, null);
@@ -353,17 +357,25 @@ test('report analysis sends frozen professional reference to the model', async (
   let received: unknown;
   const analysis = createReportAnalysis(async (_kind, schema, input) => {
     received = input;
-    return schema.parse({
-      ...evaluation,
-      strengths: evaluation.strengths.map((f) => ({
-        ...f,
-        evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q0' })),
-      })),
-      gaps: evaluation.gaps.map((f) => ({
-        ...f,
-        evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q1' })),
-      })),
-    });
+    return schema.parse(
+      evaluationWire({
+        ...evaluation,
+        six_scores: Object.fromEntries(
+          FEEDBACK_DIMENSIONS.map((d) => [
+            d.key,
+            { score: 0, text: '本次未体现', evidence_ids: [] },
+          ]),
+        ),
+        strengths: evaluation.strengths.map((f) => ({
+          ...f,
+          evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q0' })),
+        })),
+        gaps: evaluation.gaps.map((f) => ({
+          ...f,
+          evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q1' })),
+        })),
+      }),
+    );
   });
   await analysis.evaluate(turn, { ...snapshot, knowledge }, new AbortController().signal, false);
   const input = received as {
@@ -423,22 +435,32 @@ test('evaluation quotes must be exact source spans, including punctuation and re
       }).success,
       false,
     );
-    return schema.parse({
-      ...evaluation,
-      strengths: evaluation.strengths.map((f) => ({
-        ...f,
-        evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q0' })),
-      })),
-      gaps: evaluation.gaps.map((f) => ({
-        ...f,
-        evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q1' })),
-      })),
-    });
+    return schema.parse(
+      evaluationWire({
+        ...evaluation,
+        six_scores: Object.fromEntries(
+          FEEDBACK_DIMENSIONS.map((d) => [
+            d.key,
+            { score: 0, text: '本次未体现', evidence_ids: [] },
+          ]),
+        ),
+        strengths: evaluation.strengths.map((f) => ({
+          ...f,
+          evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q0' })),
+        })),
+        gaps: evaluation.gaps.map((f) => ({
+          ...f,
+          evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q1' })),
+        })),
+      }),
+    );
   });
-  assert.deepEqual(
-    await analysis.evaluate(turn, snapshot, new AbortController().signal, false),
-    evaluation,
-  );
+  const result = await analysis.evaluate(turn, snapshot, new AbortController().signal, false);
+  assert.equal(result.feedback_assessments?.length, 6);
+  const { feedback_assessments: _scores, question_scoring_version: _version, ...legacy } = result;
+  assert.deepEqual(legacy.strengths, evaluation.strengths);
+  assert.deepEqual(legacy.gaps, evaluation.gaps);
+  assert.equal(legacy.retry_goal, evaluation.retry_goal);
 });
 
 test('PDF print snapshot includes partial state, scores, full answers and safely escapes user/model markup', async () => {
@@ -458,7 +480,7 @@ test('PDF print snapshot includes partial state, scores, full answers and safely
   state.view.turns[0].answer_text = '<img src=x onerror=alert(2)> & 回答';
   report.is_partial = true;
   const html = reportExportHtml(state.view, report);
-  assert.ok(html.includes('综合分：20/100'));
+  assert.ok(html.includes('综合分：0/100'));
   assert.ok(!html.includes('历史评分'));
   assert.ok(html.includes('证据不足'));
   assert.ok(html.includes('部分复盘'));
@@ -469,7 +491,7 @@ test('PDF print snapshot includes partial state, scores, full answers and safely
   assert.ok(!html.includes('<img'));
 });
 
-test('six-dimension scores include insufficient evidence at 20 with the full scoring sheet weights', async () => {
+test('six-dimension scores include insufficient evidence at zero with the full scoring sheet weights', async () => {
   const { FEEDBACK_DIMENSIONS, FEEDBACK_TEMPLATE_VERSION, feedbackScore } = await import(
     '@interviewlab/core'
   );
@@ -492,10 +514,10 @@ test('six-dimension scores include insufficient evidence at 20 with the full sco
   assert.deepEqual(feedbackScore(template), { coverage: 100, score: 79 });
   template.assessments[0] = {
     ...template.assessments[0],
-    score: 20,
+    score: 0,
     evidence_refs: [],
   };
-  assert.deepEqual(feedbackScore(template), { coverage: 100, score: 64 });
+  assert.deepEqual(feedbackScore(template), { coverage: 100, score: 59 });
   summary.feedback_template = template;
   assert.doesNotThrow(() => assertSummary(summary, [evaluation]));
   assert.ok(
@@ -539,7 +561,7 @@ test('template model scores resolve checked quote IDs and preserve actionable ac
         version: FEEDBACK_TEMPLATE_VERSION,
         assessments: FEEDBACK_DIMENSIONS.map((d) => ({
           dimension: d.key,
-          score: d.key === 'project_reflection' ? 70 : 20,
+          score: d.key === 'project_reflection' ? 70 : 0,
           text: d.key === 'project_reflection' ? '职责清楚，缺验证' : '未问到此维度',
           evidence_ids: d.key === 'project_reflection' ? ['e0-s0-0'] : [],
         })),
@@ -575,7 +597,7 @@ test('template model scores resolve checked quote IDs and preserve actionable ac
     { ...emptyReport(state, randomUUID()), summary, summary_status: 'ready' },
     [task],
   );
-  assert.equal(report.overall_score, 33);
+  assert.equal(report.overall_score, 18);
   assert.ok(reportSchema.safeParse(report).success);
   const { reportExportHtml } = await import(
     '../../code/frontend/features/live-interview/report-export'
@@ -668,7 +690,7 @@ test('one original answer supports multiple feedback dimensions even outside old
 test('six-dimensional ratings reject null, unsupported scores and invented evidence', () => {
   const { summary, evaluation } = fixture();
   assert.doesNotThrow(() => assertSummary(summary, [evaluation]));
-  for (const score of [null, 0, 40, 100]) {
+  for (const score of [null, -1, 40, 100]) {
     const invalid = structuredClone(summary);
     (invalid.feedback_template.assessments[0] as { score: unknown }).score = score;
     assert.throws(() => assertSummary(invalid, [evaluation]));
@@ -684,15 +706,23 @@ test('an empty model retry goal is filled locally without another model request'
   let calls = 0;
   const analysis = createReportAnalysis(async (_kind, schema) => {
     calls++;
-    return schema.parse({
-      ...evaluation,
-      retry_goal: '',
-      strengths: evaluation.strengths.map((f) => ({
-        ...f,
-        evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q0' })),
-      })),
-      gaps: [],
-    });
+    return schema.parse(
+      evaluationWire({
+        ...evaluation,
+        six_scores: Object.fromEntries(
+          FEEDBACK_DIMENSIONS.map((d) => [
+            d.key,
+            { score: 0, text: '本次未体现', evidence_ids: [] },
+          ]),
+        ),
+        retry_goal: '',
+        strengths: evaluation.strengths.map((f) => ({
+          ...f,
+          evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q0' })),
+        })),
+        gaps: [],
+      }),
+    );
   });
   const value = await analysis.evaluate(turn, snapshot, new AbortController().signal, false);
   assert.equal(calls, 1);

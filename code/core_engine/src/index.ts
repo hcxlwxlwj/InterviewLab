@@ -15,3 +15,5 @@ export * from './feedback-template';
 export * from './personal';
 export * from './resume-template';
 export * from './agent-workflow';
+
+export * from './question-scoring';

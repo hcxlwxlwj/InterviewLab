@@ -56,7 +56,10 @@ export function interviewInputDigest(state: InterviewState) {
   return inputDigest({
     configuration: state.view.configuration,
     snapshot: state.snapshot,
-    ...((state.snapshot?.prompt_version === INTERVIEW_V3 || state.snapshot?.runtime_version === 'graph-v1') ? { memory: state.memory ?? null } : {}),
+    ...(state.snapshot?.prompt_version === INTERVIEW_V3 ||
+    state.snapshot?.runtime_version === 'graph-v1'
+      ? { memory: state.memory ?? null }
+      : {}),
     plan: state.view.plan,
     turns: state.view.turns.map((t) => ({
       id: t.id,
@@ -123,8 +126,15 @@ export function createInterviewsService(
   agent: InterviewAgent,
   reports: InterviewReportHooks,
   realtimeKnowledge?: InterviewKnowledgeRuntime,
-  readMaterial?: (owner:string,id:string,version:number)=>Promise<import('@interviewlab/core').PersonalMaterial>,
-  workflow?: {initialize:InterviewPreparationService['initialize'];request:InterviewPreparationService['request']},
+  readMaterial?: (
+    owner: string,
+    id: string,
+    version: number,
+  ) => Promise<import('@interviewlab/core').PersonalMaterial>,
+  workflow?: {
+    initialize: InterviewPreparationService['initialize'];
+    request: InterviewPreparationService['request'];
+  },
 ) {
   const streams = createGenerationStreams(database);
   async function seal(tx: Transaction, state: InterviewState, reason: string) {
@@ -231,7 +241,10 @@ export function createInterviewsService(
       await seal(tx, state, state.retryQuestion ? 'single_retry_complete' : 'target_reached');
     else {
       const notice =
-        (state.snapshot?.prompt_version === INTERVIEW_V3 || state.snapshot?.runtime_version === 'graph-v1') ? participationPolicy(state.view) : null;
+        state.snapshot?.prompt_version === INTERVIEW_V3 ||
+        state.snapshot?.runtime_version === 'graph-v1'
+          ? participationPolicy(state.view)
+          : null;
       if (notice?.level === 'ended') {
         await seal(tx, state, `participation:${notice.reason}`);
       } else if (notice) {
@@ -266,12 +279,13 @@ export function createInterviewsService(
       { owner_id: identity.owner_id, operation: 'interviews.create', key, input: config },
       async (tx) => {
         const state = newInterviewState(identity.owner_id, config);
-        if(workflow)state.view.preparation={status:'pending',task_id:null,error_code:null};
+        if (workflow)
+          state.view.preparation = { status: 'pending', task_id: null, error_code: null };
         await saveInterview(tx.client, state);
         return { id: state.view.id };
       },
     );
-    return workflow ? workflow.initialize(identity,ref.id) : read(identity, ref.id);
+    return workflow ? workflow.initialize(identity, ref.id) : read(identity, ref.id);
   }
   async function start(
     identity: RequestIdentity,
@@ -280,24 +294,45 @@ export function createInterviewsService(
     key: string,
   ) {
     const before = await loadInterview(database.pool, identity.owner_id, id);
-    if(before.view.preparation && !['ready','fallback'].includes(before.view.preparation.status))throw invalid('面试仍在准备，请等待或选择简化流程');
+    if (before.view.preparation && !['ready', 'fallback'].includes(before.view.preparation.status))
+      throw invalid('面试仍在准备，请等待或选择简化流程');
     // Knowledge I/O must never hold the business transaction open.
     const frozen = before.snapshot ?? {
-      personal_material: before.view.configuration.resume_ref && readMaterial ? await readMaterial(identity.owner_id,before.view.configuration.resume_ref.id,before.view.configuration.resume_ref.version) : undefined,
+      personal_material:
+        before.view.configuration.resume_ref && readMaterial
+          ? await readMaterial(
+              identity.owner_id,
+              before.view.configuration.resume_ref.id,
+              before.view.configuration.resume_ref.version,
+            )
+          : undefined,
       job_title: getJob(before.view.configuration.job)?.title ?? before.view.configuration.job,
       knowledge: await knowledge.read(before.view.configuration),
       prompt_version: INTERVIEW_PROMPT_VERSION,
       rubric_version: INTERVIEW_RUBRIC_VERSION,
       model: agent.model,
     };
-    if (frozen.knowledge.agent_release && !frozen.runtime_version) frozen.prompt_version = INTERVIEW_V3;
+    if (frozen.knowledge.agent_release && !frozen.runtime_version)
+      frozen.prompt_version = INTERVIEW_V3;
     return mutate(identity, id, 'start', key, body, async (_tx, state) => {
       if (state.view.status !== 'ready') throw invalid();
-      if(state.view.preparation && !['ready','fallback'].includes(state.view.preparation.status))throw invalid('面试准备尚未完成');
-      if(frozen.runtime_version==='graph-v1' && frozen.personal_material && !(await _tx.client.query('SELECT id FROM resume_materials WHERE id=$1 AND owner_id=$2 AND NOT deleted FOR SHARE',[frozen.personal_material.id,identity.owner_id])).rowCount)throw new ServiceError('not_found',404,'简历已不可用');
+      if (state.view.preparation && !['ready', 'fallback'].includes(state.view.preparation.status))
+        throw invalid('面试准备尚未完成');
+      if (
+        frozen.runtime_version === 'graph-v1' &&
+        frozen.personal_material &&
+        !(
+          await _tx.client.query(
+            'SELECT id FROM resume_materials WHERE id=$1 AND owner_id=$2 AND NOT deleted FOR SHARE',
+            [frozen.personal_material.id, identity.owner_id],
+          )
+        ).rowCount
+      )
+        throw new ServiceError('not_found', 404, '简历已不可用');
       if (!agent.available) throw new ServiceError('capability_unavailable', 501, '模型尚未配置');
       state.snapshot = frozen;
-      if (frozen.prompt_version === INTERVIEW_V3 || frozen.runtime_version === 'graph-v1') state.memory = initialMemory();
+      if (frozen.prompt_version === INTERVIEW_V3 || frozen.runtime_version === 'graph-v1')
+        state.memory = initialMemory();
       state.view.job_title = frozen.job_title;
       state.view.started_at = new Date().toISOString();
       state.view.target_at = new Date(
@@ -313,7 +348,11 @@ export function createInterviewsService(
         // The opening is protocol, not a pre-generated question sequence. Subsequent
         // questions are generated only after the candidate has actually answered.
         state.view.generation_id = randomUUID();
-        state.view.plan = frozen.preparation_plan?.goals.map(g=>g.focus) ?? ['了解候选人', '根据当场陈述展开交流', '结合岗位交流与收尾'];
+        state.view.plan = frozen.preparation_plan?.goals.map((g) => g.focus) ?? [
+          '了解候选人',
+          '根据当场陈述展开交流',
+          '结合岗位交流与收尾',
+        ];
         addQuestion(state, interviewOpening(frozen.job_title), false);
       }
     });
@@ -323,29 +362,6 @@ export function createInterviewsService(
     const state = await loadInterview(db, identity.owner_id, id);
     state.answerSources = [];
     if (!ended(state)) return state;
-    for (const { id: retryId } of await completedRetryIds(db, identity.owner_id, id)) {
-      const retry = await loadInterview(db, identity.owner_id, retryId);
-      const original = state.view.turns.find(
-        (t) => t.id === retry.view.parent_turn_id && t.revision === retry.view.parent_revision,
-      );
-      if (!original || state.answerSources.some((s) => s.original_turn_id === original.id))
-        continue;
-      const answer = retry.view.turns.find((t) => t.answer_status === 'answered');
-      if (!answer || answer.text !== original.text) continue;
-      const turn = {
-        ...answer,
-        main_question_index: original.main_question_index,
-        follow_up_index: original.follow_up_index,
-      };
-      state.answerSources.push({
-        original_turn_id: original.id,
-        retry_interview_id: retryId,
-        turn,
-      });
-    }
-    state.view.turns = state.view.turns.map(
-      (t) => state.answerSources!.find((s) => s.original_turn_id === t.id)?.turn ?? t,
-    );
     return state;
   }
   async function readFinalized(identity: RequestIdentity, id: string) {
@@ -371,8 +387,11 @@ export function createInterviewsService(
       return { result_ref: null };
     const retrievalStarted = performance.now();
     const retrieval =
-      (state.snapshot.prompt_version === INTERVIEW_V3 || state.snapshot.runtime_version === 'graph-v1') && realtimeKnowledge
-        ? !knowledgeReady(experiencePolicy(state.view)) && !state.snapshot.resume_analysis?.facts.length
+      (state.snapshot.prompt_version === INTERVIEW_V3 ||
+        state.snapshot.runtime_version === 'graph-v1') &&
+      realtimeKnowledge
+        ? !knowledgeReady(experiencePolicy(state.view)) &&
+          !state.snapshot.resume_analysis?.facts.length
           ? {
               release: state.snapshot.knowledge.content_version,
               chunks: [],
@@ -405,17 +424,18 @@ export function createInterviewsService(
     if (input.kind === 'plan')
       throw new ServiceError('unsupported_input', 409, '旧版出题任务已停用，请新建面试');
     const next = await agent.advance(
-          state.view,
-          state.snapshot,
-          input.kind === 'clarify',
-          signal,
-          task.attempts > 1,
-          context,
-        );
+      state.view,
+      state.snapshot,
+      input.kind === 'clarify',
+      signal,
+      task.attempts > 1,
+      context,
+    );
     if (next?.question) assertQuestion(next.question, state.snapshot, state.view.turns);
     if (
       next?.action === 'finish' &&
-      ([INTERVIEW_PROMPT_VERSION, INTERVIEW_V3].includes(state.snapshot.prompt_version) || state.snapshot.runtime_version === 'graph-v1') &&
+      ([INTERVIEW_PROMPT_VERSION, INTERVIEW_V3].includes(state.snapshot.prompt_version) ||
+        state.snapshot.runtime_version === 'graph-v1') &&
       !canSuggestInterviewFinish(state.view)
     )
       throw new ServiceError('invalid_model_output', 502, '交流尚未展开，不能提前结束');
@@ -491,12 +511,24 @@ export function createInterviewsService(
     read,
     create,
     start,
-    prepare: (identity:RequestIdentity,id:string,body:{version:number;mode:'personalized'|'fallback'},key:string) => {
-      if(!workflow)throw new ServiceError('capability_unavailable',501,'准备能力未接入');
-      return workflow.request(identity,id,body,key);
+    prepare: (
+      identity: RequestIdentity,
+      id: string,
+      body: { version: number; mode: 'personalized' | 'fallback' },
+      key: string,
+    ) => {
+      if (!workflow) throw new ServiceError('capability_unavailable', 501, '准备能力未接入');
+      return workflow.request(identity, id, body, key);
     },
     readFinalized,
     readReportState,
+    async readPracticeHistory(identity: RequestIdentity, id: string) {
+      await readFinalized(identity, id);
+      const states: InterviewState[] = [];
+      for (const retry of await completedRetryIds(database.pool, identity.owner_id, id))
+        states.push(await loadInterview(database.pool, identity.owner_id, retry.id));
+      return states.reverse();
+    },
     readAnalysisState: readReportState,
     lock: (tx: Transaction, identity: RequestIdentity, id: string) =>
       loadInterview(tx.client, identity.owner_id, id, true),
@@ -558,9 +590,10 @@ export function createInterviewsService(
         const job = getJob(body.configuration.job);
         if (!job || !job.stages.includes(body.configuration.career_stage))
           throw new ServiceError('unsupported_input', 400, '岗位或阶段不可用');
-        await cancelInterviewTasks(_tx.client,id);
-        state.snapshot=null;
-        if(state.view.preparation)state.view.preparation={status:'pending',task_id:null,error_code:null};
+        await cancelInterviewTasks(_tx.client, id);
+        state.snapshot = null;
+        if (state.view.preparation)
+          state.view.preparation = { status: 'pending', task_id: null, error_code: null };
         state.view.configuration = body.configuration;
       }),
     pause: (identity: RequestIdentity, id: string, body: { version: number }, key: string) =>
@@ -747,11 +780,17 @@ export function createInterviewsService(
     ) {
       const original = await readReportState(identity, id);
       if (!ended(original) || !original.snapshot) throw invalid('面试尚未结束');
-      const turn = original.view.turns.find(
+      const sourceTurn = original.view.turns.find(
         (t) =>
           t.id === body.turn_id && t.revision === body.revision && t.answer_status === 'answered',
       );
-      if (!turn) throw invalid('重练来源回答不可用');
+      if (!sourceTurn) throw invalid('重练来源回答不可用');
+      const group = original.view.turns
+        .filter((t) => t.main_question_index === sourceTurn.main_question_index)
+        .sort((a, b) => a.follow_up_index - b.follow_up_index);
+      const turn =
+        group.find((t) => t.follow_up_index === 0 && t.answer_status === 'answered') ?? sourceTurn;
+      const followups = group.filter((t) => t.follow_up_index > 0).map((t) => t.text);
       const ref = await withIdempotency(
         database,
         { owner_id: identity.owner_id, operation: `interviews.${id}.retry`, key, input: body },
@@ -760,10 +799,13 @@ export function createInterviewsService(
           await loadInterview(tx.client, identity.owner_id, id, true);
           const state = newInterviewState(identity.owner_id, original.view.configuration);
           state.snapshot = original.snapshot;
-          if(original.snapshot?.runtime_version==='graph-v1')state.view.preparation={status:'ready',task_id:null,error_code:null};
+          if (original.snapshot?.runtime_version === 'graph-v1')
+            state.view.preparation = { status: 'ready', task_id: null, error_code: null };
           state.retryQuestion = {
             stage: turn.stage,
-            text: turn.text,
+            text: followups.length
+              ? `${turn.text}\n请结合原题追问完善回答：\n${followups.map((q, i) => `${i + 1}. ${q}`).join('\n')}`
+              : turn.text,
             topic: turn.topic,
             purpose: turn.purpose,
             knowledge_question_id: turn.knowledge_question_id,

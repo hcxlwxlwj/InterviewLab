@@ -13,10 +13,7 @@ import {
   type ReportIndicatorAssessment,
 } from '@interviewlab/core';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
-import {
-  createReportAnalysis,
-  assertEvaluation,
-} from '../../code/backend/src/modules/reports/analysis';
+import { assertEvaluation } from '../../code/backend/src/modules/reports/analysis';
 import { emptyReport, aggregateReport } from '../../code/backend/src/modules/reports/aggregate';
 import { reportSchema, reportRequestBody } from '../../code/backend/src/modules/reports/schemas';
 import { reportExportHtml } from '../../code/frontend/features/live-interview/report-export';
@@ -154,37 +151,6 @@ test('all requested indicators must appear once; unknown indicators, fake eviden
     assert.throws(() => assertEvaluation(e, turn, snapshot));
   }
 });
-test('indicator scoring decodes exact quote IDs and keeps insufficient evidence null', async () => {
-  const { turn, snapshot, evaluation } = fixture();
-  const analysis = createReportAnalysis(async (_kind, schema, input) => {
-    const material = input as {
-      scoring_standard: { version: string; indicators: unknown[] };
-      allowed_quotes: Record<string, string>;
-    };
-    assert.equal(material.scoring_standard.version, FRONTEND_RUBRIC_VERSION);
-    assert.equal(material.scoring_standard.indicators.length, 2);
-    assert.equal(material.allowed_quotes.q0, turn.answer_text!.split('。')[0] + '。');
-    return schema.parse({
-      ...evaluation,
-      strengths: evaluation.strengths.map((f) => ({
-        ...f,
-        evidence_refs: f.evidence_refs.map((r) => ({ ...r, quote: 'q0' })),
-      })),
-      indicator_assessments: evaluation.indicator_assessments!.map((a) => ({
-        ...a,
-        evidence_refs: a.evidence_refs.map((r) => ({ ...r, quote: 'q0' })),
-      })),
-    });
-  });
-  assert.deepEqual(
-    await analysis.evaluate(turn, snapshot, new AbortController().signal, false, {
-      main_question: turn.text,
-      earlier_answers: [],
-      scoring_rubric_version: FRONTEND_RUBRIC_VERSION,
-    }),
-    evaluation,
-  );
-});
 test('repeated follow-ups do not overweight an indicator; legacy scores never mix with BARS', () => {
   const { evaluation, ref } = fixture();
   const rated = (id: ReportIndicatorAssessment['indicator_id'], level: 0 | 1 | 2 | 3 | 4) => ({
@@ -252,7 +218,7 @@ test('rubric upgrade is explicit and historical reports are never silently conve
   ]);
   assert.equal(report.overall_score, null);
   assert.notEqual(report.analysis_metadata?.scoring_rubric_version, FRONTEND_RUBRIC_VERSION);
-  assert.ok(reportRequestBody.safeParse({ version: 1, scope: 'rubric' }).success);
+  assert.equal(reportRequestBody.safeParse({ version: 1, scope: 'rubric' }).success, false);
 });
 
 test('professional indicators require a matching frozen reference and an explicit technical question', async () => {

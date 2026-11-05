@@ -8,16 +8,15 @@ import {
   FeedbackScoreTable,
 } from './report-charts';
 import { ReportProgress, isReportPending } from './report-progress';
-import { ScoringStandard, IndicatorRatings } from './report-standard';
+import { IndicatorRatings } from './report-standard';
+import { QuestionScorecard, PracticeHistory } from './question-scores';
 import { printReport } from './report-export';
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronDown, FileText, ArrowLeftRight, RotateCcw, Info } from 'lucide-react';
+import { ChevronDown, FileText, RotateCcw, Info } from 'lucide-react';
 import { Button } from '../../components/ui/button';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
   FEEDBACK_DIMENSIONS,
-  feedbackScore,
-  FRONTEND_RUBRIC_VERSION,
   type InterviewReport,
   type InterviewEvidence,
   type InterviewFinding,
@@ -36,7 +35,6 @@ function revealAnswer(turnId: string) {
     );
     return;
   }
-  document.getElementById('review-tab')?.click();
   requestAnimationFrame(() => {
     if (target instanceof HTMLDetailsElement) target.open = true;
     target.scrollIntoView({ block: 'start' });
@@ -76,106 +74,18 @@ function Findings({ items }: { items: InterviewFinding[] }) {
     </>
   );
 }
-function Comparison({ id }: { id: string }) {
-  const load = useCallback((signal: AbortSignal) => interviewsApi.comparison(id, signal), [id]);
-  const resource = useLiveResource(load, (v) => ['pending', 'generating'].includes(v.status));
-  const command = useLiveCommand();
-  const v = resource.value;
-  return (
-    <section className="panel">
-      <h2>重练比较</h2>
-      <ErrorNotice message={resource.error} retry={() => void resource.refresh()} />
-      <CommandNotice command={command} refresh={() => void resource.refresh()} />
-      {!v && !resource.error ? (
-        <Loading />
-      ) : (
-        v && (
-          <>
-            <p>比较目标：{v.goal}</p>
-            <div className="live-comparison">
-              <article id={`turn-${v.original_turn_id}`}>
-                <h3>原回答 · v{v.original_revision}</h3>
-                <p>{v.original_text}</p>
-              </article>
-              <article>
-                <h3>重练回答 · v{v.retry_revision}</h3>
-                <p>{v.retry_text}</p>
-              </article>
-            </div>
-            {v.status === 'ready' ? (
-              <>
-                <h3>观察到的变化</h3>
-                <Findings items={v.changes} />
-                <h3>仍需补充</h3>
-                <Findings items={v.remaining_gaps} />
-                <ul>
-                  {v.limitations.map((l, i) => (
-                    <li key={i}>{l}</li>
-                  ))}
-                </ul>
-              </>
-            ) : v.status === 'failed' ? (
-              <>
-                <p>比较生成失败，两份回答仍保留。</p>
-                <button
-                  className="live-button"
-                  disabled={command.blocked}
-                  onClick={() =>
-                    command.run(
-                      (key) => interviewsApi.retryComparison(id, v.version, key),
-                      resource.accept,
-                    )
-                  }
-                >
-                  重试比较
-                </button>
-              </>
-            ) : (
-              <p role="status">正在比较两次回答…</p>
-            )}
-          </>
-        )
-      )}
-    </section>
-  );
-}
 function ReportBody({ id, practice = false }: { id: string; practice?: boolean }) {
   const router = useRouter();
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState('');
-  const search = useSearchParams();
-  const [tab, setTab] = useState<'review' | 'compare'>(
-    search.has('comparison') ? 'compare' : 'review',
-  );
   const load = useCallback(
     async (signal: AbortSignal) => {
       const originalInterview = await interviewsApi.read(id, signal);
-      let interview = originalInterview;
+      const interview = originalInterview;
       let report: InterviewReport | null = null;
       if (['completed', 'failed'].includes(interview.status)) {
         try {
           report = await interviewsApi.report(id, signal);
-          if (report.needs_refresh) {
-            try {
-              report = await interviewsApi.retryReport(
-                id,
-                report.version,
-                crypto.randomUUID(),
-                'latest',
-              );
-            } catch (error) {
-              if (!(error instanceof ApiClientError && error.status === 409)) throw error;
-              report = await interviewsApi.report(id, signal);
-            }
-          }
-          interview = {
-            ...originalInterview,
-            turns: originalInterview.turns.map(
-              (turn) =>
-                report?.answer_sources?.find((source) => source.original_turn_id === turn.id)
-                  ?.turn ?? turn,
-            ),
-          };
         } catch (e) {
           if (!(e instanceof ApiClientError && e.status === 404)) throw e;
         }
@@ -184,9 +94,13 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
     },
     [id],
   );
-  const resource = useLiveResource(load, (v) => Boolean(v.report && isReportPending(v.report)), {
-    retryReadErrors: true,
-  });
+  const resource = useLiveResource(
+    load,
+    (v) => Boolean(v.report && (isReportPending(v.report) || v.report.advice_status === 'pending')),
+    {
+      retryReadErrors: true,
+    },
+  );
   const data = resource.value;
   useEffect(() => {
     if (!practice || !data) return;
@@ -239,16 +153,99 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
       </section>
     );
   }
-  const retryTurn = interview.turns.find((t) => t.answer_status === 'answered');
-  const comparisonId = search.get('comparison');
   const reportPending = isReportPending(report);
+  if (interview.parent_interview_id) {
+    const score = report.question_scores?.[0];
+    const evaluation = report.evaluations.at(-1);
+    return (
+      <>
+        <section className="panel">
+          <h1>单题重练结果</h1>
+          <p>{interview.turns[0]?.text}</p>
+          <Link href={`/reports/${interview.parent_interview_id}/practice`}>
+            返回原面试逐题复盘
+          </Link>
+          {score ? (
+            <QuestionScorecard score={score.score} assessments={score.assessments} />
+          ) : (
+            <p role="status">
+              {reportPending
+                ? '本题评分生成中…'
+                : report.status === 'failed'
+                  ? '本题评分失败，回答已保留。'
+                  : '历史练习没有本版六维评分。'}
+            </p>
+          )}
+          {report.status === 'failed' || report.analysis_progress?.failed ? (
+            <button
+              className="live-button"
+              disabled={command.blocked}
+              onClick={() =>
+                command.run(
+                  (key) => interviewsApi.retryReport(id, report.version, key),
+                  () => resource.refresh(),
+                )
+              }
+            >
+              重试本题评分
+            </button>
+          ) : null}
+          {evaluation && (
+            <>
+              <h3>做得好的地方</h3>
+              <Findings items={evaluation.strengths} />
+              <h3>仍需提升</h3>
+              <Findings items={evaluation.gaps} />
+              <h3>下一步建议</h3>
+              <ul>
+                {(report.next_steps ?? [evaluation.retry_goal]).map((step, i) => (
+                  <li key={i}>{step}</li>
+                ))}
+              </ul>
+              {report.advice_status === 'failed' && <p>个性化建议暂不可用，本题评分已保留。</p>}
+            </>
+          )}
+          <details>
+            <summary>查看本次回答</summary>
+            {interview.turns.map((t) => (
+              <p key={t.id}>{t.answer_text}</p>
+            ))}
+          </details>
+          <button
+            className="live-button"
+            disabled={command.blocked}
+            onClick={() =>
+              command.run(
+                (key) =>
+                  interviewsApi.retry(
+                    interview.parent_interview_id!,
+                    {
+                      turn_id: interview.parent_turn_id!,
+                      revision: interview.parent_revision!,
+                      goal: interview.retry_goal ?? '围绕原题补充具体依据',
+                    },
+                    key,
+                  ),
+                (result) => router.push(`/interview/${result.id}`),
+              )
+            }
+          >
+            再次重练本题
+          </button>
+          <CommandNotice command={command} />
+        </section>
+        <section className="panel">
+          <PracticeHistory
+            report={report}
+            turnIds={interview.parent_turn_id ? [interview.parent_turn_id] : undefined}
+            originalId={interview.parent_interview_id}
+          />
+        </section>
+      </>
+    );
+  }
   return (
     <>
-      {!!report.answer_sources?.length && (
-        <p className="notice" role="status">
-          本报告已采用 {report.answer_sources.length} 题的最新重练回答，首次回答和历次记录仍保留。
-        </p>
-      )}
       {!practice && (
         <>
           <div className="page-heading report-page-heading">
@@ -263,10 +260,7 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                   查看记录
                 </Link>
               </Button>
-              <TotalScore
-                score={feedbackScore(report.summary?.feedback_template).score}
-                coverage={feedbackScore(report.summary?.feedback_template).coverage}
-              />
+              <TotalScore score={report.overall_score} coverage={100} />
             </div>
           </div>
           <div className="report-banner">
@@ -307,12 +301,17 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
               <div className="report-visual-row">
                 <section className="panel score-panel" aria-label="六维能力画像">
                   <h2>能力画像</h2>
-                  <AbilityRadar feedback={report.summary} pending={reportPending} />
+                  <AbilityRadar
+                    feedback={report.summary}
+                    assessments={report.feedback_assessments}
+                    pending={reportPending}
+                  />
                   <p className="radar-caption">六维评分模板 · 权重 25 / 25 / 25 / 15 / 5 / 5</p>
                 </section>
                 <QuestionCoverage
                   turns={interview.turns}
                   evaluations={report.evaluations}
+                  scores={report.question_scores}
                   pending={reportPending}
                   failedIds={report.missing_turn_ids}
                   onSelect={revealAnswer}
@@ -357,6 +356,16 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                         <p>没有需要优先列出的已确认缺口，不强行生成练习目标。</p>
                       )}
                       <h3>四、针对性改进建议</h3>
+                      {!!report.next_steps?.length && (
+                        <ul>
+                          {report.next_steps.map((step, i) => (
+                            <li key={i}>{step}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {report.advice_status === 'failed' && (
+                        <p>个性化建议暂未生成，评分已保留，可先按以下目标练习。</p>
+                      )}
                       {report.summary.feedback_template?.action_plan.length ? (
                         report.summary.feedback_template.action_plan.map((item, i) => (
                           <article className="template-action" key={i}>
@@ -544,33 +553,6 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                       </>
                     )}
                 </section>
-                {interview.configuration.job === 'frontend' &&
-                  interview.configuration.career_stage === 'internship' && (
-                    <ScoringStandard
-                      current={
-                        report.evaluations.length > 0 &&
-                        report.evaluations.every(
-                          (e) => e.scoring_rubric_version === FRONTEND_RUBRIC_VERSION,
-                        )
-                      }
-                      busy={
-                        command.blocked ||
-                        reportPending ||
-                        !interview.turns.some((t) => t.answer_status === 'answered')
-                      }
-                      upgrade={() =>
-                        command.run(
-                          (key) => interviewsApi.retryReport(id, report.version, key, 'rubric'),
-                          (result) =>
-                            resource.accept({
-                              interview,
-                              originalInterview: data.originalInterview,
-                              report: result,
-                            }),
-                        )
-                      }
-                    />
-                  )}
               </details>
               <section className="panel export-panel">
                 <h3>导出 PDF</h3>
@@ -614,7 +596,7 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
           <div className="report-dialog-heading">
             <div>
               <h1>逐题复盘与重练</h1>
-              <p>查看回答、分析和重练记录。完成重练后，面试报告会按最新回答更新。</p>
+              <p>查看逐题得分与反馈；重练独立记录分数变化，原面试报告保持不变。</p>
             </div>
             <Link className="live-button secondary" href={`/reports/${id}`}>
               面试报告
@@ -623,48 +605,11 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
           <CommandNotice command={command} refresh={() => void resource.refresh()} />
           {reportPending && (
             <p className="notice" role="status">
-              正在分析最新回答并更新报告，完成后将自动刷新。
+              逐题分析正在生成，已完成的评分和原回答可先查看。
             </p>
           )}
           <section className="report-detail">
-            <div className="content-tabs" role="tablist" aria-label="报告视图">
-              {(['review', 'compare'] as const).map((value) => (
-                <button
-                  key={value}
-                  id={`${value}-tab`}
-                  role="tab"
-                  aria-selected={tab === value}
-                  aria-controls={`${value}-panel`}
-                  tabIndex={tab === value ? 0 : -1}
-                  className={tab === value ? 'selected' : ''}
-                  onClick={() => setTab(value)}
-                  onKeyDown={(event) => {
-                    if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
-                      event.preventDefault();
-                      const next =
-                        event.key === 'Home'
-                          ? 'review'
-                          : event.key === 'End'
-                            ? 'compare'
-                            : value === 'review'
-                              ? 'compare'
-                              : 'review';
-                      setTab(next);
-                      document.getElementById(`${next}-tab`)?.focus();
-                    }
-                  }}
-                >
-                  {value === 'review' ? <FileText size={15} /> : <ArrowLeftRight size={15} />}
-                  {value === 'review' ? '逐题复盘' : '重练对比'}
-                </button>
-              ))}
-            </div>
-            <div
-              id="review-panel"
-              role="tabpanel"
-              aria-labelledby="review-tab"
-              hidden={tab !== 'review'}
-            >
+            <div id="review-panel">
               <div className="turn-reviews">
                 <section className="panel">
                   <h2>逐题复盘</h2>
@@ -681,6 +626,9 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                   </nav>
                 </section>
                 {interview.turns.map((turn, index) => {
+                  const questionScore = report.question_scores?.find((q) =>
+                    q.turn_ids.includes(turn.id),
+                  );
                   const evaluation = report.evaluations.find(
                     (e) => e.turn_id === turn.id && e.revision === turn.revision,
                   );
@@ -705,29 +653,6 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                         <ChevronDown size={17} />
                       </summary>
                       <div className="turn-review-body">
-                        {report.answer_sources
-                          ?.filter((source) => source.turn.id === turn.id)
-                          .map((source) => (
-                            <div className="notice" key={source.retry_interview_id}>
-                              <p>
-                                本题采用最新完成的重练回答。
-                                <Link href={`/reports/${source.retry_interview_id}`}>
-                                  查看本次重练报告
-                                </Link>
-                              </p>
-                              <details>
-                                <summary>查看首次回答</summary>
-                                <p>
-                                  {
-                                    data.originalInterview.turns.find(
-                                      (t) => t.id === source.original_turn_id,
-                                    )?.answer_text
-                                  }
-                                </p>
-                              </details>
-                              <Link href="/me/interviews">查看历次面试与重练记录</Link>
-                            </div>
-                          ))}
                         {turn.answer_status === 'answered' ? (
                           <>
                             <details className="live-answer report-original-answer">
@@ -737,9 +662,22 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                               </summary>
                               <p>{turn.answer_text}</p>
                             </details>
+                            {questionScore && questionScore.turn_id === turn.id && (
+                              <>
+                                <QuestionScorecard
+                                  score={questionScore.score}
+                                  assessments={questionScore.assessments}
+                                />
+                                <PracticeHistory
+                                  report={report}
+                                  turnIds={questionScore.turn_ids}
+                                  originalId={id}
+                                />
+                              </>
+                            )}
                             {evaluation && (
                               <>
-                                <IndicatorRatings evaluation={evaluation} />
+                                {!questionScore && <IndicatorRatings evaluation={evaluation} />}
                                 <h3>已说明的内容</h3>
                                 {evaluation.strengths.length ? (
                                   <Findings items={evaluation.strengths} />
@@ -752,6 +690,12 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                                 ) : (
                                   <p>本题未识别到有证据支持的明确缺口。</p>
                                 )}
+                                <h3>下一步建议</h3>
+                                <ul>
+                                  {(report.next_steps ?? [evaluation.retry_goal]).map((step, i) => (
+                                    <li key={i}>{step}</li>
+                                  ))}
+                                </ul>
                                 <h3>参考要点</h3>
                                 <ul>
                                   {evaluation.reference_points.map((point, i) => (
@@ -775,29 +719,31 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                                     : '本题分析尚未完成。'}
                               </p>
                             )}
-                            <button
-                              className="live-button secondary"
-                              disabled={command.blocked}
-                              onClick={() =>
-                                command.run(
-                                  (key) =>
-                                    interviewsApi.retry(
-                                      id,
-                                      {
-                                        turn_id: turn.id,
-                                        revision: turn.revision,
-                                        goal:
-                                          evaluation?.retry_goal ??
-                                          '围绕原题补充本人行动及验证依据',
-                                      },
-                                      key,
-                                    ),
-                                  (result) => router.push(`/interview/${result.id}`),
-                                )
-                              }
-                            >
-                              重练这一题
-                            </button>
+                            {(turn.follow_up_index === 0 || questionScore?.turn_id === turn.id) && (
+                              <button
+                                className="live-button secondary"
+                                disabled={command.blocked}
+                                onClick={() =>
+                                  command.run(
+                                    (key) =>
+                                      interviewsApi.retry(
+                                        id,
+                                        {
+                                          turn_id: turn.id,
+                                          revision: turn.revision,
+                                          goal:
+                                            evaluation?.retry_goal ??
+                                            '围绕原题补充本人行动及验证依据',
+                                        },
+                                        key,
+                                      ),
+                                    (result) => router.push(`/interview/${result.id}`),
+                                  )
+                                }
+                              >
+                                重练这一题
+                              </button>
+                            )}
                           </>
                         ) : (
                           <p>
@@ -811,51 +757,6 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                   );
                 })}
               </div>
-            </div>
-            <div
-              id="compare-panel"
-              role="tabpanel"
-              aria-labelledby="compare-tab"
-              hidden={tab !== 'compare'}
-            >
-              <section className="panel comparison-panel">
-                <h2>同一道题，两次回答</h2>
-                {interview.parent_interview_id && retryTurn && (
-                  <button
-                    className="live-button"
-                    disabled={command.blocked}
-                    onClick={() =>
-                      command.run(
-                        (key) =>
-                          interviewsApi.compare(
-                            {
-                              original_interview_id: interview.parent_interview_id!,
-                              retry_interview_id: interview.id,
-                              original_turn_id: interview.parent_turn_id!,
-                              retry_turn_id: retryTurn.id,
-                              original_revision: interview.parent_revision!,
-                              retry_revision: retryTurn.revision,
-                            },
-                            key,
-                          ),
-                        (result) =>
-                          router.replace(`/reports/${id}/practice?comparison=${result.id}`),
-                      )
-                    }
-                  >
-                    比较原回答与本次重练
-                  </button>
-                )}
-                {interview.parent_interview_id && (
-                  <p>
-                    <Link href={`/reports/${interview.parent_interview_id}`}>查看原场面试报告</Link>
-                  </p>
-                )}
-                {!interview.parent_interview_id && !comparisonId && (
-                  <p>从逐题复盘中选择一道题重练。完成后，进入重练报告生成前后对比。</p>
-                )}
-                {comparisonId && <Comparison key={comparisonId} id={comparisonId} />}
-              </section>
             </div>
           </section>
 
