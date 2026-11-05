@@ -156,7 +156,7 @@ export function VideoInterviewWorkspace(p: Props) {
               <div className="video-room-welcome">
                 <Bot size={40} />
                 <h1>准备好，开始这次交流</h1>
-                <p>你可以打开摄像头，分享项目画面。开始面试后开启麦克风即可回答。</p>
+                <p>你可以打开摄像头，分享项目画面。点击开始面试，允许麦克风后即可进入语音对话。</p>
               </div>
             )}
             {p.turns.map((turn) => (
@@ -237,7 +237,7 @@ export function VideoInterviewWorkspace(p: Props) {
           <div className="video-room-tips">
             <h2>面试提示</h2>
             <p>问题说完后直接回答。短暂停顿会继续等待；说“回答结束”或点击下方按钮可主动提交。</p>
-            <p>需要思考时点击“让我想想”。面试官说话时可以插话打断。</p>
+            <p>需要思考时点击“让我想想”。面试官说话时自动暂停收音，播报结束后恢复。</p>
             <p>开启麦克风后，音频发送至火山引擎识别；本站仅保存转写文字。</p>
             <p>摄像头与共享画面当前仅在本机预览，不上传、不录像，也未发送给视觉模型分析。</p>
           </div>

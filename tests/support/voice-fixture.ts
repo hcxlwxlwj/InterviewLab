@@ -67,6 +67,7 @@ export function voiceFixture() {
     [];
   let closes = 0,
     audioBytes = 0,
+    voicedPackets = 0,
     finishes = 0;
   const provider: VoiceProvider = {
     available: true,
@@ -76,6 +77,7 @@ export function voiceFixture() {
       return {
         write: (pcm) => {
           audioBytes += pcm.byteLength;
+          if (pcm.some((sample) => sample !== 0)) voicedPackets++;
         },
         finish: () => {
           finishes++;
@@ -152,7 +154,7 @@ export function voiceFixture() {
     failAsr() {
       asrError?.();
     },
-    metrics: () => ({ closes, audioBytes, finishes }),
+    metrics: () => ({ closes, audioBytes, voicedPackets, finishes }),
   };
 }
 export async function waitFor(check: () => boolean, timeoutMs = 2000) {

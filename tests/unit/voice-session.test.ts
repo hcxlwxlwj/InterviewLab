@@ -19,10 +19,22 @@ function create() {
   );
   return { ...f, fixture: f, session, disconnected: () => disconnected };
 }
+async function startListening(f: ReturnType<typeof create>) {
+  await f.session.start();
+  const speech = f.events.find((e) => e.type === 'speech_start');
+  assert.ok(speech?.type === 'speech_start');
+  f.session.control({
+    type: 'playback',
+    speech_id: speech.speech_id,
+    played_ms: 100,
+    interrupted: false,
+  });
+  await waitFor(() => f.receipts.length === 1);
+}
 test('continuous audio uses ASR final plus a silence window, automatically persists a voice answer and preserves the original Agent flow', async (t) => {
   const f = create();
   t.after(() => f.session.close());
-  await f.session.start();
+  await startListening(f);
   f.session.audio(new Uint8Array(6400));
   assert.equal(f.metrics().audioBytes, 6400);
   f.session.control({ type: 'speech_start' });
@@ -36,12 +48,16 @@ test('continuous audio uses ASR final plus a silence window, automatically persi
   assert.ok(
     f.events.some((e) => e.type === 'interview' && e.interview.generation_status === 'pending'),
   );
-  assert.equal(f.speeches[0].signal.aborted, true, 'speech start cancels upstream synthesis');
+  assert.equal(
+    f.speeches[0].signal.aborted,
+    true,
+    'completed playback releases upstream synthesis',
+  );
 });
 test('hold suppresses automatic submission; explicit done waits for final transcription and overrides hold', async (t) => {
   const f = create();
   t.after(() => f.session.close());
-  await f.session.start();
+  await startListening(f);
   f.session.control({ type: 'hold', enabled: true });
   f.session.control({ type: 'speech_start' });
   f.recognize({ text: '首先我测量耗时。', final: false });
@@ -58,7 +74,7 @@ test('hold suppresses automatic submission; explicit done waits for final transc
 test('interrupt during Agent generation cancels the old generation and appends to the same answer rather than answering a future question', async (t) => {
   const f = create();
   t.after(() => f.session.close());
-  await f.session.start();
+  await startListening(f);
   f.session.control({ type: 'speech_start' });
   f.recognize({ text: '我使用缓存。', final: true });
   f.session.control({ type: 'speech_end' });
@@ -112,7 +128,7 @@ test('pausing remotely tears down provider resources; reconnect reads state and 
 test('silence flushes an unfinished ASR result automatically instead of waiting forever for manual submit', async (t) => {
   const f = create();
   t.after(() => f.session.close());
-  await f.session.start();
+  await startListening(f);
   f.session.control({ type: 'speech_start' });
   f.recognize({ text: '我通过测试验证结果。', final: false });
   f.session.control({ type: 'speech_end' });
@@ -124,7 +140,7 @@ test('silence flushes an unfinished ASR result automatically instead of waiting 
 test('resuming speech during an ASR endpoint flush keeps the previous sentence and cancels the premature submit', async (t) => {
   const f = create();
   t.after(() => f.session.close());
-  await f.session.start();
+  await startListening(f);
   f.session.control({ type: 'speech_start' });
   f.recognize({ text: '我使用了缓存。', final: false });
   f.session.control({ type: 'speech_end' });
@@ -143,7 +159,7 @@ test('resuming speech during an ASR endpoint flush keeps the previous sentence a
 test('an explicit spoken completion submits the answer without saving the control phrase', async (t) => {
   const f = create();
   t.after(() => f.session.close());
-  await f.session.start();
+  await startListening(f);
   f.session.control({ type: 'speech_start' });
   f.recognize({ text: '我通过回归测试验证。回答结束。', final: true });
   await waitFor(() => f.answers.length === 1);
@@ -152,10 +168,55 @@ test('an explicit spoken completion submits the answer without saving the contro
 test('a missing browser speech_end is recovered from subsequent quiet PCM packets', async (t) => {
   const f = create();
   t.after(() => f.session.close());
-  await f.session.start();
+  await startListening(f);
   f.session.control({ type: 'speech_start' });
   f.recognize({ text: '我负责页面测试。', final: true });
   await new Promise((r) => setTimeout(r, 850));
   f.session.audio(new Uint8Array(6400));
   await waitFor(() => f.answers.length === 1);
+});
+
+test('interviewer playback ignores voice, stale recognition and commit until the matching playback receipt', async (t) => {
+  const f = create();
+  t.after(() => f.session.close());
+  await f.session.start();
+  const speech = f.events.find((e) => e.type === 'speech_start');
+  assert.ok(speech?.type === 'speech_start');
+  f.session.audio(new Uint8Array(6400).fill(127));
+  f.session.control({ type: 'speech_start' });
+  f.session.control({ type: 'commit' });
+  f.recognize({ text: '扬声器回声', final: true });
+  f.speeches[0].finish();
+  await waitFor(() => f.events.some((e) => e.type === 'speech_end'));
+  f.session.control({ type: 'speech_start' });
+  await new Promise((resolve) => setTimeout(resolve, 60));
+  assert.equal(
+    f.metrics().audioBytes,
+    6400,
+    'ASR must receive silent keepalive frames during playback',
+  );
+  assert.equal(f.metrics().voicedPackets, 0, 'candidate audio must be zeroed before reaching ASR');
+  assert.equal(f.metrics().finishes, 0);
+  assert.equal(f.answers.length, 0);
+  assert.ok(!f.events.some((e) => e.type === 'transcript' || e.type === 'interrupted'));
+  f.session.control({
+    type: 'playback',
+    speech_id: 'stale-output',
+    played_ms: 0,
+    interrupted: false,
+  });
+  f.session.control({ type: 'speech_start' });
+  assert.equal(f.speeches[0].signal.aborted, false);
+  f.session.control({
+    type: 'playback',
+    speech_id: speech.speech_id,
+    played_ms: 100,
+    interrupted: false,
+  });
+  await waitFor(() => f.receipts.length === 1);
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '这是听完题目后的回答。', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() => f.answers.length === 1);
+  assert.equal(f.answers[0], '这是听完题目后的回答。');
 });

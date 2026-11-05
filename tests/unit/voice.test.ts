@@ -181,3 +181,29 @@ test('avatar mouth follows audible PCM time, remains closed for queued audio and
   playback.append('question', bytes.toString('base64'));
   assert.equal(playback.getLevel(), 0, 'late audio must not revive an interrupted mouth');
 });
+
+test('capture reset discards pre-mute samples and VAD activity before resuming', () => {
+  const messages: { type: string; pcm?: ArrayBuffer }[] = [];
+  let Processor: any;
+  runInNewContext(readFileSync('code/frontend/public/voice-capture.worklet.js', 'utf8'), {
+    sampleRate: 16000,
+    AudioWorkletProcessor: class {
+      port = { onmessage: null, postMessage: (data: any) => messages.push(data) };
+    },
+    registerProcessor: (_name: string, value: any) => {
+      Processor = value;
+    },
+  });
+  const capture = new Processor();
+  for (let i = 0; i < 24; i++)
+    capture.process([[new Float32Array(128).fill(0.5)]], [[new Float32Array(128)]]);
+  assert.ok(messages.some((m) => m.type === 'speech_start'));
+  capture.port.onmessage({ data: { type: 'reset' } });
+  messages.length = 0;
+  for (let i = 0; i < 26; i++)
+    capture.process([[new Float32Array(128)]], [[new Float32Array(128)]]);
+  const packets = messages.filter((m) => m.type === 'audio');
+  assert.equal(packets.length, 1);
+  assert.ok(new Uint8Array(packets[0].pcm!).every((v) => v === 0));
+  assert.ok(!messages.some((m) => m.type === 'speech_start' || m.type === 'speech_end'));
+});

@@ -69,7 +69,7 @@ export function useInterviewVoice(options: {
       setHold(false);
     }
   }, [status]);
-  async function start() {
+  async function start(beforeConnect?: () => Promise<void>) {
     if (client.current) return;
     if (latest.current.draft.trim()) {
       setError('当前有未提交的文字草稿，请先提交或清空，再开启实时语音。');
@@ -133,7 +133,7 @@ export function useInterviewVoice(options: {
     );
     client.current = connection;
     try {
-      await connection.start();
+      await connection.start(beforeConnect);
     } catch (e) {
       if (client.current === connection) {
         stop();
@@ -169,7 +169,7 @@ export function useInterviewVoice(options: {
     status: connecting
       ? '正在连接语音…'
       : playing
-        ? '面试官正在说话，开口即可打断'
+        ? '面试官正在说话，麦克风暂时关闭'
         : thinking
           ? '面试官正在思考，可继续补充'
           : talking

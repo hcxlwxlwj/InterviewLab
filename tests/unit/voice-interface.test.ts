@@ -122,3 +122,22 @@ test('video room renders a separate call layout without acquiring camera or repl
     );
   }
 });
+
+test('ready voice room directs users to the start button and has no separate enable-voice step', () => {
+  const voice = {
+    display: true,
+    active: false,
+    connecting: false,
+    sessionStatus: 'ready',
+    capabilities: { available: true, silence_ms: 3000 },
+    turns: [],
+    draft: '',
+    error: '',
+  } as unknown as ReturnType<typeof useInterviewVoice>;
+  const html = renderToStaticMarkup(
+    React.createElement(VoiceControls, { voice, disabled: true, preferred: true }),
+  );
+  assert.match(html, /点击右上角开始面试/);
+  assert.match(html, /麦克风权限/);
+  assert.doesNotMatch(html, /开启实时语音|连接语音<|开启麦克风进入通话/);
+});

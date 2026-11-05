@@ -12,6 +12,8 @@ export class RealtimeVoiceClient {
   private closed = false;
   private ready = false;
   private muted = false;
+  private outputActive = false;
+  private resumeCapture?: ReturnType<typeof setTimeout>;
   private aliveTimer?: ReturnType<typeof setInterval>;
   private timeout?: ReturnType<typeof setTimeout>;
   private captureTimeout?: ReturnType<typeof setTimeout>;
@@ -24,7 +26,7 @@ export class RealtimeVoiceClient {
     private readonly disconnected: () => void,
     private readonly activity: (speaking: boolean) => void = () => {},
   ) {}
-  async start() {
+  async start(beforeConnect?: () => Promise<void>) {
     try {
       if (
         !navigator.mediaDevices?.getUserMedia ||
@@ -58,11 +60,14 @@ export class RealtimeVoiceClient {
         throw new Error('浏览器音频采集尚未启动，请重新开启语音。');
       await this.context.audioWorklet.addModule('/voice-capture.worklet.js');
       if (this.closed) return;
+      // Ask for media first; start the interview only after permission succeeds.
+      if (beforeConnect) await beforeConnect();
+      if (this.closed) return;
       this.playback = new VoicePlayback(
         this.context,
         (id, playedMs, interrupted) =>
           this.send({ type: 'playback', speech_id: id, played_ms: playedMs, interrupted }),
-        this.playing,
+        (playing) => this.onPlaybackState(playing),
       );
       this.capture = new AudioWorkletNode(this.context, 'interview-voice-capture');
       this.capture.onprocessorerror = () => this.fail('麦克风音频处理失败，请重新连接语音。');
@@ -91,11 +96,12 @@ export class RealtimeVoiceClient {
             this.fail('网络发送过慢，已关闭麦克风，文字草稿仍保留。');
             return;
           }
-          socket.send(this.muted ? new ArrayBuffer(data.pcm.byteLength) : data.pcm);
+          socket.send(
+            this.muted || this.outputActive ? new ArrayBuffer(data.pcm.byteLength) : data.pcm,
+          );
         } else {
-          if (this.muted) return;
+          if (this.muted || this.outputActive) return;
           this.activity(data.type === 'speech_start');
-          if (data.type === 'speech_start') this.playback?.stop(true);
           this.send({ type: data.type });
         }
       };
@@ -167,11 +173,34 @@ export class RealtimeVoiceClient {
     this.playback?.stop(true);
     this.send({ type: 'interrupt' });
   }
+  private onPlaybackState(playing: boolean) {
+    if (this.closed) return;
+    clearTimeout(this.resumeCapture);
+    if (playing) {
+      this.outputActive = true;
+      this.applyCaptureState();
+      this.activity(false);
+      this.playing(true);
+    } else {
+      // Network speech_end only seals the queue. This callback runs after local playback drains.
+      // A short tail also excludes speaker echo and already queued capture messages.
+      this.resumeCapture = setTimeout(() => {
+        if (this.closed) return;
+        this.outputActive = false;
+        this.applyCaptureState();
+        this.playing(false);
+      }, 300);
+    }
+  }
+  private applyCaptureState() {
+    this.media?.getAudioTracks().forEach((track) => {
+      track.enabled = !this.muted && !this.outputActive;
+    });
+    this.capture?.port.postMessage({ type: 'reset' });
+  }
   setMuted(muted: boolean) {
     this.muted = muted;
-    this.media?.getAudioTracks().forEach((track) => {
-      track.enabled = !muted;
-    });
+    this.applyCaptureState();
     if (muted) {
       this.activity(false);
       this.send({ type: 'speech_end' });
@@ -190,6 +219,7 @@ export class RealtimeVoiceClient {
     clearInterval(this.aliveTimer);
     clearTimeout(this.timeout);
     clearTimeout(this.captureTimeout);
+    clearTimeout(this.resumeCapture);
     this.readyEvent = undefined;
     this.playback?.stop(true);
     this.socket?.close();
