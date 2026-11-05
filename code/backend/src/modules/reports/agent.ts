@@ -1,0 +1,131 @@
+import type {
+  InterviewEvaluation,
+  InterviewSnapshot,
+  InterviewReportSummary,
+} from '@interviewlab/core';
+import { ServiceError } from '../../foundation/errors';
+import { checkedGraph } from '../interviews/graph';
+import {
+  createReportAnalysis,
+  assertEvaluation,
+  assertSummary,
+  type ReportModelCall,
+  type ReportAnalysis,
+} from './analysis';
+
+/** Bounded report agent. Durable task/outbox checkpoints belong to the reports service.
+ * Each node makes at most one model call; scoring never receives resume material.
+ */
+export function createReportAgent(
+  call: ReportModelCall,
+  log: (entry: object) => void = () => {},
+): ReportAnalysis {
+  const analysis = createReportAnalysis(call, log);
+  const cancelled =
+    (signal: AbortSignal) =>
+    (error: unknown): never => {
+      if (signal.aborted) throw new ServiceError('cancelled', 502, '任务已取消', true);
+      throw error;
+    };
+  const scoringSnapshot = (snapshot: InterviewSnapshot): InterviewSnapshot => ({
+    job_title: snapshot.job_title,
+    knowledge: snapshot.knowledge,
+    prompt_version: snapshot.prompt_version,
+    rubric_version: snapshot.rubric_version,
+    model: snapshot.model,
+  });
+  return {
+    async evaluate(...args: Parameters<ReportAnalysis['evaluate']>) {
+      return checkedGraph(
+        'report_question',
+        args,
+        {
+          prepare: ([turn, snapshot, signal, repair, context]) => ({
+            turn,
+            signal,
+            repair,
+            snapshot: {
+              ...scoringSnapshot(snapshot),
+              knowledge: {
+                ...snapshot.knowledge,
+                questions: snapshot.knowledge.questions.filter(
+                  (q) => q.id === turn.knowledge_question_id || q.topic === turn.topic,
+                ),
+              },
+            },
+            context: context
+              ? {
+                  ...context,
+                  earlier_turns: context.earlier_turns
+                    ?.filter(
+                      (t) =>
+                        t.main_question_index === turn.main_question_index &&
+                        t.follow_up_index < turn.follow_up_index &&
+                        t.answer_status === 'answered',
+                    )
+                    .sort((a, b) => a.follow_up_index - b.follow_up_index),
+                }
+              : undefined,
+          }),
+          generate: (i) => analysis.evaluate(i.turn, i.snapshot, i.signal, i.repair, i.context),
+          validate: (raw, i) => {
+            const value = raw as InterviewEvaluation;
+            assertEvaluation(value, i.turn, i.snapshot, [
+              ...(i.context?.earlier_turns ?? []),
+              i.turn,
+            ]);
+            return value;
+          },
+        },
+        args[2],
+        log,
+      ).catch(cancelled(args[2]));
+    },
+    async summarize(...args: Parameters<ReportAnalysis['summarize']>) {
+      return checkedGraph(
+        'report_summary',
+        args,
+        {
+          prepare: ([evaluations, snapshot, signal, repair, context]) => ({
+            evaluations,
+            snapshot: scoringSnapshot(snapshot),
+            signal,
+            repair,
+            context,
+          }),
+          generate: (i) =>
+            analysis.summarize(i.evaluations, i.snapshot, i.signal, i.repair, i.context),
+          validate: (raw, i) => {
+            const value = raw as InterviewReportSummary;
+            assertSummary(
+              value,
+              i.evaluations,
+              i.context ? { ...i.context, snapshot: i.snapshot } : undefined,
+            );
+            return value;
+          },
+        },
+        args[2],
+        log,
+      ).catch(cancelled(args[2]));
+    },
+    async suggest(...args: Parameters<ReportAnalysis['suggest']>) {
+      return checkedGraph(
+        'report_advice',
+        args,
+        {
+          prepare: ([evaluations, snapshot, signal, repair]) => ({
+            evaluations,
+            snapshot,
+            signal,
+            repair,
+          }),
+          generate: (i) => analysis.suggest(i.evaluations, i.snapshot, i.signal, i.repair),
+          validate: (raw) => raw as Awaited<ReturnType<ReportAnalysis['suggest']>>,
+        },
+        args[2],
+        log,
+      ).catch(cancelled(args[2]));
+    },
+  };
+}

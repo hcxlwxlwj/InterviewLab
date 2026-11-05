@@ -10,7 +10,7 @@ import type { ContentSource, KnowledgeQuestion } from './domain/knowledge';
 
 /** Shared DTOs for the HTTP interview workflow. */
 export interface InterviewConfig {
-  resume_ref?: {id:string;version:number};
+  resume_ref?: { id: string; version: number };
   job: string;
   career_stage: 'internship' | 'campus';
   interview_type: LiveInterviewType;
@@ -126,6 +126,11 @@ export interface InterviewFinding {
   evidence_refs: InterviewEvidence[];
 }
 export interface InterviewEvaluation {
+  /** Cumulative six-dimensional score for this main question through this answer. */
+  feedback_assessments?: import('./feedback-template').FeedbackAssessment[];
+  question_scoring_version?: string;
+  next_steps?: string[];
+  advice_status?: 'ready' | 'failed';
   scoring_rubric_version?: string;
   indicator_assessments?: import('./report-rubric').ReportIndicatorAssessment[];
   turn_id: string;
@@ -142,6 +147,8 @@ export interface InterviewDimensionAssessment extends InterviewFinding {
   level: 0 | 1 | 2 | 3 | 4;
 }
 export interface InterviewReportSummary {
+  next_steps?: string[];
+  advice_status?: 'ready' | 'failed';
   feedback_template: import('./feedback-template').FeedbackTemplate;
   /** Auxiliary per-turn scoring; levels are AI estimates, not calibrated scores. */
   dimension_assessments?: InterviewDimensionAssessment[];
@@ -152,9 +159,24 @@ export interface InterviewReportSummary {
 }
 export interface ReportRequest {
   version: number;
-  scope?: 'missing' | 'summary' | 'rubric' | 'latest';
+  scope?: 'missing' | 'summary';
 }
 export interface InterviewReport {
+  advice_task_id?: string;
+  advice_status?: 'pending' | 'ready' | 'failed';
+  next_steps?: string[];
+  question_scoring_version?: string;
+  question_scores?: import('./question-scoring').QuestionScore[];
+  feedback_assessments?: import('./feedback-template').FeedbackAssessment[];
+  practice_history?: {
+    interview_id: string;
+    original_turn_id: string;
+    ended_at: string | null;
+    scoring_version: string | null;
+    score: number | null;
+    assessments: import('./feedback-template').FeedbackAssessment[];
+    status: 'pending' | 'generating' | 'ready' | 'failed';
+  }[];
   /** Latest completed retries used by this report; original interviews are immutable. */
   answer_sources?: { original_turn_id: string; retry_interview_id: string; turn: InterviewTurn }[];
   needs_refresh?: boolean;

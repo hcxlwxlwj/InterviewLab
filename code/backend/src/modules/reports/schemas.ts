@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import type { InterviewReport, ReportRequest } from '@interviewlab/core';
-import { summaryOutput, indicatorAssessmentOutput } from './analysis';
+import { summaryOutput, indicatorAssessmentOutput, feedbackAssessment } from './analysis';
 import { turnSchema } from '../interviews/schemas';
 const evidence = z.object({ turn_id: z.string(), revision: z.number().int(), quote: z.string() });
 const finding = z.object({ text: z.string(), evidence_refs: z.array(evidence) });
 export const reportRequestBody = z
   .object({
     version: z.number().int().positive(),
-    scope: z.enum(['missing', 'summary', 'rubric', 'latest']).optional(),
+    scope: z.enum(['missing', 'summary']).optional(),
   })
   .strict() satisfies z.ZodType<ReportRequest>;
 const dimension = z.object({
@@ -17,6 +17,35 @@ const dimension = z.object({
   explanation: z.string(),
 });
 export const reportSchema = z.object({
+  advice_task_id: z.string().optional(),
+  advice_status: z.enum(['pending', 'ready', 'failed']).optional(),
+  next_steps: z.array(z.string()).optional(),
+  question_scoring_version: z.string().optional(),
+  feedback_assessments: z.array(feedbackAssessment).length(6).optional(),
+  question_scores: z
+    .array(
+      z.object({
+        turn_id: z.string(),
+        main_question_index: z.number().int(),
+        turn_ids: z.array(z.string()),
+        score: z.number().min(0).max(100),
+        assessments: z.array(feedbackAssessment).length(6),
+      }),
+    )
+    .optional(),
+  practice_history: z
+    .array(
+      z.object({
+        interview_id: z.string(),
+        original_turn_id: z.string(),
+        ended_at: z.string().nullable(),
+        scoring_version: z.string().nullable(),
+        score: z.number().min(0).max(100).nullable(),
+        assessments: z.array(feedbackAssessment),
+        status: z.enum(['pending', 'generating', 'ready', 'failed']),
+      }),
+    )
+    .optional(),
   answer_sources: z
     .array(
       z.object({
@@ -42,6 +71,10 @@ export const reportSchema = z.object({
   }),
   evaluations: z.array(
     z.object({
+      feedback_assessments: z.array(feedbackAssessment).length(6).optional(),
+      question_scoring_version: z.string().optional(),
+      next_steps: z.array(z.string()).optional(),
+      advice_status: z.enum(['ready', 'failed']).optional(),
       turn_id: z.string(),
       revision: z.number().int(),
       scoring_rubric_version: z.string().optional(),

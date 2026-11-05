@@ -1,7 +1,9 @@
+import { evaluationWire } from '../support/report-wire';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   evidenceMatches,
+  FEEDBACK_DIMENSIONS,
   interviewOpening,
   interviewConversationHistory,
   nextQuestionPosition,
@@ -37,6 +39,14 @@ const snapshot: InterviewSnapshot = {
   rubric_version: 'evidence-uncalibrated-v1',
 };
 function response(content: unknown, finish_reason = 'stop') {
+  if (content && typeof content === 'object' && 'turn_id' in content && 'retry_goal' in content)
+    content = {
+      six_scores: Object.fromEntries(
+        FEEDBACK_DIMENSIONS.map((d) => [d.key, { score: 0, text: '本次未体现', evidence_ids: [] }]),
+      ),
+      ...content,
+    };
+  content = evaluationWire(content);
   return new Response(
     JSON.stringify({
       choices: [{ finish_reason, message: { content: JSON.stringify(content) } }],
@@ -45,8 +55,29 @@ function response(content: unknown, finish_reason = 'stop') {
     { headers: { 'content-type': 'application/json' } },
   );
 }
-const probeTurn: InterviewTurn = { ...question, id:'probe', main_question_index:1,follow_up_index:0,generation_id:'probe',presented_at:null,answer_status:'answered',answer_text:'我负责测试。',revision:1,input_mode:'text_fallback',answered_at:null };
-const probeOutput = { turn_id:'probe',revision:1,strengths:[],gaps:[],reference_points:[],retry_goal:'补充验证过程',dimensions:[],limitations:[] };
+const probeTurn: InterviewTurn = {
+  ...question,
+  id: 'probe',
+  main_question_index: 1,
+  follow_up_index: 0,
+  generation_id: 'probe',
+  presented_at: null,
+  answer_status: 'answered',
+  answer_text: '我负责测试。',
+  revision: 1,
+  input_mode: 'text_fallback',
+  answered_at: null,
+};
+const probeOutput = {
+  turn_id: 'probe',
+  revision: 1,
+  strengths: [],
+  gaps: [],
+  reference_points: [],
+  retry_goal: '补充验证过程',
+  dimensions: [],
+  limitations: [],
+};
 test('ecnu-plus is the default model and uses the configured compatible endpoint with server-only credentials', async () => {
   const log: object[] = [];
   let request: Record<string, unknown> = {};
@@ -64,9 +95,12 @@ test('ecnu-plus is the default model and uses the configured compatible endpoint
   await agent.evaluate(probeTurn, snapshot, new AbortController().signal, false);
   assert.equal(request.model, 'ecnu-plus');
   assert.deepEqual(request.response_format, { type: 'json_object' });
+  assert.deepEqual(request.thinking, { type: 'disabled' });
+  assert.equal(request.max_tokens, 1000);
   assert.ok(!JSON.stringify(log).includes('synthetic-secret'));
   assert.ok(!JSON.stringify(log).includes(question.text));
-  assert.equal(log.length, 1);
+  assert.equal(log.filter((e) => 'invocation_id' in e).length, 1);
+  assert.ok(log.some((e) => (e as { workflow?: string }).workflow === 'report_question'));
 });
 test('missing credentials stay unavailable and never trigger a provider request', async () => {
   const agent = createModelAnalysis(loadConfig({}), async () => {
@@ -247,17 +281,11 @@ test('evaluation schema offers only grounded dimensions to the provider', async 
     async (_url, init) => {
       const request = JSON.parse(init!.body as string);
       const task = JSON.parse(request.messages[1].content);
-      assert.deepEqual(task.schema.properties.dimensions.items.enum, [
-        'project_communication',
-        'logical_expression',
-      ]);
-      assert.deepEqual(task.input.allowed_dimensions, [
-        'project_communication',
-        'logical_expression',
-      ]);
-      assert.ok(task.input.missing_reason);
-      assert.equal(task.schema.properties.turn_id.const, turn.id);
-      assert.equal(task.schema.properties.revision.const, turn.revision);
+      assert.equal(task.schema.properties.scores.minItems, 6);
+      assert.equal(task.schema.properties.scores.maxItems, 6);
+      assert.equal(task.input.dimension_order.length, 6);
+      assert.ok(!('turn_id' in task.schema.properties));
+      assert.ok(!('revision' in task.schema.properties));
       return response({
         turn_id: turn.id,
         revision: 1,
@@ -276,7 +304,8 @@ test('evaluation schema offers only grounded dimensions to the provider', async 
     },
   );
   const result = await agent.evaluate(turn, snapshot, new AbortController().signal, false);
-  assert.deepEqual(result.dimensions, ['project_communication']);
+  assert.equal(result.feedback_assessments?.length, 6);
+  assert.equal(result.turn_id, turn.id);
 });
 test('comparison output is scoped to both pinned answer versions', async () => {
   const input: InterviewComparison = {

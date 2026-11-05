@@ -9,6 +9,10 @@ import {
   FRONTEND_RUBRIC_VERSION,
   aggregateIndicatorScores,
   feedbackScore,
+  QUESTION_SCORING_VERSION,
+  questionScores,
+  aggregateQuestionAssessments,
+  weightedQuestionScore,
 } from '@interviewlab/core';
 import { inputDigest } from '../../foundation/idempotency';
 import { REPORT_PROMPT_VERSION, REPORT_SCHEMA_VERSION, SCORING_RUBRIC_VERSION } from './analysis';
@@ -123,6 +127,9 @@ export function aggregateReport(
   report.analysis_metadata = base.analysis_metadata;
   report.summary_status = base.summary_status ?? 'not_requested';
   report.summary = base.summary ?? null;
+  report.advice_task_id = base.advice_task_id;
+  report.advice_status = base.advice_status;
+  report.next_steps = base.next_steps;
   report.evaluations = values;
   report.task_ids = tasks.flatMap((t) => (t.task_id ? [t.task_id] : []));
   report.analysis_progress = { total: answered.length, completed: values.length, failed, pending };
@@ -222,6 +229,23 @@ export function aggregateReport(
   if (report.summary?.feedback_template) {
     report.overall_score = feedbackScore(report.summary.feedback_template).score;
     report.scoring_status = 'experimental';
+  }
+  if (values.some((e) => e.question_scoring_version === QUESTION_SCORING_VERSION)) {
+    report.question_scoring_version = QUESTION_SCORING_VERSION;
+    report.question_scores = questionScores(state.view.turns, values);
+    const assessments = aggregateQuestionAssessments(report.question_scores);
+    report.feedback_assessments = assessments.length ? assessments : undefined;
+    const groupCount = new Set(answered.map((t) => t.main_question_index)).size;
+    report.overall_score =
+      report.question_scores.length === groupCount && groupCount > 0
+        ? Math.round(weightedQuestionScore(assessments))
+        : null;
+    report.scoring_status = assessments.length ? 'experimental' : 'uncalibrated';
+    if (report.summary && assessments.length)
+      report.summary = {
+        ...report.summary,
+        feedback_template: { ...report.summary.feedback_template, assessments },
+      };
   }
   return report;
 }

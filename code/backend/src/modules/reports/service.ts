@@ -1,4 +1,3 @@
-import { FRONTEND_RUBRIC_VERSION } from '@interviewlab/core';
 import { randomUUID } from 'node:crypto';
 import type {
   InterviewReport,
@@ -33,11 +32,9 @@ export function createReportsService(
       (t) => t.main_question_index === turn.main_question_index,
     );
     return {
-      scoring_rubric_version:
-        state.view.configuration.job === 'frontend' &&
-        state.view.configuration.career_stage === 'internship'
-          ? FRONTEND_RUBRIC_VERSION
-          : undefined,
+      earlier_turns: group.filter(
+        (t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered',
+      ),
       main_question: group.find((t) => t.follow_up_index === 0)?.text ?? turn.text,
       earlier_answers: group
         .filter((t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered')
@@ -89,11 +86,6 @@ export function createReportsService(
           report_version: version,
           turn_id: turn.id,
           revision: turn.revision,
-          scoring_rubric_version:
-            state.view.configuration.job === 'frontend' &&
-            state.view.configuration.career_stage === 'internship'
-              ? FRONTEND_RUBRIC_VERSION
-              : undefined,
           input_digest: interviewInputDigest(state),
           evaluation_input_digest: digest,
         },
@@ -160,11 +152,98 @@ export function createReportsService(
       { ...row.result, version: row.version, status: row.status as InterviewReport['status'] },
       await repository.evaluationRows(database.pool, row.id),
     );
-    report.needs_refresh = row.input_digest !== interviewInputDigest(state);
+    // Original report is immutable after practice; GET never triggers regeneration.
+    report.needs_refresh = false;
+    report.practice_history = [];
+    const rootId = state.view.parent_interview_id ?? interviewId;
+    const root = rootId === interviewId ? state : await interviews.readFinalized(identity, rootId);
+    const rootRow =
+      rootId === interviewId
+        ? row
+        : await repository.reportByInterview(database.pool, identity.owner_id, rootId);
+    const rootReport =
+      rootId === interviewId
+        ? report
+        : rootRow?.result
+          ? aggregateReport(
+              root,
+              rootRow.result,
+              await repository.evaluationRows(database.pool, rootRow.id),
+            )
+          : null;
+    for (const q of rootReport?.question_scores ?? []) {
+      const sourceTurns = root.view.turns.filter((t) => q.turn_ids.includes(t.id));
+      for (const t of sourceTurns)
+        report.practice_history.push({
+          interview_id: rootId,
+          original_turn_id: t.id,
+          ended_at: root.view.ended_at,
+          scoring_version: rootReport?.question_scoring_version ?? null,
+          score: q.score,
+          assessments: q.assessments,
+          status: 'ready',
+        });
+    }
+    for (const retry of await interviews.readPracticeHistory(identity, rootId)) {
+      const saved = await repository.reportByInterview(
+        database.pool,
+        identity.owner_id,
+        retry.view.id,
+      );
+      const result = saved?.result
+        ? aggregateReport(
+            retry,
+            { ...saved.result, status: saved.status as InterviewReport['status'] },
+            await repository.evaluationRows(database.pool, saved.id),
+          )
+        : null;
+      report.practice_history.push({
+        interview_id: retry.view.id,
+        original_turn_id: retry.view.parent_turn_id!,
+        ended_at: retry.view.ended_at,
+        scoring_version: result?.question_scoring_version ?? null,
+        score: result?.overall_score ?? null,
+        assessments: result?.feedback_assessments ?? [],
+        status: result?.status ?? 'pending',
+      });
+    }
+    if (report.advice_task_id && report.advice_status === 'pending') {
+      const adviceTask = await repository.summaryTask(database.pool, report.advice_task_id);
+      if (!adviceTask || (taskSettled(adviceTask) && adviceTask.task_status !== 'succeeded'))
+        report.advice_status = 'failed';
+    }
     if (row.summary_task_id) report.task_ids.push(row.summary_task_id);
     return report;
   }
+  async function queueAdvice(tx: Transaction, state: InterviewState, report: InterviewReport) {
+    if (!agent.suggest || report.advice_task_id || !report.evaluations.length) return;
+    const digest = evaluationDigest(report.evaluations);
+    const task = await enqueueTask(tx, {
+      owner_id: state.owner,
+      type: 'reports.advice.v1',
+      key: `${report.id}:${report.version}:${digest}`,
+      input: {
+        interview_id: state.view.id,
+        report_id: report.id,
+        report_version: report.version,
+        input_digest: interviewInputDigest(state),
+        evaluations_digest: digest,
+      },
+    });
+    report.advice_task_id = task.id;
+    report.advice_status = 'pending';
+  }
   async function queueSummary(tx: Transaction, state: InterviewState, report: InterviewReport) {
+    if (state.view.parent_interview_id) {
+      await queueAdvice(tx, state, report);
+      report.summary_status = 'not_applicable';
+      report.status = report.analysis_progress?.pending
+        ? 'generating'
+        : report.evaluations.length
+          ? 'ready'
+          : 'failed';
+      return;
+    }
     const digest = evaluationDigest(report.evaluations);
     const task = await enqueueTask(tx, {
       owner_id: state.owner,
@@ -258,6 +337,9 @@ export function createReportsService(
     );
     const value = await agent.evaluate(turn, state.snapshot!, signal, task.attempts > 1, {
       scoring_rubric_version: input.scoring_rubric_version,
+      earlier_turns: group.filter(
+        (t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered',
+      ),
       main_question: group.find((t) => t.follow_up_index === 0)?.text ?? turn.text,
       earlier_answers: group
         .filter((t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered')
@@ -266,10 +348,15 @@ export function createReportsService(
     const related = state.snapshot!.knowledge.questions.filter(
       (q) => q.id === turn.knowledge_question_id || q.topic === turn.topic,
     );
-    assertEvaluation(value, turn, {
-      ...state.snapshot!,
-      knowledge: { ...state.snapshot!.knowledge, questions: related },
-    });
+    assertEvaluation(
+      value,
+      turn,
+      {
+        ...state.snapshot!,
+        knowledge: { ...state.snapshot!.knowledge, questions: related },
+      },
+      [...evaluationContext(state, turn).earlier_turns, turn],
+    );
     return {
       result_ref: { id: input.report_id, version: input.report_version },
       lock: async (tx) => {
@@ -312,9 +399,92 @@ export function createReportsService(
           await repository.evaluationRows(tx.client, report.id),
         );
         await startSummaryIfReady(tx, fresh, next, report.summary_task_id);
+        if (fresh.view.parent_interview_id && ['completed', 'failed'].includes(fresh.view.status)) {
+          await queueAdvice(tx, fresh, next);
+          next.summary_status = 'not_applicable';
+          next.status = next.analysis_progress?.pending
+            ? 'generating'
+            : next.evaluations.length
+              ? 'ready'
+              : 'failed';
+        }
         await repository.updateReport(tx.client, report.id, report.version, next);
         if (!['completed', 'failed'].includes(fresh.view.status))
           await repository.markDraft(tx.client, report.id);
+      },
+    };
+  };
+  const advice: TaskHandler = async (task, signal) => {
+    const input = task.payload as {
+      interview_id: string;
+      report_id: string;
+      report_version: number;
+      input_digest: string;
+      evaluations_digest: string;
+    };
+    const identity = { owner_id: task.owner_id, roles: [] };
+    const state = await interviews.readFinalized(identity, input.interview_id);
+    const row = await repository.reportByInterview(
+      database.pool,
+      task.owner_id,
+      input.interview_id,
+    );
+    if (
+      !row?.result ||
+      row.id !== input.report_id ||
+      row.version !== input.report_version ||
+      row.result.advice_task_id !== task.id ||
+      interviewInputDigest(state) !== input.input_digest
+    )
+      return { result_ref: null };
+    const report = aggregateReport(
+      state,
+      row.result,
+      await repository.evaluationRows(database.pool, row.id),
+    );
+    if (evaluationDigest(report.evaluations) !== input.evaluations_digest || !agent.suggest)
+      return { result_ref: null };
+    const result = await agent.suggest(
+      report.evaluations,
+      state.snapshot!,
+      signal,
+      task.attempts > 1,
+    );
+    return {
+      result_ref: { id: row.id, version: row.version },
+      lock: async (tx) => {
+        try {
+          await interviews.lock(tx, identity, input.interview_id);
+          return true;
+        } catch (e) {
+          if (e instanceof ServiceError && e.statusCode === 404) return false;
+          throw e;
+        }
+      },
+      commit: async (tx) => {
+        const fresh = await interviews.readReportState(identity, input.interview_id, tx);
+        const current = await repository.reportByInterview(
+          tx.client,
+          task.owner_id,
+          input.interview_id,
+          true,
+        );
+        if (
+          !current?.result ||
+          current.version !== input.report_version ||
+          current.result.advice_task_id !== task.id ||
+          interviewInputDigest(fresh) !== input.input_digest
+        )
+          return false;
+        const next = aggregateReport(
+          fresh,
+          { ...current.result, status: current.status as InterviewReport['status'] },
+          await repository.evaluationRows(tx.client, current.id),
+        );
+        if (evaluationDigest(next.evaluations) !== input.evaluations_digest) return false;
+        next.next_steps = result.next_steps;
+        next.advice_status = 'ready';
+        await repository.updateReport(tx.client, current.id, current.version, next);
       },
     };
   };
@@ -416,6 +586,7 @@ export function createReportsService(
           ].slice(0, 12),
         };
         if (next.analysis_metadata) next.analysis_metadata.prompt_version = REPORT_PROMPT_VERSION;
+        await queueAdvice(tx, fresh, next);
         next.summary_status = 'ready';
         next.status = 'ready';
         await repository.updateReport(
@@ -433,8 +604,11 @@ export function createReportsService(
     const row = await repository.comparisonById(database.pool, task.owner_id, input.comparison_id);
     if (row.version !== input.version || row.task_id !== task.id) return { result_ref: null };
     await interviews.readFinalized(identity, row.original_interview_id);
-    const retrySource=await interviews.readFinalized(identity, row.retry_interview_id);
-    const value = await agent.compare(row.input, signal, task.attempts > 1, {runtime_version:retrySource.snapshot!.runtime_version,model:retrySource.snapshot!.model});
+    const retrySource = await interviews.readFinalized(identity, row.retry_interview_id);
+    const value = await agent.compare(row.input, signal, task.attempts > 1, {
+      runtime_version: retrySource.snapshot!.runtime_version,
+      model: retrySource.snapshot!.model,
+    });
     return {
       result_ref: { id: row.id, version: row.version },
       lock: async (tx) => {
@@ -536,55 +710,18 @@ export function createReportsService(
             },
             results,
           );
-          if (body.scope === 'latest') {
-            const digest = interviewInputDigest(state);
-            if (row.input_digest === digest) return { id };
-            const version = row.version + 1;
-            const next = { ...emptyReport(state, row.id), version };
-            // Reuse only unchanged answer contexts; a rewritten main answer also invalidates follow-up analysis.
-            const reusable = results.filter(
-              (r) =>
-                r.result &&
-                state.view.turns.some(
-                  (t) => t.id === r.turn_id && r.evaluation_input_digest === turnDigest(state, t),
-                ),
-            );
-            await repository.setSummaryTask(tx.client, row.id, null, null);
-            await repository.updateInputDigest(tx.client, row.id, digest);
-            await queueEvaluations(
-              tx,
-              state,
-              row.id,
-              version,
-              reusable.map((r) => r.turn_id),
-            );
-            await repository.updateReport(tx.client, row.id, version, next);
-            return { id };
-          }
           // A pending summary must finish before a new report version can invalidate its input.
           if (['pending', 'generating'].includes(row.status)) return { id };
-          if (
-            body.scope === 'rubric' &&
-            (state.view.configuration.job !== 'frontend' ||
-              state.view.configuration.career_stage !== 'internship')
-          )
-            throw new ServiceError(
-              'unsupported_input',
-              400,
-              '当前行为锚定标准只适用于前端实习岗位',
-            );
           if (body.scope === 'summary') {
             if (report.summary_status === 'ready' || !report.evaluations.length) return { id };
-          } else if (
-            body.scope !== 'rubric' &&
-            !report.missing_turn_ids.length &&
-            row.status !== 'failed'
-          )
-            return { id };
+          } else if (!report.missing_turn_ids.length && row.status !== 'failed') return { id };
           const version = row.version + 1;
           const next = {
             ...report,
             version,
+            advice_task_id: undefined,
+            advice_status: undefined,
+            next_steps: undefined,
             summary: null,
             summary_status: 'pending' as const,
             status: 'pending' as const,
@@ -597,7 +734,7 @@ export function createReportsService(
               state,
               row.id,
               version,
-              body.scope === 'rubric' ? [] : report.evaluations.map((e) => e.turn_id),
+              report.evaluations.map((e) => e.turn_id),
             );
           }
           await repository.updateReport(tx.client, row.id, version, next);
@@ -645,7 +782,7 @@ export function createReportsService(
             retry.view.parent_interview_id !== original.view.id ||
             retry.view.parent_turn_id !== originalTurn.id ||
             retry.view.parent_revision !== originalTurn.revision ||
-            retryTurn.text !== originalTurn.text ||
+            retry.retryQuestion?.text !== retryTurn.text ||
             original.snapshot?.rubric_version !== retry.snapshot?.rubric_version
           )
             throw new ServiceError(
@@ -733,6 +870,7 @@ export function createReportsService(
     },
     handlers: {
       'reports.evaluate.v1': evaluate,
+      'reports.advice.v1': advice,
       'reports.summarize.v1': summarize,
       'comparisons.generate.v1': compare,
     },
@@ -775,10 +913,19 @@ export function createReportsService(
             evaluations,
           );
           if (report.analysis_progress!.pending) report.status = 'generating';
-          else if (!report.evaluations.length) {
+          else if (state.view.parent_interview_id) {
+            await queueAdvice(tx, state, report);
+            report.status = report.evaluations.length
+              ? 'ready'
+              : report.analysis_progress!.total
+                ? 'failed'
+                : 'ready';
+            report.summary_status = 'not_applicable';
+          } else if (!report.evaluations.length) {
             report.status = report.analysis_progress!.total ? 'failed' : 'ready';
             report.summary_status = 'not_applicable';
           } else if (!report.evaluations.some((e) => e.strengths.length || e.gaps.length)) {
+            await queueAdvice(tx, state, report);
             report.status = 'ready';
             report.summary_status = 'not_applicable';
           } else if (!current.summary_task_id) {
