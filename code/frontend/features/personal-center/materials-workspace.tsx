@@ -1,19 +1,17 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import { RESUME_FIELDS, emptyResumeTemplate, extractResumeTemplate } from '@interviewlab/core';
-import type { PersonalMaterial, PersonalSettings } from '@interviewlab/core';
+import type { PersonalMaterial } from '@interviewlab/core';
 import { apiRequest } from '../../lib/api/http';
 import { WorkspaceFrame } from './workspace-frame';
 const empty = { structure: emptyResumeTemplate(), title: '', text: '', kind: 'resume' as 'resume' | 'experience', confirmed: false };
-export default function MaterialsWorkspace({ settingsOnly = false, targetsOnly = false }: { settingsOnly?: boolean; targetsOnly?: boolean }) {
+export default function MaterialsWorkspace() {
   const uploadRef = useRef<HTMLInputElement>(null);
   const [filename, setFilename] = useState('');
   const [importing, setImporting] = useState(false);
   const [items, setItems] = useState<PersonalMaterial[]>([]);
-  const [settings, setSettings] = useState<PersonalSettings>();
   const [draft, setDraft] = useState(empty);
   const [editing, setEditing] = useState<PersonalMaterial>();
-  const [history, setHistory] = useState<PersonalMaterial[]>([]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -21,12 +19,7 @@ export default function MaterialsWorkspace({ settingsOnly = false, targetsOnly =
   async function load() {
     setError('');
     try {
-      const [m, s] = await Promise.all([
-        apiRequest<PersonalMaterial[]>('/materials'),
-        apiRequest<PersonalSettings>('/me/settings'),
-      ]);
-      setItems(m);
-      setSettings(s);
+      setItems(await apiRequest<PersonalMaterial[]>('/materials'));
       setLoaded(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : '加载失败');
@@ -35,11 +28,6 @@ export default function MaterialsWorkspace({ settingsOnly = false, targetsOnly =
   useEffect(() => {
     void load();
   }, []);
-  useEffect(()=>{
-    if(!items.some(item=>item.analysis?.status==='pending'))return;
-    const timer=setTimeout(()=>void load(),1500);
-    return ()=>clearTimeout(timer);
-  },[items]);
   async function action(work: () => Promise<unknown>) {
     setBusy(true);
     setError('');
@@ -55,9 +43,9 @@ export default function MaterialsWorkspace({ settingsOnly = false, targetsOnly =
     }
   }
   return (
-    <WorkspaceFrame section={targetsOnly ? 'saved-jobs' : settingsOnly ? 'preferences' : 'resumes'}>
+    <WorkspaceFrame section="resumes">
       <section className="library-panel material-workspace">
-        <h1>{targetsOnly ? '目标岗位与求职方向' : settingsOnly ? '账号与个人设置' : '简历与经历'}</h1>
+        <h1>我的简历</h1>
         {error && (
           <p role="alert">
             {error} <button onClick={() => void load()}>重试</button>
@@ -65,77 +53,10 @@ export default function MaterialsWorkspace({ settingsOnly = false, targetsOnly =
         )}
         {notice && <p role="status">{notice}</p>}
         {!loaded && !error && <p>正在加载…</p>}
-        {loaded && settingsOnly && settings && (
-          <form
-            className="material-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void action(() => apiRequest('/me/settings', { method: 'PUT', body: settings }));
-            }}
-          >
-            <label>
-              个人显示名
-              <input
-                value={settings.display_name}
-                maxLength={80}
-                onChange={(e) => setSettings({ ...settings, display_name: e.target.value })}
-              />
-            </label>
-            <label>
-              个人简介
-              <textarea
-                value={settings.bio}
-                maxLength={1000}
-                onChange={(e) => setSettings({ ...settings, bio: e.target.value })}
-              />
-            </label>
-            <h2>求职方向与个人画像</h2>{[['city','所在城市'],['career_stage','求职阶段（实习 / 校招 / 社招）'],['strengths','个人优势（本人填写）'],['learning_goals','希望重点练习的内容']].map(([key,label])=><label key={key}>{label}<textarea rows={3} maxLength={key==='city'||key==='career_stage'?100:3000} value={String(settings[key as keyof PersonalSettings]??'')} onChange={e=>setSettings({...settings,[key]:e.target.value})}/></label>)}
-            <label>默认作答方式<select value={settings.interaction_mode??'text_fallback'} onChange={e=>setSettings({...settings,interaction_mode:e.target.value as 'text_fallback'|'realtime_voice'})}><option value="text_fallback">文字作答</option><option value="realtime_voice">语音作答</option></select></label>
-            <label>面试官风格<select value={settings.interviewer_style??'标准'} onChange={e=>setSettings({...settings,interviewer_style:e.target.value as '标准'|'友好'|'深入追问'})}><option>标准</option><option>友好</option><option>深入追问</option></select></label>
-            <label>
-              目标岗位
-              <input
-                value={settings.target_role}
-                maxLength={100}
-                onChange={(e) => setSettings({ ...settings, target_role: e.target.value })}
-              />
-            </label>
-            <label>
-              练习时长（分钟）
-              <input
-                type="number"
-                min={5}
-                max={120}
-                value={settings.practice_minutes}
-                onChange={(e) =>
-                  setSettings({ ...settings, practice_minutes: Number(e.target.value) })
-                }
-              />
-            </label>
-            <label>
-              默认简历
-              <select
-                value={settings.default_resume_id ?? ''}
-                onChange={(e) =>
-                  setSettings({ ...settings, default_resume_id: e.target.value || null })
-                }
-              >
-                <option value="">不设置</option>
-                {items
-                  .filter((x) => x.kind === 'resume' && x.confirmed)
-                  .map((x) => (
-                    <option key={x.id} value={x.id}>
-                      {x.title}
-                    </option>
-                  ))}
-              </select>
-            </label>
-            <button disabled={busy || importing}>保存设置</button>
-          </form>
-        )}
-        {loaded && !settingsOnly && (
+        {loaded && (
           <>
             <p>可分别创建“前端实习版”“后端校招版”等多份简历。每次模拟面试可单独选择一份；导入内容需核对确认。</p>
+            <details className="resume-editor-panel" open={!!editing || !items.length}><summary>{editing?'编辑简历':'＋ 新建一份简历'}</summary>
             <form
               className="material-form"
               onSubmit={(e) => {
@@ -148,7 +69,7 @@ export default function MaterialsWorkspace({ settingsOnly = false, targetsOnly =
                   setDraft(empty);
                   setFilename('');
                   setEditing(undefined);
-                  setHistory([]);
+
                 });
               }}
             >
@@ -261,33 +182,31 @@ export default function MaterialsWorkspace({ settingsOnly = false, targetsOnly =
                 />
                 我已核对以上内容，确认其为本人真实材料
               </label>
-              <button disabled={busy || importing}>{editing ? '保存标准简历版本' : '保存为一份新简历 / 经历'}</button>
+              <button disabled={busy || importing}>{editing ? '保存简历' : '保存为一份新简历 / 经历'}</button>
               <button
                 type="button"
                 onClick={() => {
                   setEditing(undefined);
                   setDraft(empty);
                   setFilename('');
-                  setHistory([]);
+
                 }}
               >
                 取消编辑
               </button>
-            </form>
+            </form></details>
             {!items.length && <p>还没有简历或经历，可以在上方创建。</p>}
-            <h2>我的简历与经历（{items.length}）</h2><p><a className="text-link" href="/interview/setup">选择一份简历开始模拟面试 →</a></p>
+            <h2>简历资料库（{items.length}）</h2><p><a className="text-link" href="/interview/setup">选择一份简历开始模拟面试 →</a></p>
             {items.map((item) => (
               <article key={item.id} className="resume-summary-row">
                 <div>
                   <strong>{item.title}</strong>
                   <p>
-                    {item.kind === 'resume' ? '简历' : '经历'} · v{item.version} ·{' '}
+                    {item.kind === 'resume' ? '简历' : '经历'} ·{' '}
                     {item.confirmed ? '已确认' : '待确认'}
-                    {item.analysis && ` · ${{pending:'面试线索分析中',ready:'面试线索已准备',failed:'分析失败',unavailable:'尚未分析'}[item.analysis.status]}`}
                   </p>
                 </div>
-                {item.kind==='resume' && item.confirmed && item.analysis && ['failed','unavailable'].includes(item.analysis.status) && <button type="button" disabled={busy} onClick={()=>void action(()=>apiRequest(`/materials/${item.id}/analysis`,{method:'POST',body:{version:item.version},idempotencyKey:crypto.randomUUID()}))}>准备面试线索</button>}
-                {item.kind==='resume' && <button type="button" disabled={busy||importing} onClick={()=>{setEditing(undefined);setDraft({title:item.title+'（新岗位版）',text:item.text,kind:item.kind,structure:item.structure??extractResumeTemplate(item.text),confirmed:false});setHistory([]);setNotice('已复制为新简历草稿，请修改岗位相关内容并确认保存。');window.scrollTo({top:0,behavior:'smooth'});}}>复制为新岗位版</button>}
+                {item.kind==='resume' && <button type="button" disabled={busy||importing} onClick={()=>{setEditing(undefined);setDraft({title:item.title+'（新岗位版）',text:item.text,kind:item.kind,structure:item.structure??extractResumeTemplate(item.text),confirmed:false});setNotice('已复制为新简历草稿，请修改岗位相关内容并确认保存。');window.scrollTo({top:0,behavior:'smooth'});}}>复制为新岗位版</button>}
                 <button
                   disabled={busy || importing}
                   onClick={() => {
@@ -299,23 +218,12 @@ export default function MaterialsWorkspace({ settingsOnly = false, targetsOnly =
                       structure: item.structure ?? extractResumeTemplate(item.text),
                     confirmed: item.confirmed,
                     });
-                    setHistory([]);
+
                   }}
                 >
                   编辑
                 </button>
-                <button
-                  disabled={busy || importing}
-                  onClick={() =>
-                    void action(async () =>
-                      setHistory(
-                        await apiRequest<PersonalMaterial[]>('/materials/' + item.id + '/versions'),
-                      ),
-                    )
-                  }
-                >
-                  版本历史
-                </button>
+
                 <button
                   disabled={busy || importing}
                   onClick={() => {
@@ -327,19 +235,6 @@ export default function MaterialsWorkspace({ settingsOnly = false, targetsOnly =
                 </button>
               </article>
             ))}
-            {history.length > 0 && (
-              <section>
-                <h2>版本历史</h2>
-                {history.map((v) => (
-                  <details key={v.version}>
-                    <summary>
-                      {v.title} · v{v.version} · {v.confirmed ? '已确认' : '待确认'}
-                    </summary>
-                    <pre style={{ whiteSpace: 'pre-wrap' }}>{v.text}</pre>
-                  </details>
-                ))}
-              </section>
-            )}
           </>
         )}
       </section>

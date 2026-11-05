@@ -100,7 +100,7 @@ export async function buildApp(options: ApplicationOptions = {}) {
       ...[settingsModule(database, materials), materialsModule(materials)].filter(
         module => !options.modules?.some(custom => custom.name === module.name),
       ),
-      jobsModule(createJobsService(publicCatalogRepository)),
+      jobsModule(createJobsService(publicCatalogRepository), database),
       ...(interview?.modules ?? [interviewsModule(undefined, { config }), reportsModule()]),
       ...(options.modules ?? []),
     ];
