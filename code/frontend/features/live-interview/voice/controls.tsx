@@ -31,7 +31,7 @@ export function VoiceControls({
               <Mic size={17} />
               实时语音
             </strong>
-            <p>像打电话一样交流，可以随时插话。</p>
+            <p>像打电话一样交流，面试官说完后自动恢复收音。</p>
           </div>
           <Button
             type="button"
@@ -114,14 +114,16 @@ export function VoiceControls({
               : voice.hold
                 ? '准备好后点一下“继续接话”'
                 : voice.playing
-                  ? '直接开口，就能打断我'
+                  ? '麦克风已自动暂停，听完后再回答'
                   : voice.thinking
                     ? '想到新的内容，也可以继续补充'
                     : `说完停顿约 ${silence} 秒，我会接着问`
             : ended
               ? '已提交的讲话内容保存在面试记录中'
               : preferred
-                ? '开始面试后，开启麦克风进入通话'
+                ? voice.sessionStatus === 'ready'
+                  ? '点击右上角开始面试，允许麦克风后直接进入通话'
+                  : '语音已断开，可重新连接继续回答'
                 : '开启麦克风，直接说出你的回答'}
         </p>
       </div>
@@ -132,16 +134,18 @@ export function VoiceControls({
       )}
       {!voice.active && !ended && (
         <>
-          <Button
-            type="button"
-            disabled={disabled || !voice.capabilities?.available}
-            onClick={() => void voice.start()}
-          >
-            <Mic size={17} />
-            开启实时语音
-          </Button>
+          {voice.sessionStatus !== 'ready' && (
+            <Button
+              type="button"
+              disabled={disabled || !voice.capabilities?.available}
+              onClick={() => void voice.start()}
+            >
+              <Mic size={17} />
+              连接语音
+            </Button>
+          )}
           <p className="voice-call-consent">
-            开启后请求麦克风权限，音频实时发送至火山引擎识别。本站保存转写，不保存原始录音。
+            开始语音面试时请求麦克风权限，音频实时发送至火山引擎识别。本站保存转写，不保存原始录音。
           </p>
           {voice.capabilities?.reason && <p className="field-help">{voice.capabilities.reason}</p>}
         </>

@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { INTERVIEW_MAX_ANSWER, LIVE_TYPE_LABELS, type Interview } from '@interviewlab/core';
+import { ApiClientError } from '../../lib/api/http';
 import { interviewsApi } from '../../lib/api/interviews';
 import { useSession } from '../../components/session-provider';
 import { Brand, Header, Loading, Modal } from '../../components/shared';
@@ -28,7 +29,9 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
   const [streamConnected, setStreamConnected] = useState(false);
   const resource = useLiveResource(
     load,
-    (v) => (v.generation_status === 'pending' && !streamConnected) || ['pending','waiting_material'].includes(v.preparation?.status ?? ''),
+    (v) =>
+      (v.generation_status === 'pending' && !streamConnected) ||
+      ['pending', 'waiting_material'].includes(v.preparation?.status ?? ''),
   );
   const stream = useInterviewStream(id, resource.value, resource.accept, resource.refresh);
   useEffect(() => setStreamConnected(stream.connected), [stream.connected]);
@@ -38,17 +41,28 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
   const [finish, setFinish] = useState(false);
   const [dismissedParticipation, setDismissedParticipation] = useState('');
   const [now, setNow] = useState(Date.now());
+  const voiceStartRequest = useRef<{ version: number; key: string } | null>(null);
   const acknowledged = useRef(new Set<string>());
   const deadlineChecked = useRef(false);
   const v = resource.value;
   const turn = v?.turns.at(-1);
-  const preparationRequested=useRef(new Set<number>());
-  useEffect(()=>{
-    if(v?.status==='ready'&&v.preparation?.status==='pending'&&!v.preparation.task_id&&!command.blocked&&!preparationRequested.current.has(v.version)){
+  const preparationRequested = useRef(new Set<number>());
+  useEffect(() => {
+    if (
+      v?.status === 'ready' &&
+      v.preparation?.status === 'pending' &&
+      !v.preparation.task_id &&
+      !command.blocked &&
+      !preparationRequested.current.has(v.version)
+    ) {
       preparationRequested.current.add(v.version);
-      command.run(key=>interviewsApi.command(id,'prepare',{version:v.version,mode:'personalized'},key),resource.accept);
+      command.run(
+        (key) =>
+          interviewsApi.command(id, 'prepare', { version: v.version, mode: 'personalized' }, key),
+        resource.accept,
+      );
     }
-  },[v,id,command.blocked]);
+  }, [v, id, command.blocked]);
   const terminal = v?.status === 'completed' || v?.status === 'failed';
   const userId = account.status === 'signed_in' ? account.session.user.id : '';
   const draftKey = userId && turn ? `interviewlab:live:${userId}:${id}:${turn.id}` : '';
@@ -253,7 +267,14 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
         draft={text}
         maxAnswer={INTERVIEW_MAX_ANSWER}
         canAnswer={Boolean(canAnswer)}
-        blocked={command.blocked || Boolean(v.preparation && !['ready','fallback'].includes(v.preparation.status))}
+        blocked={
+          command.blocked ||
+          voice.connecting ||
+          ((voice.display || videoRoom) &&
+            v.status === 'ready' &&
+            !voice.capabilities?.available) ||
+          Boolean(v.preparation && !['ready', 'fallback'].includes(v.preparation.status))
+        }
         paused={v.status === 'paused'}
         ended={Boolean(terminal)}
         saveLabel={
@@ -279,15 +300,42 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
           <>
             <ErrorNotice message={resource.error} retry={() => void resource.refresh()} />
             <CommandNotice command={command} refresh={() => void resource.refresh()} />
-            {v.status==='ready'&&v.preparation&&<section className="notice" aria-live="polite">
-              <strong>{{waiting_material:'正在分析所选简历',pending:'正在准备本场面试',ready:'面试准备完成',failed:'面试准备暂时失败',fallback:'已选择简化面试流程'}[v.preparation.status]}</strong>
-              <p>准备阶段不计时。正式开始后从自我介绍进入交流。</p>
-              {v.preparation.status==='failed'&&<div className="row-actions">
-                <button type="button" className="button button-outline" disabled={command.blocked} onClick={()=>act('prepare',{mode:'personalized'})}>重试准备</button>
-                <button type="button" className="button button-outline" disabled={command.blocked} onClick={()=>act('prepare',{mode:'fallback'})}>使用简化流程开始</button>
-              </div>}
-            </section>}
-
+            {v.status === 'ready' && v.preparation && (
+              <section className="notice" aria-live="polite">
+                <strong>
+                  {
+                    {
+                      waiting_material: '正在分析所选简历',
+                      pending: '正在准备本场面试',
+                      ready: '面试准备完成',
+                      failed: '面试准备暂时失败',
+                      fallback: '已选择简化面试流程',
+                    }[v.preparation.status]
+                  }
+                </strong>
+                <p>准备阶段不计时。正式开始后从自我介绍进入交流。</p>
+                {v.preparation.status === 'failed' && (
+                  <div className="row-actions">
+                    <button
+                      type="button"
+                      className="button button-outline"
+                      disabled={command.blocked}
+                      onClick={() => act('prepare', { mode: 'personalized' })}
+                    >
+                      重试准备
+                    </button>
+                    <button
+                      type="button"
+                      className="button button-outline"
+                      disabled={command.blocked}
+                      onClick={() => act('prepare', { mode: 'fallback' })}
+                    >
+                      使用简化流程开始
+                    </button>
+                  </div>
+                )}
+              </section>
+            )}
 
             {continuation && (
               <p className="notice" role="status">
@@ -312,7 +360,9 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
                 {v.parent_interview_id
                   ? '本次重练直接回到原问题。'
                   : '从自我介绍开始，面试官将根据你的回答继续交流。'}
-                点击{videoRoom ? '下方' : '右上角'}开始后计时。
+                {voice.display || videoRoom
+                  ? `点击${videoRoom ? '下方' : '右上角'}开始面试，将申请麦克风权限并连接语音，授权成功后开始计时。`
+                  : '点击右上角开始后计时。'}
               </p>
             )}
             {v.retry_goal && <p className="notice">单题重练目标：{v.retry_goal}</p>}
@@ -385,7 +435,35 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
           voice.stop();
           setFinish(true);
         }}
-        onStart={v.status === 'ready' ? () => act('start', {}) : undefined}
+        onStart={
+          v.status === 'ready'
+            ? () => {
+                if (!voice.display && !videoRoom) {
+                  act('start', {});
+                  return;
+                }
+                void voice.start(async () => {
+                  // Reuse the request identity if a start response was lost.
+                  if (voiceStartRequest.current?.version !== v.version)
+                    voiceStartRequest.current = { version: v.version, key: crypto.randomUUID() };
+                  try {
+                    const next = await interviewsApi.command(
+                      id,
+                      'start',
+                      { version: v.version },
+                      voiceStartRequest.current.key,
+                    );
+                    accepted(next);
+                    voiceStartRequest.current = null;
+                  } catch (error) {
+                    if (error instanceof ApiClientError && error.status === 409)
+                      void resource.refresh();
+                    throw error;
+                  }
+                });
+              }
+            : undefined
+        }
       />
       {participation && !finish && dismissedParticipation !== participationKey && (
         <Modal

@@ -1840,6 +1840,14 @@
   .answer-panel { align-self: start; }
 }
 
+/* Match the voice room card heights while keeping question history independently scrollable. */
+@media (min-width: 761px) {
+  .session-grid-voice { align-items: stretch; }
+  .session-grid-voice > .interviewer-panel { height: auto; min-height: 0; contain: size; }
+  .session-grid-voice > .answer-panel { align-self: stretch; min-height: clamp(600px, calc(100dvh - 145px), 900px); }
+  .session-grid-voice > .answer-panel > .session-tools { margin-top: auto; }
+}
+
 /* Real reports reuse the designed report layout with live progress and evidence. */
 .real-report-page .report-sidebar > .panel,
 .real-report-page .report-detail > div > .panel,

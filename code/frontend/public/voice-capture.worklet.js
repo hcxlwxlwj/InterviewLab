@@ -9,6 +9,15 @@ class InterviewVoiceCapture extends AudioWorkletProcessor {
     this.speechMs = 0;
     this.silenceMs = 0;
     this.talking = false;
+    this.port.onmessage = ({ data }) => {
+      if (data?.type !== 'reset') return;
+      this.samples = [];
+      this.position = 0;
+      this.offset = 0;
+      this.speechMs = 0;
+      this.silenceMs = 0;
+      this.talking = false;
+    };
   }
   process(inputs, outputs) {
     for (const channels of outputs) for (const channel of channels) channel.fill(0);

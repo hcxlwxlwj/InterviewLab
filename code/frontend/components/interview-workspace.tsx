@@ -119,7 +119,7 @@ export function InterviewWorkspace(p: Props) {
       </header>
       <main className="session-main" id="main-content">
         {p.notice}
-        <div className="session-grid">
+        <div className={`session-grid${p.voiceView ? ' session-grid-voice' : ''}`}>
           <aside className="panel interviewer-panel">
             <div className="interviewer-person">
               <span className="avatar avatar-mint">面</span>

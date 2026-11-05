@@ -78,13 +78,30 @@ test('real voice WebSocket enforces cookie identity, resource ownership, Origin,
   await rejected({ origin: 'https://untrusted.invalid', cookie: 'session=owner' }, 403);
   await rejected({ origin: 'http://127.0.0.1:3000' }, 401);
   await rejected({ origin: 'http://127.0.0.1:3000', cookie: 'session=other' }, 404);
-  const events: { type: string }[] = [];
+  const events: { type: string; speech_id?: string }[] = [];
   const socket = new WebSocket(address.replace('http:', 'ws:') + path, {
     headers: { origin: 'http://127.0.0.1:3000', cookie: 'session=owner' },
   });
   t.after(() => socket.terminate());
   socket.on('message', (raw) => events.push(JSON.parse(raw.toString())));
   await waitFor(() => events.some((e) => e.type === 'ready'));
+  await waitFor(() => events.some((e) => e.type === 'speech_start'));
+  socket.send(JSON.stringify({ type: 'speech_start' }));
+  await new Promise((resolve) => setTimeout(resolve, 30));
+  assert.equal(
+    f.speeches[0].signal.aborted,
+    false,
+    'microphone activity must not interrupt the interviewer',
+  );
+  socket.send(
+    JSON.stringify({
+      type: 'playback',
+      speech_id: events.find((e) => e.type === 'speech_start')!.speech_id,
+      played_ms: 100,
+      interrupted: false,
+    }),
+  );
+  await waitFor(() => f.receipts.length === 1);
   socket.send(Buffer.alloc(6400));
   await waitFor(() => f.metrics().audioBytes === 6400);
   socket.send(JSON.stringify({ type: 'speech_start' }));

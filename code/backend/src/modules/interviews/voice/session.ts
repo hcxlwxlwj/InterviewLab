@@ -138,6 +138,12 @@ export class InterviewVoiceSession {
       this.protocolError();
       return;
     }
+    if (this.speech) {
+      // ASR rejects a stream with no audio packets (45000081). Keep its clock alive
+      // without forwarding microphone samples or treating echo as candidate speech.
+      this.asr?.write(new Uint8Array(pcm.byteLength));
+      return;
+    }
     const samples = new DataView(pcm.buffer, pcm.byteOffset, pcm.byteLength);
     let power = 0;
     for (let i = 0; i < pcm.byteLength; i += 2) power += (samples.getInt16(i, true) / 32768) ** 2;
@@ -170,6 +176,7 @@ export class InterviewVoiceSession {
   }
   control(event: VoiceClientEvent) {
     if (!this.initialized || this.closed) return;
+    if (this.speech && ['speech_start', 'speech_end', 'commit'].includes(event.type)) return;
     const resumeFlushed = event.type === 'speech_start' && this.flushing;
     const activityRevision = ['speech_start', 'speech_end'].includes(event.type)
       ? ++this.activityRevision
@@ -189,11 +196,21 @@ export class InterviewVoiceSession {
     }
     if (event.type === 'speech_start' || event.type === 'interrupt') this.stopSpeech();
     this.enqueue(async () => {
+      if (this.speech && ['speech_start', 'speech_end', 'commit'].includes(event.type)) return;
       if (event.type === 'ping') return;
       if (event.type === 'playback') {
         const turn = this.playback.get(event.speech_id);
         if (turn) {
           this.playback.delete(event.speech_id);
+          if (this.speech?.id === event.speech_id) {
+            this.speech.controller.abort();
+            this.speech = undefined;
+            this.talking = false;
+            this.final = false;
+            this.manual = false;
+            clearTimeout(this.timer);
+            await this.resetRecognition();
+          }
           await this.service.recordVoicePlayback(await this.identity(), this.id, turn, {
             speech_id: event.speech_id,
             played_ms: event.played_ms,
@@ -265,6 +282,7 @@ export class InterviewVoiceSession {
     clearTimeout(this.timer);
     if (
       this.closed ||
+      this.speech ||
       this.talking ||
       this.hold ||
       this.manual ||
@@ -332,9 +350,9 @@ export class InterviewVoiceSession {
     }
     const stream = await this.provider.recognize(
       (result) => {
-        if (this.closed || epoch !== this.asrEpoch) return;
+        if (this.closed || this.speech || epoch !== this.asrEpoch) return;
         this.enqueue(async () => {
-          if (epoch !== this.asrEpoch) return;
+          if (this.speech || epoch !== this.asrEpoch) return;
           const completeText = [this.recognitionPrefix, result.text].filter(Boolean).join('');
           const done =
             result.final && /(?:回答结束|我的回答完毕|我说完了)[。！!，,\s]*$/.test(completeText);
@@ -418,7 +436,7 @@ export class InterviewVoiceSession {
   }
   private async submit() {
     clearTimeout(this.timer);
-    if (this.talking || this.hold || this.closed) return;
+    if (this.talking || this.hold || this.closed || this.speech) return;
     const text = this.text.trim();
     if (!text && !this.interruptedTurn) {
       await this.resetRecognition();
@@ -427,7 +445,7 @@ export class InterviewVoiceSession {
     }
     const principal = await this.identity();
     const current = await this.service.read(principal, this.id);
-    if (this.talking || this.hold || this.closed) return;
+    if (this.talking || this.hold || this.closed || this.speech) return;
     const turn = current.turns.at(-1);
     if (current.status !== 'in_progress' || !turn) return;
     if (this.capturedTurn && this.capturedTurn !== turn.id)
