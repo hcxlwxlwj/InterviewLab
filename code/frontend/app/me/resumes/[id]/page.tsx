@@ -1,2 +1,2 @@
 import MaterialsWorkspace from '../../../../features/personal-center/materials-workspace';
-export default function Page() { return <MaterialsWorkspace settingsOnly={false} />; }
+export default function Page() { return <MaterialsWorkspace />; }

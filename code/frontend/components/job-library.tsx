@@ -5,10 +5,11 @@ import {
   type JobTemplate,
   type ContentSource,
 } from '@interviewlab/core';
-import { ArrowRight, Bookmark, Copy, ExternalLink, Search } from 'lucide-react';
+import { ArrowRight, Copy, ExternalLink, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import {BookmarkButton} from './bookmark-button';
 import { jobsApi } from '../lib/api/jobs';
 import { ErrorNotice, useLiveResource } from '../features/live-interview/common';
 import { EmptyState, Footer, Header, Loading } from './shared';
@@ -120,7 +121,7 @@ export function JobLibrary() {
             <ErrorNotice message={resource.error} retry={() => void resource.refresh()} />
             <ErrorNotice message={categories.error} retry={() => void categories.refresh()} />
             {!resource.value && !resource.error && <Loading />}
-            <p className="muted">岗位收藏与个人 JD 维护暂未开放。</p>
+            <p className="muted">点击岗位旁的收藏按钮，可在个人中心的目标岗位中集中查看。</p>
             <div className="catalog-rows">
               {jobs.map((j) => (
                 <article className="catalog-job" key={j.id}>
@@ -136,14 +137,7 @@ export function JobLibrary() {
                     </div>
                   </div>
                   <div className="catalog-actions">
-                    <button
-                      className="icon-button"
-                      disabled
-                      title="岗位收藏暂未开放"
-                      aria-label="岗位收藏暂未开放"
-                    >
-                      <Bookmark size={21} />
-                    </button>
+                    <BookmarkButton id={j.id} />
                     <Link className="text-link" href={`/jobs/${j.slug}`}>
                       查看岗位
                       <ArrowRight size={18} />
@@ -223,10 +217,7 @@ export function JobDetail({ job, sources }: { job: JobTemplate; sources: Content
                     <ArrowRight size={18} />
                   </Link>
                 </Button>
-                <Button variant="outline" disabled title="岗位收藏暂未开放">
-                  <Bookmark size={18} />
-                  收藏暂未开放
-                </Button>
+                <BookmarkButton id={job.id} />
               </div>
             </div>
           </div>

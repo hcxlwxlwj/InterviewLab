@@ -1,2 +1,2 @@
-import MaterialsWorkspace from '../../../features/personal-center/materials-workspace';
-export default function Page() { return <MaterialsWorkspace settingsOnly={true} />; }
+import {redirect} from 'next/navigation';
+export default function Page(){redirect('/me');}

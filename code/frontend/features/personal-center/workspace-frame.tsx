@@ -1,16 +1,16 @@
 'use client';
-import { Bookmark, FileText, FolderOpen, LayoutDashboard, Settings2 } from 'lucide-react';
+import { Bookmark, FileText, FolderOpen, LayoutDashboard, ChartNoAxesCombined } from 'lucide-react';
 import Link from 'next/link';
 import { type ReactNode } from 'react';
 import { Footer, Header } from '../../components/shared';
 
-export type PersonalSection = 'overview' | 'resumes' | 'interviews' | 'saved-jobs' | 'preferences';
+export type PersonalSection = 'overview' | 'resumes' | 'interviews' | 'saved-jobs' | 'profile';
 export const navigation = [
   { id: 'overview', title: '概览', Icon: LayoutDashboard, href: '/me' },
   { id: 'resumes', title: '我的简历', Icon: FileText, href: '/me/resumes' },
   { id: 'interviews', title: '面试记录', Icon: FolderOpen, href: '/me/interviews' },
   { id: 'saved-jobs', title: '目标岗位', Icon: Bookmark, href: '/me/saved-jobs' },
-  { id: 'preferences', title: '偏好设置', Icon: Settings2, href: '/me/preferences' },
+  { id: 'profile', title: '个人画像', Icon: ChartNoAxesCombined, href: '/me/profile' },
 ];
 export function WorkspaceFrame({
   section,

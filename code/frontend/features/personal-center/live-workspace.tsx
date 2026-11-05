@@ -7,25 +7,7 @@ import { useSession } from '../../components/session-provider';
 import { EmptyState, Loading } from '../../components/shared';
 import { interviewsApi } from '../../lib/api/interviews';
 import { ErrorNotice, useLiveResource } from '../live-interview/common';
-import { WorkspaceFrame, type PersonalSection } from './workspace-frame';
-
-export function UnavailableWorkspace({ section }: { section: PersonalSection }) {
-  const title =
-    section === 'resumes' ? '简历管理' : section === 'saved-jobs' ? '目标岗位管理' : '偏好设置';
-  return (
-    <WorkspaceFrame section={section}>
-      <section className="library-panel">
-        <EmptyState
-          title={`${title}暂未开放`}
-          description="该功能尚未接入真实账号，当前没有可展示的个人数据。"
-        />
-        <Link className="text-link" href="/interview/setup">
-          开始文字面试
-        </Link>
-      </section>
-    </WorkspaceFrame>
-  );
-}
+import { WorkspaceFrame } from './workspace-frame';
 
 export default function AccountOverview() {
   const { state } = useSession();
@@ -42,7 +24,7 @@ export default function AccountOverview() {
             <p>{state.session.user.email}</p>
           </>
         )}
-        <p className="muted">这里只展示当前账号的真实记录。可在简历管理与偏好设置中维护个人材料。</p>
+        <p className="muted">这里只展示当前账号的真实记录。可在简历管理中维护不同岗位的材料，在个人画像中回顾练习表现。</p>
       </section>
       <section className="library-panel">
         <div className="section-title-row">
