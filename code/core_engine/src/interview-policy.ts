@@ -2,7 +2,7 @@ import type { InterviewConfig, Interview } from './live-interview';
 import type { InterviewMemory as Memory } from './interview-agent';
 import { mainQuestionLimit } from './live-interview';
 
-export const INTERVIEW_POLICY_VERSION = 'interview-policy-v2';
+export const INTERVIEW_POLICY_VERSION = 'interview-policy-v3';
 export const ACTIVE_INTERVIEW_TYPES = ['technical_qa', 'business_scenario', 'hr', 'mixed'] as const;
 export interface InterviewTheme {
   goal: string;

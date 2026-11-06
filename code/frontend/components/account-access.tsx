@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { businessTarget, requiresLogin } from '../lib/access';
+import { businessTarget, loginDestination, requiresLogin } from '../lib/access';
 import { useSession } from './session-provider';
 import { AuthForm } from './auth-form';
 import { Header, Loading, Modal } from './shared';
@@ -72,7 +72,13 @@ export function AccountAccess({ children }: { children: React.ReactNode }) {
         if (!next && (url.pathname !== '/login' || path !== '/')) return;
         event.preventDefault();
         event.stopPropagation();
-        setTarget(next ?? '/me');
+        setTarget(
+          next ??
+            loginDestination(
+              url.searchParams.get('next') ??
+                window.location.pathname + window.location.search + window.location.hash,
+            ),
+        );
       }}
     >
       <div key={state.status === 'signed_in' ? state.session.user.id : 'guest'}>{content}</div>

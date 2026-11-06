@@ -31,6 +31,48 @@ async function startListening(f: ReturnType<typeof create>) {
   });
   await waitFor(() => f.receipts.length === 1);
 }
+
+for (const duration of [20, 30] as const)
+  test(`${duration}-minute voice transport remains connected beyond twelve minutes and obeys its interview deadline`, async (t) => {
+    t.mock.timers.enable({ apis: ['setTimeout', 'setInterval', 'Date'] });
+    const f = create();
+    try {
+      const remaining = (duration + 2) * 60000;
+      f.fixture.setView({
+        ...f.fixture.view,
+        configuration: { ...f.fixture.view.configuration, duration_minutes: duration },
+        deadline_at: new Date(Date.now() + remaining).toISOString(),
+      });
+      await f.session.start();
+      t.mock.timers.tick(13 * 60000);
+      assert.equal(f.disconnected(), false);
+      t.mock.timers.tick(remaining - 13 * 60000);
+      assert.equal(f.disconnected(), true);
+    } finally {
+      f.session.close();
+      t.mock.timers.reset();
+    }
+  });
+
+test('voice reconnect uses remaining deadline instead of granting a new full session', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval', 'Date'] });
+  const f = create();
+  try {
+    f.fixture.setView({
+      ...f.fixture.view,
+      configuration: { ...f.fixture.view.configuration, duration_minutes: 20 },
+      deadline_at: new Date(Date.now() + 14000).toISOString(),
+    });
+    await f.session.start();
+    t.mock.timers.tick(13999);
+    assert.equal(f.disconnected(), false);
+    t.mock.timers.tick(1);
+    assert.equal(f.disconnected(), true);
+  } finally {
+    f.session.close();
+    t.mock.timers.reset();
+  }
+});
 test('continuous audio uses ASR final plus a silence window, automatically persists a voice answer and preserves the original Agent flow', async (t) => {
   const f = create();
   t.after(() => f.session.close());
@@ -71,7 +113,7 @@ test('hold suppresses automatic submission; explicit done waits for final transc
   await waitFor(() => f.answers.length === 1);
   assert.equal(f.answers[0], '首先我测量了耗时。');
 });
-test('interrupt during Agent generation cancels the old generation and appends to the same answer rather than answering a future question', async (t) => {
+test('confirmed speech replaces pending generation atomically and appends to the same answer', async (t) => {
   const f = create();
   t.after(() => f.session.close());
   await startListening(f);
@@ -80,8 +122,11 @@ test('interrupt during Agent generation cancels the old generation and appends t
   f.session.control({ type: 'speech_end' });
   await waitFor(() => f.answers.length === 1);
   f.session.control({ type: 'speech_start' });
-  await waitFor(() =>
-    f.events.some((e) => e.type === 'interview' && e.interview.generation_status === 'idle'),
+  await waitFor(() => f.activities.some((activity) => activity.active));
+  assert.equal(
+    f.metrics().interruptions,
+    0,
+    'VAD reserves publication without cancelling the model',
   );
   f.recognize({ text: '补充一下，我还验证了命中率。', final: true });
   f.session.control({ type: 'speech_end' });
@@ -89,6 +134,126 @@ test('interrupt during Agent generation cancels the old generation and appends t
   assert.equal(f.answers.length, 1);
   assert.equal(f.fixture.view.turns.length, 1);
   assert.equal(f.fixture.view.turns[0].answer_text, '我使用缓存。\n补充一下，我还验证了命中率。');
+  assert.equal(
+    f.metrics().interruptions,
+    0,
+    'there is no cancelled-but-unsubmitted generation gap',
+  );
+  assert.ok(f.activities.some((activity) => !activity.active));
+});
+
+test('noise-only VAD and an empty ASR endpoint release publication without cancelling or starting an empty continuation', async (t) => {
+  const f = create();
+  t.after(() => f.session.close());
+  await startListening(f);
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '我使用缓存。', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() => f.answers.length === 1);
+  const generation = f.fixture.view.generation_id;
+  f.session.control({ type: 'speech_start' });
+  await waitFor(() => f.activities.some((activity) => activity.active));
+  f.recognize({ text: '', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() => f.activities.some((activity) => !activity.active), 2000);
+  assert.equal(f.metrics().interruptions, 0);
+  assert.equal(f.continuations.length, 0);
+  assert.equal(f.fixture.view.generation_id, generation);
+  assert.equal(f.fixture.view.generation_status, 'pending');
+});
+
+test('old recognizer packets and a replay of the submitted answer do not cancel pending generation', async (t) => {
+  const f = create();
+  t.after(() => f.session.close());
+  await startListening(f);
+  const previous = f.metrics().recognizers - 1;
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '我使用缓存。', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() => f.metrics().recognizers > previous + 1);
+  f.recognizeAt(previous, { text: '旧epoch迟到的转写。', final: true });
+  f.recognize({ text: '我使用缓存。', final: true });
+  await new Promise((resolve) => setTimeout(resolve, 70));
+  assert.equal(f.metrics().interruptions, 0);
+  assert.equal(f.continuations.length, 0);
+  assert.equal(f.fixture.view.turns[0].revision, 1);
+});
+
+test('continued speech renews its publication reservation and closing releases it without cancelling the model', async (t) => {
+  const f = create();
+  t.after(() => f.session.close());
+  await startListening(f);
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '我使用缓存。', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() => f.answers.length === 1);
+  f.session.control({ type: 'speech_start' });
+  await waitFor(() => f.activities.filter((activity) => activity.active).length >= 2, 1500);
+  assert.equal(f.metrics().interruptions, 0);
+  f.session.close();
+  await waitFor(() => f.activities.some((activity) => !activity.active));
+  assert.equal(f.metrics().interruptions, 0);
+});
+
+test('reconnecting to an already interrupted answer never starts an empty continuation after a noise pulse', async (t) => {
+  const f = create();
+  t.after(() => f.session.close());
+  const current = f.fixture.view;
+  current.generation_status = 'idle';
+  current.turns[0].answer_status = 'answered';
+  current.turns[0].answer_text = '已经提交的回答。';
+  current.turns[0].revision = 1;
+  f.fixture.setView(current);
+  await f.session.start();
+  f.session.control({ type: 'speech_start' });
+  f.session.control({ type: 'speech_end' });
+  await new Promise((resolve) => setTimeout(resolve, 90));
+  assert.equal(f.continuations.length, 0);
+  assert.equal(f.fixture.view.turns[0].revision, 1);
+});
+
+test('a rejected input reservation keeps a late supplement on its old question as a draft', async (t) => {
+  const f = create();
+  t.after(() => f.session.close());
+  await startListening(f);
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '我使用缓存。', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() => f.answers.length === 1);
+  const next = f.fixture.view;
+  const previous = next.turns[0].id;
+  next.turns.push({
+    ...next.turns[0],
+    id: 'future-question',
+    text: '接下来你如何验证？',
+    answer_text: null,
+    answer_status: 'waiting',
+    revision: 0,
+    main_question_index: 2,
+  });
+  next.generation_status = 'ready';
+  next.version++;
+  f.fixture.setView(next);
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '补充一下，我也验证过命中率。', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() =>
+    f.events.some((event) => event.type === 'error' && event.code === 'voice_previous_draft'),
+  );
+  const transcript = f.events.filter((event) => event.type === 'transcript').at(-1);
+  assert.ok(transcript?.type === 'transcript');
+  assert.equal(transcript.turn_id, previous);
+  assert.equal(f.metrics().interruptions, 0);
+  assert.equal(f.answers.length, 1);
+  assert.equal(f.continuations.length, 0);
+  assert.equal(f.disconnected(), false);
+  await waitFor(() => f.speeches.length === 2);
+  assert.equal(f.fixture.view.turns.at(-1)?.id, 'future-question');
+  assert.equal(
+    f.continuations.length,
+    0,
+    'the independent old draft does not block the new spoken question',
+  );
 });
 test('late provider audio and recognition are discarded after interrupt/close; ASR error leaves the transcript in the client', async (t) => {
   const f = create();
@@ -219,4 +384,106 @@ test('interviewer playback ignores voice, stale recognition and commit until the
   f.session.control({ type: 'speech_end' });
   await waitFor(() => f.answers.length === 1);
   assert.equal(f.answers[0], '这是听完题目后的回答。');
+});
+
+test('a tentative supplement withdrawn by the final transcript leaves the original generation running', async (t) => {
+  const f = create();
+  t.after(() => f.session.close());
+  await startListening(f);
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '我使用缓存。', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() => f.answers.length === 1);
+  const generation = f.fixture.view.generation_id;
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '可能的误识别', final: false });
+  await waitFor(() => f.events.some((e) => e.type === 'transcript' && e.text === '可能的误识别'));
+  assert.equal(f.fixture.view.generation_status, 'pending');
+  f.recognize({ text: '', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() => f.activities.some((a) => !a.active));
+  assert.equal(f.fixture.view.generation_id, generation);
+  assert.equal(f.metrics().interruptions, 0);
+  assert.equal(f.continuations.length, 0);
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '我还验证了命中率。', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() => f.continuations.length === 1);
+  assert.equal(f.continuations[0], '我还验证了命中率。');
+});
+
+test('a delayed final supplement keeps publication reserved until the same answer can be updated', async (t) => {
+  const f = create();
+  t.after(() => f.session.close());
+  await startListening(f);
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '我使用缓存。', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() => f.answers.length === 1);
+  f.activities.length = 0;
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '还测了命中率', final: false });
+  f.session.control({ type: 'speech_end' });
+  await new Promise((resolve) => setTimeout(resolve, 1300));
+  assert.equal(f.activities.at(-1)?.active, true);
+  assert.equal(f.fixture.view.generation_status, 'pending');
+  f.recognize({ text: '还测了命中率。', final: true });
+  await waitFor(() => f.continuations.length === 1);
+  assert.ok(f.activities.some((a) => !a.active));
+});
+
+test('explicit completion without speech does not flush ASR or wait for a final packet', async (t) => {
+  const f = create();
+  t.after(() => f.session.close());
+  await startListening(f);
+  f.session.control({ type: 'commit' });
+  await waitFor(() => f.events.some((e) => e.type === 'status' && e.state === 'listening'));
+  assert.equal(f.metrics().finishes, 0);
+  assert.equal(f.answers.length, 0);
+});
+
+test('recognition final timeout releases the pending generation and preserves the transcript', async (t) => {
+  const f = create();
+  t.after(() => f.session.close());
+  await startListening(f);
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '我使用缓存。', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() => f.answers.length === 1);
+  f.activities.length = 0;
+  const generation = f.fixture.view.generation_id;
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '尚未确认的补充', final: false });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(
+    () => f.events.some((e) => e.type === 'error' && e.code === 'voice_final_pending'),
+    10000,
+  );
+  await waitFor(() => f.activities.at(-1)?.active === false);
+  assert.equal(f.fixture.view.generation_id, generation);
+  assert.equal(f.continuations.length, 0);
+  assert.ok(f.events.some((e) => e.type === 'transcript' && e.text === '尚未确认的补充'));
+  assert.equal(f.disconnected(), false);
+});
+
+test('a failed next-question generation is reported without closing voice or losing the answer', async (t) => {
+  const f = create();
+  t.after(() => f.session.close());
+  await startListening(f);
+  const v = f.fixture.view;
+  v.generation_status = 'failed';
+  v.version++;
+  v.turns[0].answer_status = 'answered';
+  v.turns[0].answer_text = '已经保存';
+  f.fixture.setView(v);
+  await waitFor(() =>
+    f.events.some((e) => e.type === 'error' && e.code === 'voice_generation_failed'),
+  );
+  assert.equal(f.disconnected(), false);
+  assert.equal(f.fixture.view.turns[0].answer_text, '已经保存');
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '继续补充一次。', final: true });
+  f.session.control({ type: 'speech_end' });
+  await waitFor(() => f.continuations.length === 1);
+  assert.equal(f.fixture.view.generation_status, 'pending');
 });

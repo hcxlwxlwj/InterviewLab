@@ -28,8 +28,30 @@ export function createReportAgent(
       throw error;
     };
   const scoringSnapshot = (snapshot: InterviewSnapshot): InterviewSnapshot => ({
+    scoring_evidence_version:
+      snapshot.scoring_evidence_version ??
+      (snapshot.preparation_plan?.policy?.version === 'interview-policy-v3'
+        ? 'candidate-answer-v1'
+        : undefined),
     interview_type: snapshot.interview_type,
     job_title: snapshot.job_title,
+    preparation_plan: snapshot.preparation_plan?.role_context
+      ? {
+          role_context: {
+            job_id: snapshot.preparation_plan.role_context.job_id,
+            job_title: snapshot.preparation_plan.role_context.job_title,
+            job_version: snapshot.preparation_plan.role_context.job_version,
+            description: snapshot.preparation_plan.role_context.description,
+            responsibilities: snapshot.preparation_plan.role_context.responsibilities,
+            requirements: snapshot.preparation_plan.role_context.requirements,
+            topics: snapshot.preparation_plan.role_context.topics,
+            source_refs: snapshot.preparation_plan.role_context.source_refs,
+            usage: 'role_requirements_not_candidate_evidence',
+          },
+          goals: [],
+          limitations: [],
+        }
+      : undefined,
     knowledge: snapshot.knowledge,
     prompt_version: snapshot.prompt_version,
     rubric_version: snapshot.rubric_version,
@@ -45,15 +67,7 @@ export function createReportAgent(
             turn,
             signal,
             repair,
-            snapshot: {
-              ...scoringSnapshot(snapshot),
-              knowledge: {
-                ...snapshot.knowledge,
-                questions: snapshot.knowledge.questions.filter(
-                  (q) => q.id === turn.knowledge_question_id || q.topic === turn.topic,
-                ),
-              },
-            },
+            snapshot: scoringSnapshot(snapshot),
             context: context
               ? {
                   ...context,

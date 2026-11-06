@@ -15,7 +15,7 @@ VOLC_TTS_API_KEY=在本机填写合成服务Key
 VOLC_ASR_RESOURCE_ID=volc.seedasr.sauc.duration
 VOLC_TTS_RESOURCE_ID=seed-tts-2.0
 VOLC_TTS_SPEAKER=zh_female_vv_uranus_bigtts
-VOICE_SILENCE_MS=3000
+VOICE_SILENCE_MS=1800
 ```
 
 示例采用新版 `X-Api-Key` 鉴权。旧版 AppID/Access Token 鉴权未实现，旧账户请按官方控制台说明迁移或另行扩展适配器。资源 ID 和音色必须匹配已开通的产品。
@@ -43,7 +43,7 @@ npm run dev:api
 - 自动接话：必须同时满足本地停止讲话、识别分句 final、文本稳定及至少配置时长的停顿。ASR final 不等于整段答完。“因为/然后/比如”等未完成结尾额外等待；这仍是启发式端点判断，不是完善的语义端点模型。
 - 思考：点击“让我想想”暂停自动提交，继续采集转写；“恢复自动接话”恢复判断。“我说完了”要求 ASR 刷出最终结果后提交，即使处于思考状态也可主动结束回答。
 - 播报期间自动暂停收音：从服务端开始播报到本地播放队列耗尽，禁用麦克风音轨，只发送静音包，不转发人声活动事件。实际播完后额外等待 300ms 清除回声尾音并重置采集缓冲，再恢复收音；手动静音保持不变。后端将这段时间收到的音频替换为静音包以维持 ASR 连接，同时忽略转写及自动提交，收到对应播放回执后重新建立识别流。只有显式点击“停止播报”才提前终止；旧 `speech_id` 不能影响新播报。
-- 打断思考：若上一回答已保存、下一问题仍生成中，则取消对应 generation，将面试置于可补充状态。新转写追加到上一回答并提升 revision，再调用同一 Agent。已被取消的旧任务通过既有 generation 和输入摘要校验无法提交。
+- 打断思考：上一回答已保存、下一问题仍生成中时，先保留生成并暂缓发布。最终转写确认后，在同一事务中追加回答、提升 revision、取消旧 generation 并登记新任务。临时识别撤回为空或超时时释放发布租约，不把面试留在取消后的空档。旧任务仍受 generation 和输入摘要校验保护。
 - 切回文字/断线：停止麦克风、采集节点与播放资源。已识别的草稿保留在当前标签页；无法保证保留尚未被识别的音频。补充状态下可文字提交，或点击“按已保存的回答继续提问”。重新连接读取服务端权威状态，不重放历史问题；主动重连时仅播报当前待回答题目。
 - 暂停、结束、离页和麦克风断开会释放资源。远端状态每 500ms 刷新，连接内每 5 秒重新认证。每位用户每场面试只保留一个语音连接，新连接替换旧连接。
 - TTS 失败时题目仍显示，可以继续回答或切回文字；ASR 或连接失败时停止采集并明确报错，不自动重试上传音频。
@@ -53,7 +53,7 @@ npm run dev:api
 - `GET /api/v1/interviews/:id/voice/capabilities`：仅本人读取，返回是否可用及说明，不返回配置值或密钥。
 - `WS /api/v1/interviews/:id/voice`：同源 Cookie 身份和资源归属校验；必须携带与 `PUBLIC_ORIGIN` 相符的 Origin。原 Next.js 外部重写负责开发代理，生产反向代理必须允许 WebSocket Upgrade，不能缓存或缓冲实时帧。
 - 上行二进制为 PCM；控制事件有 `speech_start`、`speech_end`、`commit`、`hold`、`interrupt`、`repeat`、`playback` 和 `ping`。下行 JSON 包括转写、面试状态、播报标识、PCM base64 块和经过脱敏的错误；核心 DTO 位于 `code/core_engine/src/voice.ts`。
-- `POST /api/v1/interviews/:id/voice/continue`：复用 version、幂等键、身份和同源校验；仅允许补充被打断后尚未生成新问题的最后一条已回答回合，空文本表示按原回答继续生成。
+- `POST /api/v1/interviews/:id/voice/continue`：复用 version、幂等键、身份和同源校验；补充尚未生成新问题的最后一条已回答回合。已提交的语音回答支持直接原子替换正在生成的下一题；空文本仅在生成已停止时按原回答继续，不修订回答或重算已成功的评分。
 - 新增迁移 `0005_massive_marvex.sql`，历史回合默认 `input_mode=text_fallback`，语音回答记为 `voice`；不修改历史迁移。报告和重练继续使用确认保存的 answer_text/revision。
 - 播放结束/打断时记录 `voice_playback` 事件，包含 speech_id、实际播放毫秒数和是否打断。它不代表用户听清或听完全文，也不用于推断情绪、人格或专业能力。
 - 供应商密钥只存在于后端配置。协议错误与服务异常不打印原始供应商消息、音频、转写或凭证。连接有音频包大小、传输速率、累计时长和出站积压限制。

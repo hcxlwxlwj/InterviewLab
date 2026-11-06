@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { businessTarget, requiresLogin } from '../../code/frontend/lib/access';
+import { businessTarget, loginDestination, requiresLogin } from '../../code/frontend/lib/access';
 import { signUpSchema } from '../../code/backend/src/modules/accounts/auth-routes';
 test('authentication restores only local business destinations and preserves filters', () => {
   assert.equal(
@@ -22,6 +22,19 @@ test('authentication restores only local business destinations and preserves fil
   assert.equal(requiresLogin('/'), false);
   assert.equal(requiresLogin('/login'), false);
   assert.equal(requiresLogin('/me/interviews'), true);
+});
+test('login returns to the requested page and never redirects back to login or outside the app', () => {
+  assert.equal(
+    loginDestination('/interview/setup?job=frontend#configuration'),
+    '/interview/setup?job=frontend#configuration',
+  );
+  assert.equal(
+    loginDestination('/reports/report-id/practice#turn-id'),
+    '/reports/report-id/practice#turn-id',
+  );
+  for (const value of [null, '/login', 'https://attacker.test/me', '//attacker.test/me']) {
+    assert.equal(loginDestination(value), '/');
+  }
 });
 test('signup contract normalizes names and emails while rejecting unexpected identity fields', () => {
   assert.deepEqual(

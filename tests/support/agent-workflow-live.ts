@@ -173,7 +173,7 @@ async function main() {
             model: config.LLM_MODEL,
             job_title: job.title,
             knowledge: k,
-            prompt_version: 'interview-policy-v2',
+            prompt_version: 'interview-policy-v3',
             interview_type: state.view.configuration.interview_type,
             rubric_version: 'evidence-uncalibrated-v1',
             runtime_version: 'graph-v1',

@@ -11,11 +11,11 @@ import type { BackendConfig } from '../../foundation/config';
 import { ServiceError } from '../../foundation/errors';
 import { langChainFetch } from './model';
 import { checkedGraph } from './graph';
-import { interviewPolicy } from '@interviewlab/core';
-import { PROFILE_GOALS } from '../knowledge/catalog';
+import { interviewPolicy, FEEDBACK_INTERVIEW_GOALS } from '@interviewlab/core';
+import { COMPETENCIES, PROFILE_GOALS, planningRoleContext } from '../knowledge/catalog';
 
 export const RESUME_ANALYSIS_VERSION = 'resume-evidence-v2';
-export const PREPARATION_VERSION = 'interview-preparation-v2';
+export const PREPARATION_VERSION = 'interview-preparation-v3';
 const fact = z
   .object({
     kind: z.enum(['experience', 'skill', 'role', 'action', 'result']),
@@ -78,6 +78,7 @@ export function createWorkflowModels(
     signal: AbortSignal,
     repair = false,
     model = config.LLM_MODEL,
+    maxTokens = 1800,
   ) {
     if (!config.LLM_API_KEY) throw new ServiceError('capability_unavailable', 501, '模型未配置');
     const timeout = AbortSignal.any([signal, AbortSignal.timeout(config.LLM_TIMEOUT_MS)]);
@@ -90,7 +91,7 @@ export function createWorkflowModels(
           model,
           stream: false,
           temperature: 0.1,
-          max_tokens: 1800,
+          max_tokens: maxTokens,
           thinking: { type: 'disabled' },
           messages: [
             {
@@ -219,58 +220,93 @@ export function createWorkflowModels(
               z
                 .object({
                   goal: z.enum(goals as [string, ...string[]]),
-                  focus: z.string().min(1).max(180),
+                  focus: z.string().min(1).max(80),
                   evidence_indices: z.array(z.number().int().nonnegative()).max(3),
                 })
                 .strict(),
             )
             .min(1)
-            .max(6),
-          limitations: z.array(z.string().max(200)).max(5),
+            .max(3),
+          limitations: z.array(z.string().max(80)).max(1),
         })
         .strict();
       return checkedGraph(
         'interview_preparation',
         { configuration, knowledge, analysis },
         {
-          prepare: (input) => ({
-            configuration: input.configuration,
-            policy: interviewPolicy(input.configuration),
-            goals,
-            job_context: input.knowledge.questions
-              .slice(0, 8)
-              .map((q) => ({ topic: q.topic, intent: q.intent })),
-            resume: input.analysis ?? null,
-          }),
+          prepare: (input) => {
+            const role = planningRoleContext(input.configuration);
+            const type = input.configuration.interview_type;
+            return {
+              configuration: input.configuration,
+              policy: interviewPolicy(input.configuration),
+              goals,
+              job_context: role,
+              task_context:
+                type === 'business_scenario' || type === 'mixed' ? role.responsibilities : [],
+              question_materials:
+                type === 'hr' || type === 'business_scenario'
+                  ? []
+                  : input.knowledge.questions.slice(0, 8).map((q) => ({
+                      id: q.id,
+                      topic: q.topic,
+                      question: q.text,
+                      intent: q.intent,
+                    })),
+              resume: input.analysis ?? null,
+            };
+          },
           generate: (input) =>
             call(
               schema,
               input,
-              '按policy的类型、招聘阶段、时长和主题优先级生成观察目标，不生成固定题单或答案。HR安排求职动机与到岗、出勤、时长或地点、薪资期望，不追专业实现；专业与业务面结合相关项目的本人参与和心得，以各自考察方式覆盖六维。focus说明要了解什么，不声称候选人具备能力。evidence_indices仅引用resume.facts；没有简历则为空。',
+              '按policy的类型、招聘阶段、时长和主题优先级选择最多3个最有针对性的优先观察目标，其余必备覆盖由程序补齐，不重复输出整份policy，不生成题单或答案。每个focus不超过25字，limitations无必要则空，必要时只写一句。job_context是目标岗位的公共职责和要求，不是候选人已做过或已掌握的事实；task_context是可讨论的实际岗位任务。resume仅是候选人的材料陈述，不能作为当场表现或评分证据，计划必须允许核对参与范围及接受口头修正；岗位要求、专业知识或他人项目不能移植为候选人经历。HR安排求职动机与到岗、出勤、时长或地点、薪资期望，不追专业实现；业务面围绕task_context中的目标、约束、优先级、处理方法与验证，不改成代码考试，没有已确认经历时只可明确设计为假设任务。专业面围绕岗位要求和相关原理、实际运用；综合面组合上述内容。非HR整场为六维安排观察机会，不要求每一题同时考齐六维。focus说明要了解什么，不声称候选人具备能力。evidence_indices仅引用resume.facts；没有简历则为空。',
               signal,
               repair,
               model,
+              600,
             ),
-          validate: (raw) => {
+          validate: (raw, prepared) => {
             const parsed = schema.parse(raw);
-            const policy = interviewPolicy(configuration);
-            if (configuration.interview_type === 'hr') {
-              for (const goal of ['motivation', 'availability', 'expectations'])
-                if (!parsed.goals.some((g) => g.goal === goal))
-                  parsed.goals.unshift({
-                    goal,
-                    focus: policy.themes.find((t) => t.goal === goal)!.purpose,
-                    evidence_indices: [],
+            const policy = prepared.policy;
+            if (parsed.goals.some((g) => g.evidence_indices.some((i) => !analysis?.facts[i])))
+              throw new ServiceError('invalid_model_output', 502, '规划引用无效');
+            const selected = [...new Map(parsed.goals.map((g) => [g.goal, g])).values()];
+            const required =
+              configuration.interview_type === 'hr'
+                ? ['motivation', 'availability', 'expectations']
+                : Object.values(FEEDBACK_INTERVIEW_GOALS).flatMap((options) => {
+                    const applicable = (options as readonly string[]).filter((goal) =>
+                      goals.includes(goal),
+                    );
+                    const chosen = selected.find((g) => applicable.includes(g.goal));
+                    return chosen ? [chosen.goal] : applicable.slice(0, 1);
                   });
-              parsed.goals.sort(
-                (a, b) =>
-                  policy.themes.findIndex((t) => t.goal === a.goal) -
-                  policy.themes.findIndex((t) => t.goal === b.goal),
-              );
-            }
+            for (const goal of required)
+              if (!selected.some((g) => g.goal === goal))
+                selected.push({
+                  goal,
+                  focus:
+                    policy.themes.find((t) => t.goal === goal)?.purpose ??
+                    COMPETENCIES.find((g) => g.id === goal)!.evidence_wanted,
+                  evidence_indices: [],
+                });
+            const ordered = [
+              ...selected.filter((g) => required.includes(g.goal)),
+              ...selected.filter((g) => !required.includes(g.goal)),
+            ];
+            if (configuration.interview_type === 'hr')
+              ordered.sort((a, b) => {
+                const rank = (goal: string) => {
+                  const i = policy.themes.findIndex((t) => t.goal === goal);
+                  return i < 0 ? 99 : i;
+                };
+                return rank(a.goal) - rank(b.goal);
+              });
             return {
               policy,
-              goals: parsed.goals.slice(0, 6).map((g) => ({
+              role_context: prepared.job_context,
+              goals: ordered.slice(0, 6).map((g) => ({
                 goal: g.goal,
                 focus: g.focus,
                 material_refs: g.evidence_indices.map((i) => {

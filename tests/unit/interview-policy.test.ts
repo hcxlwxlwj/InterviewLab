@@ -217,7 +217,9 @@ test('new HR turns carry recent dialogue and policy, accept neutral bridges, and
     async (_url, init) => {
       const body = JSON.parse(String(init?.body));
       const input = JSON.parse(body.messages[1].content);
+      assert.equal(input.recent_dialogue.length, 2);
       assert.equal(input.recent_dialogue[0].answer, state.view.turns[0].answer_text);
+      assert.equal(input.current_answer, state.view.turns.at(-1)!.answer_text);
       assert.equal(input.policy.required_dimensions, false);
       assert.deepEqual(input.required_feedback_coverage, []);
       assert.equal(
@@ -227,15 +229,15 @@ test('new HR turns carry recent dialogue and policy, accept neutral bridges, and
       );
       assert.equal(body.response_format.json_schema.schema.properties.q.maxLength, 100);
       const output = {
-        a: 'n',
-        g: 0,
+        h: 'asn1',
+        decision: { a: 'n', g: 0 },
         e: 0,
-        o: 1,
-        r: [],
-        b: '我们聊聊求职选择。',
-        d: 'type_priority',
         q: question,
-        s: [],
+        v: [
+          input.goal_options.findIndex((option: { goal: string }) => option.goal === 'motivation'),
+        ],
+        d: 'type_priority',
+        b: '',
       };
       return new Response(
         `data: ${JSON.stringify({ choices: [{ delta: { content: JSON.stringify(output) } }] })}\n\ndata: [DONE]\n\n`,
@@ -257,7 +259,7 @@ test('new HR turns carry recent dialogue and policy, accept neutral bridges, and
     false,
     context,
   );
-  assert.equal(result.question?.acknowledgement, '我们聊聊求职选择。');
+  assert.equal(result.question?.acknowledgement, '');
   assert.equal(result.memory?.decision?.reason, 'type_priority');
   seen.length = 0;
   question = '你如何解释缓存机制？';

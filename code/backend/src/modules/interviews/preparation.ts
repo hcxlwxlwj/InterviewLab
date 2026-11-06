@@ -22,7 +22,7 @@ import {
 } from './repository';
 import { materialFields, type WorkflowModels } from './workflow-models';
 import { interviewPolicy } from '@interviewlab/core';
-import { COMPETENCIES, PROFILE_GOALS } from '../knowledge/catalog';
+import { COMPETENCIES, PROFILE_GOALS, planningRoleContext } from '../knowledge/catalog';
 
 export const preparationDigest = (state: InterviewState) =>
   inputDigest({ configuration: state.view.configuration, snapshot: state.snapshot });
@@ -113,7 +113,7 @@ export function createInterviewPreparation(
         personal_material: material,
         knowledge: await knowledge.read(before.view.configuration),
         model: config.LLM_MODEL,
-        prompt_version: 'interview-policy-v2',
+        prompt_version: 'interview-policy-v3',
         rubric_version: 'evidence-uncalibrated-v1',
       };
     }
@@ -138,6 +138,7 @@ export function createInterviewPreparation(
         if (body.mode === 'fallback') {
           state.snapshot.resume_analysis = simpleResume(state.snapshot.personal_material);
           state.snapshot.preparation_plan = {
+            role_context: planningRoleContext(state.view.configuration),
             policy: interviewPolicy(state.view.configuration),
             goals: PROFILE_GOALS[state.view.configuration.interview_type].map((goal) => ({
               goal,

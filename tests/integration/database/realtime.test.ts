@@ -75,24 +75,44 @@ function runtime(blocked = false, extra: InterviewRuntimeOptions = {}) {
       const body = JSON.parse(init!.body as string);
       modelInputs.push(body);
       assert.equal(body.stream, true);
+      const input = JSON.parse(body.messages[1].content);
+      const semantic = Boolean(body.response_format.json_schema.schema.properties.decision);
+      const branches = body.response_format.json_schema.schema.properties.decision?.anyOf ?? [];
+      const follow = semantic
+        ? branches.some((branch: any) => branch.properties.a.const === 'f')
+        : body.response_format.json_schema.schema.properties.a.enum?.includes('f');
+      const action = follow ? 'f' : 'n';
+      const goals = follow ? input.follow_up_goal_indices : input.next_goal_indices;
+      const goal = semantic ? goals[0] : Math.max(0, input.goal_options.indexOf('verification'));
       const raw = JSON.stringify({
-        a: body.response_format.json_schema.schema.properties.a.enum?.includes('f') ? 'f' : 'n',
-        g: Math.max(0, JSON.parse(body.messages[1].content).goal_options.indexOf('verification')),
+        ...(semantic
+          ? {
+              h: 'ade1',
+              v:
+                input.current_stage === 'introduction'
+                  ? []
+                  : [
+                      input.goal_options.findIndex(
+                        (option: { goal: string }) =>
+                          option.goal === (input.memory?.focus ?? 'understanding'),
+                      ),
+                    ],
+            }
+          : {}),
+        ...(semantic ? { decision: { a: action, g: goal } } : { a: action, g: goal }),
         e: 0,
-        o: 0,
+        ...(!semantic ? { o: 0 } : {}),
+        ...(body.response_format.json_schema.schema.properties.r ? { r: [] } : {}),
+        ...(body.response_format.json_schema.schema.properties.s ? { s: [] } : {}),
         q: '你提到缓存，如何验证数据仍然正确？',
-        s: [],
-        r: [],
+        d: follow ? 'probe_gap' : 'type_priority',
         b: '',
-        d: body.response_format.json_schema.schema.properties.a.enum?.includes('f')
-          ? 'probe_gap'
-          : 'type_priority',
       });
       let cancelled = false;
       const response = new Response(
         new ReadableStream({
           async start(c) {
-            const cut = raw.indexOf(',"s"');
+            const cut = raw.indexOf(',"d"');
             c.enqueue(
               new TextEncoder().encode(
                 'data: ' +

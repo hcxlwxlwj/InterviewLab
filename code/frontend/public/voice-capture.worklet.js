@@ -9,8 +9,10 @@ class InterviewVoiceCapture extends AudioWorkletProcessor {
     this.speechMs = 0;
     this.silenceMs = 0;
     this.talking = false;
+    this.epoch = 0;
     this.port.onmessage = ({ data }) => {
       if (data?.type !== 'reset') return;
+      this.epoch = data.epoch ?? this.epoch + 1;
       this.samples = [];
       this.position = 0;
       this.offset = 0;
@@ -39,12 +41,12 @@ class InterviewVoiceCapture extends AudioWorkletProcessor {
     }
     if (!this.talking && this.speechMs >= 160) {
       this.talking = true;
-      this.port.postMessage({ type: 'speech_start' });
+      this.port.postMessage({ type: 'speech_start', epoch: this.epoch });
     }
     if (this.talking && this.silenceMs >= 500) {
       this.talking = false;
       this.speechMs = 0;
-      this.port.postMessage({ type: 'speech_end' });
+      this.port.postMessage({ type: 'speech_end', epoch: this.epoch });
     }
     // Fractional position persists across render quanta, including 44.1 kHz devices.
     const step = sampleRate / 16000;
@@ -60,7 +62,7 @@ class InterviewVoiceCapture extends AudioWorkletProcessor {
         const pcm = new ArrayBuffer(this.packet.length * 2),
           view = new DataView(pcm);
         for (let i = 0; i < this.packet.length; i++) view.setInt16(i * 2, this.packet[i], true);
-        this.port.postMessage({ type: 'audio', pcm }, [pcm]);
+        this.port.postMessage({ type: 'audio', pcm, epoch: this.epoch }, [pcm]);
         this.offset = 0;
       }
     }

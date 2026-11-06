@@ -5,8 +5,16 @@ import type {
   InterviewConfig,
   InterviewProfile,
   KnowledgeChunk,
+  InterviewRoleContext,
 } from '@interviewlab/core';
-import { JOBS, CONTENT_SOURCES, templateJd, frontendReportReference } from '../../content/index';
+import {
+  JOBS,
+  CONTENT_SOURCES,
+  getJob,
+  templateJd,
+  frontendReportReference,
+} from '../../content/index';
+import { ServiceError } from '../../foundation/errors';
 import { professionalFoundations as professional } from '../../content/index';
 
 export const CATALOG_FORMAT = 'all-roles-v1';
@@ -83,6 +91,22 @@ export function catalogProfile(type: InterviewConfig['interview_type']): Intervi
     goals: PROFILE_GOALS[type],
   };
 }
+export function planningRoleContext(config: InterviewConfig): InterviewRoleContext {
+  const job = getJob(config.job);
+  if (!job || !job.stages.includes(config.career_stage))
+    throw new ServiceError('unsupported_input', 400, '岗位或招聘阶段不可用');
+  return {
+    job_id: job.id,
+    job_title: job.title,
+    job_version: job.version,
+    description: job.description,
+    responsibilities: [...job.responsibilities],
+    requirements: [...job.requirements],
+    topics: [...job.topics],
+    source_refs: [...job.source_refs],
+    usage: 'role_requirements_not_candidate_evidence',
+  };
+}
 export interface CatalogDocument {
   id: string;
   kind: NonNullable<KnowledgeChunk['kind']>;
@@ -139,7 +163,7 @@ export function buildCatalog(): CatalogDocument[] {
       bindings: JOBS.filter((j) => j.category_id === card.family).map((j) => ({
         job: j.id,
         stages: j.stages,
-        types: ['technical_qa', 'project_deep_dive', 'mixed'],
+        types: ['technical_qa', 'project_deep_dive', 'business_scenario', 'mixed'],
         goals: ['understanding', 'verification', 'tradeoffs'],
       })),
     });

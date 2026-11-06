@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { INTERVIEW_MAX_ANSWER, LIVE_TYPE_LABELS, type Interview } from '@interviewlab/core';
-import { ApiClientError } from '../../lib/api/http';
+import { useRouter } from 'next/navigation';
 import { interviewsApi } from '../../lib/api/interviews';
 import { useSession } from '../../components/session-provider';
 import { Brand, Header, Loading, Modal } from '../../components/shared';
@@ -10,7 +10,9 @@ import { CommandNotice, ErrorNotice, SessionGate, useLiveCommand, useLiveResourc
 import { useInterviewStream } from './stream';
 import { InterviewWorkspace } from '../../components/interview-workspace';
 import { Button } from '../../components/ui/button';
-import { useInterviewVoice } from './voice/use-voice';
+import { useInterviewFlow } from './flow-provider';
+import { PreparationScreen } from './preparation';
+import { TransitionScreen } from './transition-screen';
 import { VoiceControls } from './voice/controls';
 import { VideoInterviewWorkspace } from '../video-interview/room';
 
@@ -23,6 +25,8 @@ const STAGES = {
   closing: '面试收尾',
 };
 function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: boolean }) {
+  const flow = useInterviewFlow();
+  const router = useRouter();
   const Workspace = videoRoom ? VideoInterviewWorkspace : InterviewWorkspace;
   const { state: account } = useSession();
   const load = useCallback((signal: AbortSignal) => interviewsApi.read(id, signal), [id]);
@@ -39,30 +43,12 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
   const [draft, setDraft] = useState({ key: '', text: '' });
   const [storageError, setStorageError] = useState('');
   const [finish, setFinish] = useState(false);
-  const [dismissedParticipation, setDismissedParticipation] = useState('');
+  const restoreVoice = useRef<(() => void) | null>(null);
   const [now, setNow] = useState(Date.now());
-  const voiceStartRequest = useRef<{ version: number; key: string } | null>(null);
   const acknowledged = useRef(new Set<string>());
   const deadlineChecked = useRef(false);
   const v = resource.value;
   const turn = v?.turns.at(-1);
-  const preparationRequested = useRef(new Set<number>());
-  useEffect(() => {
-    if (
-      v?.status === 'ready' &&
-      v.preparation?.status === 'pending' &&
-      !v.preparation.task_id &&
-      !command.blocked &&
-      !preparationRequested.current.has(v.version)
-    ) {
-      preparationRequested.current.add(v.version);
-      command.run(
-        (key) =>
-          interviewsApi.command(id, 'prepare', { version: v.version, mode: 'personalized' }, key),
-        resource.accept,
-      );
-    }
-  }, [v, id, command.blocked]);
   const terminal = v?.status === 'completed' || v?.status === 'failed';
   const userId = account.status === 'signed_in' ? account.session.user.id : '';
   const draftKey = userId && turn ? `interviewlab:live:${userId}:${id}:${turn.id}` : '';
@@ -132,6 +118,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
     }
     resource.accept(result);
     setNow(Date.now());
+    restoreVoice.current = null;
     setFinish(false);
   }
   function act(
@@ -145,13 +132,33 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
       (result) => accepted(result, submitted),
     );
   }
-  const voice = useInterviewVoice({
-    id,
-    view: v,
-    draft: text,
-    onDraft: setText,
-    onView: resource.accept,
-  });
+  const voice = flow.voice;
+  function changeFinish(open: boolean) {
+    if (open) restoreVoice.current = voice.suspend();
+    else {
+      restoreVoice.current?.();
+      restoreVoice.current = null;
+    }
+    setFinish(open);
+  }
+  useEffect(
+    () => flow.bind({ id, draft: text, onDraft: setText, onView: resource.accept }),
+    [id, text, draftKey],
+  );
+  useEffect(() => {
+    if (!v) return;
+    if (flow.view !== v) flow.accept(v);
+    if (terminal) {
+      flow.release();
+      router.replace(`/interview/${id}/analysis`);
+    } else if (
+      v.status === 'ready' ||
+      (v.status === 'in_progress' &&
+        v.configuration.interaction_mode !== 'text_fallback' &&
+        flow.phase === 'idle')
+    )
+      router.replace(`/interview/${id}/prepare`);
+  }, [v?.id, v?.version, v?.status]);
   if (!v)
     return (
       <>
@@ -163,6 +170,19 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
           {!resource.error && <Loading />}
         </main>
       </>
+    );
+  if (v.status === 'ready') return <PreparationScreen view={v} />;
+  if (terminal)
+    return (
+      <TransitionScreen
+        kind="analysis"
+        title="恭喜你完成面试"
+        description="回答已保存，正在为你准备复盘。"
+        steps={[
+          { label: '保存回答', state: 'done' },
+          { label: '读取分析进度', state: 'active' },
+        ]}
+      />
     );
   const waiting = turn?.answer_status === 'waiting';
   const continuation =
@@ -188,7 +208,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
   }));
   const seconds = v.started_at
     ? Math.min(
-        720,
+        (Math.max(10, v.configuration.duration_minutes) + 2) * 60,
         Math.max(
           0,
           Math.floor(
@@ -216,11 +236,12 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
     else act(`turns/${turn!.id}/answer`, { text }, { turnId: turn!.id, text, key: draftKey });
   };
   const participation = v.participation;
-  const participationKey = participation ? `${participation.turn_id}:${participation.level}` : '';
   return (
     <>
       <Workspace
         voice={voice}
+        initialCamera={flow.camera}
+        onCameraChange={flow.setCamera}
         jobTitle={v.job_title}
         typeLabel={
           v.parent_interview_id ? '单题重练' : LIVE_TYPE_LABELS[v.configuration.interview_type]
@@ -270,9 +291,6 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
         blocked={
           command.blocked ||
           voice.connecting ||
-          ((voice.display || videoRoom) &&
-            v.status === 'ready' &&
-            !voice.capabilities?.available) ||
           Boolean(v.preparation && !['ready', 'fallback'].includes(v.preparation.status))
         }
         paused={v.status === 'paused'}
@@ -300,43 +318,6 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
           <>
             <ErrorNotice message={resource.error} retry={() => void resource.refresh()} />
             <CommandNotice command={command} refresh={() => void resource.refresh()} />
-            {v.status === 'ready' && v.preparation && (
-              <section className="notice" aria-live="polite">
-                <strong>
-                  {
-                    {
-                      waiting_material: '正在分析所选简历',
-                      pending: '正在准备本场面试',
-                      ready: '面试准备完成',
-                      failed: '面试准备暂时失败',
-                      fallback: '已选择简化面试流程',
-                    }[v.preparation.status]
-                  }
-                </strong>
-                <p>准备阶段不计时。正式开始后从自我介绍进入交流。</p>
-                {v.preparation.status === 'failed' && (
-                  <div className="row-actions">
-                    <button
-                      type="button"
-                      className="button button-outline"
-                      disabled={command.blocked}
-                      onClick={() => act('prepare', { mode: 'personalized' })}
-                    >
-                      重试准备
-                    </button>
-                    <button
-                      type="button"
-                      className="button button-outline"
-                      disabled={command.blocked}
-                      onClick={() => act('prepare', { mode: 'fallback' })}
-                    >
-                      使用简化流程开始
-                    </button>
-                  </div>
-                )}
-              </section>
-            )}
-
             {continuation && (
               <p className="notice" role="status">
                 旧问题生成已被你的补充打断。可继续补充回答，或{' '}
@@ -355,20 +336,12 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
                 {participation.message}
               </p>
             )}
-            {v.status === 'ready' && (
-              <p className="notice">
-                {v.parent_interview_id
-                  ? '本次重练直接回到原问题。'
-                  : '从自我介绍开始，面试官将根据你的回答继续交流。'}
-                {voice.display || videoRoom
-                  ? `点击${videoRoom ? '下方' : '右上角'}开始面试，将申请麦克风权限并连接语音，授权成功后开始计时。`
-                  : '点击右上角开始后计时。'}
-              </p>
-            )}
             {v.retry_goal && <p className="notice">单题重练目标：{v.retry_goal}</p>}
             {targetReached && !terminal && (
               <p className="notice" role="status">
-                已到目标时长，请完成当前回答后收尾。{Math.max(10, v.configuration.duration_minutes) + 2} 分钟后会自动封存，暂停和断线仍计时。
+                已到目标时长，请完成当前回答后收尾。
+                {Math.max(10, v.configuration.duration_minutes) + 2}{' '}
+                分钟后会自动封存，暂停和断线仍计时。
               </p>
             )}
           </>
@@ -431,100 +404,55 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
           voice.stop();
           act(v.status === 'paused' ? 'resume' : 'pause', {});
         }}
-        onFinish={() => {
-          voice.stop();
-          setFinish(true);
-        }}
-        onStart={
-          v.status === 'ready'
-            ? () => {
-                if (!voice.display && !videoRoom) {
-                  act('start', {});
-                  return;
-                }
-                void voice.start(async () => {
-                  // Reuse the request identity if a start response was lost.
-                  if (voiceStartRequest.current?.version !== v.version)
-                    voiceStartRequest.current = { version: v.version, key: crypto.randomUUID() };
-                  try {
-                    const next = await interviewsApi.command(
-                      id,
-                      'start',
-                      { version: v.version },
-                      voiceStartRequest.current.key,
-                    );
-                    accepted(next);
-                    voiceStartRequest.current = null;
-                  } catch (error) {
-                    if (error instanceof ApiClientError && error.status === 409)
-                      void resource.refresh();
-                    throw error;
-                  }
-                });
-              }
-            : undefined
-        }
+        onFinish={() => changeFinish(true)}
       />
-      {participation && !finish && dismissedParticipation !== participationKey && (
+      {finish && (
         <Modal
           open
           onOpenChange={(open) => {
-            if (!open) setDismissedParticipation(participationKey);
+            if (!command.blocked) changeFinish(open);
           }}
-          title={
-            participation.level === 'ended'
-              ? '本场面试已结束'
-              : participation.level === 'confirmation'
-                ? '是否继续面试？'
-                : '面试交流提醒'
+          title="确定提前结束面试？"
+          description={
+            text.trim()
+              ? '当前回答会一并提交，随后为你呈现本场分析报告。'
+              : '结束后将为你呈现本场分析报告。'
           }
-          description={participation.message}
         >
           <div className="dialog-actions">
-            <Button onClick={() => setDismissedParticipation(participationKey)}>
-              {terminal ? '知道了' : '继续作答'}
-            </Button>
-            {!terminal && (
-              <Button
-                variant="outline"
-                disabled={command.blocked}
-                onClick={() => {
-                  setDismissedParticipation(participationKey);
-                  setFinish(true);
-                }}
-              >
-                结束面试
-              </Button>
-            )}
-          </div>
-        </Modal>
-      )}
-      {finish && (
-        <Modal open={finish} onOpenChange={setFinish} title="结束本场面试">
-          <p>已提交的回答会保留并生成复盘。未提交的草稿不会自动保存。</p>
-          <div className="dialog-actions">
-            <button
-              className="button button-outline"
+            <Button
+              variant="outline"
               disabled={command.blocked}
-              onClick={() => act('finish', { reason: 'user_finished' })}
+              onClick={() => changeFinish(false)}
             >
-              仅保存已提交内容并结束
-            </button>
-            {waiting && text.trim() && (
-              <button
-                className="button button-primary"
-                disabled={command.blocked}
-                onClick={() =>
-                  act(
-                    'finish',
-                    { reason: 'user_finished', final_answer: { turn_id: turn!.id, text } },
-                    { turnId: turn!.id, text, key: draftKey },
-                  )
-                }
-              >
-                提交当前草稿并结束
-              </button>
-            )}
+              继续面试
+            </Button>
+            <Button
+              disabled={command.blocked}
+              onClick={() => {
+                const finalText = text.trim();
+                act(
+                  'finish',
+                  {
+                    reason: 'user_finished',
+                    ...(finalText && turn
+                      ? { final_answer: { turn_id: turn.id, text: finalText } }
+                      : {}),
+                  },
+                  finalText && turn
+                    ? {
+                        turnId: turn.id,
+                        text: continuation
+                          ? [turn.answer_text, finalText].filter(Boolean).join('\n')
+                          : finalText,
+                        key: draftKey,
+                      }
+                    : undefined,
+                );
+              }}
+            >
+              结束面试并查看报告
+            </Button>
           </div>
           <CommandNotice command={command} refresh={() => void resource.refresh()} />
         </Modal>

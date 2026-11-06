@@ -76,6 +76,7 @@ export interface InterviewTurn extends InterviewQuestion {
   answered_at: string | null;
 }
 export interface InterviewSnapshot {
+  scoring_evidence_version?: 'candidate-answer-v1';
   interview_type?: LiveInterviewType;
   runtime_version?: 'graph-v1';
   resume_analysis?: import('./agent-workflow').ResumeAnalysis;
@@ -128,6 +129,9 @@ export interface InterviewFinding {
   evidence_refs: InterviewEvidence[];
 }
 export interface InterviewEvaluation {
+  response_assessment?: import('./interview-response').InterviewResponseAssessment;
+  response_assessments?: import('./question-scoring').AssessedResponse[];
+  feedback_observations?: import('./feedback-template').FeedbackObservation[];
   /** Cumulative six-dimensional score for this main question through this answer. */
   feedback_assessments?: import('./feedback-template').FeedbackAssessment[];
   question_scoring_version?: string;
@@ -161,9 +165,10 @@ export interface InterviewReportSummary {
 }
 export interface ReportRequest {
   version: number;
-  scope?: 'missing' | 'summary';
+  scope?: 'missing' | 'summary' | 'advice';
 }
 export interface InterviewReport {
+  feedback_observations?: import('./feedback-template').FeedbackObservation[];
   advice_task_id?: string;
   advice_status?: 'pending' | 'ready' | 'failed';
   next_steps?: string[];

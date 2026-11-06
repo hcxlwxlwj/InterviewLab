@@ -14,6 +14,7 @@ import type { InterviewAgent } from '../interviews/model-analysis';
 import {
   assertEvaluation,
   assertSummary,
+  reuseSingleQuestionSummary,
   REPORT_PROMPT_VERSION,
   REPORT_SCHEMA_VERSION,
 } from './analysis';
@@ -217,6 +218,14 @@ export function createReportsService(
   }
   async function queueAdvice(tx: Transaction, state: InterviewState, report: InterviewReport) {
     if (!agent.suggest || report.advice_task_id || !report.evaluations.length) return;
+    if (
+      report.evaluations.every(
+        (e) =>
+          e.question_scoring_version === 'question-evidence-v3' &&
+          !e.response_assessments?.some((r) => r.response_eligibility === 'answer'),
+      )
+    )
+      return;
     const digest = evaluationDigest(report.evaluations);
     const task = await enqueueTask(tx, {
       owner_id: state.owner,
@@ -234,14 +243,26 @@ export function createReportsService(
     report.advice_status = 'pending';
   }
   async function queueSummary(tx: Transaction, state: InterviewState, report: InterviewReport) {
+    await queueAdvice(tx, state, report);
     if (state.view.parent_interview_id) {
-      await queueAdvice(tx, state, report);
       report.summary_status = 'not_applicable';
       report.status = report.analysis_progress?.pending
         ? 'generating'
         : report.evaluations.length
           ? 'ready'
           : 'failed';
+      return;
+    }
+    const reused = reuseSingleQuestionSummary(
+      report.evaluations,
+      state.snapshot!,
+      state.view.turns,
+    );
+    if (reused) {
+      await repository.setSummaryTask(tx.client, report.id, null, null);
+      report.summary = reused;
+      report.summary_status = 'ready';
+      report.status = 'ready';
       return;
     }
     const digest = evaluationDigest(report.evaluations);
@@ -271,7 +292,8 @@ export function createReportsService(
       ['completed', 'failed'].includes(state.view.status) &&
       !summaryTaskId &&
       !report.analysis_progress?.pending &&
-      report.evaluations.some((e) => e.strengths.length || e.gaps.length)
+      (report.evaluations.some((e) => e.strengths.length || e.gaps.length) ||
+        Boolean(reuseSingleQuestionSummary(report.evaluations, state.snapshot!, state.view.turns)))
     ) {
       await queueSummary(tx, state, report);
     }
@@ -336,6 +358,7 @@ export function createReportsService(
       (t) => t.main_question_index === turn.main_question_index,
     );
     const value = await agent.evaluate(turn, state.snapshot!, signal, task.attempts > 1, {
+      retrieval: state.retrievals?.[turn.id],
       scoring_rubric_version: input.scoring_rubric_version,
       earlier_turns: group.filter(
         (t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered',
@@ -712,6 +735,24 @@ export function createReportsService(
           );
           // A pending summary must finish before a new report version can invalidate its input.
           if (['pending', 'generating'].includes(row.status)) return { id };
+          if (body.scope === 'advice') {
+            if (!agent.suggest || !report.evaluations.length || report.advice_status === 'ready')
+              return { id };
+            if (report.advice_status === 'pending' && report.advice_task_id) {
+              const task = await repository.summaryTask(tx.client, report.advice_task_id);
+              if (task && !taskSettled(task)) return { id };
+            }
+            const next = {
+              ...report,
+              version: row.version + 1,
+              advice_task_id: undefined,
+              advice_status: undefined,
+              next_steps: undefined,
+            };
+            await queueAdvice(tx, state, next);
+            await repository.updateReport(tx.client, row.id, next.version, next);
+            return { id };
+          }
           if (body.scope === 'summary') {
             if (report.summary_status === 'ready' || !report.evaluations.length) return { id };
           } else if (!report.missing_turn_ids.length && row.status !== 'failed') return { id };
@@ -924,7 +965,10 @@ export function createReportsService(
           } else if (!report.evaluations.length) {
             report.status = report.analysis_progress!.total ? 'failed' : 'ready';
             report.summary_status = 'not_applicable';
-          } else if (!report.evaluations.some((e) => e.strengths.length || e.gaps.length)) {
+          } else if (
+            !report.evaluations.some((e) => e.strengths.length || e.gaps.length) &&
+            !reuseSingleQuestionSummary(report.evaluations, state.snapshot!, state.view.turns)
+          ) {
             await queueAdvice(tx, state, report);
             report.status = 'ready';
             report.summary_status = 'not_applicable';

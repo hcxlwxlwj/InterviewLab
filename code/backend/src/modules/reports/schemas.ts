@@ -1,13 +1,20 @@
 import { z } from 'zod';
 import type { InterviewReport, ReportRequest } from '@interviewlab/core';
-import { summaryOutput, indicatorAssessmentOutput, feedbackAssessment } from './analysis';
+import {
+  summaryOutput,
+  indicatorAssessmentOutput,
+  feedbackAssessment,
+  feedbackObservationOutput,
+  responseAssessmentOutput,
+  assessedResponseOutput,
+} from './analysis';
 import { turnSchema } from '../interviews/schemas';
 const evidence = z.object({ turn_id: z.string(), revision: z.number().int(), quote: z.string() });
 const finding = z.object({ text: z.string(), evidence_refs: z.array(evidence) });
 export const reportRequestBody = z
   .object({
     version: z.number().int().positive(),
-    scope: z.enum(['missing', 'summary']).optional(),
+    scope: z.enum(['missing', 'summary', 'advice']).optional(),
   })
   .strict() satisfies z.ZodType<ReportRequest>;
 const dimension = z.object({
@@ -17,6 +24,7 @@ const dimension = z.object({
   explanation: z.string(),
 });
 export const reportSchema = z.object({
+  feedback_observations: z.array(feedbackObservationOutput).length(6).optional(),
   advice_task_id: z.string().optional(),
   advice_status: z.enum(['pending', 'ready', 'failed']).optional(),
   next_steps: z.array(z.string()).optional(),
@@ -71,6 +79,9 @@ export const reportSchema = z.object({
   }),
   evaluations: z.array(
     z.object({
+      response_assessment: responseAssessmentOutput.optional(),
+      response_assessments: z.array(assessedResponseOutput).max(3).optional(),
+      feedback_observations: z.array(feedbackObservationOutput).length(6).optional(),
       feedback_assessments: z.array(feedbackAssessment).max(6).optional(),
       question_scoring_version: z.string().optional(),
       next_steps: z.array(z.string()).optional(),

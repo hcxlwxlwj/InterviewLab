@@ -1,12 +1,122 @@
 'use client';
-import {useEffect,useState} from 'react';
+import { useCallback, useState } from 'react';
 import Link from 'next/link';
-import {Bookmark,ArrowUpRight} from 'lucide-react';
-import {apiRequest} from '../../lib/api/http';
-import {WorkspaceFrame} from './workspace-frame';
-type SavedJob={id:string;title:string;slug:string;tags:string[];available:boolean;saved_at:string};
-export default function SavedJobs(){const [items,setItems]=useState<SavedJob[]>(),[error,setError]=useState(''),[busy,setBusy]=useState('');
- async function load(){setError('');try{setItems(await apiRequest<SavedJob[]>('/bookmarks'));}catch(e){setError(e instanceof Error?e.message:'加载失败');}}
- useEffect(()=>{void load();},[]);
- return <WorkspaceFrame section="saved-jobs"><section className="personal-heading"><span className="personal-eyebrow">MY CAREER COLLECTION</span><h1>目标岗位</h1><p>在岗位库收藏心仪的方向，把下一次练习变得更具体。</p><Link className="personal-primary" href="/jobs">探索岗位库 <ArrowUpRight size={18}/></Link></section>{error&&<p role="alert">{error}<button onClick={()=>void load()}>重试</button></p>}{!items&&!error&&<p>正在读取收藏…</p>}{items&&!items.length&&<section className="personal-empty"><Bookmark size={36}/><h2>还没有收藏的岗位</h2><p>去岗位库点击“收藏岗位”，它就会出现在这里。</p><Link href="/jobs">去发现适合你的岗位 →</Link></section>}<div className="saved-job-grid">{items?.map(job=><article className="saved-job-card" key={job.id}><span className="personal-eyebrow">已收藏 · {new Date(job.saved_at).toLocaleDateString('zh-CN')}</span><h2>{job.title}</h2><div className="catalog-tags">{job.tags.slice(0,4).map(tag=><span key={tag}>{tag}</span>)}</div><div className="personal-card-actions">{job.available&&<><Link href={'/jobs/'+job.slug}>查看岗位</Link><Link className="personal-primary" href={'/interview/setup?job='+encodeURIComponent(job.id)}>模拟面试 →</Link></>}<button disabled={!!busy} onClick={async()=>{setBusy(job.id);try{await apiRequest('/bookmarks/'+encodeURIComponent(job.id),{method:'DELETE'});await load();}catch(e){setError(e instanceof Error?e.message:'取消失败');}finally{setBusy('');}}}>{busy===job.id?'处理中':'取消收藏'}</button></div></article>)}</div></WorkspaceFrame>;
+import { Bookmark, ArrowRight, Trash2, ArrowUpRight } from 'lucide-react';
+import { apiRequest } from '../../lib/api/http';
+import { WorkspaceFrame } from './workspace-frame';
+import { Button } from '../../components/ui/button';
+import { Loading } from '../../components/shared';
+import { ErrorNotice, useLiveResource } from '../live-interview/common';
+type SavedJob = {
+  id: string;
+  title: string;
+  slug: string;
+  tags: string[];
+  available: boolean;
+  saved_at: string;
+};
+export default function SavedJobs() {
+  const load = useCallback(
+    (signal: AbortSignal) => apiRequest<SavedJob[]>('/bookmarks', { signal }),
+    [],
+  );
+  const resource = useLiveResource(load, () => false);
+  const [busy, setBusy] = useState(''),
+    [error, setError] = useState('');
+  return (
+    <WorkspaceFrame section="saved-jobs">
+      <header className="personal-page-header">
+        <div>
+          <h1>目标岗位</h1>
+          <p>收藏感兴趣的方向，随时开始针对练习。</p>
+        </div>
+        <Button variant="outline" asChild>
+          <Link href="/jobs">
+            探索岗位库
+            <ArrowUpRight size={18} />
+          </Link>
+        </Button>
+      </header>
+      <ErrorNotice message={resource.error || error} retry={() => void resource.refresh()} />
+      {!resource.value && !resource.error && <Loading />}
+      {resource.value && !resource.value.length && (
+        <section className="workspace-empty-state">
+          <span className="workspace-empty-symbol">
+            <Bookmark size={42} />
+          </span>
+          <h2>把感兴趣的岗位放在这里</h2>
+          <p>在岗位库收藏一个方向，下次就能直接开始练习。</p>
+          <Button asChild>
+            <Link href="/jobs">
+              去发现岗位
+              <ArrowRight size={18} />
+            </Link>
+          </Button>
+        </section>
+      )}
+      <div className="saved-role-list">
+        {resource.value?.map((job) => (
+          <article className="saved-role-row" key={job.id}>
+            <span className="workspace-row-icon">
+              <Bookmark size={24} />
+            </span>
+            <div className="saved-role-info">
+              <h2>
+                {job.available ? (
+                  <Link href={'/jobs/' + job.slug}>
+                    {job.title}
+                    <ArrowUpRight size={18} />
+                  </Link>
+                ) : (
+                  job.title
+                )}
+              </h2>
+              <div className="catalog-tags">
+                {[...new Set(job.tags)].slice(0, 4).map((tag) => (
+                  <span key={tag}>{tag}</span>
+                ))}
+              </div>
+              <p>
+                {job.available ? '收藏于 ' : '岗位已下架 · '}
+                {new Date(job.saved_at).toLocaleDateString('zh-CN')}
+              </p>
+            </div>
+            <div className="saved-role-actions">
+              {job.available && (
+                <Button asChild>
+                  <Link href={'/interview/setup?job=' + encodeURIComponent(job.id)}>
+                    模拟面试
+                    <ArrowRight size={17} />
+                  </Link>
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={'取消收藏' + job.title}
+                title="取消收藏"
+                disabled={!!busy}
+                onClick={async () => {
+                  setBusy(job.id);
+                  setError('');
+                  try {
+                    await apiRequest('/bookmarks/' + encodeURIComponent(job.id), {
+                      method: 'DELETE',
+                    });
+                    await resource.refresh();
+                  } catch (e) {
+                    setError(e instanceof Error ? e.message : '取消失败');
+                  } finally {
+                    setBusy('');
+                  }
+                }}
+              >
+                <Trash2 size={19} />
+              </Button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </WorkspaceFrame>
+  );
 }

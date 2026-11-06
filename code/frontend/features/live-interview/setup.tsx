@@ -6,13 +6,15 @@ import { Button } from '../../components/ui/button';
 import { apiRequest } from '../../lib/api/http';
 import type { PersonalMaterial, PersonalSettings, JobTemplate } from '@interviewlab/core';
 import { useCallback, useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { LIVE_TYPE_LABELS, liveInterviewPath, type InterviewConfig } from '@interviewlab/core';
+import { useSearchParams } from 'next/navigation';
+import { LIVE_TYPE_LABELS, mainQuestionLimit, type InterviewConfig } from '@interviewlab/core';
 import { interviewsApi } from '../../lib/api/interviews';
 import { jobsApi } from '../../lib/api/jobs';
 import { Loading } from '../../components/shared';
 import { CommandNotice, ErrorNotice, SessionGate, useLiveCommand, useLiveResource } from './common';
 import { selectInterviewJob } from './setup-state';
+import { useInterviewFlow } from './flow-provider';
+import { PreparationScreen } from './preparation';
 
 function Form() {
   const search = useSearchParams();
@@ -20,8 +22,9 @@ function Form() {
   const load = useCallback(
     async (signal: AbortSignal) => {
       const page = await interviewsApi.jobs(signal);
-      const initialJob = page.items.find((job) => job.id === requestedJob || job.slug === requestedJob)
-        ?? await jobsApi.read(requestedJob, signal);
+      const initialJob =
+        page.items.find((job) => job.id === requestedJob || job.slug === requestedJob) ??
+        (await jobsApi.read(requestedJob, signal));
       if (!page.items.some((job) => job.id === initialJob.id)) page.items.unshift(initialJob);
       return { items: page.items, initialJob };
     },
@@ -39,19 +42,41 @@ function Form() {
 }
 
 function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJob: JobTemplate }) {
-  const router = useRouter();
-  const [config, setConfig] = useState<InterviewConfig>(() => selectInterviewJob({
-    job: initialJob.id,
-    career_stage: 'internship',
-    interview_type: 'technical_qa',
-    difficulty: '基础',
-    duration_minutes: 10,
-    interviewer_style: '标准',
-    interaction_mode: 'text_fallback',
-  }, initialJob));
-  const [materials,setMaterials]=useState<PersonalMaterial[]>([]);
-  const [materialError,setMaterialError]=useState('');
-  useEffect(()=>{Promise.all([apiRequest<PersonalMaterial[]>('/materials'),apiRequest<PersonalSettings>('/me/settings')]).then(([m,p])=>{setMaterials(m.filter(x=>x.kind==='resume'&&x.confirmed));const selected=m.find(x=>x.id===p.default_resume_id&&x.confirmed);setConfig(c=>({...c,interviewer_style:p.interviewer_style??c.interviewer_style,...(selected?{resume_ref:{id:selected.id,version:selected.version}}:{})}));}).catch(()=>setMaterialError('简历暂时无法加载，可不带简历继续通用面试。'));},[]);
+  const flow = useInterviewFlow();
+  const [config, setConfig] = useState<InterviewConfig>(
+    () =>
+      flow.configuration ??
+      selectInterviewJob(
+        {
+          job: initialJob.id,
+          career_stage: 'internship',
+          interview_type: 'technical_qa',
+          difficulty: '基础',
+          duration_minutes: 10,
+          interviewer_style: '标准',
+          interaction_mode: 'text_fallback',
+        },
+        initialJob,
+      ),
+  );
+  const [materials, setMaterials] = useState<PersonalMaterial[]>([]);
+  const [materialError, setMaterialError] = useState('');
+  useEffect(() => {
+    Promise.all([
+      apiRequest<PersonalMaterial[]>('/materials'),
+      apiRequest<PersonalSettings>('/me/settings'),
+    ])
+      .then(([m, p]) => {
+        setMaterials(m.filter((x) => x.kind === 'resume' && x.confirmed));
+        const selected = m.find((x) => x.id === p.default_resume_id && x.confirmed);
+        setConfig((c) => ({
+          ...c,
+          interviewer_style: p.interviewer_style ?? c.interviewer_style,
+          ...(selected ? { resume_ref: { id: selected.id, version: selected.version } } : {}),
+        }));
+      })
+      .catch(() => setMaterialError('简历暂时无法加载，可不带简历继续通用面试。'));
+  }, []);
   const loadProfiles = useCallback(
     (signal: AbortSignal) => interviewsApi.profiles(config.job, config.career_stage, signal),
     [config.job, config.career_stage],
@@ -61,19 +86,15 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
   const change = <K extends keyof InterviewConfig>(key: K, value: InterviewConfig[K]) =>
     setConfig((c) => ({ ...c, [key]: value }));
   const selected = jobs.find((j) => j.id === config.job);
+  if (flow.phase !== 'idle' && flow.phase !== 'running') return <PreparationScreen />;
   return (
     <form
       className="setup-grid"
       onSubmit={(e) => {
         e.preventDefault();
-        command.run(
-          (key) => interviewsApi.create(config, key),
-          (result) => router.push(liveInterviewPath(result)),
-        );
+        void flow.begin(config);
       }}
     >
-
-
       <div className="setup-panels">
         <section className="panel form-panel">
           <div className="form-panel-title">
@@ -176,8 +197,8 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
             disabled={command.blocked}
           />
           <p className="field-help">
-            最多 6 个主问题，每题最多 2 次追问。达到目标时间后收尾，12
-            分钟自动结束；暂停和断线仍计时。
+            最多 {mainQuestionLimit(config.duration_minutes)} 个主问题，每题最多 2
+            次追问。达到目标时间后收尾，最多保留 2 分钟完成当前回答；暂停和断线仍计时。
           </p>
         </section>
         <section className="panel form-panel">
@@ -187,16 +208,46 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
               <h2>简历与重点经历</h2>
             </div>
           </div>
-          <p className="field-help">你可以为不同岗位保存多份简历，每次面试单独选择其中一份。只有已确认的简历可以使用。</p>
+          <p className="field-help">
+            你可以为不同岗位保存多份简历，每次面试单独选择其中一份。只有已确认的简历可以使用。
+          </p>
           {materialError && <p role="alert">{materialError}</p>}
-          <label className="field-label" htmlFor="interview-resume">本次面试使用的简历</label>
-          <select id="interview-resume" disabled={command.blocked} value={config.resume_ref?.id??''} onChange={e=>{const m=materials.find(x=>x.id===e.target.value);setConfig(c=>({...c,resume_ref:m?{id:m.id,version:m.version}:undefined}));}}>
+          <label className="field-label" htmlFor="interview-resume">
+            本次面试使用的简历
+          </label>
+          <select
+            id="interview-resume"
+            disabled={command.blocked}
+            value={config.resume_ref?.id ?? ''}
+            onChange={(e) => {
+              const m = materials.find((x) => x.id === e.target.value);
+              setConfig((c) => ({
+                ...c,
+                resume_ref: m ? { id: m.id, version: m.version } : undefined,
+              }));
+            }}
+          >
             <option value="">不使用简历，进行通用面试</option>
-            {materials.map(m=><option key={m.id} value={m.id}>{m.title} · v{m.version}</option>)}
+            {materials.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.title} · v{m.version}
+              </option>
+            ))}
           </select>
-          {config.resume_ref && <div className="resume-selection-summary"><strong>本次已选：{materials.find(m=>m.id===config.resume_ref?.id)?.title}</strong><p>版本 v{config.resume_ref.version} · 开始后冻结，之后修改简历不会影响本次面试。</p></div>}
-          {!materials.length && !materialError && <p className="field-help">还没有已确认简历。请先创建并核对简历，再回来选择。</p>}
-          <Link href="/me/resumes" className="text-link">管理多份简历 / 新增岗位版简历 →</Link>
+          {config.resume_ref && (
+            <div className="resume-selection-summary">
+              <strong>
+                本次已选：{materials.find((m) => m.id === config.resume_ref?.id)?.title}
+              </strong>
+              <p>版本 v{config.resume_ref.version} · 开始后冻结，之后修改简历不会影响本次面试。</p>
+            </div>
+          )}
+          {!materials.length && !materialError && (
+            <p className="field-help">还没有已确认简历。请先创建并核对简历，再回来选择。</p>
+          )}
+          <Link href="/me/resumes" className="text-link">
+            管理多份简历 / 新增岗位版简历 →
+          </Link>
         </section>
         <section className="panel form-panel">
           <div className="form-panel-title">
@@ -224,9 +275,7 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
               ) : (
                 <MicOff size={14} />
               )}
-              {config.interaction_mode === 'realtime_voice'
-                ? '开启语音时授权麦克风'
-                : '麦克风未采集'}
+              {config.interaction_mode === 'realtime_voice' ? '准备时授权麦克风' : '麦克风未采集'}
             </span>
             <span>
               <CameraOff size={14} />
@@ -239,13 +288,13 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
           </div>
           {config.interaction_mode === 'realtime_video' && (
             <p className="field-help">
-              进入独立视频面试房间，可开启本机摄像头与屏幕共享预览。画面暂不上传、不录像，语音沿用当前面试
+              准备时申请麦克风和摄像头，完成后自动进入视频房间。屏幕共享由你主动开启。画面不上传、不录像，语音沿用当前面试
               Agent。
             </p>
           )}
           {config.interaction_mode === 'realtime_voice' && (
             <p className="field-help">
-              进入面试页后，点击“开始面试”，再点击“开启实时语音”。支持实时转写、自动接话和插话打断，也可以随时切回文字。
+              点击开启模拟面试后授权麦克风，设备和面试准备完成后自动进入语音对话，也可以随时切回文字。
             </p>
           )}
         </section>
@@ -294,13 +343,19 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
         <p className="notice">
           回答会发送至 AI 模型。请勿填写联系方式等敏感信息；面试官会根据你的陈述继续提问。
         </p>
-        <p className="field-help">创建配置后，在面试页点击开始才计时。</p>
+        <p className="field-help">准备和设备检查期间不计时，就绪后自动进入面试。</p>
         <CommandNotice command={command} />
         <Button
           type="submit"
-          disabled={command.blocked || !selected || !selected.stages.includes(config.career_stage) || !profiles.value || Boolean(profiles.error)}
+          disabled={
+            command.blocked ||
+            !selected ||
+            !selected.stages.includes(config.career_stage) ||
+            !profiles.value ||
+            Boolean(profiles.error)
+          }
         >
-          {command.busy ? '正在创建…' : '创建面试'}
+          {command.busy ? '正在准备…' : '开启模拟面试'}
           <ArrowRight size={17} />
         </Button>
       </aside>

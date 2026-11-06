@@ -9,6 +9,11 @@ import { INTERVIEW_V3 } from '@interviewlab/core';
 import type { InterviewKnowledgeRuntime } from '@interviewlab/core';
 import { initialMemory } from './memory';
 import { createGenerationStreams } from './streams';
+import {
+  setVoiceInputActivity,
+  voicePublicationReady,
+  type VoiceInputActivity,
+} from './voice/activity';
 import { randomUUID } from 'node:crypto';
 import {
   INTERVIEW_PROMPT_VERSION,
@@ -21,6 +26,7 @@ import {
   type InterviewConfig,
   type InterviewKnowledgeProvider,
   type InterviewQuestion,
+  type InterviewTurn,
   type RequestIdentity,
   type PageResult,
   type Interview,
@@ -194,7 +200,10 @@ export function createInterviewsService(
       { owner_id: identity.owner_id, operation: `interviews.${id}.${operation}`, key, input: body },
       async (tx) => {
         const state = await loadInterview(tx.client, identity.owner_id, id, true);
-        if (state.view.version !== body.version)
+        if (
+          state.view.version !== body.version &&
+          !(operation === 'finish' && !('final_answer' in body))
+        )
           throw new ServiceError('version_conflict', 409, '面试状态已更新，请刷新后重试');
         if (!operation.startsWith('presented.')) state.view.version++;
         if (
@@ -240,6 +249,16 @@ export function createInterviewsService(
     turn.answer_text = text;
     state.view.clarification = null;
   }
+  function appendAnswer(turn: InterviewTurn, addition: string) {
+    const text = [turn.answer_text, addition.trim()].filter(Boolean).join('\n');
+    if (text.length > INTERVIEW_MAX_ANSWER)
+      throw new ServiceError('unsupported_input', 400, '追加后回答超过字数上限，请缩短补充内容。');
+    if (addition.trim()) {
+      turn.answer_text = text;
+      turn.revision++;
+      turn.answered_at = new Date().toISOString();
+    }
+  }
   async function advanceAfterAnswer(tx: Transaction, state: InterviewState) {
     await cancelInterviewTasks(tx.client, state.view.id);
     if (state.retryQuestion || Date.now() >= Date.parse(state.view.target_at!))
@@ -259,7 +278,7 @@ export function createInterviewsService(
         if (
           !addQuestion(
             state,
-            participationQuestion(notice),
+            participationQuestion(notice, state.view),
             state.view.turns.at(-1)!.follow_up_index < 2,
           )
         )
@@ -466,6 +485,13 @@ export function createInterviewsService(
       throw new ServiceError('invalid_model_output', 502, '追问超过预算或缺少有效回答');
     return {
       result_ref: { id: state.view.id, version: state.view.version + 1 },
+      publicationReady: (tx) =>
+        voicePublicationReady(
+          tx.client,
+          state.view.id,
+          input.generation_id,
+          state.view.turns.at(-1)!.id,
+        ),
       lock: async (tx) => {
         try {
           await loadInterview(tx.client, task.owner_id, input.interview_id, true);
@@ -696,24 +722,19 @@ export function createInterviewsService(
         const turn = state.view.turns.at(-1);
         if (
           state.view.status !== 'in_progress' ||
-          state.view.generation_status !== 'idle' ||
+          !['idle', 'pending', 'failed'].includes(state.view.generation_status) ||
+          (state.view.generation_status === 'pending' && turn?.input_mode !== 'voice') ||
           turn?.id !== turnId ||
           turn.answer_status !== 'answered'
         )
           throw invalid();
-        const text = [turn.answer_text, body.text.trim()].filter(Boolean).join('\n');
-        if (text.length > INTERVIEW_MAX_ANSWER)
-          throw new ServiceError(
-            'unsupported_input',
-            400,
-            '追加后回答超过字数上限，请缩短补充内容。',
-          );
-        if (body.text.trim()) {
-          turn.answer_text = text;
-          turn.input_mode = 'voice';
-          turn.revision++;
-          turn.answered_at = new Date().toISOString();
+        if (!body.text.trim()) {
+          if (state.view.generation_status === 'pending') throw invalid('下一题仍在生成中');
+          await advanceAfterAnswer(tx, state);
+          return;
         }
+        appendAnswer(turn, body.text);
+        if (body.text.trim()) turn.input_mode = 'voice';
         await reports.prepare?.(tx, state);
         await advanceAfterAnswer(tx, state);
       }),
@@ -729,6 +750,8 @@ export function createInterviewsService(
         await interviewEvent(tx.client, id, 'voice_playback', turnId, JSON.stringify(value));
       });
     },
+    setVoiceInputActivity: (identity: RequestIdentity, id: string, activity: VoiceInputActivity) =>
+      setVoiceInputActivity(database, identity, id, activity),
     presented: (
       identity: RequestIdentity,
       id: string,
@@ -767,7 +790,13 @@ export function createInterviewsService(
       mutate(identity, id, 'finish', key, body, async (tx, state) => {
         if (ended(state)) return;
         if (!['in_progress', 'paused'].includes(state.view.status)) throw invalid();
-        if (body.final_answer) answer(state, body.final_answer.turn_id, body.final_answer.text);
+        if (body.final_answer) {
+          const turn = state.view.turns.at(-1);
+          if (turn?.id === body.final_answer.turn_id && turn.answer_status === 'answered') {
+            if (turn.answer_text?.trim() !== body.final_answer.text.trim())
+              appendAnswer(turn, body.final_answer.text);
+          } else answer(state, body.final_answer.turn_id, body.final_answer.text);
+        }
         await seal(tx, state, body.reason);
       }),
     retryGeneration: (

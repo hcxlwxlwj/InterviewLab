@@ -2,8 +2,8 @@ import type { InterviewEvidence, InterviewReportSummary } from './live-interview
 
 /** Source: 面试反馈模板.xlsx / 维度评分表 A2:F7. Percent scores are weighted in code. */
 export const FEEDBACK_TEMPLATE_VERSION = 'interview-feedback-v2';
-/** Non-HR uses six scores; HR records only dimensions actually examined. */
-export const FEEDBACK_ANALYSIS_VERSION = 'text-review-v12';
+/** New evaluations score only actual answer evidence within the question's scope. */
+export const FEEDBACK_ANALYSIS_VERSION = 'text-review-v16';
 export const FEEDBACK_DIMENSIONS = [
   {
     key: 'professional_foundation',
@@ -82,6 +82,13 @@ export type FeedbackDimensionKey = (typeof FEEDBACK_DIMENSIONS)[number]['key'];
 export interface FeedbackAssessment {
   dimension: FeedbackDimensionKey;
   score: number;
+  text: string;
+  evidence_refs: InterviewEvidence[];
+}
+/** A missing score is an observation boundary, never a zero score. */
+export interface FeedbackObservation {
+  dimension: FeedbackDimensionKey;
+  status: 'observed' | 'not_observed' | 'insufficient_evidence';
   text: string;
   evidence_refs: InterviewEvidence[];
 }

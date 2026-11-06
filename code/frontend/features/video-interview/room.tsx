@@ -16,20 +16,26 @@ import {
 } from 'lucide-react';
 import type { InterviewWorkspace } from '../../components/interview-workspace';
 import type { useInterviewVoice } from '../live-interview/voice/use-voice';
+import { VoiceDraftRecovery } from '../live-interview/voice/controls';
 import { formatTime } from '../../components/shared';
 import { MediaPreview } from './media-preview';
 import { InterviewerAvatar } from './interviewer-avatar';
 
 type Props = ComponentProps<typeof InterviewWorkspace> & {
   voice: ReturnType<typeof useInterviewVoice>;
+  initialCamera?: MediaStream | null;
+  onCameraChange?: (camera: MediaStream | null) => void;
 };
-function useLocalMedia() {
-  const [camera, setCamera] = useState<MediaStream | null>(null);
+function useLocalMedia(
+  initialCamera?: MediaStream | null,
+  onCameraChange?: (camera: MediaStream | null) => void,
+) {
+  const [camera, setCamera] = useState<MediaStream | null>(initialCamera ?? null);
   const [screen, setScreen] = useState<MediaStream | null>(null);
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const streams = useRef<{ camera: MediaStream | null; screen: MediaStream | null }>({
-    camera: null,
+    camera: initialCamera ?? null,
     screen: null,
   });
   const epochs = useRef({ camera: 0, screen: 0 });
@@ -41,16 +47,22 @@ function useLocalMedia() {
       t.stop();
     });
     streams.current[kind] = null;
+    if (kind === 'camera') onCameraChange?.(null);
     if (alive.current) (kind === 'camera' ? setCamera : setScreen)(null);
   }
   useEffect(() => {
     alive.current = true;
     return () => {
       alive.current = false;
-      stop('camera');
+      if (!onCameraChange) stop('camera');
       stop('screen');
     };
   }, []);
+  useEffect(() => {
+    if (!onCameraChange) return;
+    streams.current.camera = initialCamera ?? null;
+    setCamera(initialCamera ?? null);
+  }, [initialCamera]);
   async function toggle(kind: 'camera' | 'screen') {
     if (streams.current[kind]) {
       stop(kind);
@@ -73,6 +85,7 @@ function useLocalMedia() {
         return;
       }
       streams.current[kind] = stream;
+      if (kind === 'camera') onCameraChange?.(stream);
       (kind === 'camera' ? setCamera : setScreen)(stream);
       stream.getVideoTracks().forEach((t) => {
         t.onended = () => stop(kind);
@@ -91,7 +104,7 @@ function useLocalMedia() {
   return { camera, screen, busy, error, toggle, stop };
 }
 export function VideoInterviewWorkspace(p: Props) {
-  const media = useLocalMedia();
+  const media = useLocalMedia(p.initialCamera, p.onCameraChange);
   const log = useRef<HTMLDivElement>(null);
   const last = p.turns.at(-1);
   useEffect(() => {
@@ -138,6 +151,7 @@ export function VideoInterviewWorkspace(p: Props) {
                 {p.voice.error}
               </p>
             )}
+            <VoiceDraftRecovery voice={p.voice} />
             {p.voice.capabilities?.reason && (
               <p className="field-help">{p.voice.capabilities.reason}</p>
             )}

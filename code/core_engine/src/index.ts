@@ -19,3 +19,4 @@ export * from './agent-workflow';
 export * from './question-scoring';
 export * from './performance-profile';
 export * from './interview-policy';
+export * from './interview-response';

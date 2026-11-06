@@ -9,6 +9,7 @@ import './library.css';
 import './auth.css';
 import './live-interview.css';
 import '../features/live-interview/report-design.css';
+import '../features/live-interview/transition-screen.css';
 const uiFont = localFont({
   src: '../public/fonts/interviewlab-sans.woff2',
   variable: '--font-ui',

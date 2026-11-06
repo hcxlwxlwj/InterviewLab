@@ -503,6 +503,31 @@ test('final draft is saved atomically on explicit finish, while an expired draft
   );
   assert.equal(late.turns[0].answer_text, null);
 });
+
+test('manual finish atomically saves an interrupted answer supplement and retries without duplicating it', async () => {
+  let v = await started();
+  const turnId = v.turns[0].id;
+  v = await runtime.interviews.answer(
+    identity,
+    v.id,
+    turnId,
+    { version: v.version, text: '我负责接口。', input_mode: 'voice' },
+    randomUUID(),
+  );
+  v = await runtime.interviews.interruptVoice(identity, v.id, { version: v.version }, randomUUID());
+  const body = {
+    version: v.version,
+    reason: 'user_finished',
+    final_answer: { turn_id: turnId, text: '我还测试了并发请求。' },
+  };
+  const key = randomUUID();
+  const ended = await runtime.interviews.finish(identity, v.id, body, key);
+  const retried = await runtime.interviews.finish(identity, v.id, body, key);
+  assert.equal(ended.status, 'completed');
+  assert.equal(ended.turns[0].answer_text, '我负责接口。\n我还测试了并发请求。');
+  assert.equal(ended.turns[0].revision, 2);
+  assert.deepEqual(retried, ended);
+});
 test('provider failure is bounded; generation fallback continues without rolling back an answer', async () => {
   let v = await started();
   agent.advance = async () => {
@@ -1243,6 +1268,61 @@ test('answers are analyzed before finish and finalization reuses them without an
   assert.equal(calls, 1);
 });
 
+for (const input_mode of ['text_fallback', 'voice'] as const) {
+  test(`${input_mode}: the interviewer publishes its next question while answer analysis is still running`, async () => {
+    const evaluate = agent.evaluate;
+    let release!: () => void;
+    let entered!: () => void;
+    const enteredAnalysis = new Promise<void>((resolve) => {
+      entered = resolve;
+    });
+    const analysisGate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    agent.evaluate = async (...args) => {
+      entered();
+      await analysisGate;
+      return evaluate(...args);
+    };
+    let v = await started();
+    v = await runtime.interviews.answer(
+      identity,
+      v.id,
+      v.turns.at(-1)!.id,
+      { version: v.version, text: '我通过边界测试验证表单校验。', input_mode },
+      randomUUID(),
+    );
+    const scoring = (
+      await database.pool.query(
+        "SELECT id FROM tasks WHERE type='reports.evaluate.v1' AND payload->>'interview_id'=$1",
+        [v.id],
+      )
+    ).rows[0];
+    assert.ok(scoring);
+    const analysis = runTask(database, scoring.id, runtime.handlers);
+    try {
+      await enteredAnalysis;
+      await runTask(database, v.task_id!, runtime.handlers);
+      const next = await runtime.interviews.read(identity, v.id);
+      assert.equal(next.turns.length, 2);
+      assert.equal(next.generation_status, 'ready');
+      assert.equal(
+        (await database.pool.query('SELECT status FROM tasks WHERE id=$1', [scoring.id])).rows[0]
+          .status,
+        'running',
+      );
+    } finally {
+      release();
+      await analysis;
+    }
+    assert.equal(
+      (await database.pool.query('SELECT status FROM tasks WHERE id=$1', [scoring.id])).rows[0]
+        .status,
+      'succeeded',
+    );
+  });
+}
+
 test('voice supplements invalidate a running analysis and only the new revision is published', async () => {
   let v = await started();
   const turnId = v.turns.at(-1)!.id;
@@ -1250,7 +1330,7 @@ test('voice supplements invalidate a running analysis and only the new revision 
     identity,
     v.id,
     turnId,
-    { version: v.version, text: '我会测试。' },
+    { version: v.version, text: '我会测试。', input_mode: 'voice' },
     randomUUID(),
   );
   const old = (
@@ -1462,6 +1542,192 @@ test('practice preserves the original report and repeated requests cannot replac
   assert.equal((await runtime.reports.get(identity, v.id)).needs_refresh, false);
 });
 
+test('a v3 single-topic full interview keeps six dimensions with zero for absent demonstrations and reuses its findings', async () => {
+  const evaluate = agent.evaluate;
+  let summaryCalls = 0;
+  agent.summarize = async () => {
+    summaryCalls++;
+    throw new Error('single-topic summary must not invoke a model');
+  };
+  agent.suggest = async () => ({ next_steps: ['围绕本题现有练习目标继续练习'] });
+  agent.evaluate = async (...args) => {
+    const result = await evaluate(...args);
+    const t = args[0];
+    const response = {
+      response_eligibility: 'answer' as const,
+      act: 'answer' as const,
+      relevance: 'responsive' as const,
+      sufficiency: 'sufficient' as const,
+      continuation: 'not_applicable' as const,
+      explanation: '回应了自我介绍的背景与方向要求',
+    };
+    const assessment = {
+      dimension: 'communication' as const,
+      score: 80,
+      text: '清楚介绍学习背景和求职方向',
+      evidence_refs: [evidence(t)],
+    };
+    return {
+      ...result,
+      question_scoring_version: 'question-evidence-v3',
+      response_assessment: response,
+      response_assessments: [
+        {
+          ...response,
+          turn_id: t.id,
+          revision: t.revision,
+          knowledge_evidence: 'claim_only' as const,
+          question_scope: {
+            kind: 'explanation' as const,
+            dimensions: ['communication' as const],
+            expectation: '介绍学习背景和求职方向',
+          },
+        },
+      ],
+      feedback_assessments: [assessment],
+      feedback_observations: FEEDBACK_DIMENSIONS.map((d) => ({
+        dimension: d.key,
+        status: d.key === 'communication' ? ('observed' as const) : ('not_observed' as const),
+        text: d.key === 'communication' ? assessment.text : '本题未考察',
+        evidence_refs: d.key === 'communication' ? assessment.evidence_refs : [],
+      })),
+    };
+  };
+  let v = await started();
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: v.turns[0].id, text: '我在读人工智能硕士，想应聘前端开发岗位。' },
+    },
+    randomUUID(),
+  );
+  await drain();
+  const report = await runtime.reports.get(identity, v.id);
+  assert.equal(summaryCalls, 0);
+  assert.equal(report.status, 'ready');
+  assert.equal(report.summary_status, 'ready');
+  assert.equal(report.advice_status, 'ready');
+  assert.equal(report.overall_score, 12);
+  assert.equal(report.question_scores?.[0].score, 80);
+  assert.deepEqual(report.summary?.strengths, report.evaluations[0].strengths);
+  assert.deepEqual(report.summary?.feedback_template.assessments, report.feedback_assessments);
+  assert.deepEqual(report.summary?.feedback_template.action_plan, []);
+  assert.match(report.summary!.limitations[0], /仅完成一个已评分主问题/);
+  assert.equal(
+    (
+      await database.pool.query(
+        "SELECT count(*) FROM tasks WHERE type='reports.summarize.v1' AND payload->>'interview_id'=$1",
+        [v.id],
+      )
+    ).rows[0].count,
+    '0',
+  );
+});
+
+test('advice and summary are queued together and advice may finish before summary without losing either result', async () => {
+  agent.suggest = async () => ({ next_steps: ['围绕已保存回答完成一次验证练习'] });
+  let v = await started();
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: v.turns[0].id, text: '我负责接口，并检查了边界条件。' },
+    },
+    randomUUID(),
+  );
+  const evaluation = (
+    await database.pool.query(
+      "SELECT * FROM tasks WHERE type='reports.evaluate.v1' AND payload->>'interview_id'=$1",
+      [v.id],
+    )
+  ).rows[0];
+  await runTask(database, evaluation.id, runtime.handlers);
+  const tasks = (
+    await database.pool.query(
+      "SELECT id,type,status FROM tasks WHERE type IN ('reports.summarize.v1','reports.advice.v1') AND payload->>'interview_id'=$1",
+      [v.id],
+    )
+  ).rows;
+  assert.equal(tasks.length, 2);
+  assert.ok(tasks.every((t) => t.status === 'queued'));
+  const summary = tasks.find((t) => t.type === 'reports.summarize.v1')!;
+  const advice = tasks.find((t) => t.type === 'reports.advice.v1')!;
+  await runTask(database, advice.id, runtime.handlers);
+  const waiting = await runtime.reports.get(identity, v.id);
+  assert.equal(waiting.advice_status, 'ready');
+  assert.equal(waiting.summary_status, 'pending');
+  assert.equal(waiting.status, 'generating');
+  await runTask(database, summary.id, runtime.handlers);
+  const ready = await runtime.reports.get(identity, v.id);
+  assert.equal(ready.summary_status, 'ready');
+  assert.equal(ready.advice_status, 'ready');
+  assert.deepEqual(ready.next_steps, ['围绕已保存回答完成一次验证练习']);
+  assert.equal(
+    (
+      await database.pool.query(
+        "SELECT count(*) FROM tasks WHERE type='reports.advice.v1' AND payload->>'interview_id'=$1",
+        [v.id],
+      )
+    ).rows[0].count,
+    '1',
+  );
+});
+
+test('advice-only retries are idempotent and preserve completed scoring and summary', async () => {
+  let failing = true;
+  agent.suggest = async () => {
+    if (failing) throw new ServiceError('provider_error', 502, '受控建议失败', true);
+    return { next_steps: ['围绕已保存的回答补充一次验证练习'] };
+  };
+  let v = await started();
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: v.turns[0].id, text: '我负责接口，并检查了边界条件。' },
+    },
+    randomUUID(),
+  );
+  await drain();
+  const before = await runtime.reports.get(identity, v.id);
+  assert.equal(before.advice_status, 'failed');
+  assert.equal(before.summary_status, 'ready');
+  const countCoreTasks = () =>
+    database.pool.query(
+      "SELECT type,count(*) FROM tasks WHERE type IN ('reports.evaluate.v1','reports.summarize.v1') GROUP BY type ORDER BY type",
+    );
+  const taskCounts = (await countCoreTasks()).rows;
+  failing = false;
+  const key = randomUUID();
+  const body = { version: before.version, scope: 'advice' as const };
+  const pending = await runtime.reports.request(identity, v.id, body, key);
+  assert.equal(pending.version, before.version + 1);
+  assert.equal(pending.advice_status, 'pending');
+  assert.deepEqual(pending.evaluations, before.evaluations);
+  assert.deepEqual(pending.summary, before.summary);
+  const replay = await runtime.reports.request(identity, v.id, body, key);
+  assert.equal(replay.version, pending.version);
+  assert.equal(replay.advice_task_id, pending.advice_task_id);
+  await drain();
+  const complete = await runtime.reports.get(identity, v.id);
+  assert.equal(complete.advice_status, 'ready');
+  assert.deepEqual(complete.next_steps, ['围绕已保存的回答补充一次验证练习']);
+  assert.deepEqual(complete.evaluations, before.evaluations);
+  assert.deepEqual(complete.summary, before.summary);
+  assert.deepEqual((await countCoreTasks()).rows, taskCounts);
+  await assert.rejects(
+    runtime.reports.request(identity, v.id, body, randomUUID()),
+    (error: unknown) => error instanceof ServiceError && error.statusCode === 409,
+  );
+});
+
 test('six-dimensional scores survive advice failure and practice never queues a whole report summary', async () => {
   const { QUESTION_SCORING_VERSION } = await import('@interviewlab/core');
   const evaluate = agent.evaluate;
@@ -1513,7 +1779,7 @@ test('six-dimensional scores survive advice failure and practice never queues a 
   assert.equal(before.overall_score, 70);
   assert.equal(before.advice_status, 'failed');
   assert.equal(before.summary_status, 'ready');
-  assert.equal(summaryCalls, 1);
+  assert.equal(summaryCalls, 0);
   adviceFails = false;
   score = 90;
   let retry = await runtime.interviews.createRetry(
@@ -1548,7 +1814,7 @@ test('six-dimensional scores survive advice failure and practice never queues a 
   assert.equal(practiced.summary, null);
   assert.equal(practiced.advice_status, 'ready');
   assert.deepEqual(practiced.next_steps, ['补充边界测试并记录失败率']);
-  assert.equal(summaryCalls, 1);
+  assert.equal(summaryCalls, 0);
   const after = await runtime.reports.get(identity, v.id);
   assert.equal(after.version, before.version);
   assert.equal(after.overall_score, before.overall_score);
@@ -1566,4 +1832,138 @@ test('six-dimensional scores survive advice failure and practice never queues a 
   const deleted = await runtime.reports.get(identity, v.id);
   assert.equal(deleted.practice_history?.length, 1);
   assert.equal(deleted.overall_score, 70);
+});
+
+test('a confirmed voice supplement replaces pending generation in one transaction and rejects stale writes', async () => {
+  let v = await started();
+  const turn = v.turns[0].id;
+  v = await runtime.interviews.answer(
+    identity,
+    v.id,
+    turn,
+    { version: v.version, text: '第一段回答。', input_mode: 'voice' },
+    randomUUID(),
+  );
+  const oldTask = v.task_id!,
+    oldVersion = v.version;
+  v = await runtime.interviews.continueVoice(
+    identity,
+    v.id,
+    turn,
+    { version: v.version, text: '确认后的补充。' },
+    randomUUID(),
+  );
+  assert.equal(v.generation_status, 'pending');
+  assert.notEqual(v.task_id, oldTask);
+  assert.equal(v.turns[0].answer_text, '第一段回答。\n确认后的补充。');
+  assert.equal(
+    (await database.pool.query('SELECT status FROM tasks WHERE id=$1', [oldTask])).rows[0].status,
+    'cancelled',
+  );
+  await assert.rejects(
+    runtime.interviews.continueVoice(
+      identity,
+      v.id,
+      turn,
+      { version: oldVersion, text: '过期补充' },
+      randomUUID(),
+    ),
+    (e: unknown) => e instanceof ServiceError && e.statusCode === 409,
+  );
+  assert.equal((await runtime.interviews.read(identity, v.id)).turns[0].revision, 2);
+});
+
+test('finish during thinking saves the final supplement and cancels generation without waiting', async () => {
+  let v = await started();
+  const turn = v.turns[0].id;
+  v = await runtime.interviews.answer(
+    identity,
+    v.id,
+    turn,
+    { version: v.version, text: '第一段回答。', input_mode: 'voice' },
+    randomUUID(),
+  );
+  const oldTask = v.task_id!;
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    {
+      version: v.version,
+      reason: 'user_finished',
+      final_answer: { turn_id: turn, text: '结束前的补充。' },
+    },
+    randomUUID(),
+  );
+  assert.equal(v.status, 'completed');
+  assert.equal(v.turns[0].revision, 2);
+  assert.equal(v.turns[0].answer_text, '第一段回答。\n结束前的补充。');
+  assert.equal(
+    (await database.pool.query('SELECT status FROM tasks WHERE id=$1', [oldTask])).rows[0].status,
+    'cancelled',
+  );
+});
+
+test('finish without any answer succeeds despite an intervening version update and produces no model tasks', async () => {
+  let v = await started();
+  const oldVersion = v.version;
+  v = await runtime.interviews.pause(identity, v.id, { version: v.version }, randomUUID());
+  v = await runtime.interviews.finish(
+    identity,
+    v.id,
+    { version: oldVersion, reason: 'user_finished' },
+    randomUUID(),
+  );
+  const report = await runtime.reports.get(identity, v.id);
+  assert.equal(v.status, 'completed');
+  assert.equal(report.status, 'ready');
+  assert.equal(report.overall_score, null);
+  assert.equal(report.summary_status, 'not_applicable');
+  assert.equal(report.evaluations.length, 0);
+  assert.equal(
+    (
+      await database.pool.query(
+        "SELECT count(*)::int n FROM tasks WHERE payload->>'interview_id'=$1 AND type LIKE 'reports.%'",
+        [v.id],
+      )
+    ).rows[0].n,
+    0,
+  );
+});
+
+test('resuming an interrupted generation without new words preserves the answer revision and analysis task', async () => {
+  let v = await started();
+  const turn = v.turns[0].id;
+  v = await runtime.interviews.answer(
+    identity,
+    v.id,
+    turn,
+    { version: v.version, text: '原回答内容。', input_mode: 'voice' },
+    randomUUID(),
+  );
+  v = await runtime.interviews.interruptVoice(identity, v.id, { version: v.version }, randomUUID());
+  const before = (
+    await database.pool.query(
+      "SELECT id FROM tasks WHERE payload->>'interview_id'=$1 AND type='reports.evaluate.v1' ORDER BY id",
+      [v.id],
+    )
+  ).rows;
+  v = await runtime.interviews.continueVoice(
+    identity,
+    v.id,
+    turn,
+    { version: v.version, text: '' },
+    randomUUID(),
+  );
+  assert.equal(v.generation_status, 'pending');
+  assert.equal(v.turns[0].revision, 1);
+  assert.equal(v.turns[0].answer_text, '原回答内容。');
+  assert.deepEqual(
+    (
+      await database.pool.query(
+        "SELECT id FROM tasks WHERE payload->>'interview_id'=$1 AND type='reports.evaluate.v1' ORDER BY id",
+        [v.id],
+      )
+    ).rows,
+    before,
+  );
 });

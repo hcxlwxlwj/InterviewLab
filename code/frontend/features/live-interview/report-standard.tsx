@@ -19,16 +19,6 @@ export function IndicatorRatings({ evaluation }: { evaluation: InterviewEvaluati
             {rating.level !== null && (
               <p className="report-anchor">对应锚点：{indicator?.anchors[rating.level]}</p>
             )}
-            {rating.evidence_refs.length > 0 && (
-              <details>
-                <summary>查看评分原文依据</summary>
-                {rating.evidence_refs.map((ref, index) => (
-                  <blockquote key={index}>
-                    回答 v{ref.revision}：“{ref.quote}”
-                  </blockquote>
-                ))}
-              </details>
-            )}
           </article>
         );
       })}

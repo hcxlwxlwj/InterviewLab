@@ -10,3 +10,7 @@ export function businessTarget(value: string): string | null {
 export function requiresLogin(pathname: string) {
   return pathname !== '/' && pathname !== '/login';
 }
+
+export function loginDestination(value: string | null) {
+  return (value && businessTarget(value)) || '/';
+}
