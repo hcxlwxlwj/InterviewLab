@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { setTimeout as delay } from 'node:timers/promises';
 import type { VersionRef } from '@interviewlab/core';
 import type { Database, Transaction } from '../database/connection';
 import { ServiceError } from '../foundation/errors';
@@ -8,6 +9,8 @@ export interface TaskOutcome {
   result_ref: VersionRef | null;
   /** Acquire module locks before the task lock, matching command lock order. False discards stale output. */
   lock?: (tx: Transaction) => Promise<boolean | void>;
+  /** False releases the transaction and waits to publish this same result, without another model call. */
+  publicationReady?: (tx: Transaction) => Promise<boolean>;
   /** Database-only publication. Runs atomically with succeeded, after checking the active claim. */
   commit?: (tx: Transaction) => Promise<boolean | void>;
 }
@@ -62,8 +65,9 @@ export async function runTask(
       handlers[claimed.type](claimed, controller.signal),
       new Promise<never>((_, reject) => {
         timer = setTimeout(() => {
-          controller.abort();
-          reject(new TaskDeliveryError('Task timed out'));
+          const error = new TaskDeliveryError('Task timed out');
+          controller.abort(error);
+          reject(error);
         }, leaseMs);
       }),
       new Promise<never>((_, reject) => {
@@ -82,13 +86,15 @@ export async function runTask(
               row.execution_token !== token ||
               (await isCancelled?.(claimed))
             ) {
-              controller.abort();
-              reject(new ServiceError('task_cancelled', 409, 'Task cancelled'));
+              const error = new ServiceError('task_cancelled', 409, 'Task cancelled');
+              controller.abort(error);
+              reject(error);
             }
           })()
             .catch(() => {
-              controller.abort();
-              reject(new TaskDeliveryError('Cancellation check failed'));
+              const error = new TaskDeliveryError('Cancellation check failed');
+              controller.abort(error);
+              reject(error);
             })
             .finally(() => {
               checking = false;
@@ -97,30 +103,43 @@ export async function runTask(
       }),
     ]);
     if (outcome.result_ref !== null) versionRefSchema.parse(outcome.result_ref);
-    await database.transaction(async (tx) => {
-      const validSource = await outcome.lock?.(tx);
-      const current = await tx.client.query<TaskRow>(
-        'SELECT *, lease_until > clock_timestamp() AS lease_active FROM tasks WHERE id=$1 FOR UPDATE',
-        [id],
-      );
-      const row = current.rows[0];
-      if (!row || row.status !== 'running' || row.execution_token !== token || !row.lease_active)
-        throw new TaskDeliveryError('Task claim expired');
-      const published = validSource === false ? false : await outcome.commit?.(tx);
-      await tx.client.query(
-        'UPDATE tasks SET status=$3,result_ref=$2::jsonb,execution_token=NULL,lease_until=NULL,error_code=NULL,updated_at=now() WHERE id=$1',
-        [
-          id,
-          published === false ? null : JSON.stringify(outcome.result_ref),
-          published === false ? 'cancelled' : 'succeeded',
-        ],
-      );
-    });
+    let publishedOutcome = false;
+    while (!publishedOutcome) {
+      if (controller.signal.aborted) throw controller.signal.reason;
+      publishedOutcome = await database.transaction(async (tx) => {
+        const validSource = await outcome.lock?.(tx);
+        const current = await tx.client.query<TaskRow>(
+          'SELECT *, lease_until > clock_timestamp() AS lease_active FROM tasks WHERE id=$1 FOR UPDATE',
+          [id],
+        );
+        const row = current.rows[0];
+        if (!row || row.status !== 'running' || row.execution_token !== token || !row.lease_active)
+          throw new TaskDeliveryError('Task claim expired');
+        if (
+          validSource !== false &&
+          outcome.publicationReady &&
+          !(await outcome.publicationReady(tx))
+        )
+          return false;
+        const published = validSource === false ? false : await outcome.commit?.(tx);
+        await tx.client.query(
+          'UPDATE tasks SET status=$3,result_ref=$2::jsonb,execution_token=NULL,lease_until=NULL,error_code=NULL,updated_at=now() WHERE id=$1',
+          [
+            id,
+            published === false ? null : JSON.stringify(outcome.result_ref),
+            published === false ? 'cancelled' : 'succeeded',
+          ],
+        );
+        return true;
+      });
+      if (!publishedOutcome) await delay(50, undefined, { signal: controller.signal });
+    }
   } catch (error) {
+    const failure = controller.signal.aborted ? controller.signal.reason : error;
     const code =
-      error instanceof ServiceError
-        ? error.code
-        : error instanceof TaskDeliveryError
+      failure instanceof ServiceError
+        ? failure.code
+        : failure instanceof TaskDeliveryError
           ? 'task_timeout'
           : 'task_failed';
     const result = await database.pool.query(

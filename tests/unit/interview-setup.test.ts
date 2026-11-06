@@ -11,7 +11,7 @@ const configuration: InterviewConfig = {
   career_stage: 'internship',
   interview_type: 'hr',
   difficulty: '基础',
-  duration_minutes: 5,
+  duration_minutes: 10,
   interviewer_style: '友好',
   interaction_mode: 'realtime_video',
   resume_ref: { id: 'selected-resume', version: 2 },
@@ -29,9 +29,12 @@ test('AI product designer selects campus instead of submitting an unsupported in
 });
 
 test('switching back preserves a supported stage and retains unrelated settings', () => {
-  const selected = selectInterviewJob({ ...configuration, career_stage: 'campus' }, getJob('frontend')!);
+  const selected = selectInterviewJob(
+    { ...configuration, career_stage: 'campus' },
+    getJob('frontend')!,
+  );
   assert.equal(selected.career_stage, 'campus');
-  assert.equal(selected.duration_minutes, 5);
+  assert.equal(selected.duration_minutes, 10);
   assert.equal(selected.interviewer_style, '友好');
 });
 
@@ -43,7 +46,7 @@ test('every catalog target selected from either stage produces a valid profile r
         const selected = selectInterviewJob({ ...configuration, career_stage: stage }, job);
         assert.ok(job.stages.includes(selected.career_stage), job.id);
         const profiles = await knowledge.profiles(selected);
-        assert.equal(profiles.profiles.length, 5, job.id);
+        assert.equal(profiles.profiles.length, 4, job.id);
       }
     }
   } finally {

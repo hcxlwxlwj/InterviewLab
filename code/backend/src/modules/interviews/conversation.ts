@@ -37,6 +37,9 @@ export function questionTopic(
     /^.{0,35}(?:跳过|不展开|先放下|不再聊)[，,：:]\s*/,
     '',
   );
+  if (/薪资|薪酬|待遇|期望收入/.test(text)) return 'expectations';
+  if (/到岗|入职|出勤|实习.{0,6}(?:时长|多久|几个月)|工作地点|城市意向/.test(text))
+    return 'availability';
   if (
     /学校|学历|毕业院校|教育背景|学习背景|自我介绍|介绍.{0,5}自己/.test(text) ||
     turn.stage === 'introduction'
@@ -57,6 +60,8 @@ export function questionTopic(
   return 'other';
 }
 function namedTopic(text: string): InterviewTopic | null {
+  if (/薪资|薪酬|待遇|期望收入/.test(text)) return 'expectations';
+  if (/到岗|入职|出勤|实习安排|工作地点/.test(text)) return 'availability';
   if (/学校|学历|背景|个人信息|自我介绍/.test(text)) return 'personal_background';
   if (/应聘原因|岗位动机|选择.{0,8}原因/.test(text)) return 'motivation';
   if (/项目|游戏|实习细节/.test(text)) return 'project';
@@ -71,7 +76,7 @@ export function conversationPolicy(interview: Interview): InterviewConversationS
     const text = turn.answer_text;
     lastAct = replyAct(text);
     const reopened =
-      /(?:现在|还是|可以|愿意|继续).{0,6}(?:聊|谈|介绍|说|回答).{0,12}(?:学校|背景|项目|课程|练习|原因)|(?:背景|项目|课程|练习).{0,6}(?:现在可以聊|可以继续)/.test(
+      /(?:现在|还是|可以|愿意|继续).{0,6}(?:聊|谈|介绍|说|回答).{0,12}(?:学校|背景|项目|课程|练习|原因|薪资|薪酬|待遇|到岗|出勤|工作地点)|(?:背景|项目|课程|练习|薪资|薪酬|待遇|到岗|出勤|工作地点).{0,6}(?:现在可以聊|可以继续)/.test(
         text,
       )
         ? namedTopic(text)

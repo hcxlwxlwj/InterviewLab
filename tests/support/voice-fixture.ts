@@ -20,7 +20,7 @@ export function voiceFixture() {
       career_stage: 'internship',
       interview_type: 'technical_qa',
       difficulty: '基础',
-      duration_minutes: 5,
+      duration_minutes: 10,
       interviewer_style: '标准',
       interaction_mode: 'text_fallback',
     },
@@ -58,8 +58,15 @@ export function voiceFixture() {
     ],
   };
   let recognition: ((result: Recognition) => void) | undefined;
+  const recognizers: ((result: Recognition) => void)[] = [];
   let asrError: (() => void) | undefined;
   const events: VoiceServerEvent[] = [];
+  const activities: {
+    session_id: string;
+    turn_id: string;
+    generation_id: string;
+    active: boolean;
+  }[] = [];
   const answers: string[] = [],
     continuations: string[] = [],
     receipts: unknown[] = [];
@@ -68,11 +75,13 @@ export function voiceFixture() {
   let closes = 0,
     audioBytes = 0,
     voicedPackets = 0,
-    finishes = 0;
+    finishes = 0,
+    interruptions = 0;
   const provider: VoiceProvider = {
     available: true,
     async recognize(text, error) {
       recognition = text;
+      recognizers.push(text);
       asrError = error;
       return {
         write: (pcm) => {
@@ -96,6 +105,16 @@ export function voiceFixture() {
   };
   const copy = () => structuredClone(view);
   const service: VoiceInterviews = {
+    async setVoiceInputActivity(_identity, _id, activity) {
+      activities.push(activity);
+      return (
+        !activity.active ||
+        (view.status === 'in_progress' &&
+          view.generation_status === 'pending' &&
+          view.generation_id === activity.generation_id &&
+          view.turns.at(-1)?.id === activity.turn_id)
+      );
+    },
     async read(principal) {
       if (principal.owner_id !== 'voice-owner')
         throw new ServiceError('not_found', 404, '不可读取');
@@ -115,6 +134,7 @@ export function voiceFixture() {
       return copy();
     },
     async interruptVoice() {
+      interruptions++;
       view.generation_status = 'idle';
       view.generation_id = null;
       view.version++;
@@ -126,6 +146,7 @@ export function voiceFixture() {
       current.answer_text += '\n' + body.text;
       current.revision++;
       view.generation_status = 'pending';
+      view.generation_id = randomUUID();
       view.version++;
       return copy();
     },
@@ -138,6 +159,7 @@ export function voiceFixture() {
     service,
     provider,
     events,
+    activities,
     answers,
     continuations,
     receipts,
@@ -151,10 +173,20 @@ export function voiceFixture() {
     recognize(result: Recognition) {
       recognition?.(result);
     },
+    recognizeAt(index: number, result: Recognition) {
+      recognizers[index]?.(result);
+    },
     failAsr() {
       asrError?.();
     },
-    metrics: () => ({ closes, audioBytes, voicedPackets, finishes }),
+    metrics: () => ({
+      closes,
+      audioBytes,
+      voicedPackets,
+      finishes,
+      interruptions,
+      recognizers: recognizers.length,
+    }),
   };
 }
 export async function waitFor(check: () => boolean, timeoutMs = 2000) {

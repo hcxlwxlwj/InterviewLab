@@ -8,7 +8,9 @@ import {
 
 export const interviewConfigSchema = z
   .object({
-    resume_ref: z.object({id:z.string().uuid(),version:z.number().int().positive()}).optional(),
+    resume_ref: z
+      .object({ id: z.string().uuid(), version: z.number().int().positive() })
+      .optional(),
     job: z.string().min(1).max(100),
     career_stage: z.enum(['internship', 'campus']),
     interview_type: z.enum([
@@ -19,12 +21,18 @@ export const interviewConfigSchema = z
       'mixed',
     ]),
     difficulty: z.literal('基础'),
-    duration_minutes: z.union([z.literal(5), z.literal(10)]),
+    duration_minutes: z.union([z.literal(5), z.literal(10), z.literal(20), z.literal(30)]),
     interviewer_style: z.enum(['标准', '友好', '深入追问']),
     interaction_mode: z.enum(['text_fallback', 'realtime_voice', 'realtime_video']),
   })
   .strict() satisfies z.ZodType<InterviewConfig>;
 export const versionBody = z.object({ version: z.number().int().positive() }).strict();
+export const newInterviewConfigSchema = interviewConfigSchema
+  .extend({ duration_minutes: z.union([z.literal(10), z.literal(20), z.literal(30)]) })
+  .refine((config) => config.interview_type !== 'project_deep_dive', {
+    message: '项目深挖已合入专业面和业务面，请选择新的面试类型',
+    path: ['interview_type'],
+  });
 export const textAnswer = z
   .string()
   .min(1)
@@ -83,9 +91,17 @@ export const turnSchema = z.object({
   input_mode: z.enum(['text_fallback', 'voice']),
   answered_at: z.string().nullable(),
 });
-export const preparationBody=versionBody.extend({mode:z.enum(['personalized','fallback']).default('personalized')});
+export const preparationBody = versionBody.extend({
+  mode: z.enum(['personalized', 'fallback']).default('personalized'),
+});
 export const interviewSchema = z.object({
-  preparation:z.object({status:z.enum(['waiting_material','pending','ready','failed','fallback']),task_id:z.string().nullable(),error_code:z.string().nullable()}).optional(),
+  preparation: z
+    .object({
+      status: z.enum(['waiting_material', 'pending', 'ready', 'failed', 'fallback']),
+      task_id: z.string().nullable(),
+      error_code: z.string().nullable(),
+    })
+    .optional(),
   id: z.string(),
   version: z.number().int(),
   configuration: interviewConfigSchema,

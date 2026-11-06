@@ -52,7 +52,7 @@ function fixture() {
     career_stage: 'internship',
     interview_type: 'project_deep_dive',
     difficulty: '基础',
-    duration_minutes: 5,
+    duration_minutes: 10,
     interviewer_style: '标准',
     interaction_mode: 'text_fallback',
   });
@@ -224,6 +224,7 @@ test('evaluation digest is independent of query order but changes with content o
 test('report retry accepts the legacy body and explicit scopes, rejecting unknown commands', () => {
   assert.ok(reportRequestBody.safeParse({ version: 1 }).success);
   assert.ok(reportRequestBody.safeParse({ version: 1, scope: 'summary' }).success);
+  assert.ok(reportRequestBody.safeParse({ version: 1, scope: 'advice' }).success);
   assert.equal(reportRequestBody.safeParse({ version: 1, scope: 'all' }).success, false);
 });
 test('summary uses the shared model adapter with checked evaluations and records its own prompt version', async () => {
@@ -282,8 +283,9 @@ test('summary uses the shared model adapter with checked evaluations and records
     },
   );
   assert.equal(
-    (logs.find((e) => 'invocation_id' in e) as unknown as { prompt_version: string }).prompt_version,
-    'text-review-v11',
+    (logs.find((e) => 'invocation_id' in e) as unknown as { prompt_version: string })
+      .prompt_version,
+    'text-review-v16',
   );
 });
 

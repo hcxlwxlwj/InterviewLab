@@ -140,26 +140,105 @@ test('denying a complete system is not treated as claiming a project', () => {
   assert.equal(policy.user_requested_scenario, false);
 });
 
-test('limited personal ownership is known and a genuine module-scope question is valid context discovery',()=>{
-  const known=experiencePolicy(interview(['团队四个人，我只负责搜索页面。']));
-  assert.ok(known.experience.personal_role);assert.ok(!known.missing.includes('personal_role'));
-  const unknown=experiencePolicy(interview(['我做了一个系统。']));
-  assert.doesNotThrow(()=>assertExperienceQuestion('这个系统具体包含哪些功能模块？',unknown,false,true));
-  assert.throws(()=>assertExperienceQuestion('这个系统如何处理异步请求竞态？',unknown,false,true));
+test('limited personal ownership is known and a genuine module-scope question is valid context discovery', () => {
+  const known = experiencePolicy(interview(['团队四个人，我只负责搜索页面。']));
+  assert.ok(known.experience.personal_role);
+  assert.ok(!known.missing.includes('personal_role'));
+  const unknown = experiencePolicy(interview(['我做了一个系统。']));
+  assert.doesNotThrow(() =>
+    assertExperienceQuestion('这个系统具体包含哪些功能模块？', unknown, false, true),
+  );
+  assert.throws(() =>
+    assertExperienceQuestion('这个系统如何处理异步请求竞态？', unknown, false, true),
+  );
 });
 
-test('resume context only fills demonstrated project slots and never overrides no-experience or project switches',()=>{
-  const analysis=(quote:string,field='projects')=>({facts:[{kind:'experience' as const,text:quote,evidence:{material_id:'synthetic',version:1,field,quote}}],clarification_points:[]});
-  const v=interview(['我做了一个系统。']);
-  const partial=experiencePolicy(v);applyResumeExperience(partial,analysis('本人负责接口。'),v.turns[0].answer_text!,v.turns[0].text);
-  assert.deepEqual(partial.missing,['project_description']);assert.equal(partial.discovery_required,true);
-  const education=experiencePolicy(v);applyResumeExperience(education,analysis('系统用于同学预约教室，本人负责接口。','education'),v.turns[0].answer_text!,v.turns[0].text);
-  assert.equal(education.discovery_required,true);
-  const complete=experiencePolicy(v);applyResumeExperience(complete,analysis('系统用于同学预约教室，本人负责接口。'),v.turns[0].answer_text!,v.turns[0].text);
-  assert.equal(complete.discovery_required,false);assert.equal(complete.next_step,'interview');assert.equal(complete.experience.description,null);
-  const denied=experiencePolicy(interview(['我没有做过完整系统。']));const prior=denied.next_step;
-  applyResumeExperience(denied,analysis('系统用于同学预约教室，本人负责接口。'),'我没有做过完整系统。','请介绍经历');assert.equal(denied.next_step,prior);
-  const switched=experiencePolicy(v);applyResumeExperience(switched,analysis('系统用于同学预约教室，本人负责接口。'),'换个项目','请介绍经历');assert.equal(switched.discovery_required,true);
+test('resume context only fills demonstrated project slots and never overrides no-experience or project switches', () => {
+  const analysis = (quote: string, field = 'projects') => ({
+    facts: [
+      {
+        kind: 'experience' as const,
+        text: quote,
+        evidence: { material_id: 'synthetic', version: 1, field, quote },
+      },
+    ],
+    clarification_points: [],
+  });
+  const v = interview(['我做了教室预约系统。']);
+  const partial = experiencePolicy(v);
+  applyResumeExperience(
+    partial,
+    analysis('本人负责教室预约接口。'),
+    v.turns[0].answer_text!,
+    v.turns[0].text,
+  );
+  assert.deepEqual(partial.missing, ['project_description']);
+  assert.equal(partial.discovery_required, true);
+  const education = experiencePolicy(v);
+  applyResumeExperience(
+    education,
+    analysis('教室预约系统用于同学预约教室，本人负责接口。', 'education'),
+    v.turns[0].answer_text!,
+    v.turns[0].text,
+  );
+  assert.equal(education.discovery_required, true);
+  const complete = experiencePolicy(v);
+  applyResumeExperience(
+    complete,
+    analysis('教室预约系统用于同学预约教室，本人负责接口。'),
+    v.turns[0].answer_text!,
+    v.turns[0].text,
+  );
+  assert.equal(complete.discovery_required, false);
+  assert.equal(complete.next_step, 'interview');
+  assert.equal(complete.experience.description, null);
+  const denied = experiencePolicy(interview(['我没有做过完整系统。']));
+  const prior = denied.next_step;
+  applyResumeExperience(
+    denied,
+    analysis('系统用于同学预约教室，本人负责接口。'),
+    '我没有做过完整系统。',
+    '请介绍经历',
+  );
+  assert.equal(denied.next_step, prior);
+  const switched = experiencePolicy(v);
+  applyResumeExperience(
+    switched,
+    analysis('系统用于同学预约教室，本人负责接口。'),
+    '换个项目',
+    '请介绍经历',
+  );
+  assert.equal(switched.discovery_required, true);
+  const unrelated = experiencePolicy(interview(['我做了一个系统。']));
+  applyResumeExperience(
+    unrelated,
+    analysis('教室预约系统用于同学预约教室，本人负责接口。'),
+    '我做了一个系统。',
+    '请介绍经历',
+  );
+  assert.deepEqual(unrelated.missing, ['project_description', 'personal_role']);
+  const crossProject = experiencePolicy(v);
+  applyResumeExperience(
+    crossProject,
+    {
+      facts: [
+        ...analysis('教室预约系统用于同学预约教室。').facts,
+        ...analysis('购物商城系统，本人负责接口。').facts,
+      ],
+      clarification_points: [],
+    },
+    v.turns[0].answer_text!,
+    v.turns[0].text,
+  );
+  assert.deepEqual(crossProject.missing, ['personal_role']);
+  const corrected = experiencePolicy(v);
+  applyResumeExperience(
+    corrected,
+    analysis('教室预约系统用于同学预约教室，本人负责接口。'),
+    '教室预约系统不是我做的。',
+    v.turns[0].text,
+  );
+  assert.deepEqual(corrected.missing, ['project_description', 'personal_role']);
 });
 test('explicitly declining hypothetical questions is not parsed as a request for them', () => {
   for (const answer of [

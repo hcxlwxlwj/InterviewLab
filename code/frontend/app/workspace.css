@@ -18,7 +18,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 15px;
+  font-size: 16px;
   border-left: 1px solid #e4e3de;
   padding-left: 25px;
 }
@@ -38,13 +38,13 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 16px;
+  font-size: 17px;
   font-variant-numeric: tabular-nums;
   margin-right: 12px;
   font-weight: 600;
 }
 .timer small {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   font-weight: 400;
 }
@@ -79,13 +79,13 @@
 .interviewer-person .avatar {
   height: 42px;
   width: 42px;
-  font-size: 16px;
+  font-size: 17px;
 }
 .interviewer-person h2 {
-  font-size: 16px;
+  font-size: 17px;
 }
 .interviewer-person > div > span {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   display: flex;
   align-items: center;
@@ -107,7 +107,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   margin-bottom: 15px;
 }
@@ -118,12 +118,12 @@
   margin-bottom: 18px;
 }
 .current-question > .text-link {
-  font-size: 14px;
+  font-size: 15px;
   background: none;
   color: #6b7280;
 }
 .repeated-question {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.9;
   color: #647082;
   padding: 12px;
@@ -139,10 +139,10 @@
   margin-bottom: 12px;
 }
 .question-history h2 {
-  font-size: 14px;
+  font-size: 15px;
 }
 .question-history .panel-heading > span {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
 }
 .history-question {
@@ -160,7 +160,7 @@
   height: 20px;
   border: 1px solid #cbd3db;
   border-radius: 50%;
-  font-size: 14px;
+  font-size: 15px;
   flex-shrink: 0;
   margin-top: 4px;
   color: #6b7280;
@@ -177,16 +177,16 @@
 }
 .history-question small {
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
 }
 .history-question p {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.9;
   color: #6b7280;
   margin-top: 2px;
 }
 .history-question em {
-  font-size: 14px;
+  font-size: 15px;
   font-style: normal;
   color: #6b7280;
 }
@@ -208,7 +208,7 @@
   margin-top: 24px;
   background: #f7f7f3;
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
   padding: 12px;
   border-radius: 6px;
 }
@@ -229,14 +229,14 @@
   border-bottom: 1px solid var(--border);
 }
 .answer-panel-header h2 {
-  font-size: 16px;
+  font-size: 17px;
 }
 .answer-panel-header > span {
   display: flex;
   gap: 5px;
   align-items: center;
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
 }
 .conversation {
   padding: 24px;
@@ -252,7 +252,7 @@
   text-align: center;
 }
 .conversation-intro > p {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   line-height: 2;
   margin-top: 11px;
@@ -266,7 +266,7 @@
 .message > .avatar {
   width: 29px;
   height: 29px;
-  font-size: 14px;
+  font-size: 15px;
   margin-top: 4px;
 }
 .message > div {
@@ -277,11 +277,11 @@
   background: #f6f7f8;
 }
 .message small {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
 }
 .message p {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.95;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -304,7 +304,7 @@
   padding-bottom: 4px;
 }
 .pause-notice {
-  font-size: 14px;
+  font-size: 15px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -331,13 +331,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 13px 0;
-  font-size: 14px;
+  font-size: 15px;
 }
 .composer-heading label {
   font-weight: 600;
 }
 .composer-heading > span {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
 }
 .answer-composer textarea {
@@ -348,7 +348,7 @@
   min-height: 105px;
   padding: 11px 13px;
   resize: vertical;
-  font-size: 14px;
+  font-size: 15px;
 }
 .answer-composer textarea:focus-visible {
   outline: none;
@@ -361,7 +361,7 @@
   padding: 0 10px 10px;
 }
 .composer-bottom > span {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
 }
 .composer-bottom kbd {
@@ -378,14 +378,14 @@
 }
 .answer-composer .error-inline {
   margin: 5px 12px 10px;
-  font-size: 14px;
+  font-size: 15px;
 }
 .session-tools {
   display: flex;
   align-items: center;
   gap: 17px;
   padding: 15px 23px;
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   flex-wrap: wrap;
 }
@@ -400,7 +400,7 @@
   background: transparent;
   padding: 0;
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
 }
 .session-tools > a {
   margin-left: auto;
@@ -427,18 +427,18 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 14px;
+  font-size: 15px;
 }
 .code-header > .icon-button {
   margin-left: auto;
 }
 .code-header .badge {
-  font-size: 14px;
+  font-size: 15px;
 }
 .code-task {
   padding: 12px 14px;
   background: #fffdf8;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.9;
 }
 .code-task strong {
@@ -446,10 +446,10 @@
 }
 .code-task p {
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
 }
 .code-task code {
-  font-size: 14px;
+  font-size: 15px;
   color: #63748a;
   background: #f4f6f8;
   display: block;
@@ -465,7 +465,7 @@
   border-block: 1px solid var(--border);
 }
 .code-languages button {
-  font-size: 14px;
+  font-size: 15px;
   padding: 4px 10px;
   border-radius: 4px;
   background: none;
@@ -476,7 +476,7 @@
   color: #8b7145;
 }
 .code-languages > span {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   margin-left: auto;
 }
@@ -488,14 +488,14 @@
   border-top: 1px solid var(--border);
 }
 .code-actions > span {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   margin-left: auto;
 }
 .code-result {
   background: #fff7e6;
   border-top: 1px solid #eee6d4;
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   padding: 10px 12px;
 }
@@ -519,7 +519,7 @@
   border: 1px solid #f0e4bd;
   padding: 12px 16px;
   border-radius: 7px;
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   margin-bottom: 24px;
 }
@@ -533,13 +533,13 @@
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: 15px;
 }
 .status-preview-label select {
   width: auto;
   min-width: 90px;
   padding: 4px 7px;
-  font-size: 14px;
+  font-size: 15px;
   background: #fffcf5;
   border-color: #e9d8af;
 }
@@ -565,7 +565,7 @@
   padding: 9px 16px;
   border-radius: 6px;
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
 }
 .content-tabs > button.selected {
   color: #446c79;
@@ -599,21 +599,21 @@
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 17px;
   flex-shrink: 0;
 }
 .review-number small {
-  font-size: 14px;
+  font-size: 15px;
 }
 .turn-review summary > span:nth-child(2) {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.8;
   font-weight: 600;
   flex: 1;
 }
 .turn-review summary > span:nth-child(2) > small {
   display: block;
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   font-weight: 400;
   margin-top: 5px;
@@ -634,11 +634,11 @@
   background: #f7f8fa;
 }
 .quote-label {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
 }
 .answer-quote p {
-  font-size: 14px;
+  font-size: 15px;
   color: #5d6880;
   line-height: 2;
   white-space: pre-wrap;
@@ -659,12 +659,12 @@
   margin-top: 2px;
 }
 .review-feedback strong {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: #527579;
 }
 .review-feedback p {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.9;
   color: #6b7280;
   margin-top: 6px;
@@ -681,20 +681,20 @@
 }
 .evidence {
   margin-top: 15px;
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
 }
 .evidence blockquote {
   margin: 7px 0 0;
   padding-left: 12px;
   border-left: 2px solid #e3e5e8;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.9;
   color: #6b7280;
 }
 .reference-points {
   margin-top: 18px;
-  font-size: 14px;
+  font-size: 15px;
 }
 .reference-points strong {
   font-weight: 500;
@@ -714,7 +714,7 @@
   border-top: 1px solid #f0f0ed;
 }
 .turn-review-actions > span {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
 }
 .report-sidebar {
@@ -725,7 +725,7 @@
   padding: 23px;
 }
 .score-panel .panel-heading h2 {
-  font-size: 16px;
+  font-size: 17px;
 }
 .score-summary {
   padding: 4px 0 19px;
@@ -739,12 +739,12 @@
   letter-spacing: -2px;
 }
 .score-summary > span {
-  font-size: 15px;
+  font-size: 16px;
   color: #6b7280;
   margin-left: 8px;
 }
 .score-summary p {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   margin-top: 12px;
 }
@@ -756,10 +756,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 14px;
+  font-size: 15px;
 }
 .dimension strong {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
 }
 .dimension-track {
@@ -777,7 +777,7 @@
 }
 .dimension p {
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.8;
   margin-top: 7px;
 }
@@ -788,7 +788,7 @@
   display: flex;
   gap: 7px;
   align-items: center;
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
 }
 .observations-panel {
@@ -798,7 +798,7 @@
   margin-bottom: 0;
 }
 .observations-panel h2 {
-  font-size: 16px;
+  font-size: 17px;
 }
 .observation-row {
   display: flex;
@@ -813,11 +813,11 @@
   margin-top: 3px;
 }
 .observation-row strong {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
 }
 .observation-row p {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   margin-top: 5px;
 }
@@ -830,10 +830,10 @@
   gap: 9px;
 }
 .export-panel h3 {
-  font-size: 14px;
+  font-size: 15px;
 }
 .export-panel p {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   line-height: 1.9;
   margin: 10px 0 13px;
@@ -855,7 +855,7 @@
   margin-top: 20px;
 }
 .report-state p {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   margin: 13px 0 23px;
 }
@@ -866,10 +866,10 @@
   padding: 23px;
 }
 .comparison-panel .panel-heading h2 {
-  font-size: 16px;
+  font-size: 17px;
 }
 .comparison-question {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.9;
   padding: 13px;
   background: #f8f8f4;
@@ -892,7 +892,7 @@
   border-color: #d5e9e6;
 }
 .comparison-columns p {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 2;
   color: #6b7280;
   margin-top: 12px;
@@ -907,12 +907,12 @@
   margin-top: 10px;
   background: #f7f8f9;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 15px;
 }
 .code-review-record pre {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font-size: 14px;
+  font-size: 15px;
   margin-top: 12px;
 }
 .personal-heading {
@@ -930,12 +930,12 @@
   font-size: 28px;
 }
 .personal-heading p {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   margin-top: 7px;
 }
 .personal-heading .section-kicker {
-  font-size: 14px;
+  font-size: 15px;
 }
 .personal-panel {
   margin-top: 22px;
@@ -947,7 +947,7 @@
   margin: 0;
 }
 .personal-tabs > button {
-  font-size: 15px;
+  font-size: 16px;
   padding: 10px 19px;
 }
 .personal-message {
@@ -967,18 +967,18 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
 }
 .record-filters select {
   width: 132px;
-  font-size: 14px;
+  font-size: 15px;
   padding: 7px 10px;
 }
 .record-filters > span {
   margin-left: auto;
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
 }
 .table-scroll {
   overflow-x: auto;
@@ -989,11 +989,11 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 14px;
+  font-size: 15px;
   white-space: nowrap;
 }
 .records-table th {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   font-weight: 500;
   padding: 12px;
@@ -1030,10 +1030,10 @@
 }
 .record-job strong {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
 }
 .record-job small {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   display: flex;
   align-items: center;
@@ -1042,28 +1042,28 @@
 }
 .record-job small .badge {
   padding: 1px 5px;
-  font-size: 14px;
+  font-size: 15px;
 }
 .table-mode {
   display: flex;
   gap: 5px;
   align-items: center;
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
 }
 .table-date {
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
 }
 .table-score {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 .table-score small {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
   background: #f4f5f7;
   padding: 1px 5px;
@@ -1076,7 +1076,7 @@
   align-items: center;
 }
 .table-actions > .button {
-  font-size: 14px;
+  font-size: 15px;
 }
 .table-actions .icon-button {
   color: #6b7280;
@@ -1089,14 +1089,14 @@
   gap: 15px;
 }
 .table-footer > span {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
 }
 .table-footer > div {
   display: flex;
   gap: 9px;
   align-items: center;
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
 }
 .personal-panel-bottom {
@@ -1109,19 +1109,19 @@
   margin-top: 14px;
 }
 .personal-panel-bottom > span {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
 }
 .personal-panel-bottom .button {
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
 }
 .resumes-panel,
 .preferences-panel {
   padding: 25px;
 }
 .resumes-panel .panel-heading h2 {
-  font-size: 16px;
+  font-size: 17px;
 }
 .resume-library {
   display: grid;
@@ -1148,16 +1148,16 @@
   color: #6b7280;
 }
 .resume-card-content h3 {
-  font-size: 16px;
+  font-size: 17px;
   display: flex;
   align-items: center;
   gap: 9px;
 }
 .resume-card-content h3 > .badge {
-  font-size: 14px;
+  font-size: 15px;
 }
 .resume-card-content p {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   display: flex;
   gap: 8px;
@@ -1165,11 +1165,11 @@
   margin-top: 6px;
 }
 .resume-card-content p > .badge {
-  font-size: 14px;
+  font-size: 15px;
 }
 .resume-card-content > small {
   color: #6b7280;
-  font-size: 14px;
+  font-size: 15px;
 }
 .resume-card-actions {
   display: flex;
@@ -1178,7 +1178,7 @@
   margin-left: auto;
 }
 .resume-card-actions .button {
-  font-size: 14px;
+  font-size: 15px;
 }
 .resume-preview-item {
   padding: 15px 0;
@@ -1191,11 +1191,11 @@
   border-bottom: 0;
 }
 .resume-preview-item h3 {
-  font-size: 16px;
+  font-size: 17px;
   margin-bottom: 9px;
 }
 .resume-preview-item p {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.9;
   margin-top: 5px;
   color: #6b7280;
@@ -1212,17 +1212,17 @@
   padding-top: 0;
 }
 .preference-row h3 {
-  font-size: 15px;
+  font-size: 16px;
 }
 .preference-row p {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   margin-top: 6px;
 }
 .preference-row select {
   width: 230px;
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: 15px;
 }
 .preferences-panel > .notice {
   margin-top: 25px;
@@ -1248,14 +1248,14 @@
   }
   .session-title {
     padding-left: 18px;
-    font-size: 14px;
+    font-size: 15px;
     gap: 8px;
   }
   .session-header .brand {
     font-size: 18px;
   }
   .timer {
-    font-size: 15px;
+    font-size: 16px;
     margin-right: 0;
   }
   .session-header-right {
@@ -1326,10 +1326,10 @@
     min-height: 100px;
   }
   .session-header .brand {
-    font-size: 16px;
+    font-size: 17px;
   }
   .session-header .brand small {
-    font-size: 14px;
+    font-size: 15px;
     letter-spacing: 2px;
   }
   .session-header .brand-mark {
@@ -1340,14 +1340,14 @@
     margin-left: auto;
     border: 0;
     padding: 0;
-    font-size: 14px;
+    font-size: 15px;
     gap: 7px;
   }
   .session-title > span:first-of-type {
     display: none;
   }
   .session-title > span:last-of-type {
-    font-size: 14px;
+    font-size: 15px;
   }
   .session-header-right {
     width: 100%;
@@ -1358,22 +1358,22 @@
   }
   .timer {
     margin-right: auto;
-    font-size: 15px;
+    font-size: 16px;
   }
   .timer small {
-    font-size: 14px;
+    font-size: 15px;
   }
   .session-header-right .button {
     min-height: 30px;
     padding: 6px 10px;
-    font-size: 14px;
+    font-size: 15px;
   }
   .session-main {
     padding: 12px 12px 20px;
   }
   .session-main > .notice {
     margin-bottom: 12px;
-    font-size: 14px;
+    font-size: 15px;
   }
   .session-grid {
     grid-template-columns: 1fr;
@@ -1389,17 +1389,17 @@
   .interviewer-person .avatar {
     height: 32px;
     width: 32px;
-    font-size: 15px;
+    font-size: 16px;
   }
   .interviewer-person h2 {
-    font-size: 15px;
+    font-size: 16px;
   }
   .interviewer-person > div > span {
-    font-size: 14px;
+    font-size: 15px;
   }
   .interviewer-person > .badge {
     display: inline-flex;
-    font-size: 14px;
+    font-size: 15px;
   }
   .current-question {
     padding: 17px 0 0;
@@ -1407,7 +1407,7 @@
   }
   .question-meta {
     margin-bottom: 10px;
-    font-size: 14px;
+    font-size: 15px;
   }
   .current-question h1 {
     font-size: 18px;
@@ -1415,7 +1415,7 @@
     margin-bottom: 10px;
   }
   .current-question > .text-link {
-    font-size: 14px;
+    font-size: 15px;
   }
   .question-history,
   .interviewer-foot {
@@ -1425,10 +1425,10 @@
     padding: 14px 16px;
   }
   .answer-panel-header h2 {
-    font-size: 15px;
+    font-size: 16px;
   }
   .answer-panel-header > span {
-    font-size: 14px;
+    font-size: 15px;
   }
   .conversation {
     height: 285px;
@@ -1447,23 +1447,23 @@
   .message > .avatar {
     width: 25px;
     height: 25px;
-    font-size: 14px;
+    font-size: 15px;
   }
   .message > div {
     padding: 9px 11px;
     max-width: calc(100% - 33px);
   }
   .message p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .message small {
-    font-size: 14px;
+    font-size: 15px;
   }
   .answer-composer {
     margin-inline: 12px;
   }
   .answer-composer textarea {
-    font-size: 14px;
+    font-size: 15px;
     min-height: 105px;
   }
   .composer-heading > span {
@@ -1476,16 +1476,16 @@
     display: none;
   }
   .composer-bottom .button {
-    font-size: 14px;
+    font-size: 15px;
     padding: 7px 10px;
   }
   .session-tools {
     padding: 12px;
     gap: 13px;
-    font-size: 14px;
+    font-size: 15px;
   }
   .session-tools > button {
-    font-size: 14px;
+    font-size: 15px;
   }
   .session-tools .device-off {
     display: none;
@@ -1497,13 +1497,13 @@
     margin-inline: 12px;
   }
   .code-languages > span {
-    font-size: 14px;
+    font-size: 15px;
   }
   .code-actions > span {
-    font-size: 14px;
+    font-size: 15px;
   }
   .code-actions .button {
-    font-size: 14px;
+    font-size: 15px;
   }
   .page-heading.report-page-heading {
     gap: 16px;
@@ -1515,13 +1515,13 @@
     gap: 7px;
   }
   .page-actions .button {
-    font-size: 14px;
+    font-size: 15px;
   }
   .report-banner {
     flex-direction: column;
     align-items: start;
     padding: 12px;
-    font-size: 14px;
+    font-size: 15px;
     gap: 10px;
     margin-bottom: 18px;
   }
@@ -1545,7 +1545,7 @@
     margin-bottom: 10px;
   }
   .score-panel .panel-heading h2 {
-    font-size: 16px;
+    font-size: 17px;
   }
   .score-summary {
     padding: 0 0 14px;
@@ -1555,14 +1555,14 @@
     font-size: 40px;
   }
   .score-summary p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .score-dimensions {
     grid-template-columns: 1fr 1fr;
     gap: 14px 20px;
   }
   .dimension p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .dimension-track {
     margin-top: 7px;
@@ -1570,7 +1570,7 @@
   .coverage {
     margin-top: 15px;
     padding-top: 12px;
-    font-size: 14px;
+    font-size: 15px;
   }
   .observations-panel {
     order: 1;
@@ -1580,7 +1580,7 @@
     margin-bottom: 0;
   }
   .observations-panel h2 {
-    font-size: 16px;
+    font-size: 17px;
   }
   .observation-row {
     padding-top: 12px;
@@ -1588,10 +1588,10 @@
     gap: 9px;
   }
   .observation-row strong {
-    font-size: 14px;
+    font-size: 15px;
   }
   .observation-row p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .report-sidebar > .notice,
   .export-panel {
@@ -1604,7 +1604,7 @@
     padding-bottom: 12px;
   }
   .content-tabs > button {
-    font-size: 14px;
+    font-size: 15px;
     padding: 8px 14px;
   }
   .turn-review summary {
@@ -1615,13 +1615,13 @@
     width: 28px;
     min-width: 28px;
     height: 28px;
-    font-size: 14px;
+    font-size: 15px;
   }
   .turn-review summary > span:nth-child(2) {
-    font-size: 14px;
+    font-size: 15px;
   }
   .turn-review summary > span:nth-child(2) > small {
-    font-size: 14px;
+    font-size: 15px;
   }
   .turn-review-body {
     padding: 0 16px 16px;
@@ -1630,26 +1630,26 @@
     padding: 12px;
   }
   .answer-quote p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .review-feedback {
     padding: 11px;
     gap: 7px;
   }
   .review-feedback strong {
-    font-size: 14px;
+    font-size: 15px;
   }
   .review-feedback p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .reference-points p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .turn-review-actions > span {
-    font-size: 14px;
+    font-size: 15px;
   }
   .turn-review-actions .button {
-    font-size: 14px;
+    font-size: 15px;
   }
   .comparison-panel {
     padding: 17px;
@@ -1659,7 +1659,7 @@
     gap: 12px;
   }
   .comparison-columns p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .report-state {
     padding: 45px 20px;
@@ -1668,7 +1668,7 @@
     font-size: 18px;
   }
   .report-state p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .personal-heading {
     padding: 22px;
@@ -1680,10 +1680,10 @@
     font-size: 25px;
   }
   .personal-heading p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .personal-heading .button {
-    font-size: 14px;
+    font-size: 15px;
   }
   .personal-panel {
     margin-top: 17px;
@@ -1693,7 +1693,7 @@
     gap: 3px;
   }
   .personal-tabs > button {
-    font-size: 14px;
+    font-size: 15px;
     padding: 8px 10px;
     gap: 5px;
   }
@@ -1702,20 +1702,20 @@
     gap: 12px;
   }
   .record-filters > label {
-    font-size: 14px;
+    font-size: 15px;
     gap: 6px;
     flex: 1;
     min-width: 130px;
   }
   .record-filters select {
-    font-size: 14px;
+    font-size: 15px;
     flex: 1;
     min-width: 0;
     width: auto;
     padding: 6px;
   }
   .record-filters > span {
-    font-size: 14px;
+    font-size: 15px;
     margin-left: 0;
   }
   .table-scroll {
@@ -1725,13 +1725,13 @@
     min-width: 695px;
   }
   .records-table th {
-    font-size: 14px;
+    font-size: 15px;
   }
   .records-table td {
     padding: 17px 9px;
   }
   .record-job strong {
-    font-size: 14px;
+    font-size: 15px;
   }
   .record-job-icon {
     width: 30px;
@@ -1747,7 +1747,7 @@
     gap: 8px;
   }
   .table-footer > span {
-    font-size: 14px;
+    font-size: 15px;
   }
   .table-footer > div {
     margin-left: auto;
@@ -1756,10 +1756,10 @@
     padding: 12px;
   }
   .personal-panel-bottom > span {
-    font-size: 14px;
+    font-size: 15px;
   }
   .personal-panel-bottom .button {
-    font-size: 14px;
+    font-size: 15px;
   }
   .resumes-panel,
   .preferences-panel {
@@ -1771,7 +1771,7 @@
     gap: 13px;
   }
   .resumes-panel .panel-heading h2 {
-    font-size: 16px;
+    font-size: 17px;
   }
   .resume-library-card {
     padding: 16px;
@@ -1782,13 +1782,13 @@
     height: 46px;
   }
   .resume-card-content h3 {
-    font-size: 15px;
+    font-size: 16px;
   }
   .resume-card-content p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .resume-card-content > small {
-    font-size: 14px;
+    font-size: 15px;
   }
   .resume-card-actions {
     margin-left: 0;
@@ -1796,7 +1796,7 @@
     gap: 4px;
   }
   .resume-card-actions .button {
-    font-size: 14px;
+    font-size: 15px;
     padding: 6px 8px;
   }
   .preference-row {
@@ -1806,24 +1806,24 @@
     padding: 20px 0;
   }
   .preference-row h3 {
-    font-size: 14px;
+    font-size: 15px;
   }
   .preference-row p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .preference-row select {
     width: 100%;
-    font-size: 14px;
+    font-size: 15px;
   }
   .personal-message {
     margin: 15px 14px 0;
-    font-size: 14px;
+    font-size: 15px;
   }
   .resume-preview-item p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .resume-preview-item h3 {
-    font-size: 16px;
+    font-size: 17px;
   }
 }
 
@@ -1861,7 +1861,7 @@
 .real-report-page .turn-review-body h3 {
   margin-top: 20px;
   margin-bottom: 8px;
-  font-size: 15px;
+  font-size: 16px;
 }
 .real-report-page .report-sidebar p,
 .real-report-page .turn-review-body p,
@@ -1875,7 +1875,7 @@
 .real-report-page .report-evidence > summary,
 .real-report-page .report-original-answer > summary {
   padding: 8px 0;
-  font-size: 13px;
+  font-size: 14px;
   color: #446c79;
 }
 .real-report-page .live-button {
@@ -1887,7 +1887,7 @@
   border-radius: 6px;
   background: #446c79;
   color: white;
-  font-size: 13px;
+  font-size: 14px;
 }
 .real-report-page .live-button:disabled {
   opacity: 0.5;

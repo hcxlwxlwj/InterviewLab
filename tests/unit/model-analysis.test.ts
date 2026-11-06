@@ -96,7 +96,7 @@ test('ecnu-plus is the default model and uses the configured compatible endpoint
   assert.equal(request.model, 'ecnu-plus');
   assert.deepEqual(request.response_format, { type: 'json_object' });
   assert.deepEqual(request.thinking, { type: 'disabled' });
-  assert.equal(request.max_tokens, 1000);
+  assert.equal(request.max_tokens, 1400);
   assert.ok(!JSON.stringify(log).includes('synthetic-secret'));
   assert.ok(!JSON.stringify(log).includes(question.text));
   assert.equal(log.filter((e) => 'invocation_id' in e).length, 1);

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import {
   FEEDBACK_DIMENSIONS,
-  QUESTION_SCORING_VERSION,
+  isQuestionScoringVersion,
   type FeedbackAssessment,
   type InterviewReport,
 } from '@interviewlab/core';
@@ -20,9 +20,8 @@ export function QuestionScorecard({
       <h3>
         本题得分 <strong>{Math.round(score)} / 100</strong>
       </h3>
-      <p>综合主问题与追问作答，六维按 25 / 25 / 25 / 15 / 5 / 5 加权。</p>
-      <details>
-        <summary>查看六维评分与依据</summary>
+      <div className="question-dimension-section">
+        <h3>维度表现</h3>
         <div className="template-score-table">
           <table>
             <thead>
@@ -34,26 +33,20 @@ export function QuestionScorecard({
             </thead>
             <tbody>
               {FEEDBACK_DIMENSIONS.map((d) => {
-                const a = assessments.find((a) => a.dimension === d.key)!;
+                const a = assessments.find((a) => a.dimension === d.key);
+                if (!a) return null;
                 return (
                   <tr key={d.key}>
                     <th>{d.short}</th>
                     <td>{Math.round(a.score)}</td>
-                    <td>
-                      {a.text}
-                      {a.evidence_refs.map((r, i) => (
-                        <blockquote key={i}>
-                          回答 v{r.revision}：“{r.quote}”
-                        </blockquote>
-                      ))}
-                    </td>
+                    <td>{a.text}</td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
-      </details>
+      </div>
     </section>
   );
 }
@@ -72,10 +65,14 @@ export function PracticeHistory({
   );
   const entries = [...new Map(filtered.map((e) => [e.interview_id, e])).values()];
   if (!entries.length) return null;
+  const referenceVersion =
+    entries.find((e) => e.interview_id === originalId)?.scoring_version ??
+    report.question_scoring_version;
   const points = entries.map((e) => ({
     ...e,
     value:
-      e.scoring_version !== QUESTION_SCORING_VERSION
+      !isQuestionScoringVersion(e.scoring_version ?? undefined) ||
+      e.scoring_version !== referenceVersion
         ? null
         : dimension === 'total'
           ? e.score
@@ -93,61 +90,65 @@ export function PracticeHistory({
   return (
     <section className="practice-history">
       <h3>本题练习记录</h3>
-      <label>
-        查看走势{' '}
-        <select value={dimension} onChange={(e) => setDimension(e.target.value)}>
-          <option value="total">本题总分</option>
-          {FEEDBACK_DIMENSIONS.map((d) => (
-            <option key={d.key} value={d.key}>
-              {d.short}
-            </option>
-          ))}
-        </select>
-      </label>
+      {entries.length > 1 && (
+        <label>
+          查看走势{' '}
+          <select value={dimension} onChange={(e) => setDimension(e.target.value)}>
+            <option value="total">本题总分</option>
+            {FEEDBACK_DIMENSIONS.map((d) => (
+              <option key={d.key} value={d.key}>
+                {d.short}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       {last && previous && (
         <p>
           比首条同标准记录 {delta(last.value! - first.value!)} 分 · 比上次{' '}
           {delta(last.value! - previous.value!)} 分
         </p>
       )}
-      <svg
-        viewBox="0 0 600 210"
-        className="practice-trend"
-        role="img"
-        aria-label="历次练习分数变化，纵轴0至100分"
-      >
-        {[0, 25, 50, 75, 100].map((n) => (
-          <g key={n}>
-            <line x1="35" x2="570" y1={y(n)} y2={y(n)} stroke="#dce5e7" />
-            <text x="5" y={y(n) + 4}>
-              {n}
-            </text>
-          </g>
-        ))}
-        {points.map((e, i) =>
-          e.value === null ? null : (
-            <g key={e.interview_id}>
-              {i > 0 && points[i - 1].value !== null && (
-                <line
-                  x1={x(i - 1)}
-                  y1={y(points[i - 1].value!)}
-                  x2={x(i)}
-                  y2={y(e.value)}
-                  stroke="#ed9369"
-                  strokeWidth="3"
-                />
-              )}
-              <circle cx={x(i)} cy={y(e.value)} r="5" fill="#ed9369" />
-              <text x={x(i)} y={y(e.value) - 12} textAnchor="middle">
-                {Math.round(e.value)}
-              </text>
-              <text x={x(i)} y="198" textAnchor="middle">
-                {e.interview_id === originalId ? '首次' : `重练${practiceNumber(i)}`}
+      {comparable.length > 1 && (
+        <svg
+          viewBox="0 0 600 210"
+          className="practice-trend"
+          role="img"
+          aria-label="历次练习分数变化，纵轴0至100分"
+        >
+          {[0, 25, 50, 75, 100].map((n) => (
+            <g key={n}>
+              <line x1="35" x2="570" y1={y(n)} y2={y(n)} stroke="#dce5e7" />
+              <text x="5" y={y(n) + 4}>
+                {n}
               </text>
             </g>
-          ),
-        )}
-      </svg>
+          ))}
+          {points.map((e, i) =>
+            e.value === null ? null : (
+              <g key={e.interview_id}>
+                {i > 0 && points[i - 1].value !== null && (
+                  <line
+                    x1={x(i - 1)}
+                    y1={y(points[i - 1].value!)}
+                    x2={x(i)}
+                    y2={y(e.value)}
+                    stroke="#ed9369"
+                    strokeWidth="3"
+                  />
+                )}
+                <circle cx={x(i)} cy={y(e.value)} r="5" fill="#ed9369" />
+                <text x={x(i)} y={y(e.value) - 12} textAnchor="middle">
+                  {Math.round(e.value)}
+                </text>
+                <text x={x(i)} y="198" textAnchor="middle">
+                  {e.interview_id === originalId ? '首次' : `重练${practiceNumber(i)}`}
+                </text>
+              </g>
+            ),
+          )}
+        </svg>
+      )}
       <ol>
         {points.map((e, i) => (
           <li key={e.interview_id}>
@@ -158,7 +159,9 @@ export function PracticeHistory({
             </Link>{' '}
             ·{' '}
             {e.value === null
-              ? e.scoring_version && e.scoring_version !== QUESTION_SCORING_VERSION
+              ? e.scoring_version &&
+                (!isQuestionScoringVersion(e.scoring_version ?? undefined) ||
+                  e.scoring_version !== referenceVersion)
                 ? '历史评分标准，不参与对比'
                 : e.status === 'failed'
                   ? '评分失败'

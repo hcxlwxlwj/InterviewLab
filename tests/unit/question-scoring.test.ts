@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {
   FEEDBACK_DIMENSIONS,
   QUESTION_SCORING_VERSION,
+  HR_SCORING_VERSION,
+  weightedObservedScore,
   weightedQuestionScore,
   questionScores,
   aggregateQuestionAssessments,
@@ -74,6 +76,88 @@ const zero = () =>
   Object.fromEntries(
     FEEDBACK_DIMENSIONS.map((d) => [d.key, { score: 0, text: '本次未体现', evidence_ids: [] }]),
   );
+
+test('HR aggregates only examined dimensions and excludes administrative-only questions from totals', () => {
+  const a = turn('hr-a'),
+    b = turn('hr-b', 2),
+    c = turn('hr-c', 3);
+  const hr = (t: InterviewTurn, score: number, dimensions: string[]): InterviewEvaluation => ({
+    ...evaluation(t, score),
+    question_scoring_version: HR_SCORING_VERSION,
+    feedback_assessments: ratings(t, score).filter((a) => dimensions.includes(a.dimension)),
+  });
+  const values = [hr(a, 80, ['motivation']), hr(b, 60, ['communication']), hr(c, 0, [])];
+  assert.equal(weightedObservedScore(values[0].feedback_assessments!), 80);
+  assert.equal(weightedObservedScore([]), null);
+  const qs = questionScores([a, b, c], values);
+  assert.equal(qs.length, 2);
+  const dims = aggregateQuestionAssessments(qs);
+  assert.deepEqual(
+    dims.map((a) => a.dimension),
+    ['communication', 'motivation'],
+  );
+  const state = newInterviewState('hr-test', {
+    job: 'frontend',
+    career_stage: 'internship',
+    interview_type: 'hr',
+    duration_minutes: 10,
+    difficulty: '基础',
+    interaction_mode: 'text_fallback',
+    interviewer_style: '标准',
+  });
+  state.view.turns = [a, b, c];
+  state.view.status = 'completed';
+  const report = aggregateReport(
+    state,
+    emptyReport(state, 'hr-report'),
+    values.map((result) => ({
+      turn_id: result.turn_id,
+      task_id: null,
+      result,
+      task_status: 'succeeded',
+      attempts: 1,
+      max_attempts: 1,
+      error_code: null,
+    })),
+  );
+  assert.equal(report.overall_score, 65);
+  assert.equal(report.question_scoring_version, HR_SCORING_VERSION);
+  assert.equal(report.feedback_assessments?.length, 2);
+});
+
+test('an HR summary with no examined dimensions never asks the summary model to invent scores', async () => {
+  const t = turn('admin');
+  const e = {
+    ...evaluation(t, 0),
+    question_scoring_version: HR_SCORING_VERSION,
+    feedback_assessments: [],
+    strengths: [
+      {
+        text: '明确说明了安排。',
+        evidence_refs: [{ turn_id: t.id, revision: t.revision, quote: t.answer_text! }],
+      },
+    ],
+  };
+  const analysis = createReportAnalysis(async (_kind, schema, payload) => {
+    const input = payload as { computed_scores: unknown[]; feedback_standard?: unknown };
+    assert.deepEqual(input.computed_scores, []);
+    assert.equal(input.feedback_standard, undefined);
+    return schema.parse({
+      overview: { text: '只记录求职安排，暂无能力评价。', evidence_ids: ['e0-s0-0'] },
+      strengths: [],
+      improvements: [],
+      limitations: ['本场没有足够的能力考察内容。'],
+    });
+  });
+  const result = await analysis.summarize(
+    [e],
+    { ...snapshot, interview_type: 'hr' },
+    new AbortController().signal,
+    false,
+    { turns: [t] },
+  );
+  assert.deepEqual(result.feedback_template?.assessments, []);
+});
 
 test('all six dimensions are required; zero is a real score and missing/null are rejected', async () => {
   const t = turn('t');
@@ -164,7 +248,7 @@ test('scores remain visible when summary fails and cannot be replaced by summary
       career_stage: 'internship',
       interview_type: 'technical_qa',
       difficulty: '基础',
-      duration_minutes: 5,
+      duration_minutes: 10,
       interviewer_style: '标准',
       interaction_mode: 'text_fallback',
     });

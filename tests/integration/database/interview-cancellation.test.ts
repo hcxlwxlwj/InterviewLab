@@ -48,15 +48,20 @@ test('pausing cancels a running provider HTTP request; unknown worker types surf
       {
         job: 'backend',
         career_stage: 'internship',
-        interview_type: 'project_deep_dive',
+        interview_type: 'business_scenario',
         difficulty: '基础',
-        duration_minutes: 5,
+        duration_minutes: 10,
         interviewer_style: '标准',
         interaction_mode: 'text_fallback',
       },
       randomUUID(),
     );
-    v = await runtime.interviews.prepare(identity, v.id, { version: v.version, mode: 'fallback' }, randomUUID());
+    v = await runtime.interviews.prepare(
+      identity,
+      v.id,
+      { version: v.version, mode: 'fallback' },
+      randomUUID(),
+    );
     v = await runtime.interviews.start(identity, v.id, { version: v.version }, randomUUID());
     v = await runtime.interviews.answer(
       identity,

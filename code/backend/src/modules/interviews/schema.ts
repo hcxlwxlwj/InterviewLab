@@ -29,6 +29,19 @@ export const interviews = pgTable(
     configuration: jsonb().$type<InterviewConfig>().notNull(),
     snapshot: jsonb().$type<InterviewSnapshot>(),
     agent_memory: jsonb().$type<InterviewMemory>(),
+    voice_activity: jsonb()
+      .$type<
+        Record<
+          string,
+          {
+            turn_id: string;
+            generation_id: string;
+            expires_at: string;
+          }
+        >
+      >()
+      .notNull()
+      .default({}),
     plan: jsonb().$type<string[]>().notNull().default([]),
     generation_id: uuid(),
     generation_kind: text(),

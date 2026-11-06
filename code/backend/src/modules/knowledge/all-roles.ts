@@ -265,7 +265,6 @@ export function createAllRoleKnowledge(config: BackendConfig): InterviewKnowledg
 }
 const PROFILE_TYPES = {
   technical_qa: 1,
-  project_deep_dive: 1,
   business_scenario: 1,
   hr: 1,
   mixed: 1,

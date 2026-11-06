@@ -93,17 +93,21 @@ export function participationPolicy(interview: Interview): InterviewParticipatio
     return null;
   return latest;
 }
-export function participationQuestion(notice: InterviewParticipation): InterviewQuestion {
+export function participationQuestion(
+  notice: InterviewParticipation,
+  interview?: Interview,
+): InterviewQuestion {
+  const previous = interview?.turns.filter((t) => !isParticipationQuestion(t.purpose)).at(-1);
   return {
-    stage: 'experience',
+    stage: notice.level === 'confirmation' ? 'behavioral' : (previous?.stage ?? 'introduction'),
     topic: notice.level === 'confirmation' ? '继续意愿确认' : '面试交流提醒',
     purpose: marker + notice.level,
     acknowledgement:
-      notice.level === 'confirmation' ? '我们先确认一下是否继续。' : '我们先回到面试交流。',
+      notice.level === 'confirmation' ? '我们先确认一下是否继续。' : '没关系，我们先从这一问开始。',
     text:
       notice.level === 'confirmation'
         ? '你还希望继续本场面试吗？可以说“继续”，或直接结束。'
-        : '请说一个你接触过的岗位相关知识点；还没学过也可以直接说明。',
+        : (previous?.text ?? '可以先简单介绍一下你的学习背景吗？'),
     knowledge_question_id: null,
     source_refs: [],
     evidence_refs: [],

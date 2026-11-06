@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import {
   Mic,
   MicOff,
@@ -12,6 +13,51 @@ import {
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import type { useInterviewVoice } from './use-voice';
+
+export function VoiceDraftRecovery({
+  voice,
+}: {
+  voice: Pick<ReturnType<typeof useInterviewVoice>, 'supplements' | 'dismissSupplement'>;
+}) {
+  const [copyStatus, setCopyStatus] = useState('');
+  if (!voice.supplements?.length) return null;
+  return (
+    <section className="voice-call-error" aria-label="未提交的语音补充">
+      <strong>有补充内容尚未提交</strong>
+      <p>这段内容未加入当前回答，可先复制保存。</p>
+      {voice.supplements.map((supplement) => (
+        <div key={supplement.turn_id ?? 'unassigned'}>
+          {supplement.question && <p>对应问题：{supplement.question}</p>}
+          <p style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{supplement.text}</p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(supplement.text);
+                setCopyStatus('已复制补充内容。');
+              } catch {
+                setCopyStatus('暂时无法复制，可选中上方文字手动复制。');
+              }
+            }}
+          >
+            复制补充
+          </Button>{' '}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => voice.dismissSupplement(supplement.turn_id)}
+          >
+            关闭补充提示
+          </Button>
+        </div>
+      ))}
+      <p role="status">{copyStatus}</p>
+    </section>
+  );
+}
 
 export function VoiceControls({
   voice,
@@ -49,6 +95,7 @@ export function VoiceControls({
             {voice.error}
           </p>
         )}
+        <VoiceDraftRecovery voice={voice} />
       </section>
     );
   const ended = voice.sessionStatus === 'completed' || voice.sessionStatus === 'failed';
@@ -132,6 +179,7 @@ export function VoiceControls({
           {voice.error}
         </p>
       )}
+      <VoiceDraftRecovery voice={voice} />
       {!voice.active && !ended && (
         <>
           {voice.sessionStatus !== 'ready' && (

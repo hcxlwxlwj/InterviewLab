@@ -46,13 +46,10 @@ export interface InterviewExperienceGrounding {
   description: InterviewEvidence | null;
   personal_role: InterviewEvidence | null;
 }
-export type InterviewReplyAct =
-  | 'answer'
-  | 'greeting'
-  | 'acknowledgement'
-  | 'decline_topic'
-  | 'dont_know';
+export type InterviewReplyAct = import('./interview-response').InterviewResponseAssessment['act'];
 export type InterviewTopic =
+  | 'availability'
+  | 'expectations'
   | 'personal_background'
   | 'motivation'
   | 'project'
@@ -73,6 +70,13 @@ export interface InterviewConversationState {
   boundaries: InterviewTopicBoundary[];
 }
 export interface InterviewMemory {
+  communication_observed?: boolean;
+  introduction_complete?: boolean;
+  response?: import('./interview-response').InterviewResponseAssessment & {
+    turn_id: string;
+    revision: number;
+  };
+  decision?: { reason: string; action: string };
   conversation?: InterviewConversationState;
   experience?: InterviewExperienceGrounding;
   version: number;

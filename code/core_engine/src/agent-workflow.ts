@@ -15,8 +15,22 @@ export interface ResumeAnalysis {
   clarification_points: string[];
 }
 export interface InterviewPreparationPlan {
+  role_context?: InterviewRoleContext;
+  policy?: ReturnType<typeof import('./interview-policy').interviewPolicy>;
   goals: { goal: string; focus: string; material_refs: MaterialEvidence[] }[];
   limitations: string[];
+}
+/** Frozen public role requirements describe the job, never the candidate's performance. */
+export interface InterviewRoleContext {
+  job_id: string;
+  job_title: string;
+  job_version: number;
+  description: string;
+  responsibilities: string[];
+  requirements: string[];
+  topics: string[];
+  source_refs: string[];
+  usage: 'role_requirements_not_candidate_evidence';
 }
 export interface PreparationStatus {
   status: 'waiting_material' | 'pending' | 'ready' | 'failed' | 'fallback';

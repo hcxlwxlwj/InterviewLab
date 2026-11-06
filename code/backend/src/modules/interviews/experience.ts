@@ -253,11 +253,66 @@ export function experiencePolicy(interview: Interview): ExperiencePolicy {
   };
 }
 /** Materials can fill known context slots, but never become answer evidence. */
-export function applyResumeExperience(policy:ExperiencePolicy,analysis:ResumeAnalysis|undefined,answer:string,question:string) {
-  if(policy.next_step!=='project_discovery'||switches.test(answer)||switches.test(question))return;
-  const facts=analysis?.facts.filter(f=>['experience','role','action'].includes(f.kind)&&(['projects','internships','text'].includes(f.evidence.field)))??[];
-  policy.missing=policy.missing.filter(slot=>!facts.some(f=>slot==='project_description'?hasDescription(f.evidence.quote):hasRole(f.evidence.quote)));
-  if(!policy.missing.length){policy.discovery_required=false;policy.next_step='interview';}
+export function applyResumeExperience(
+  policy: ExperiencePolicy,
+  analysis: ResumeAnalysis | undefined,
+  answer: string,
+  question: string,
+) {
+  if (
+    policy.next_step !== 'project_discovery' ||
+    switches.test(answer) ||
+    switches.test(question) ||
+    /不是我|不属于我|我(?:没|没有|未)(?:参与|负责|做)|我只(?:负责|参与)/.test(answer)
+  )
+    return;
+  const ignored = new Set([
+    '项目',
+    '系统',
+    '平台',
+    '本人',
+    '负责',
+    '课程',
+    '介绍',
+    '具体',
+    '部分',
+    '用于',
+    '相关',
+    '一个',
+    '主要',
+    '工作',
+  ]);
+  const terms = (text: string) => [
+    ...new Set(
+      Array.from(new Intl.Segmenter('zh', { granularity: 'word' }).segment(text.toLowerCase()))
+        .filter((t) => t.isWordLike && t.segment.length >= 2 && !ignored.has(t.segment))
+        .map((t) => t.segment),
+    ),
+  ];
+  const current = new Set(terms(answer + ' ' + question));
+  const facts =
+    analysis?.facts
+      .filter(
+        (f) =>
+          ['experience', 'role', 'action'].includes(f.kind) &&
+          ['projects', 'internships', 'text'].includes(f.evidence.field),
+      )
+      .map((f) => ({
+        fact: f,
+        overlap: terms(f.evidence.quote).filter((term) => current.has(term)).length,
+      }))
+      .filter((f) => f.overlap >= 2)
+      .sort((a, b) => b.overlap - a.overlap) ?? [];
+  // One explicitly matched source span can supplement context; independent project facts never merge.
+  const anchor = facts[0]?.fact.evidence.quote;
+  if (!anchor || switches.test(anchor)) return;
+  policy.missing = policy.missing.filter(
+    (slot) => !(slot === 'project_description' ? hasDescription(anchor) : hasRole(anchor)),
+  );
+  if (!policy.missing.length) {
+    policy.discovery_required = false;
+    policy.next_step = 'interview';
+  }
 }
 const hypothetical =
   /假设|假如|设想|如果(?:要|让|需|有|你|这)|若(?:要|需)|(?:如果|若).{0,15}(?:加入|新增|支持|扩展)|(?:加入|新增|扩展).{0,12}你会/;

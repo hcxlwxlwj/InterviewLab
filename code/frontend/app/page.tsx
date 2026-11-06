@@ -37,7 +37,7 @@ export default function Home() {
                   <i />
                   <i />
                 </span>
-                <strong>前端开发 · 项目深挖</strong>
+                <strong>前端开发 · 专业面</strong>
                 <span>界面预览</span>
               </div>
               <div className="product-preview-body">
@@ -92,7 +92,7 @@ export default function Home() {
           <div className="container hero-bottom">
             <span>
               <FileText size={18} />
-              <b>项目深挖</b>
+              <b>项目经历考察</b>
             </span>
             <span>
               <MessageCircle size={18} />

@@ -77,7 +77,7 @@ async function main() {
         career_stage: job.stages[0],
         interview_type: 'technical_qa',
         difficulty: '基础',
-        duration_minutes: 5,
+        duration_minutes: 10,
         interviewer_style: '标准',
         interaction_mode: 'text_fallback',
       };

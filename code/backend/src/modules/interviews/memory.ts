@@ -68,6 +68,13 @@ export function applyMemory(
   delta.observations.forEach((x) => observations.set(x.goal, x));
   return {
     version: base.version + 1,
+    ...(base.response ? { response: base.response } : {}),
+    ...(base.communication_observed !== undefined
+      ? { communication_observed: base.communication_observed }
+      : {}),
+    ...(base.introduction_complete !== undefined
+      ? { introduction_complete: base.introduction_complete }
+      : {}),
     ...(base.experience ? { experience: base.experience } : {}),
     ...(base.conversation ? { conversation: base.conversation } : {}),
     focus: delta.focus,

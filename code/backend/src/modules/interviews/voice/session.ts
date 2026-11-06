@@ -5,14 +5,19 @@ import type {
   VoiceClientEvent,
   VoiceServerEvent,
 } from '@interviewlab/core';
-import { INTERVIEW_MAX_ANSWER } from '@interviewlab/core';
+import { INTERVIEW_MAX_ANSWER, interviewDeadline } from '@interviewlab/core';
 import type { LiveInterviewsService } from '../service';
 import { ServiceError } from '../../../foundation/errors';
 import type { AsrStream, VoiceProvider } from './volcengine';
 
 export type VoiceInterviews = Pick<
   LiveInterviewsService,
-  'read' | 'answer' | 'interruptVoice' | 'continueVoice' | 'recordVoicePlayback'
+  | 'read'
+  | 'answer'
+  | 'interruptVoice'
+  | 'continueVoice'
+  | 'recordVoicePlayback'
+  | 'setVoiceInputActivity'
 >;
 /** One transport session, one authoritative interview service. No audio is persisted. */
 export class InterviewVoiceSession {
@@ -47,6 +52,12 @@ export class InterviewVoiceSession {
   private checking = false;
   private lastAuth = 0;
   private initialOwner = '';
+  private readonly sessionId = randomUUID();
+  private inputActivity?: { turn: string; generation: string };
+  private activityTimer?: ReturnType<typeof setInterval>;
+  private activityTail?: ReturnType<typeof setTimeout>;
+  private staleDraft = false;
+  private staleNoticeSent = false;
   constructor(
     private readonly id: string,
     private readonly identity: () => Promise<RequestIdentity>,
@@ -128,7 +139,13 @@ export class InterviewVoiceSession {
         this.close();
         this.disconnect();
       },
-      12 * 60 * 1000,
+      Math.max(
+        0,
+        (this.view.deadline_at
+          ? Date.parse(this.view.deadline_at)
+          : interviewDeadline(this.view.started_at!, this.view.configuration.duration_minutes)) -
+          Date.now(),
+      ),
     );
   }
   audio(pcm: Uint8Array) {
@@ -152,6 +169,7 @@ export class InterviewVoiceSession {
       // Recover if a browser VAD speech_end notification is lost.
       this.talking = false;
       this.stoppedAt = this.lastAudioVoiceAt;
+      this.releaseActivityAfterTail();
       this.arm();
     }
     if (this.asr) this.asr.write(pcm);
@@ -186,6 +204,8 @@ export class InterviewVoiceSession {
       this.talking = true;
       this.lastAudioVoiceAt = Date.now();
       this.manual = false;
+      this.capturedTurn ??= this.view.turns.at(-1)?.id ?? null;
+      clearTimeout(this.activityTail);
       clearTimeout(this.timer);
       if (resumeFlushed) {
         ++this.asrEpoch;
@@ -209,6 +229,10 @@ export class InterviewVoiceSession {
             this.final = false;
             this.manual = false;
             clearTimeout(this.timer);
+            if (!this.text && !this.interruptedTurn) {
+              this.capturedTurn = null;
+              this.staleDraft = false;
+            }
             await this.resetRecognition();
           }
           await this.service.recordVoicePlayback(await this.identity(), this.id, turn, {
@@ -230,31 +254,22 @@ export class InterviewVoiceSession {
       }
       if (event.type === 'speech_start') {
         if (resumeFlushed) await this.resetRecognition(true, true);
-        this.publish(await this.service.read(await this.identity(), this.id));
-        if (
-          this.view.generation_status === 'pending' &&
-          this.view.turns.at(-1)?.answer_status === 'answered'
-        ) {
-          try {
-            const next = await this.service.interruptVoice(
-              await this.identity(),
-              this.id,
-              { version: this.view.version },
-              randomUUID(),
-            );
-            this.interruptedTurn = next.turns.at(-1)!.id;
-            this.publish(next);
-          } catch (e) {
-            if (!(e instanceof ServiceError && e.statusCode === 409)) throw e;
-            this.publish(await this.service.read(await this.identity(), this.id));
-          }
-        }
+        await this.reserveInputActivity();
       } else if (event.type === 'speech_end') {
         if (activityRevision !== this.activityRevision) return;
         this.talking = false;
         this.stoppedAt = Date.now();
+        this.releaseActivityAfterTail();
         this.arm();
       } else if (event.type === 'commit') {
+        if (!this.text.trim() && !this.talking && !this.capturedTurn) {
+          await this.releaseInputActivity();
+          this.send({
+            type: 'status',
+            state: this.view.generation_status === 'pending' ? 'thinking' : 'listening',
+          });
+          return;
+        }
         this.manual = true;
         this.hold = false;
         this.talking = false;
@@ -277,6 +292,119 @@ export class InterviewVoiceSession {
         );
       }
     });
+  }
+  private async reserveInputActivity() {
+    const turn = this.view.turns.at(-1);
+    if (
+      this.view.generation_status !== 'pending' ||
+      turn?.answer_status !== 'answered' ||
+      !this.view.generation_id
+    ) {
+      if (this.inputActivity) await this.releaseInputActivity();
+      if (this.capturedTurn && turn?.id !== this.capturedTurn) this.staleDraft = true;
+      return !this.staleDraft;
+    }
+    if (this.capturedTurn && this.capturedTurn !== turn.id) {
+      this.staleDraft = true;
+      return false;
+    }
+    const activity = { turn: turn.id, generation: this.view.generation_id };
+    const accepted = await this.service.setVoiceInputActivity(await this.identity(), this.id, {
+      session_id: this.sessionId,
+      turn_id: activity.turn,
+      generation_id: activity.generation,
+      active: true,
+    });
+    if (this.closed) {
+      if (accepted)
+        await this.service.setVoiceInputActivity(await this.identity(), this.id, {
+          session_id: this.sessionId,
+          turn_id: activity.turn,
+          generation_id: activity.generation,
+          active: false,
+        });
+      return false;
+    }
+    if (!accepted) {
+      this.staleDraft = true;
+      await this.releaseInputActivity();
+      return false;
+    }
+    this.inputActivity = activity;
+    this.activityTimer ??= setInterval(
+      () =>
+        this.enqueue(async () => {
+          if (this.inputActivity && !(await this.reserveInputActivity()) && this.text.trim())
+            this.preservePreviousDraft();
+        }),
+      1000,
+    );
+    return true;
+  }
+  private async releaseInputActivity() {
+    clearTimeout(this.activityTail);
+    clearInterval(this.activityTimer);
+    this.activityTail = undefined;
+    this.activityTimer = undefined;
+    const activity = this.inputActivity;
+    this.inputActivity = undefined;
+    if (activity)
+      await this.service.setVoiceInputActivity(await this.identity(), this.id, {
+        session_id: this.sessionId,
+        turn_id: activity.turn,
+        generation_id: activity.generation,
+        active: false,
+      });
+  }
+  private releaseActivityAfterTail() {
+    clearTimeout(this.activityTail);
+    if (!this.inputActivity && !this.capturedTurn) return;
+    const revision = this.activityRevision;
+    this.activityTail = setTimeout(
+      () =>
+        this.enqueue(async () => {
+          if (!this.talking && revision === this.activityRevision) {
+            if (this.text.trim() && !this.staleDraft) {
+              if (!this.manual) this.arm();
+              return;
+            }
+            await this.releaseInputActivity();
+            if (this.staleDraft && this.final) {
+              this.arm();
+              return;
+            }
+            if (!this.text) {
+              this.capturedTurn = null;
+              this.staleDraft = false;
+            }
+            this.say();
+          }
+        }),
+      Math.max(this.silenceMs, 1200),
+    );
+  }
+  private preservePreviousDraft() {
+    if (this.staleNoticeSent) return;
+    this.staleNoticeSent = true;
+    this.send({
+      type: 'error',
+      code: 'voice_previous_draft',
+      message: '问题已更新，这段补充仍保留为上一题草稿，请先确认内容。',
+      retryable: true,
+    });
+  }
+  private async settlePreviousDraft() {
+    if (this.talking || !this.final) return;
+    await this.releaseInputActivity();
+    this.text = '';
+    this.final = false;
+    this.manual = false;
+    this.interruptedTurn = null;
+    this.capturedTurn = null;
+    this.staleDraft = false;
+    this.staleNoticeSent = false;
+    await this.resetRecognition();
+    this.publish(await this.service.read(await this.identity(), this.id), true);
   }
   private arm() {
     clearTimeout(this.timer);
@@ -310,7 +438,7 @@ export class InterviewVoiceSession {
               this.manual = true;
               this.asr?.finish();
             }
-            this.armAfterFinalWait();
+            await this.armAfterFinalWait();
             return;
           }
           await this.submit();
@@ -318,7 +446,7 @@ export class InterviewVoiceSession {
       remaining,
     );
   }
-  private armAfterFinalWait() {
+  private async armAfterFinalWait() {
     if (Date.now() - this.changedAt > 8000) {
       this.send({
         type: 'error',
@@ -327,13 +455,15 @@ export class InterviewVoiceSession {
         retryable: true,
       });
       this.manual = false;
+      if (this.inputActivity) this.staleDraft = true;
+      await this.releaseInputActivity();
       return;
     }
     this.timer = setTimeout(
       () =>
         this.enqueue(async () => {
           if (this.final) await this.submit();
-          else this.armAfterFinalWait();
+          else await this.armAfterFinalWait();
         }),
       300,
     );
@@ -366,27 +496,45 @@ export class InterviewVoiceSession {
               400,
               '语音回答已超过字数上限，草稿已保留，请使用文字缩短后提交。',
             );
-          // Quiet speech may be recognized even if the local energy VAD did not fire.
+          const unchanged = this.text === result.text;
+          const saved = this.view.turns.at(-1)?.answer_text?.replace(/\s/g, '') ?? '';
+          const recognized = result.text.replace(/\s/g, '');
           if (
+            this.view.generation_status === 'pending' &&
+            recognized &&
+            saved.includes(recognized)
+          ) {
+            // An ASR replay or a partial prefix already present in the answer adds no new input.
+            if (result.final && !this.talking) {
+              await this.releaseInputActivity();
+              if (!this.text) this.capturedTurn = null;
+            }
+            return;
+          }
+          // Only new recognized words confirm continuation; a VAD pulse alone reserves publication.
+          if (
+            !unchanged &&
             result.text.trim() &&
             this.view.generation_status === 'pending' &&
             this.view.turns.at(-1)?.answer_status === 'answered'
           ) {
-            try {
-              const next = await this.service.interruptVoice(
-                await this.identity(),
-                this.id,
-                { version: this.view.version },
-                randomUUID(),
-              );
-              this.interruptedTurn = next.turns.at(-1)!.id;
-              this.publish(next);
-            } catch (error) {
-              if (!(error instanceof ServiceError && error.statusCode === 409)) throw error;
-              this.publish(await this.service.read(await this.identity(), this.id));
+            this.capturedTurn ??= this.view.turns.at(-1)!.id;
+            if (await this.reserveInputActivity()) {
+              try {
+                const current = await this.service.read(await this.identity(), this.id);
+                if (
+                  current.turns.at(-1)?.id !== this.capturedTurn ||
+                  current.generation_id !== this.inputActivity?.generation
+                )
+                  throw new ServiceError('version_conflict', 409, 'Voice input changed');
+                // Keep the pending generation reserved until a final supplement can replace it atomically.
+                this.interruptedTurn = current.turns.at(-1)!.id;
+              } catch (error) {
+                if (!(error instanceof ServiceError && error.statusCode === 409)) throw error;
+                this.staleDraft = true;
+              }
             }
           }
-          const unchanged = this.text === result.text;
           if (!unchanged) this.changedAt = Date.now();
           if (result.text.trim() && !this.capturedTurn)
             this.capturedTurn = this.view.turns.at(-1)?.id ?? null;
@@ -397,8 +545,16 @@ export class InterviewVoiceSession {
             type: 'transcript',
             text: this.text,
             final: result.final,
-            turn_id: this.view?.turns.at(-1)?.id ?? null,
+            turn_id: this.capturedTurn ?? this.view?.turns.at(-1)?.id ?? null,
           });
+          if (this.staleDraft) {
+            this.preservePreviousDraft();
+            if (this.manual && result.final) {
+              this.manual = false;
+              await this.submit();
+            } else this.arm();
+            return;
+          }
           if (done) {
             this.talking = false;
             this.hold = false;
@@ -410,7 +566,14 @@ export class InterviewVoiceSession {
               this.manual = false;
               await this.submit();
             }
-          } else this.arm();
+          } else {
+            if (result.final && !this.talking && !this.text) {
+              this.interruptedTurn = null;
+              await this.releaseInputActivity();
+              this.capturedTurn = null;
+            }
+            this.arm();
+          }
         });
       },
       () => {
@@ -438,9 +601,20 @@ export class InterviewVoiceSession {
     clearTimeout(this.timer);
     if (this.talking || this.hold || this.closed || this.speech) return;
     const text = this.text.trim();
-    if (!text && !this.interruptedTurn) {
+    if (!text) {
+      this.interruptedTurn = null;
+      await this.releaseInputActivity();
+      this.capturedTurn = null;
       await this.resetRecognition();
-      this.send({ type: 'status', state: 'listening' });
+      this.send({
+        type: 'status',
+        state: this.view.generation_status === 'pending' ? 'thinking' : 'listening',
+      });
+      return;
+    }
+    if (this.staleDraft) {
+      this.preservePreviousDraft();
+      await this.settlePreviousDraft();
       return;
     }
     const principal = await this.identity();
@@ -454,29 +628,33 @@ export class InterviewVoiceSession {
         409,
         '当前问题已在其他页面更新，语音草稿仍保留，请先确认内容再继续。',
       );
-    if (current.generation_status === 'pending') return;
-    if (!this.interruptedTurn && turn.answer_status !== 'waiting') return;
+    if (current.generation_status === 'pending' && !this.interruptedTurn) return;
+    const continuing =
+      turn.answer_status === 'answered' && ['idle', 'failed'].includes(current.generation_status);
+    if (!this.interruptedTurn && !continuing && turn.answer_status !== 'waiting') return;
     this.send({ type: 'submitting', text, turn_id: turn.id });
-    const next = this.interruptedTurn
-      ? await this.service.continueVoice(
-          principal,
-          this.id,
-          this.interruptedTurn,
-          { version: current.version, text },
-          randomUUID(),
-        )
-      : await this.service.answer(
-          principal,
-          this.id,
-          turn.id,
-          { version: current.version, text, input_mode: 'voice' },
-          randomUUID(),
-        );
+    const next =
+      this.interruptedTurn || continuing
+        ? await this.service.continueVoice(
+            principal,
+            this.id,
+            this.interruptedTurn ?? turn.id,
+            { version: current.version, text },
+            randomUUID(),
+          )
+        : await this.service.answer(
+            principal,
+            this.id,
+            turn.id,
+            { version: current.version, text, input_mode: 'voice' },
+            randomUUID(),
+          );
     this.text = '';
     this.recognitionPrefix = '';
     this.final = false;
     this.interruptedTurn = null;
     this.capturedTurn = null;
+    await this.releaseInputActivity();
     this.publish(next, true);
     if (next.status === 'in_progress') await this.resetRecognition();
   }
@@ -492,6 +670,13 @@ export class InterviewVoiceSession {
       return;
     }
     if (changed) {
+      if (next.generation_status === 'failed')
+        this.send({
+          type: 'error',
+          code: 'voice_generation_failed',
+          message: '面试官生成失败，回答已保存。可以重试生成、补充回答或结束面试。',
+          retryable: true,
+        });
       this.send({
         type: 'status',
         state: next.generation_status === 'pending' ? 'thinking' : 'listening',
@@ -552,6 +737,7 @@ export class InterviewVoiceSession {
   close() {
     if (this.closed) return;
     this.closed = true;
+    void this.releaseInputActivity().catch(() => {});
     clearInterval(this.poll);
     clearTimeout(this.timer);
     clearTimeout(this.expire);

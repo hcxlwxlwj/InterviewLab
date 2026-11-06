@@ -10,9 +10,17 @@ import {
   aggregateIndicatorScores,
   feedbackScore,
   QUESTION_SCORING_VERSION,
+  HR_SCORING_VERSION,
+  EVIDENCE_SCORING_VERSION,
+  completeSixScores,
+  aggregateFeedbackObservations,
+  isQuestionScoringVersion,
   questionScores,
   aggregateQuestionAssessments,
   weightedQuestionScore,
+  weightedObservedScore,
+  completeInterviewAssessments,
+  WHOLE_INTERVIEW_SCORING_VERSION,
 } from '@interviewlab/core';
 import { inputDigest } from '../../foundation/idempotency';
 import { REPORT_PROMPT_VERSION, REPORT_SCHEMA_VERSION, SCORING_RUBRIC_VERSION } from './analysis';
@@ -230,21 +238,86 @@ export function aggregateReport(
     report.overall_score = feedbackScore(report.summary.feedback_template).score;
     report.scoring_status = 'experimental';
   }
-  if (values.some((e) => e.question_scoring_version === QUESTION_SCORING_VERSION)) {
-    report.question_scoring_version = QUESTION_SCORING_VERSION;
-    report.question_scores = questionScores(state.view.turns, values);
+  if (values.some((e) => isQuestionScoringVersion(e.question_scoring_version))) {
+    report.question_scoring_version = values.some(
+      (e) => e.question_scoring_version === EVIDENCE_SCORING_VERSION,
+    )
+      ? EVIDENCE_SCORING_VERSION
+      : values.some((e) => e.question_scoring_version === HR_SCORING_VERSION)
+        ? HR_SCORING_VERSION
+        : QUESTION_SCORING_VERSION;
+    const scoringValues = values.filter(
+      (e) => e.question_scoring_version === report.question_scoring_version,
+    );
+    report.question_scores = questionScores(state.view.turns, scoringValues);
     const assessments = aggregateQuestionAssessments(report.question_scores);
-    report.feedback_assessments = assessments.length ? assessments : undefined;
+    report.feedback_assessments = assessments;
     const groupCount = new Set(answered.map((t) => t.main_question_index)).size;
-    report.overall_score =
-      report.question_scores.length === groupCount && groupCount > 0
-        ? Math.round(weightedQuestionScore(assessments))
+    const scoped = report.question_scoring_version === EVIDENCE_SCORING_VERSION;
+    const hr = scoped
+      ? state.view.configuration.interview_type === 'hr'
+      : report.question_scoring_version === HR_SCORING_VERSION;
+    const practice = Boolean(state.view.parent_interview_id);
+    if (scoped)
+      report.feedback_observations = aggregateFeedbackObservations(scoringValues, assessments);
+    const completedGroups = new Set(
+      answered
+        .filter(
+          (t) =>
+            !answered.some(
+              (other) =>
+                other.main_question_index === t.main_question_index &&
+                other.follow_up_index > t.follow_up_index,
+            ),
+        )
+        .filter((t) =>
+          scoringValues.some(
+            (e) =>
+              e.turn_id === t.id &&
+              e.revision === t.revision &&
+              isQuestionScoringVersion(e.question_scoring_version),
+          ),
+        )
+        .map((t) => t.main_question_index),
+    ).size;
+    const wholeSession =
+      scoped &&
+      !hr &&
+      !practice &&
+      answered.length > 0 &&
+      completedGroups === groupCount &&
+      !pending &&
+      !failed;
+    const sessionAssessments = wholeSession
+      ? completeInterviewAssessments(assessments)
+      : assessments;
+    report.feedback_assessments = sessionAssessments;
+    if (wholeSession && report.analysis_metadata) {
+      report.analysis_metadata = {
+        ...report.analysis_metadata,
+        scoring_rubric_version: WHOLE_INTERVIEW_SCORING_VERSION,
+      };
+      report.coverage +=
+        ' 整场按固定六维评价本场展示，未体现维度计0分；不据此推断未展示的真实能力。';
+    }
+    report.overall_score = wholeSession
+      ? Math.round(weightedQuestionScore(sessionAssessments))
+      : completedGroups === groupCount &&
+          report.question_scores.length &&
+          (practice || hr || completeSixScores(assessments))
+        ? Math.round(
+            practice
+              ? report.question_scores[0].score
+              : hr
+                ? weightedObservedScore(assessments)!
+                : weightedQuestionScore(assessments),
+          )
         : null;
-    report.scoring_status = assessments.length ? 'experimental' : 'uncalibrated';
-    if (report.summary && assessments.length)
+    report.scoring_status = sessionAssessments.length ? 'experimental' : 'uncalibrated';
+    if (report.summary && sessionAssessments.length)
       report.summary = {
         ...report.summary,
-        feedback_template: { ...report.summary.feedback_template, assessments },
+        feedback_template: { ...report.summary.feedback_template, assessments: sessionAssessments },
       };
   }
   return report;

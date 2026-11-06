@@ -74,7 +74,7 @@ for (let n = 0; n < 30; n++)
       career_stage: 'internship',
       interview_type: type,
       difficulty: '基础',
-      duration_minutes: 5,
+      duration_minutes: 10,
       interviewer_style: '标准',
       interaction_mode: 'text_fallback',
     });

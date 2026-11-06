@@ -1,6 +1,6 @@
 /* Shared reading scale: body, forms, and supporting copy stay at 14px or above. */
 body {
-  font-size: 16px;
+  font-size: 17px;
 }
 h1,
 h2,
@@ -14,7 +14,7 @@ h3 {
   letter-spacing: -0.4px;
 }
 .brand small {
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: 2px;
 }
 .brand-mark {
@@ -22,7 +22,7 @@ h3 {
 }
 .main-nav a,
 .user-link {
-  font-size: 16px;
+  font-size: 17px;
 }
 .button {
   min-height: 46px;
@@ -30,10 +30,10 @@ h3 {
 }
 .button-sm {
   min-height: 38px;
-  font-size: 14px;
+  font-size: 15px;
 }
 .badge {
-  font-size: 13px;
+  font-size: 14px;
 }
 .field-label,
 .form-panel-title h2,
@@ -46,7 +46,7 @@ select,
 .message p,
 .answer-quote p,
 .comparison-columns p {
-  font-size: 16px;
+  font-size: 17px;
 }
 .field-group {
   margin-bottom: 24px;
@@ -59,17 +59,17 @@ select,
 }
 .choice {
   padding: 11px 14px;
-  font-size: 15px;
+  font-size: 16px;
 }
 .setup-grid {
   grid-template-columns: minmax(0, 1fr) 350px;
 }
 .summary-row {
   padding-block: 13px;
-  font-size: 15px;
+  font-size: 16px;
 }
 .notice {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.8;
 }
 .page-heading {
@@ -79,17 +79,17 @@ select,
   font-size: 32px;
 }
 .page-heading p {
-  font-size: 16px;
+  font-size: 17px;
 }
 .current-question h1 {
   font-size: 25px;
 }
 .answer-composer textarea {
-  font-size: 16px;
+  font-size: 17px;
   min-height: 130px;
 }
 .session-title {
-  font-size: 16px;
+  font-size: 17px;
 }
 .session-header {
   position: sticky;
@@ -109,19 +109,19 @@ select,
   padding: 0 24px 24px;
 }
 .record-job strong {
-  font-size: 16px;
+  font-size: 17px;
 }
 .records-table td {
   padding-block: 24px;
 }
 .table-actions > .button {
-  font-size: 14px;
+  font-size: 15px;
 }
 .personal-heading h1 {
   font-size: 32px;
 }
 .personal-heading p {
-  font-size: 16px;
+  font-size: 17px;
 }
 .resume-card-content h3 {
   font-size: 18px;
@@ -230,7 +230,7 @@ select,
   line-height: 1.5;
 }
 .home-page .filter-tabs button {
-  font-size: 15px;
+  font-size: 16px;
   padding: 9px 14px;
 }
 .home-page .job-card {
@@ -255,7 +255,7 @@ select,
 }
 .home-page .job-card > p {
   grid-column: 2;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.8;
   min-height: 0;
   margin-top: 8px;
@@ -265,7 +265,7 @@ select,
   margin-top: 23px;
 }
 .home-page .tags span {
-  font-size: 14px;
+  font-size: 15px;
   padding: 4px 8px;
 }
 .home-page .feature-section {
@@ -280,27 +280,27 @@ select,
   margin: 19px 0 24px;
 }
 .home-page .text-link {
-  font-size: 16px;
+  font-size: 17px;
 }
 .home-page .preview-top {
   padding: 17px 24px;
-  font-size: 16px;
+  font-size: 17px;
 }
 .home-page .preview-question h3 {
   font-size: 18px;
 }
 .home-page .preview-question p {
-  font-size: 16px;
+  font-size: 17px;
   padding: 17px;
 }
 .home-page .preview-insight strong {
-  font-size: 16px;
+  font-size: 17px;
 }
 .home-page .preview-insight p {
-  font-size: 15px;
+  font-size: 16px;
 }
 .home-page .preview-footer {
-  font-size: 14px;
+  font-size: 15px;
 }
 .home-page .steps {
   gap: 50px;
@@ -310,7 +310,7 @@ select,
   font-size: 20px;
 }
 .home-page .step p {
-  font-size: 16px;
+  font-size: 17px;
 }
 .home-page .faq-section {
   padding-block: 45px;
@@ -319,7 +319,7 @@ select,
   font-size: 17px;
 }
 .home-page .faq-list p {
-  font-size: 16px;
+  font-size: 17px;
 }
 .home-page .bottom-cta {
   padding: 34px;
@@ -376,14 +376,14 @@ select,
   .home-page .hero-actions .button {
     min-height: 50px;
     padding: 12px 18px;
-    font-size: 16px;
+    font-size: 17px;
   }
   .home-page .hero-bottom {
     gap: 30px;
     bottom: 28px;
   }
   .home-page .hero-bottom b {
-    font-size: 16px;
+    font-size: 17px;
   }
   .home-page .job-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -403,11 +403,11 @@ select,
     font-size: 20px;
   }
   .brand small {
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 1px;
   }
   .user-link {
-    font-size: 14px;
+    font-size: 15px;
     gap: 5px;
   }
   .user-link > svg:first-child {
@@ -418,7 +418,7 @@ select,
     gap: 20px;
   }
   .main-nav a {
-    font-size: 15px;
+    font-size: 16px;
   }
   .setup-grid {
     grid-template-columns: 1fr;
@@ -430,7 +430,7 @@ select,
     font-size: 19px;
   }
   .field-label {
-    font-size: 16px;
+    font-size: 17px;
   }
   .page-heading h1,
   .personal-heading h1 {
@@ -438,45 +438,45 @@ select,
   }
   .page-heading p,
   .personal-heading p {
-    font-size: 15px;
+    font-size: 16px;
   }
   .choice {
-    font-size: 15px;
+    font-size: 16px;
     padding: 10px;
   }
   .summary-rows {
     grid-template-columns: 1fr;
   }
   .summary-row {
-    font-size: 15px;
+    font-size: 16px;
   }
   .input,
   textarea,
   select {
-    font-size: 16px;
+    font-size: 17px;
   }
   .notice {
-    font-size: 14px;
+    font-size: 15px;
   }
   .current-question h1 {
     font-size: 21px;
   }
   .session-title {
-    font-size: 14px;
+    font-size: 15px;
   }
   .session-header .brand small {
-    font-size: 11px;
+    font-size: 12px;
   }
   .message p,
   .answer-quote p,
   .comparison-columns p {
-    font-size: 16px;
+    font-size: 17px;
   }
   .conversation {
     height: 340px;
   }
   .turn-review summary > span:nth-child(2) {
-    font-size: 16px;
+    font-size: 17px;
   }
   .turn-review summary {
     padding: 18px;
@@ -485,14 +485,14 @@ select,
     padding: 0 18px 18px;
   }
   .record-job strong {
-    font-size: 15px;
+    font-size: 16px;
   }
   .records-table {
     min-width: 800px;
   }
   .personal-tabs > button {
     padding: 10px;
-    font-size: 14px;
+    font-size: 15px;
     gap: 5px;
   }
   .resume-card-content h3 {
@@ -505,7 +505,7 @@ select,
   }
   .site-footer .footer-inner > span {
     margin-left: 0;
-    font-size: 13px;
+    font-size: 14px;
   }
   .home-page .hero {
     background: #fbe8a6;
@@ -554,7 +554,7 @@ select,
   .home-page .hero-actions .button {
     min-height: 49px;
     padding: 12px 17px;
-    font-size: 15px;
+    font-size: 16px;
   }
   .home-page .hero-bottom {
     display: none;
@@ -575,7 +575,7 @@ select,
     gap: 2px;
   }
   .home-page .filter-tabs button {
-    font-size: 14px;
+    font-size: 15px;
     padding: 7px 9px;
   }
   .home-page .job-grid {
@@ -591,14 +591,14 @@ select,
     font-size: 21px;
   }
   .home-page .job-card > p {
-    font-size: 15px;
+    font-size: 16px;
     margin-top: 5px;
   }
   .home-page .job-card-bottom {
     margin-top: 18px;
   }
   .home-page .tags span {
-    font-size: 14px;
+    font-size: 15px;
   }
   .home-page .feature-section {
     padding-block: 32px;
@@ -607,18 +607,18 @@ select,
     gap: 28px;
   }
   .home-page .feature-copy > p {
-    font-size: 16px;
+    font-size: 17px;
     margin-block: 15px 20px;
   }
   .home-page .preview-top {
     padding: 15px 18px;
-    font-size: 15px;
+    font-size: 16px;
   }
   .home-page .preview-question h3 {
     font-size: 17px;
   }
   .home-page .preview-question p {
-    font-size: 15px;
+    font-size: 16px;
     padding: 13px;
   }
   .home-page .preview-footer {
@@ -632,10 +632,10 @@ select,
     font-size: 20px;
   }
   .home-page .step p {
-    font-size: 16px;
+    font-size: 17px;
   }
   .home-page .faq-list summary {
-    font-size: 16px;
+    font-size: 17px;
     gap: 12px;
   }
   .home-page .bottom-cta {
@@ -666,7 +666,7 @@ select,
   gap: 9px;
   padding: 0 14px;
   border-bottom: 1px solid #edf0f1;
-  font-size: 14px;
+  font-size: 15px;
 }
 .product-preview-header > strong {
   font-weight: 600;
@@ -674,7 +674,7 @@ select,
 }
 .product-preview-header > span:last-child {
   margin-left: auto;
-  font-size: 13px;
+  font-size: 14px;
   color: #946143;
   background: #fff1e3;
   padding: 2px 7px;
@@ -708,16 +708,16 @@ select,
 .product-question-list {
   padding: 15px 12px;
   border-right: 1px solid #edf0f1;
-  font-size: 14px;
+  font-size: 15px;
 }
 .product-question-list > .avatar {
   height: 29px;
   width: 29px;
   margin-bottom: 11px;
-  font-size: 14px;
+  font-size: 15px;
 }
 .product-question-list > strong {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.7;
   font-weight: 550;
   display: block;
@@ -739,7 +739,7 @@ select,
   display: flex;
   flex-direction: column;
   gap: 13px;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.8;
 }
 .product-question {
@@ -748,7 +748,7 @@ select,
   padding: 10px 12px;
 }
 .product-conversation > p {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.8;
   background: #f5f6f8;
   padding: 10px 12px;
@@ -812,14 +812,14 @@ select,
 
 .score-notes {
   margin-top: 22px;
-  font-size: 14px;
+  font-size: 15px;
   color: #697486;
 }
 .score-notes summary {
   cursor: pointer;
 }
 .score-notes p {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.9;
   margin-top: 14px;
 }

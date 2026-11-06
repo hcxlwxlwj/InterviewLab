@@ -507,7 +507,7 @@ test('two registered cookie accounts isolate real interviews and a privileged ro
       career_stage: 'internship',
       interview_type: 'technical_qa',
       difficulty: '基础',
-      duration_minutes: 5,
+      duration_minutes: 10,
       interviewer_style: '标准',
       interaction_mode: 'text_fallback',
     },

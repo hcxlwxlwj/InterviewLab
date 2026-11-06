@@ -15,7 +15,8 @@ export interface InterviewConfig {
   career_stage: 'internship' | 'campus';
   interview_type: LiveInterviewType;
   difficulty: '基础';
-  duration_minutes: 5 | 10;
+  /** Five minutes is retained only for reading historical sessions. */
+  duration_minutes: 5 | 10 | 20 | 30;
   interviewer_style: '标准' | '友好' | '深入追问';
   interaction_mode: 'text_fallback' | 'realtime_voice' | 'realtime_video';
 }
@@ -75,6 +76,8 @@ export interface InterviewTurn extends InterviewQuestion {
   answered_at: string | null;
 }
 export interface InterviewSnapshot {
+  scoring_evidence_version?: 'candidate-answer-v1';
+  interview_type?: LiveInterviewType;
   runtime_version?: 'graph-v1';
   resume_analysis?: import('./agent-workflow').ResumeAnalysis;
   preparation_plan?: import('./agent-workflow').InterviewPreparationPlan;
@@ -126,6 +129,9 @@ export interface InterviewFinding {
   evidence_refs: InterviewEvidence[];
 }
 export interface InterviewEvaluation {
+  response_assessment?: import('./interview-response').InterviewResponseAssessment;
+  response_assessments?: import('./question-scoring').AssessedResponse[];
+  feedback_observations?: import('./feedback-template').FeedbackObservation[];
   /** Cumulative six-dimensional score for this main question through this answer. */
   feedback_assessments?: import('./feedback-template').FeedbackAssessment[];
   question_scoring_version?: string;
@@ -159,9 +165,10 @@ export interface InterviewReportSummary {
 }
 export interface ReportRequest {
   version: number;
-  scope?: 'missing' | 'summary';
+  scope?: 'missing' | 'summary' | 'advice';
 }
 export interface InterviewReport {
+  feedback_observations?: import('./feedback-template').FeedbackObservation[];
   advice_task_id?: string;
   advice_status?: 'pending' | 'ready' | 'failed';
   next_steps?: string[];
@@ -241,11 +248,13 @@ export interface InterviewComparison {
 export const INTERVIEW_PROMPT_VERSION = 'interview-conversation-v2';
 export const INTERVIEW_RUBRIC_VERSION = 'evidence-uncalibrated-v1';
 export const INTERVIEW_MAX_ANSWER = 4000;
-export function interviewOpening(jobTitle: string): InterviewQuestion {
+export function interviewOpening(jobTitle: string, config?: InterviewConfig): InterviewQuestion {
   return {
     stage: 'introduction',
     acknowledgement: `你好，欢迎参加${jobTitle}的面试。我们先认识一下，再聊聊你的经历和想法。`,
-    text: '请先用一两分钟做个自我介绍，可以聊聊你的学习背景、与岗位相关的经历，以及你希望从事这个方向的原因。',
+    text: config
+      ? `请用${config.duration_minutes === 5 ? '半分钟' : '一分钟'}做个自我介绍，简要聊聊${config.interview_type === 'hr' ? '你的求职方向和相关经历' : '你的学习背景和与目标岗位相关的经历'}。`
+      : '请先用一两分钟做个自我介绍，可以聊聊你的学习背景、与岗位相关的经历，以及你希望从事这个方向的原因。',
     topic: '自我介绍',
     purpose: '了解候选人背景，从当场陈述中寻找后续交流线索',
     knowledge_question_id: null,
@@ -267,14 +276,22 @@ export function interviewConversationHistory(turns: InterviewTurn[]) {
 export function canSuggestInterviewFinish(interview: Interview): boolean {
   return (
     interview.turns.filter((turn) => turn.answer_status === 'answered').length >= 3 ||
-    !nextQuestionPosition(interview.turns, false) ||
+    !nextQuestionPosition(interview.turns, false, interview.configuration.duration_minutes) ||
     Boolean(interview.target_at && Date.now() >= Date.parse(interview.target_at))
   );
 }
-export function interviewDeadline(startedAt: string): number {
-  return Date.parse(startedAt) + 720000;
+export const INTERVIEW_DURATIONS = [10, 20, 30] as const;
+export function mainQuestionLimit(durationMinutes = 10): number {
+  return durationMinutes <= 10 ? 6 : durationMinutes <= 20 ? 10 : 14;
 }
-export function nextQuestionPosition(turns: InterviewTurn[], followUp: boolean) {
+export function interviewDeadline(startedAt: string, durationMinutes = 10): number {
+  return Date.parse(startedAt) + (Math.max(10, durationMinutes) + 2) * 60000;
+}
+export function nextQuestionPosition(
+  turns: InterviewTurn[],
+  followUp: boolean,
+  durationMinutes = 10,
+) {
   const last = turns.at(-1);
   if (!last) return { main_question_index: 1, follow_up_index: 0 };
   if (followUp && last.follow_up_index < 2 && last.answer_status === 'answered')
@@ -282,7 +299,7 @@ export function nextQuestionPosition(turns: InterviewTurn[], followUp: boolean) 
       main_question_index: last.main_question_index,
       follow_up_index: last.follow_up_index + 1,
     };
-  if (last.main_question_index >= 6) return null;
+  if (last.main_question_index >= mainQuestionLimit(durationMinutes)) return null;
   return { main_question_index: last.main_question_index + 1, follow_up_index: 0 };
 }
 export function evidenceMatches(ref: InterviewEvidence, turns: InterviewTurn[]): boolean {

@@ -35,7 +35,7 @@ const configuration: InterviewConfig = {
   career_stage: 'internship',
   interview_type: 'technical_qa',
   difficulty: '基础',
-  duration_minutes: 5,
+  duration_minutes: 10,
   interviewer_style: '标准',
   interaction_mode: 'text_fallback',
 };
@@ -75,20 +75,44 @@ function runtime(blocked = false, extra: InterviewRuntimeOptions = {}) {
       const body = JSON.parse(init!.body as string);
       modelInputs.push(body);
       assert.equal(body.stream, true);
+      const input = JSON.parse(body.messages[1].content);
+      const semantic = Boolean(body.response_format.json_schema.schema.properties.decision);
+      const branches = body.response_format.json_schema.schema.properties.decision?.anyOf ?? [];
+      const follow = semantic
+        ? branches.some((branch: any) => branch.properties.a.const === 'f')
+        : body.response_format.json_schema.schema.properties.a.enum?.includes('f');
+      const action = follow ? 'f' : 'n';
+      const goals = follow ? input.follow_up_goal_indices : input.next_goal_indices;
+      const goal = semantic ? goals[0] : Math.max(0, input.goal_options.indexOf('verification'));
       const raw = JSON.stringify({
-        a: 'f',
-        g: 1,
+        ...(semantic
+          ? {
+              h: 'ade1',
+              v:
+                input.current_stage === 'introduction'
+                  ? []
+                  : [
+                      input.goal_options.findIndex(
+                        (option: { goal: string }) =>
+                          option.goal === (input.memory?.focus ?? 'understanding'),
+                      ),
+                    ],
+            }
+          : {}),
+        ...(semantic ? { decision: { a: action, g: goal } } : { a: action, g: goal }),
         e: 0,
-        o: 0,
+        ...(!semantic ? { o: 0 } : {}),
+        ...(body.response_format.json_schema.schema.properties.r ? { r: [] } : {}),
+        ...(body.response_format.json_schema.schema.properties.s ? { s: [] } : {}),
         q: '你提到缓存，如何验证数据仍然正确？',
-        s: [],
-        r: [],
+        d: follow ? 'probe_gap' : 'type_priority',
+        b: '',
       });
       let cancelled = false;
       const response = new Response(
         new ReadableStream({
           async start(c) {
-            const cut = raw.indexOf(',"s"');
+            const cut = raw.indexOf(',"d"');
             c.enqueue(
               new TextEncoder().encode(
                 'data: ' +
@@ -132,7 +156,12 @@ function runtime(blocked = false, extra: InterviewRuntimeOptions = {}) {
 }
 async function ready(r: ReturnType<typeof runtime>) {
   let v = await r.value.interviews.create(owner, configuration, crypto.randomUUID());
-  v = await r.value.interviews.prepare(owner, v.id, { version: v.version, mode: 'fallback' }, crypto.randomUUID());
+  v = await r.value.interviews.prepare(
+    owner,
+    v.id,
+    { version: v.version, mode: 'fallback' },
+    crypto.randomUUID(),
+  );
   v = await r.value.interviews.start(owner, v.id, { version: v.version }, crypto.randomUUID());
   v = await r.value.interviews.answer(
     owner,
@@ -252,7 +281,12 @@ test('participation reminders, confirmation and sealing are atomic, durable and 
   const r = runtime();
   try {
     let v = await r.value.interviews.create(owner, configuration, crypto.randomUUID());
-    v = await r.value.interviews.prepare(owner, v.id, { version: v.version, mode: 'fallback' }, crypto.randomUUID());
+    v = await r.value.interviews.prepare(
+      owner,
+      v.id,
+      { version: v.version, mode: 'fallback' },
+      crypto.randomUUID(),
+    );
     v = await r.value.interviews.start(owner, v.id, { version: v.version }, crypto.randomUUID());
     const firstTurn = v.turns.at(-1)!;
     const firstBody = { version: v.version, text: '我不配合' };
@@ -309,7 +343,12 @@ test('a substantive answer clears the warning and returns to the existing model 
   const r = runtime();
   try {
     let v = await r.value.interviews.create(owner, configuration, crypto.randomUUID());
-    v = await r.value.interviews.prepare(owner, v.id, { version: v.version, mode: 'fallback' }, crypto.randomUUID());
+    v = await r.value.interviews.prepare(
+      owner,
+      v.id,
+      { version: v.version, mode: 'fallback' },
+      crypto.randomUUID(),
+    );
     v = await r.value.interviews.start(owner, v.id, { version: v.version }, crypto.randomUUID());
     v = await r.value.interviews.answer(
       owner,
@@ -376,7 +415,12 @@ test('voice answers use our existing knowledge runtime and pass its retrieved co
   let session: InterviewVoiceSession | undefined;
   try {
     let v = await r.value.interviews.create(owner, configuration, crypto.randomUUID());
-    v = await r.value.interviews.prepare(owner, v.id, { version: v.version, mode: 'fallback' }, crypto.randomUUID());
+    v = await r.value.interviews.prepare(
+      owner,
+      v.id,
+      { version: v.version, mode: 'fallback' },
+      crypto.randomUUID(),
+    );
     v = await r.value.interviews.start(owner, v.id, { version: v.version }, crypto.randomUUID());
     session = new InterviewVoiceSession(
       v.id,

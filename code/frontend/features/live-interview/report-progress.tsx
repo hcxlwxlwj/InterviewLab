@@ -8,8 +8,49 @@ export function isReportPending(report: InterviewReport) {
   return (
     ['pending', 'generating'].includes(report.status) ||
     (report.analysis_progress?.pending ?? 0) > 0 ||
-    ['pending', 'generating'].includes(report.summary_status ?? '')
+    ['pending', 'generating'].includes(report.summary_status ?? '') ||
+    report.advice_status === 'pending'
   );
+}
+
+export type ReportDisplayState = 'pending' | 'ready' | 'failed' | 'empty' | 'unrequested';
+/** A ready database row can still have an unfinished advice task. */
+export function reportDisplayState(report: InterviewReport | null): ReportDisplayState {
+  if (!report) return 'unrequested';
+  if (isReportPending(report)) return 'pending';
+  if (
+    report.status === 'failed' ||
+    (report.analysis_progress?.failed ?? 0) > 0 ||
+    Boolean(
+      report.analysis_progress &&
+        report.analysis_progress.completed < report.analysis_progress.total,
+    ) ||
+    report.missing_turn_ids.length > 0 ||
+    report.summary_status === 'failed' ||
+    report.advice_status === 'failed' ||
+    (report.summary_status === 'ready' && !report.summary)
+  )
+    return 'failed';
+  if (!(report.analysis_progress?.total ?? report.evaluations.length)) return 'empty';
+  if (!report.summary && [undefined, 'not_requested'].includes(report.summary_status))
+    return 'unrequested';
+  return 'ready';
+}
+
+export function reportRetryScope(report: InterviewReport | null): 'missing' | 'summary' | 'advice' {
+  if (
+    !report ||
+    report.missing_turn_ids.length ||
+    (report.analysis_progress?.failed ?? 0) > 0 ||
+    report.status === 'failed'
+  )
+    return 'missing';
+  if (
+    report.summary_status === 'failed' ||
+    (!report.summary && report.summary_status !== 'not_applicable')
+  )
+    return 'summary';
+  return 'advice';
 }
 
 export function ReportProgress({

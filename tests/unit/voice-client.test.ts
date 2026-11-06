@@ -2,17 +2,26 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { RealtimeVoiceClient } from '../../code/frontend/features/live-interview/voice/client';
 import type { VoiceServerEvent } from '@interviewlab/core';
+import {
+  prepareVoiceDevices,
+  releaseVoiceDevices,
+} from '../../code/frontend/features/live-interview/voice/devices';
 
-function browserFixture(options: { denyPermission?: boolean } = {}) {
+function browserFixture(
+  options: { denyPermission?: boolean; denyCamera?: boolean; pendingResume?: boolean } = {},
+) {
   const keys = ['window', 'navigator', 'AudioContext', 'AudioWorkletNode', 'WebSocket'] as const;
   const saved = keys.map((key) => [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const);
   const events: VoiceServerEvent[] = [],
     sent: unknown[] = [];
   const playing: boolean[] = [];
+  const captureCommands: { type: string; epoch: number }[] = [];
   const sources: { onended: (() => void) | null }[] = [];
   let constraints: MediaStreamConstraints | undefined;
   let resumes = 0,
     stopped = false,
+    cameraStopped = false,
+    blockResume = false,
     disconnected = false;
   let capture!: Worklet, socket!: Socket, context!: Context;
   const track = {
@@ -21,6 +30,11 @@ function browserFixture(options: { denyPermission?: boolean } = {}) {
     addEventListener() {},
     stop() {
       stopped = true;
+    },
+  };
+  const cameraTrack = {
+    stop() {
+      cameraStopped = true;
     },
   };
   class Context {
@@ -34,7 +48,8 @@ function browserFixture(options: { denyPermission?: boolean } = {}) {
     }
     async resume() {
       resumes++;
-      this.state = 'running';
+      if (options.pendingResume) await new Promise<void>(() => {});
+      if (!blockResume) this.state = 'running';
     }
     async close() {
       this.state = 'closed';
@@ -60,7 +75,12 @@ function browserFixture(options: { denyPermission?: boolean } = {}) {
     }
   }
   class Worklet {
-    port = { postMessage() {}, onmessage: null as ((event: { data: unknown }) => void) | null };
+    port = {
+      postMessage(command: { type: string; epoch: number }) {
+        captureCommands.push(command);
+      },
+      onmessage: null as ((event: { data: unknown }) => void) | null,
+    };
     onprocessorerror: (() => void) | null = null;
     constructor() {
       capture = this;
@@ -98,6 +118,14 @@ function browserFixture(options: { denyPermission?: boolean } = {}) {
           constraints = input;
           if (options.denyPermission) throw new DOMException('Denied', 'NotAllowedError');
           context.state = 'suspended';
+          if (input.video) {
+            if (options.denyCamera) throw new DOMException('Camera denied', 'NotAllowedError');
+            return {
+              getAudioTracks: () => [],
+              getVideoTracks: () => [cameraTrack],
+              getTracks: () => [cameraTrack],
+            };
+          }
           return { getAudioTracks: () => [track], getTracks: () => [track] };
         },
       },
@@ -125,24 +153,30 @@ function browserFixture(options: { denyPermission?: boolean } = {}) {
     client,
     track,
     hasSocket: () => Boolean(socket),
+    hasCapture: () => Boolean(capture?.port.onmessage),
+    blockAudioResume() {
+      context.state = 'suspended';
+      blockResume = true;
+    },
     playing,
     sources,
     server(event: VoiceServerEvent) {
       socket.onmessage?.({ data: JSON.stringify(event) });
     },
-    vad(type: 'speech_start' | 'speech_end') {
-      capture.port.onmessage?.({ data: { type } });
+    vad(type: 'speech_start' | 'speech_end', epoch?: number) {
+      capture.port.onmessage?.({ data: { type, epoch } });
     },
     events,
     sent,
+    captureCommands,
     ready() {
       socket.onmessage?.({ data: JSON.stringify({ type: 'ready', silence_ms: 3000 }) });
     },
-    audio(amplitude: number) {
+    audio(amplitude: number, epoch?: number) {
       const pcm = new ArrayBuffer(6400),
         view = new DataView(pcm);
       for (let i = 0; i < 6400; i += 2) view.setInt16(i, Math.round(amplitude * 32767), true);
-      capture.port.onmessage?.({ data: { type: 'audio', pcm } });
+      capture.port.onmessage?.({ data: { type: 'audio', pcm, epoch } });
     },
     processorError() {
       capture.onprocessorerror?.();
@@ -158,6 +192,12 @@ function browserFixture(options: { denyPermission?: boolean } = {}) {
     },
     get disconnected() {
       return disconnected;
+    },
+    get cameraStopped() {
+      return cameraStopped;
+    },
+    get contextState() {
+      return context.state;
     },
     restore() {
       client.stop();
@@ -185,6 +225,192 @@ test('voice uses the browser microphone, resumes after permission and waits for 
     assert.ok(new Uint8Array(f.sent.at(-1) as ArrayBuffer).every((value) => value === 0));
   } finally {
     f.restore();
+  }
+});
+
+test('submitting advances the capture epoch without muting genuine continuation speech', async () => {
+  const f = browserFixture();
+  try {
+    await f.client.start();
+    f.ready();
+    f.audio(0, 0);
+    const before = f.sent.length;
+    f.server({ type: 'submitting', turn_id: 'current', text: '第一段回答' });
+    const epoch = f.captureCommands.at(-1)!.epoch;
+    assert.equal(epoch, 1);
+    assert.equal(f.track.enabled, true);
+    f.vad('speech_start', 0);
+    f.audio(0.5, 0);
+    assert.equal(
+      f.sent.length,
+      before,
+      'queued worklet notifications from the submitted segment are stale',
+    );
+    f.vad('speech_start', epoch);
+    f.audio(0.5, epoch);
+    assert.equal(JSON.parse(f.sent.at(-2) as string).type, 'speech_start');
+    assert.ok(new Uint8Array(f.sent.at(-1) as ArrayBuffer).some((value) => value !== 0));
+  } finally {
+    f.restore();
+  }
+});
+
+async function microtasksUntil(check: () => boolean) {
+  for (let i = 0; i < 30 && !check(); i++) await Promise.resolve();
+  assert.ok(check(), 'asynchronous setup did not reach the expected phase');
+}
+
+test('staged preparation verifies local capture without uploading or starting the interview', async () => {
+  const f = browserFixture();
+  let starts = 0,
+    prepared = false,
+    connected = false;
+  try {
+    const preparation = f.client.prepare().then(() => {
+      prepared = true;
+    });
+    await microtasksUntil(f.hasCapture);
+    assert.equal(prepared, false);
+    assert.equal(f.hasSocket(), false);
+    f.audio(0);
+    await preparation;
+    assert.equal(prepared, true);
+    f.audio(0.5);
+    assert.equal(f.sent.length, 0);
+    const connection = f.client
+      .connect(async () => {
+        assert.equal(f.hasSocket(), false);
+        starts++;
+      })
+      .then(() => {
+        connected = true;
+      });
+    await microtasksUntil(f.hasSocket);
+    assert.equal(starts, 1);
+    assert.equal(connected, false);
+    f.ready();
+    await connection;
+    assert.equal(connected, true);
+    assert.equal(f.events.filter((e) => e.type === 'ready').length, 1);
+  } finally {
+    f.restore();
+  }
+});
+
+test('staged capture timeout rejects preparation and never starts a socket', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
+  const f = browserFixture();
+  try {
+    const rejection = assert.rejects(f.client.prepare(), /没有产生麦克风音频/);
+    await microtasksUntil(f.hasCapture);
+    t.mock.timers.tick(5001);
+    await rejection;
+    assert.equal(f.hasSocket(), false);
+    assert.equal(f.stopped, true);
+  } finally {
+    f.restore();
+    t.mock.timers.reset();
+  }
+});
+
+test('a gesture-blocked pending audio resume fails clearly without waiting forever or requesting media', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
+  const f = browserFixture({ pendingResume: true });
+  try {
+    const rejection = assert.rejects(prepareVoiceDevices(false), /尚未允许声音.*重试设备检查/);
+    assert.equal(
+      f.resumes,
+      1,
+      'resume starts in the original call rather than a deferred callback',
+    );
+    t.mock.timers.tick(4000);
+    await rejection;
+    assert.equal(f.constraints, undefined);
+    assert.equal(f.contextState, 'closed');
+    assert.equal(f.hasSocket(), false);
+  } finally {
+    f.restore();
+    t.mock.timers.reset();
+  }
+});
+
+test('staged connection rejects server failure and cancellation rather than hanging on readiness', async () => {
+  const f = browserFixture();
+  try {
+    const preparation = f.client.prepare();
+    await microtasksUntil(f.hasCapture);
+    f.audio(0);
+    await preparation;
+    const rejection = assert.rejects(f.client.connect(), /语音服务暂不可用/);
+    await microtasksUntil(f.hasSocket);
+    f.server({
+      type: 'error',
+      code: 'voice_unavailable',
+      message: '语音服务暂不可用',
+      retryable: true,
+    });
+    await rejection;
+    assert.equal(f.stopped, true);
+  } finally {
+    f.restore();
+  }
+  const cancelled = browserFixture();
+  try {
+    const rejection = assert.rejects(cancelled.client.prepare(), /取消/);
+    await microtasksUntil(cancelled.hasCapture);
+    cancelled.client.stop();
+    await rejection;
+  } finally {
+    cancelled.restore();
+  }
+});
+
+test('an audio context that cannot resume prevents staged interview start', async () => {
+  const f = browserFixture();
+  let starts = 0;
+  try {
+    const preparation = f.client.prepare();
+    await microtasksUntil(f.hasCapture);
+    f.audio(0);
+    await preparation;
+    f.blockAudioResume();
+    await assert.rejects(
+      f.client.connect(async () => {
+        starts++;
+      }),
+      /音频尚未启动/,
+    );
+    assert.equal(starts, 0);
+    assert.equal(f.hasSocket(), false);
+  } finally {
+    f.restore();
+  }
+});
+
+test('prepared camera remains provider-owned while denied video setup releases acquired audio', async () => {
+  const f = browserFixture();
+  try {
+    const devices = await prepareVoiceDevices(true);
+    assert.ok(devices.camera);
+    const preparation = f.client.prepare(devices);
+    await microtasksUntil(f.hasCapture);
+    f.audio(0);
+    await preparation;
+    f.client.stop();
+    assert.equal(f.stopped, true);
+    assert.equal(f.cameraStopped, false);
+    releaseVoiceDevices(devices);
+    assert.equal(f.cameraStopped, true);
+  } finally {
+    f.restore();
+  }
+  const denied = browserFixture({ denyCamera: true });
+  try {
+    await assert.rejects(prepareVoiceDevices(true), /未获得麦克风或摄像头权限/);
+    assert.equal(denied.stopped, true);
+    assert.equal(denied.contextState, 'closed');
+  } finally {
+    denied.restore();
   }
 });
 

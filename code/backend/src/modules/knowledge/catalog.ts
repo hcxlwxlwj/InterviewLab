@@ -5,8 +5,16 @@ import type {
   InterviewConfig,
   InterviewProfile,
   KnowledgeChunk,
+  InterviewRoleContext,
 } from '@interviewlab/core';
-import { JOBS, CONTENT_SOURCES, templateJd, frontendReportReference } from '../../content/index';
+import {
+  JOBS,
+  CONTENT_SOURCES,
+  getJob,
+  templateJd,
+  frontendReportReference,
+} from '../../content/index';
+import { ServiceError } from '../../foundation/errors';
 import { professionalFoundations as professional } from '../../content/index';
 
 export const CATALOG_FORMAT = 'all-roles-v1';
@@ -41,6 +49,8 @@ export const COMPETENCIES: CompetencyCard[] = [
   ['collaboration', '协作沟通', '说明具体协作行动与职责边界'],
   ['learning', '学习反思', '说明学习、反馈及主动验证的具体行动'],
   ['motivation', '岗位动机', '解释岗位理解、选择依据及准备过程'],
+  ['availability', '求职安排', '了解到岗时间、地点意向和实习安排；不按早晚或时长评价能力'],
+  ['expectations', '求职期望', '了解薪资期望和求职关注点；只记录，不评价期望高低'],
 ].map(([id, title, evidence_wanted]) => ({
   id,
   title,
@@ -50,10 +60,26 @@ export const COMPETENCIES: CompetencyCard[] = [
   alternative: '尊重边界，选择尚未覆盖的适用目标',
 }));
 export const PROFILE_GOALS: Record<InterviewConfig['interview_type'], string[]> = {
-  technical_qa: ['understanding', 'verification', 'tradeoffs', 'contribution'],
+  technical_qa: [
+    'understanding',
+    'contribution',
+    'verification',
+    'tradeoffs',
+    'learning',
+    'motivation',
+  ],
   project_deep_dive: ['contribution', 'tradeoffs', 'verification', 'collaboration'],
-  business_scenario: ['business', 'tradeoffs', 'verification', 'collaboration'],
-  hr: ['motivation', 'collaboration', 'learning', 'contribution'],
+  business_scenario: [
+    'business',
+    'contribution',
+    'tradeoffs',
+    'understanding',
+    'verification',
+    'learning',
+    'motivation',
+    'collaboration',
+  ],
+  hr: ['motivation', 'availability', 'expectations', 'collaboration', 'learning', 'contribution'],
   mixed: COMPETENCIES.map((c) => c.id),
 };
 export function catalogProfile(type: InterviewConfig['interview_type']): InterviewProfile {
@@ -63,6 +89,22 @@ export function catalogProfile(type: InterviewConfig['interview_type']): Intervi
     version: CATALOG_FORMAT,
     label: LIVE_TYPE_LABELS[type],
     goals: PROFILE_GOALS[type],
+  };
+}
+export function planningRoleContext(config: InterviewConfig): InterviewRoleContext {
+  const job = getJob(config.job);
+  if (!job || !job.stages.includes(config.career_stage))
+    throw new ServiceError('unsupported_input', 400, '岗位或招聘阶段不可用');
+  return {
+    job_id: job.id,
+    job_title: job.title,
+    job_version: job.version,
+    description: job.description,
+    responsibilities: [...job.responsibilities],
+    requirements: [...job.requirements],
+    topics: [...job.topics],
+    source_refs: [...job.source_refs],
+    usage: 'role_requirements_not_candidate_evidence',
   };
 }
 export interface CatalogDocument {
@@ -121,7 +163,7 @@ export function buildCatalog(): CatalogDocument[] {
       bindings: JOBS.filter((j) => j.category_id === card.family).map((j) => ({
         job: j.id,
         stages: j.stages,
-        types: ['technical_qa', 'project_deep_dive', 'mixed'],
+        types: ['technical_qa', 'project_deep_dive', 'business_scenario', 'mixed'],
         goals: ['understanding', 'verification', 'tradeoffs'],
       })),
     });

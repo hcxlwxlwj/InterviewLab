@@ -2,6 +2,8 @@
 
 import {
   reportFeedback,
+  feedbackScore,
+  isQuestionScoringVersion,
   type QuestionScore,
   FEEDBACK_DIMENSIONS,
   type InterviewReport,
@@ -32,7 +34,7 @@ export function TotalScore({ score, coverage = 100 }: { score: number | null; co
         <b>综合得分</b>
         <small>
           {score === null
-            ? '评分正在生成或暂无评价依据'
+            ? '本场回答不足以形成综合评分'
             : coverage < 100
               ? `部分参考分 · 已评价权重 ${coverage}/100`
               : 'AI 参考 · 未经人工校准'}
@@ -85,10 +87,23 @@ export function AbilityRadar({
     }),
   );
   const labels = Object.fromEntries(FEEDBACK_DIMENSIONS.map((d) => [d.key, d.short]));
-  const entries = Object.entries(dimensions);
+  const entries = Object.entries(dimensions).filter(([, d]) => d.score !== null);
+  if (!entries.length) return <p className="radar-pending">本次暂无能力画像。</p>;
+  if (entries.length < 3)
+    return (
+      <div className="ability-bars" role="img" aria-label="已考察维度评分条形图">
+        {entries.map(([key, d]) => (
+          <div key={key}>
+            <span>{labels[key]}</span>
+            <strong>{Math.round(d.score!)} / 100</strong>
+            <meter min={0} max={100} value={d.score!} aria-label={labels[key]} />
+          </div>
+        ))}
+      </div>
+    );
   const point = (index: number, radius: number) => {
     const angle = (index * Math.PI * 2) / entries.length - Math.PI / 2;
-    return [260 + Math.cos(angle) * radius, 190 + Math.sin(angle) * radius];
+    return [220 + Math.cos(angle) * radius, 200 + Math.sin(angle) * radius];
   };
   const observed = entries.flatMap(([, d], index) =>
     d.score === null ? [] : [{ index, score: d.score }],
@@ -97,7 +112,7 @@ export function AbilityRadar({
     <>
       <svg
         className="ability-radar"
-        viewBox="0 0 520 380"
+        viewBox="0 0 440 410"
         role="img"
         aria-label={`能力雷达图：${entries.map(([key, d]) => `${labels[key]}${d.score === null ? '尚未生成' : `${d.score} 分`}`).join('，')}`}
       >
@@ -105,24 +120,24 @@ export function AbilityRadar({
           <polygon
             key={level}
             className="radar-grid"
-            points={entries.map((_, i) => point(i, level * 1.2).join(',')).join(' ')}
+            points={entries.map((_, i) => point(i, level * 1.32).join(',')).join(' ')}
           />
         ))}
         {entries.map(([key], i) => (
           <line
             key={key}
             className="radar-grid"
-            x1="260"
-            y1="190"
-            x2={point(i, 120)[0]}
-            y2={point(i, 120)[1]}
+            x1="220"
+            y1="200"
+            x2={point(i, 132)[0]}
+            y2={point(i, 132)[1]}
           />
         ))}
         {observed.length === entries.length && (
           <polygon
             className="radar-area"
             points={observed
-              .map(({ index, score }) => point(index, score * 1.2).join(','))
+              .map(({ index, score }) => point(index, score * 1.32).join(','))
               .join(' ')}
           />
         )}
@@ -131,35 +146,33 @@ export function AbilityRadar({
             {observed.length !== entries.length && (
               <line
                 className="radar-spoke"
-                x1="260"
-                y1="190"
-                x2={point(index, score * 1.2)[0]}
-                y2={point(index, score * 1.2)[1]}
+                x1="220"
+                y1="200"
+                x2={point(index, score * 1.32)[0]}
+                y2={point(index, score * 1.32)[1]}
               />
             )}
             <circle
               className="radar-point"
-              cx={point(index, score * 1.2)[0]}
-              cy={point(index, score * 1.2)[1]}
+              cx={point(index, score * 1.32)[0]}
+              cy={point(index, score * 1.32)[1]}
               r="5"
             />
           </g>
         ))}
         {entries.map(([key, d], i) => {
-          const [x, y] = point(i, 162);
+          const [x, y] = point(i, 164);
           return (
             <text key={key} x={x} y={y} textAnchor="middle" dominantBaseline="middle">
               {labels[key]}
-              <tspan x={x} dy="22" className="radar-label-score">
+              <tspan x={x} dy="24" className="radar-label-score">
                 {d.score ?? '尚未生成'}
               </tspan>
             </text>
           );
         })}
       </svg>
-      <p className="radar-caption">
-        六维全部计分；展示不足给低分，完全未体现可为0分。评分反映本场回答表现。
-      </p>
+      <p className="radar-caption">评分反映本场回答的展示情况</p>
       <div className="ability-chips">
         {entries.map(([key, d]) => (
           <div key={key}>
@@ -186,6 +199,7 @@ export function QuestionCoverage({
     follow_up_index: number;
     revision: number;
     answer_status: string;
+    text?: string;
   }[];
   evaluations: InterviewEvaluation[];
   scores?: QuestionScore[];
@@ -204,9 +218,9 @@ export function QuestionCoverage({
   ];
   return (
     <section className="panel question-coverage">
-      <h2>逐题得分</h2>
-      <p>0–100分；每题合并主问题与追问评价，点击查看得分依据。</p>
-      <div className="question-chart" role="group" aria-label="按题目查看分析详情">
+      <h2>逐题表现</h2>
+      <p className="question-score-caption">点击题目，查看分析与重练</p>
+      <div className="question-score-list" role="group" aria-label="按题目查看分析详情">
         {groups.map((turn) => {
           const evaluation = evaluations.find(
             (e) => e.turn_id === turn.id && e.revision === turn.revision,
@@ -218,7 +232,9 @@ export function QuestionCoverage({
             score !== undefined
               ? `${Math.round(score)} 分`
               : evaluation
-                ? '历史报告无单题分'
+                ? isQuestionScoringVersion(evaluation.question_scoring_version)
+                  ? '暂无能力评分'
+                  : '历史报告无单题分'
                 : turn.answer_status === 'answered'
                   ? failedIds.includes(turn.id)
                     ? '分析失败'
@@ -232,17 +248,23 @@ export function QuestionCoverage({
               onClick={() => onSelect(turn.id)}
               aria-label={`第 ${turn.main_question_index} 题${turn.follow_up_index ? `追问 ${turn.follow_up_index}` : ''}，${state}`}
             >
-              <span className="question-chart-track">
-                <span
-                  className={`question-chart-bar ${score !== undefined ? '' : 'unscored'}`}
-                  style={{ height: `${score ?? 0}%` }}
-                />
-                <strong>{state}</strong>
+              <span className="question-score-number">Q{turn.main_question_index}</span>
+              <span className="question-score-main">
+                <span className="question-score-question" title={turn.text}>
+                  {turn.text ?? `第 ${turn.main_question_index} 题`}
+                </span>
+                {score !== undefined ? (
+                  <meter
+                    min={0}
+                    max={100}
+                    value={score}
+                    aria-label={`第${turn.main_question_index}题 ${state}`}
+                  />
+                ) : (
+                  <span className="question-score-empty-track" />
+                )}
               </span>
-              <span>
-                第 {turn.main_question_index} 题
-                {turn.follow_up_index ? ` · 追问 ${turn.follow_up_index}` : ''}
-              </span>
+              <strong>{state}</strong>
             </button>
           );
         })}
@@ -253,7 +275,8 @@ export function QuestionCoverage({
 
 export function FeedbackScoreTable({ report }: { report: InterviewReport }) {
   const feedback = reportFeedback(report);
-  const total = { score: report.overall_score, coverage: 100 };
+  if (!feedback?.assessments.length) return null;
+  const total = { ...feedbackScore(feedback), score: report.overall_score };
   return (
     <section className="template-score-summary">
       <h3>五、评分汇总</h3>
@@ -270,17 +293,14 @@ export function FeedbackScoreTable({ report }: { report: InterviewReport }) {
           <tbody>
             {FEEDBACK_DIMENSIONS.map((d) => {
               const a = feedback?.assessments.find((a) => a.dimension === d.key);
+              if (!a) return null;
               return (
                 <tr key={d.key}>
                   <th scope="row">{d.label}</th>
                   <td>{d.weight}</td>
+                  <td>{`${Math.round(((a.score * d.weight) / 100) * 10) / 10} / ${d.weight}`}</td>
                   <td>
-                    {a?.score == null
-                      ? '尚未生成'
-                      : `${Math.round(((a.score * d.weight) / 100) * 10) / 10} / ${d.weight}`}
-                  </td>
-                  <td>
-                    {a?.text ?? '评分正在生成。'}
+                    {a.text}
                     {!!a?.evidence_refs.length && (
                       <details className="report-evidence">
                         <summary>查看评分依据</summary>
@@ -304,8 +324,8 @@ export function FeedbackScoreTable({ report }: { report: InterviewReport }) {
           : `综合参考分 ${total.score} / 100${total.coverage < 100 ? `（按已评价权重 ${total.coverage}/100 归一化）` : ''}`}
       </p>
       <p className="radar-caption">
-        维度分按百分制绘图，按 25 / 25 / 25 / 15 / 5 / 5 加权。每维均给分，完全未体现可为0分。AI
-        参考评分不代表招聘结论。
+        维度分按百分制绘图，按 25 / 25 / 25 / 15 / 5 / 5
+        加权。专业、业务、综合面保留六维；HR仅按已考察维度计分。AI 参考评分不代表招聘结论。
       </p>
     </section>
   );

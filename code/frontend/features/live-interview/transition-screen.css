@@ -1,0 +1,444 @@
+.interview-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  width: 100%;
+  min-height: 100vh;
+  height: 100dvh;
+  overflow: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  background: #fffcf7;
+  color: #303c6c;
+  isolation: isolate;
+  outline: none;
+}
+.interview-transition__wordmark {
+  position: absolute;
+  top: clamp(25px, 4.5vh, 46px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+.interview-transition__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: min(580px, calc(100% - 40px));
+  min-height: 100%;
+  padding: 108px 0 68px;
+  margin: auto;
+  text-align: center;
+}
+.interview-transition__illustration {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 340px;
+  max-width: 100%;
+  height: 294px;
+  flex: 0 0 auto;
+  margin-bottom: 30px;
+}
+.interview-transition__halo {
+  position: absolute;
+  inset: -20% -44%;
+  background:
+    radial-gradient(ellipse at 33% 49%, #ffd5bd63 0%, transparent 48%),
+    radial-gradient(ellipse at 74% 46%, #d1eee45e 0%, transparent 43%);
+  pointer-events: none;
+  animation: transition-halo 8s ease-in-out infinite alternate;
+}
+.interview-transition__float {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  animation: transition-float 5.2s ease-in-out infinite;
+}
+.interview-transition__orb {
+  position: relative;
+  z-index: 1;
+  width: 202px;
+  height: 207px;
+  overflow: hidden;
+  border: 1px solid #fff9ecc9;
+  border-radius: 44% 56% 49% 51% / 52% 43% 57% 48%;
+  background: radial-gradient(
+    ellipse at 32% 23%,
+    #fff0d8 0%,
+    #ffc5a0 41%,
+    #f7ad947a 76%,
+    #f8d8cf 100%
+  );
+  box-shadow:
+    inset 7px 5px 17px #fff9ea8c,
+    inset -9px -7px 22px #e7ac9461,
+    0 1px 1px #e6bdab26;
+  animation: transition-morph 7.6s ease-in-out infinite;
+}
+.interview-transition__surface {
+  position: absolute;
+  inset: -32%;
+  border-radius: 47%;
+  background: conic-gradient(
+    from 35deg,
+    #ffe9d100,
+    #fff7dc82 16%,
+    #fff5efdd 24%,
+    #ffd9d43b 33%,
+    #f3b7b177 44%,
+    #fff5e345 58%,
+    #dbf3e32b 66%,
+    #fff7e782 79%,
+    #ffd4af00 90%
+  );
+  animation: transition-surface 11s linear infinite;
+}
+.interview-transition__sheen {
+  position: absolute;
+  inset: 5% 8% 10% 5%;
+  border: 1px solid #fff6eab5;
+  border-left-width: 3px;
+  border-radius: 52% 48% 43% 57% / 46% 58% 42% 54%;
+  box-shadow:
+    inset 10px 11px 21px #fff9ee67,
+    inset -3px -2px 10px #fff9ed61;
+  animation: transition-sheen 6.4s ease-in-out infinite;
+}
+.interview-transition__belt {
+  position: absolute;
+  left: 22px;
+  top: 104px;
+  width: 298px;
+  height: 80px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  transform: rotate(-28deg);
+  animation: transition-belt 6.8s ease-in-out infinite;
+}
+.interview-transition__belt--back {
+  z-index: 0;
+  border-top-color: #d6f2e5b3;
+  border-right-color: #d6f2e573;
+}
+.interview-transition__belt--front {
+  z-index: 2;
+  border-bottom-color: #edfff0de;
+  border-left-color: #e1f7e8c4;
+  box-shadow: 0 2px 0 -1px #d9f4e691;
+}
+.interview-transition__shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  width: 112px;
+  height: 13px;
+  margin-left: -56px;
+  border-radius: 50%;
+  background: #e5b49339;
+  filter: blur(7px);
+  animation: transition-shadow 5.2s ease-in-out infinite;
+}
+.interview-transition__dot {
+  position: absolute;
+  z-index: 3;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fffdf5;
+  box-shadow: 0 0 9px #ffffff9c;
+}
+.interview-transition__dot--one {
+  left: 47px;
+  top: 120px;
+  animation: transition-drift-one 5.8s ease-in-out infinite;
+}
+.interview-transition__dot--two {
+  right: 68px;
+  top: 37px;
+  width: 6px;
+  height: 6px;
+  animation: transition-drift-two 7s ease-in-out infinite;
+}
+.interview-transition__dot--three {
+  right: 48px;
+  bottom: 53px;
+  width: 8px;
+  height: 8px;
+  animation: transition-drift-three 6.2s ease-in-out infinite;
+}
+.interview-transition h1 {
+  margin: 0;
+  font-size: clamp(29px, 4.3vw, 42px);
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.interview-transition__status {
+  max-width: 100%;
+  margin: 12px 0 0;
+  color: #737789;
+  font-size: 15px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.interview-transition__status--error {
+  color: #995f50;
+}
+.interview-transition__context {
+  display: inline-block;
+  max-width: 100%;
+  margin: 21px 0 0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #f4f1e967;
+  color: #8a8782;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.interview-transition__track {
+  position: relative;
+  width: min(280px, 80%);
+  height: 5px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  margin-top: 27px;
+  border-radius: 20px;
+  background: #eee5da8a;
+}
+.interview-transition__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #f49c77, #ffc69c);
+  transition: width 0.5s ease;
+}
+.interview-transition__shimmer {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 30%;
+  background: linear-gradient(100deg, transparent, #fffdf599, transparent);
+  animation: transition-shimmer 2.4s ease-in-out infinite;
+}
+.interview-transition__actions,
+.interview-transition__actions .transition-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.interview-transition__actions {
+  max-width: 100%;
+  margin-top: 24px;
+}
+.interview-transition__actions :is(button, a) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 13px;
+  border: 0;
+  border-radius: 11px;
+  color: #777c8b;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-decoration: none;
+}
+.interview-transition__actions :is(button, a):hover:not(:disabled) {
+  color: #303c6c;
+  background: #f2eee55c;
+}
+.interview-transition--error .interview-transition__actions button:first-child {
+  background: #f4976c;
+  color: #303c6c;
+  font-weight: 600;
+}
+.interview-transition--error .interview-transition__halo {
+  opacity: 0.65;
+}
+.interview-transition--error .interview-transition__orb {
+  animation-duration: 10s;
+}
+.interview-transition--error .interview-transition__float {
+  animation-duration: 7s;
+}
+@keyframes transition-morph {
+  0%,
+  100% {
+    border-radius: 44% 56% 49% 51% / 52% 43% 57% 48%;
+    transform: rotate(-5deg);
+  }
+  25% {
+    border-radius: 55% 45% 42% 58% / 45% 54% 46% 55%;
+  }
+  50% {
+    border-radius: 48% 52% 59% 41% / 58% 48% 52% 42%;
+    transform: rotate(9deg);
+  }
+  75% {
+    border-radius: 57% 43% 47% 53% / 47% 42% 58% 53%;
+  }
+}
+@keyframes transition-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+@keyframes transition-surface {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes transition-sheen {
+  0%,
+  100% {
+    transform: rotate(-14deg) scale(1);
+    border-radius: 52% 48% 43% 57% / 46% 58% 42% 54%;
+  }
+  50% {
+    transform: rotate(19deg) scale(0.92);
+    border-radius: 43% 57% 56% 44% / 57% 42% 58% 43%;
+  }
+}
+@keyframes transition-belt {
+  0%,
+  100% {
+    transform: rotate(-28deg) scale(1);
+  }
+  50% {
+    transform: rotate(-17deg) scale(1.05);
+  }
+}
+@keyframes transition-halo {
+  from {
+    transform: scale(0.92);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+@keyframes transition-shadow {
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scaleX(0.72);
+    opacity: 0.45;
+  }
+}
+@keyframes transition-drift-one {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-11px, 12px);
+  }
+}
+@keyframes transition-drift-two {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(15px, -9px);
+  }
+}
+@keyframes transition-drift-three {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(8px, -16px);
+  }
+}
+@keyframes transition-shimmer {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(440%);
+  }
+}
+@media (max-width: 560px) {
+  .interview-transition__content {
+    padding: 96px 0 42px;
+  }
+  .interview-transition__illustration {
+    width: 300px;
+    height: 264px;
+    margin-bottom: 23px;
+    transform: scale(0.9);
+  }
+  .interview-transition__belt {
+    left: 3px;
+  }
+  .interview-transition__status {
+    font-size: 14px;
+  }
+  .interview-transition__context {
+    margin-top: 17px;
+  }
+  .interview-transition__track {
+    margin-top: 22px;
+  }
+}
+@media (max-height: 700px) {
+  .interview-transition__content {
+    padding-top: 84px;
+    padding-bottom: 25px;
+  }
+  .interview-transition__illustration {
+    width: 300px;
+    height: 232px;
+    margin-bottom: 10px;
+    transform: scale(0.82);
+  }
+  .interview-transition__belt {
+    top: 74px;
+    left: 3px;
+  }
+  .interview-transition__context {
+    margin-top: 13px;
+  }
+  .interview-transition__track {
+    margin-top: 21px;
+  }
+  .interview-transition__actions {
+    margin-top: 17px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .interview-transition *,
+  .interview-transition *::before,
+  .interview-transition *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .interview-transition__shimmer {
+    display: none;
+  }
+}
