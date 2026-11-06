@@ -52,7 +52,7 @@ function fixture() {
     career_stage: 'internship',
     interview_type: 'project_deep_dive',
     difficulty: '基础',
-    duration_minutes: 5,
+    duration_minutes: 10,
     interviewer_style: '标准',
     interaction_mode: 'text_fallback',
   });
@@ -282,8 +282,9 @@ test('summary uses the shared model adapter with checked evaluations and records
     },
   );
   assert.equal(
-    (logs.find((e) => 'invocation_id' in e) as unknown as { prompt_version: string }).prompt_version,
-    'text-review-v11',
+    (logs.find((e) => 'invocation_id' in e) as unknown as { prompt_version: string })
+      .prompt_version,
+    'text-review-v12',
   );
 });
 

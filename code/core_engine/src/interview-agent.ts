@@ -53,6 +53,8 @@ export type InterviewReplyAct =
   | 'decline_topic'
   | 'dont_know';
 export type InterviewTopic =
+  | 'availability'
+  | 'expectations'
   | 'personal_background'
   | 'motivation'
   | 'project'
@@ -73,6 +75,7 @@ export interface InterviewConversationState {
   boundaries: InterviewTopicBoundary[];
 }
 export interface InterviewMemory {
+  decision?: { reason: string; action: string };
   conversation?: InterviewConversationState;
   experience?: InterviewExperienceGrounding;
   version: number;

@@ -10,9 +10,12 @@ import {
   aggregateIndicatorScores,
   feedbackScore,
   QUESTION_SCORING_VERSION,
+  HR_SCORING_VERSION,
+  isQuestionScoringVersion,
   questionScores,
   aggregateQuestionAssessments,
   weightedQuestionScore,
+  weightedObservedScore,
 } from '@interviewlab/core';
 import { inputDigest } from '../../foundation/idempotency';
 import { REPORT_PROMPT_VERSION, REPORT_SCHEMA_VERSION, SCORING_RUBRIC_VERSION } from './analysis';
@@ -230,15 +233,40 @@ export function aggregateReport(
     report.overall_score = feedbackScore(report.summary.feedback_template).score;
     report.scoring_status = 'experimental';
   }
-  if (values.some((e) => e.question_scoring_version === QUESTION_SCORING_VERSION)) {
-    report.question_scoring_version = QUESTION_SCORING_VERSION;
+  if (values.some((e) => isQuestionScoringVersion(e.question_scoring_version))) {
+    report.question_scoring_version = values.some(
+      (e) => e.question_scoring_version === HR_SCORING_VERSION,
+    )
+      ? HR_SCORING_VERSION
+      : QUESTION_SCORING_VERSION;
     report.question_scores = questionScores(state.view.turns, values);
     const assessments = aggregateQuestionAssessments(report.question_scores);
-    report.feedback_assessments = assessments.length ? assessments : undefined;
+    report.feedback_assessments = assessments;
     const groupCount = new Set(answered.map((t) => t.main_question_index)).size;
+    const hr = report.question_scoring_version === HR_SCORING_VERSION;
+    const completedGroups = new Set(
+      answered
+        .filter(
+          (t) =>
+            !answered.some(
+              (other) =>
+                other.main_question_index === t.main_question_index &&
+                other.follow_up_index > t.follow_up_index,
+            ),
+        )
+        .filter((t) =>
+          values.some(
+            (e) =>
+              e.turn_id === t.id &&
+              e.revision === t.revision &&
+              isQuestionScoringVersion(e.question_scoring_version),
+          ),
+        )
+        .map((t) => t.main_question_index),
+    ).size;
     report.overall_score =
-      report.question_scores.length === groupCount && groupCount > 0
-        ? Math.round(weightedQuestionScore(assessments))
+      completedGroups === groupCount && report.question_scores.length
+        ? Math.round(hr ? weightedObservedScore(assessments)! : weightedQuestionScore(assessments))
         : null;
     report.scoring_status = assessments.length ? 'experimental' : 'uncalibrated';
     if (report.summary && assessments.length)

@@ -21,6 +21,7 @@ import {
   type InterviewState,
 } from './repository';
 import { materialFields, type WorkflowModels } from './workflow-models';
+import { interviewPolicy } from '@interviewlab/core';
 import { COMPETENCIES, PROFILE_GOALS } from '../knowledge/catalog';
 
 export const preparationDigest = (state: InterviewState) =>
@@ -105,13 +106,14 @@ export function createInterviewPreparation(
       if (ref && !material) throw new ServiceError('not_found', 404, '已选简历不可用');
       snapshot = {
         runtime_version: 'graph-v1',
+        interview_type: before.view.configuration.interview_type,
         job_title:
           (await import('../../content/index')).getJob(before.view.configuration.job)?.title ??
           before.view.configuration.job,
         personal_material: material,
         knowledge: await knowledge.read(before.view.configuration),
         model: config.LLM_MODEL,
-        prompt_version: 'interview-graph-v1',
+        prompt_version: 'interview-policy-v2',
         rubric_version: 'evidence-uncalibrated-v1',
       };
     }
@@ -136,6 +138,7 @@ export function createInterviewPreparation(
         if (body.mode === 'fallback') {
           state.snapshot.resume_analysis = simpleResume(state.snapshot.personal_material);
           state.snapshot.preparation_plan = {
+            policy: interviewPolicy(state.view.configuration),
             goals: PROFILE_GOALS[state.view.configuration.interview_type].map((goal) => ({
               goal,
               focus: COMPETENCIES.find((g) => g.id === goal)!.evidence_wanted,

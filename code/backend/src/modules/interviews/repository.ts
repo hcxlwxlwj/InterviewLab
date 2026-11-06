@@ -12,7 +12,7 @@ import type {
 import { ServiceError } from '../../foundation/errors';
 import type { interviews, interviewTurns } from './schema';
 import { participationPolicy } from './participation';
-import { INTERVIEW_V3 } from '@interviewlab/core';
+import { INTERVIEW_V3, interviewDeadline } from '@interviewlab/core';
 
 export type Executor = Pick<PoolClient, 'query'>;
 export interface InterviewState {
@@ -71,7 +71,9 @@ export async function loadInterview(
       target_at: started
         ? new Date(Date.parse(started) + row.configuration.duration_minutes * 60000).toISOString()
         : null,
-      deadline_at: started ? new Date(Date.parse(started) + 720000).toISOString() : null,
+      deadline_at: started
+        ? new Date(interviewDeadline(started, row.configuration.duration_minutes)).toISOString()
+        : null,
       parent_interview_id: row.parent_interview_id,
       parent_turn_id: row.parent_turn_id,
       parent_revision: row.parent_revision,
@@ -92,7 +94,9 @@ export async function loadInterview(
     },
   };
   state.view.participation =
-    (row.snapshot?.prompt_version === INTERVIEW_V3 || row.snapshot?.runtime_version === 'graph-v1') ? participationPolicy(state.view) : null;
+    row.snapshot?.prompt_version === INTERVIEW_V3 || row.snapshot?.runtime_version === 'graph-v1'
+      ? participationPolicy(state.view)
+      : null;
   return state;
 }
 export async function saveInterview(executor: Executor, state: InterviewState) {

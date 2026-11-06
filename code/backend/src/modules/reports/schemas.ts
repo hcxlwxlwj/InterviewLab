@@ -21,7 +21,7 @@ export const reportSchema = z.object({
   advice_status: z.enum(['pending', 'ready', 'failed']).optional(),
   next_steps: z.array(z.string()).optional(),
   question_scoring_version: z.string().optional(),
-  feedback_assessments: z.array(feedbackAssessment).length(6).optional(),
+  feedback_assessments: z.array(feedbackAssessment).max(6).optional(),
   question_scores: z
     .array(
       z.object({
@@ -29,7 +29,7 @@ export const reportSchema = z.object({
         main_question_index: z.number().int(),
         turn_ids: z.array(z.string()),
         score: z.number().min(0).max(100),
-        assessments: z.array(feedbackAssessment).length(6),
+        assessments: z.array(feedbackAssessment).max(6),
       }),
     )
     .optional(),
@@ -71,7 +71,7 @@ export const reportSchema = z.object({
   }),
   evaluations: z.array(
     z.object({
-      feedback_assessments: z.array(feedbackAssessment).length(6).optional(),
+      feedback_assessments: z.array(feedbackAssessment).max(6).optional(),
       question_scoring_version: z.string().optional(),
       next_steps: z.array(z.string()).optional(),
       advice_status: z.enum(['ready', 'failed']).optional(),

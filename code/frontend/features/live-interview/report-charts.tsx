@@ -2,6 +2,8 @@
 
 import {
   reportFeedback,
+  feedbackScore,
+  HR_SCORING_VERSION,
   type QuestionScore,
   FEEDBACK_DIMENSIONS,
   type InterviewReport,
@@ -85,7 +87,20 @@ export function AbilityRadar({
     }),
   );
   const labels = Object.fromEntries(FEEDBACK_DIMENSIONS.map((d) => [d.key, d.short]));
-  const entries = Object.entries(dimensions);
+  const entries = Object.entries(dimensions).filter(([, d]) => d.score !== null);
+  if (!entries.length) return <p className="radar-pending">本场暂无已考察的能力维度。</p>;
+  if (entries.length < 3)
+    return (
+      <div className="ability-chips" role="img" aria-label="已考察维度评分条形图">
+        {entries.map(([key, d]) => (
+          <div key={key}>
+            <span>{labels[key]}</span>
+            <meter min={0} max={100} value={d.score!} aria-label={labels[key]} />
+            <strong>{Math.round(d.score!)} / 100</strong>
+          </div>
+        ))}
+      </div>
+    );
   const point = (index: number, radius: number) => {
     const angle = (index * Math.PI * 2) / entries.length - Math.PI / 2;
     return [260 + Math.cos(angle) * radius, 190 + Math.sin(angle) * radius];
@@ -157,9 +172,7 @@ export function AbilityRadar({
           );
         })}
       </svg>
-      <p className="radar-caption">
-        六维全部计分；展示不足给低分，完全未体现可为0分。评分反映本场回答表现。
-      </p>
+      <p className="radar-caption">图中仅展示已考察维度。评分反映本场回答表现，未考察不补零。</p>
       <div className="ability-chips">
         {entries.map(([key, d]) => (
           <div key={key}>
@@ -218,7 +231,9 @@ export function QuestionCoverage({
             score !== undefined
               ? `${Math.round(score)} 分`
               : evaluation
-                ? '历史报告无单题分'
+                ? evaluation.question_scoring_version === HR_SCORING_VERSION
+                  ? '本题未考察能力'
+                  : '历史报告无单题分'
                 : turn.answer_status === 'answered'
                   ? failedIds.includes(turn.id)
                     ? '分析失败'
@@ -253,7 +268,7 @@ export function QuestionCoverage({
 
 export function FeedbackScoreTable({ report }: { report: InterviewReport }) {
   const feedback = reportFeedback(report);
-  const total = { score: report.overall_score, coverage: 100 };
+  const total = { ...feedbackScore(feedback), score: report.overall_score };
   return (
     <section className="template-score-summary">
       <h3>五、评分汇总</h3>
@@ -276,11 +291,16 @@ export function FeedbackScoreTable({ report }: { report: InterviewReport }) {
                   <td>{d.weight}</td>
                   <td>
                     {a?.score == null
-                      ? '尚未生成'
+                      ? report.question_scoring_version === HR_SCORING_VERSION
+                        ? '未考察'
+                        : '尚未生成'
                       : `${Math.round(((a.score * d.weight) / 100) * 10) / 10} / ${d.weight}`}
                   </td>
                   <td>
-                    {a?.text ?? '评分正在生成。'}
+                    {a?.text ??
+                      (report.question_scoring_version === HR_SCORING_VERSION
+                        ? '本场未考察，不计入总分。'
+                        : '评分正在生成。')}
                     {!!a?.evidence_refs.length && (
                       <details className="report-evidence">
                         <summary>查看评分依据</summary>
@@ -304,8 +324,8 @@ export function FeedbackScoreTable({ report }: { report: InterviewReport }) {
           : `综合参考分 ${total.score} / 100${total.coverage < 100 ? `（按已评价权重 ${total.coverage}/100 归一化）` : ''}`}
       </p>
       <p className="radar-caption">
-        维度分按百分制绘图，按 25 / 25 / 25 / 15 / 5 / 5 加权。每维均给分，完全未体现可为0分。AI
-        参考评分不代表招聘结论。
+        维度分按百分制绘图，按 25 / 25 / 25 / 15 / 5 / 5
+        加权。专业、业务、综合面保留六维；HR仅按已考察维度计分。AI 参考评分不代表招聘结论。
       </p>
     </section>
   );

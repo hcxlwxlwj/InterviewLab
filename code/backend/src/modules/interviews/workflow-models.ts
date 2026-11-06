@@ -11,10 +11,11 @@ import type { BackendConfig } from '../../foundation/config';
 import { ServiceError } from '../../foundation/errors';
 import { langChainFetch } from './model';
 import { checkedGraph } from './graph';
+import { interviewPolicy } from '@interviewlab/core';
 import { PROFILE_GOALS } from '../knowledge/catalog';
 
 export const RESUME_ANALYSIS_VERSION = 'resume-evidence-v2';
-export const PREPARATION_VERSION = 'interview-preparation-v1';
+export const PREPARATION_VERSION = 'interview-preparation-v2';
 const fact = z
   .object({
     kind: z.enum(['experience', 'skill', 'role', 'action', 'result']),
@@ -234,6 +235,7 @@ export function createWorkflowModels(
         {
           prepare: (input) => ({
             configuration: input.configuration,
+            policy: interviewPolicy(input.configuration),
             goals,
             job_context: input.knowledge.questions
               .slice(0, 8)
@@ -244,15 +246,31 @@ export function createWorkflowModels(
             call(
               schema,
               input,
-              '生成本场观察目标，不生成固定题单或答案。focus说明要了解什么，不声称候选人已具备能力。evidence_indices仅引用resume.facts；没有简历则为空。按类型区分技术、项目、业务、HR。',
+              '按policy的类型、招聘阶段、时长和主题优先级生成观察目标，不生成固定题单或答案。HR安排求职动机与到岗、出勤、时长或地点、薪资期望，不追专业实现；专业与业务面结合相关项目的本人参与和心得，以各自考察方式覆盖六维。focus说明要了解什么，不声称候选人具备能力。evidence_indices仅引用resume.facts；没有简历则为空。',
               signal,
               repair,
               model,
             ),
           validate: (raw) => {
             const parsed = schema.parse(raw);
+            const policy = interviewPolicy(configuration);
+            if (configuration.interview_type === 'hr') {
+              for (const goal of ['motivation', 'availability', 'expectations'])
+                if (!parsed.goals.some((g) => g.goal === goal))
+                  parsed.goals.unshift({
+                    goal,
+                    focus: policy.themes.find((t) => t.goal === goal)!.purpose,
+                    evidence_indices: [],
+                  });
+              parsed.goals.sort(
+                (a, b) =>
+                  policy.themes.findIndex((t) => t.goal === a.goal) -
+                  policy.themes.findIndex((t) => t.goal === b.goal),
+              );
+            }
             return {
-              goals: parsed.goals.map((g) => ({
+              policy,
+              goals: parsed.goals.slice(0, 6).map((g) => ({
                 goal: g.goal,
                 focus: g.focus,
                 material_refs: g.evidence_indices.map((i) => {

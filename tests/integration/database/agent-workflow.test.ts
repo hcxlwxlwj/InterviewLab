@@ -34,9 +34,9 @@ const identity = { owner_id: 'workflow-synthetic-owner', roles: [] };
 const configuration: InterviewConfig = {
   job: 'backend',
   career_stage: 'internship',
-  interview_type: 'project_deep_dive',
+  interview_type: 'business_scenario',
   difficulty: '基础',
-  duration_minutes: 5,
+  duration_minutes: 10,
   interviewer_style: '标准',
   interaction_mode: 'text_fallback',
 };
@@ -53,9 +53,13 @@ const materialInput = {
 };
 const runtimes: ReturnType<typeof createInterviewRuntime>[] = [];
 function runtime(overrides: Partial<WorkflowModels> = {}, runtimeConfig = config) {
-  const agent = createInterviewAgent(runtimeConfig, () => {}, async () => {
-    throw new Error('No generation needed in preparation tests');
-  });
+  const agent = createInterviewAgent(
+    runtimeConfig,
+    () => {},
+    async () => {
+      throw new Error('No generation needed in preparation tests');
+    },
+  );
   const models: WorkflowModels = {
     ...createWorkflowModels(runtimeConfig),
     analyze: async (m) => simpleResume(m)!,
@@ -374,17 +378,11 @@ test('deleting an interview during preparation prevents late publication', async
   );
 });
 
-test('every job family can create all five interview types in the graph runtime', async () => {
+test('every job family can create all four current interview types in the graph runtime', async () => {
   const rt = runtime();
   for (const family of new Set(JOBS.map((j) => j.category_id))) {
     const job = JOBS.find((j) => j.category_id === family)!;
-    for (const type of [
-      'technical_qa',
-      'project_deep_dive',
-      'business_scenario',
-      'hr',
-      'mixed',
-    ] as const) {
+    for (const type of ['technical_qa', 'business_scenario', 'hr', 'mixed'] as const) {
       const view = await rt.interviews.create(
         identity,
         { ...configuration, job: job.id, career_stage: job.stages[0], interview_type: type },

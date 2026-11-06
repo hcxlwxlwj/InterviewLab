@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import {
   FEEDBACK_DIMENSIONS,
-  QUESTION_SCORING_VERSION,
+  isQuestionScoringVersion,
   type FeedbackAssessment,
   type InterviewReport,
 } from '@interviewlab/core';
@@ -20,7 +20,7 @@ export function QuestionScorecard({
       <h3>
         本题得分 <strong>{Math.round(score)} / 100</strong>
       </h3>
-      <p>综合主问题与追问作答，六维按 25 / 25 / 25 / 15 / 5 / 5 加权。</p>
+      <p>综合主问题与追问作答，按已考察维度的既定权重计算；HR未考察项不计分。</p>
       <details>
         <summary>查看六维评分与依据</summary>
         <div className="template-score-table">
@@ -34,7 +34,8 @@ export function QuestionScorecard({
             </thead>
             <tbody>
               {FEEDBACK_DIMENSIONS.map((d) => {
-                const a = assessments.find((a) => a.dimension === d.key)!;
+                const a = assessments.find((a) => a.dimension === d.key);
+                if (!a) return null;
                 return (
                   <tr key={d.key}>
                     <th>{d.short}</th>
@@ -72,10 +73,14 @@ export function PracticeHistory({
   );
   const entries = [...new Map(filtered.map((e) => [e.interview_id, e])).values()];
   if (!entries.length) return null;
+  const referenceVersion =
+    entries.find((e) => e.interview_id === originalId)?.scoring_version ??
+    report.question_scoring_version;
   const points = entries.map((e) => ({
     ...e,
     value:
-      e.scoring_version !== QUESTION_SCORING_VERSION
+      !isQuestionScoringVersion(e.scoring_version ?? undefined) ||
+      e.scoring_version !== referenceVersion
         ? null
         : dimension === 'total'
           ? e.score
@@ -158,7 +163,9 @@ export function PracticeHistory({
             </Link>{' '}
             ·{' '}
             {e.value === null
-              ? e.scoring_version && e.scoring_version !== QUESTION_SCORING_VERSION
+              ? e.scoring_version &&
+                (!isQuestionScoringVersion(e.scoring_version ?? undefined) ||
+                  e.scoring_version !== referenceVersion)
                 ? '历史评分标准，不参与对比'
                 : e.status === 'failed'
                   ? '评分失败'

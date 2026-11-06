@@ -39,7 +39,7 @@ const configuration: InterviewConfig = {
   career_stage: 'internship',
   interview_type: 'technical_qa',
   difficulty: '基础',
-  duration_minutes: 5,
+  duration_minutes: 10,
   interviewer_style: '标准',
   interaction_mode: 'text_fallback',
 };
@@ -449,6 +449,30 @@ test('12-minute deadline seals paused sessions without a browser and zero-answer
     Object.values(report.dimensions).every((d) => d.status === 'not_observed' && d.score === null),
   );
 });
+for (const duration_minutes of [20, 30] as const)
+  test(`${duration_minutes}-minute interviews survive twelve minutes and seal only at their own deadline`, async () => {
+    let v = await started({ ...configuration, duration_minutes });
+    assert.equal(
+      Date.parse(v.deadline_at!) - Date.parse(v.started_at!),
+      (duration_minutes + 2) * 60000,
+    );
+    v = await runtime.interviews.pause(identity, v.id, { version: v.version }, randomUUID());
+    await database.pool.query(
+      "UPDATE interviews SET started_at=now()-interval '13 minutes' WHERE id=$1",
+      [v.id],
+    );
+    await runtime.maintain();
+    assert.equal((await runtime.interviews.read(identity, v.id)).status, 'paused');
+    await database.pool.query(
+      "UPDATE interviews SET started_at=now()-$2*interval '1 minute' WHERE id=$1",
+      [v.id, duration_minutes + 3],
+    );
+    await runtime.maintain();
+    v = await runtime.interviews.read(identity, v.id);
+    assert.equal(v.status, 'completed');
+    assert.equal(v.end_reason, 'hard_deadline');
+  });
+
 test('final draft is saved atomically on explicit finish, while an expired draft is excluded', async () => {
   let v = await started();
   v = await runtime.interviews.finish(
@@ -612,7 +636,7 @@ test('all interview types and empty knowledge can start without private material
       }),
     },
   });
-  for (const interview_type of ['technical_qa', 'project_deep_dive', 'hr', 'mixed'] as const) {
+  for (const interview_type of ['technical_qa', 'business_scenario', 'hr', 'mixed'] as const) {
     const v = await started({ ...configuration, interview_type });
     assert.equal(v.turns.length, 1);
     assert.equal(v.turns[0].stage, 'introduction');

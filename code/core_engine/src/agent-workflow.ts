@@ -15,6 +15,7 @@ export interface ResumeAnalysis {
   clarification_points: string[];
 }
 export interface InterviewPreparationPlan {
+  policy?: ReturnType<typeof import('./interview-policy').interviewPolicy>;
   goals: { goal: string; focus: string; material_refs: MaterialEvidence[] }[];
   limitations: string[];
 }

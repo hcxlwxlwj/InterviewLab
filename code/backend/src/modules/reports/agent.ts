@@ -28,6 +28,7 @@ export function createReportAgent(
       throw error;
     };
   const scoringSnapshot = (snapshot: InterviewSnapshot): InterviewSnapshot => ({
+    interview_type: snapshot.interview_type,
     job_title: snapshot.job_title,
     knowledge: snapshot.knowledge,
     prompt_version: snapshot.prompt_version,

@@ -45,7 +45,7 @@ test('retired interview snapshots never invoke a fallback model or rewrite the s
     career_stage: 'internship',
     interview_type: 'technical_qa',
     difficulty: '基础',
-    duration_minutes: 5,
+    duration_minutes: 10,
     interviewer_style: '标准',
     interaction_mode: 'text_fallback',
   });
@@ -153,7 +153,10 @@ test('all 1000 roles and 8000 original questions have applicable typed records, 
   for (const job of JOBS)
     for (const stage of job.stages) {
       const profiles = await knowledge.profiles({ job: job.id, career_stage: stage });
-      assert.equal(profiles.profiles.length, Object.keys(PROFILE_GOALS).length);
+      assert.equal(
+        profiles.profiles.length,
+        Object.keys(PROFILE_GOALS).filter((t) => t !== 'project_deep_dive').length,
+      );
       assert.ok(profiles.profiles.every((p) => p.goals.length));
     }
   await knowledge.close();
@@ -195,7 +198,7 @@ test('resume and preparation reject fabricated quotes and nonexistent evidence i
     career_stage: 'internship',
     interview_type: 'hr',
     difficulty: '基础',
-    duration_minutes: 5,
+    duration_minutes: 10,
     interviewer_style: '标准',
     interaction_mode: 'text_fallback',
   });
@@ -240,7 +243,7 @@ test('new non-frontend turns execute the graph and retain answer revision fencin
       career_stage: 'internship',
       interview_type: 'project_deep_dive',
       difficulty: '基础',
-      duration_minutes: 5,
+      duration_minutes: 10,
       interviewer_style: '标准',
       interaction_mode: mode,
     });

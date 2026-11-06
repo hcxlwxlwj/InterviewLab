@@ -157,8 +157,9 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
             name="duration"
             value={config.duration_minutes}
             options={[
-              { value: 5, label: '5 分钟' },
               { value: 10, label: '10 分钟' },
+              { value: 20, label: '20 分钟' },
+              { value: 30, label: '30 分钟' },
             ]}
             onChange={(v) => change('duration_minutes', v)}
             disabled={command.blocked}

@@ -17,6 +17,9 @@ import { Button } from '../../components/ui/button';
 import { useRouter } from 'next/navigation';
 import {
   FEEDBACK_DIMENSIONS,
+  HR_SCORING_VERSION,
+  feedbackScore,
+  reportFeedback,
   type InterviewReport,
   type InterviewEvidence,
   type InterviewFinding,
@@ -173,7 +176,9 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                 ? '本题评分生成中…'
                 : report.status === 'failed'
                   ? '本题评分失败，回答已保留。'
-                  : '历史练习没有本版六维评分。'}
+                  : report.question_scoring_version === HR_SCORING_VERSION
+                    ? '本题仅记录求职安排，未考察可评分的能力维度。'
+                    : '历史练习没有本版六维评分。'}
             </p>
           )}
           {report.status === 'failed' || report.analysis_progress?.failed ? (
@@ -260,7 +265,10 @@ function ReportBody({ id, practice = false }: { id: string; practice?: boolean }
                   查看记录
                 </Link>
               </Button>
-              <TotalScore score={report.overall_score} coverage={100} />
+              <TotalScore
+                score={report.overall_score}
+                coverage={feedbackScore(reportFeedback(report)).coverage}
+              />
             </div>
           </div>
           <div className="report-banner">

@@ -2,8 +2,8 @@ import type { InterviewEvidence, InterviewReportSummary } from './live-interview
 
 /** Source: 面试反馈模板.xlsx / 维度评分表 A2:F7. Percent scores are weighted in code. */
 export const FEEDBACK_TEMPLATE_VERSION = 'interview-feedback-v2';
-/** Six-dimensional scoring policy; every question has all six scores. */
-export const FEEDBACK_ANALYSIS_VERSION = 'text-review-v11';
+/** Non-HR uses six scores; HR records only dimensions actually examined. */
+export const FEEDBACK_ANALYSIS_VERSION = 'text-review-v12';
 export const FEEDBACK_DIMENSIONS = [
   {
     key: 'professional_foundation',
@@ -102,7 +102,7 @@ export function feedbackScore(feedback: InterviewReportSummary['feedback_templat
     return a ? [{ weight: d.weight, score: a.score }] : [];
   });
   const coverage = scored.reduce((sum, d) => sum + d.weight, 0);
-  // All six scores, including insufficient-evidence scores, contribute their full weight.
+  // Omitted HR dimensions carry no weight; recorded zero scores remain real scores.
   return {
     coverage,
     score:

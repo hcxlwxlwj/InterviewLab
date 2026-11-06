@@ -368,7 +368,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
             {v.retry_goal && <p className="notice">单题重练目标：{v.retry_goal}</p>}
             {targetReached && !terminal && (
               <p className="notice" role="status">
-                已到目标时长，请完成当前回答后收尾。12 分钟后会自动封存，暂停和断线仍计时。
+                已到目标时长，请完成当前回答后收尾。{Math.max(10, v.configuration.duration_minutes) + 2} 分钟后会自动封存，暂停和断线仍计时。
               </p>
             )}
           </>

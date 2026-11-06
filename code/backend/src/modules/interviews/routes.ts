@@ -60,7 +60,7 @@ export function interviewsModule(
         {
           schema: {
             tags: ['interviews'],
-            body: s.interviewConfigSchema,
+            body: s.newInterviewConfigSchema,
             headers: writeHeaders,
             response: { 201: s.interviewSchema, ...privateErrors },
           },
@@ -112,13 +112,21 @@ export function interviewsModule(
               request.body as B,
               request.headers['idempotency-key'] as string,
             );
-            return reply.code(result.generation_status === 'pending' || (path === '/prepare' && ['pending','waiting_material'].includes(result.preparation?.status ?? '')) ? 202 : 200).send(result);
+            return reply
+              .code(
+                result.generation_status === 'pending' ||
+                  (path === '/prepare' &&
+                    ['pending', 'waiting_material'].includes(result.preparation?.status ?? ''))
+                  ? 202
+                  : 200,
+              )
+              .send(result);
           },
         });
       }
       command(
         '',
-        s.versionBody.extend({ configuration: s.interviewConfigSchema }),
+        s.versionBody.extend({ configuration: s.newInterviewConfigSchema }),
         (...args) => ready().patch(...args),
         'patch',
       );
@@ -215,7 +223,15 @@ export function interviewsModule(
               request.body as B,
               request.headers['idempotency-key'] as string,
             );
-            return reply.code(result.generation_status === 'pending' || (path === '/prepare' && ['pending','waiting_material'].includes(result.preparation?.status ?? '')) ? 202 : 200).send(result);
+            return reply
+              .code(
+                result.generation_status === 'pending' ||
+                  (path === '/prepare' &&
+                    ['pending', 'waiting_material'].includes(result.preparation?.status ?? ''))
+                  ? 202
+                  : 200,
+              )
+              .send(result);
           },
         );
       }

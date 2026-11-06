@@ -88,7 +88,10 @@ async function main() {
       fetch,
       process.argv.includes('--debug') ? (e) => console.log(JSON.stringify(e)) : () => {},
     );
-  const graph = createInterviewAgent(config, process.argv.includes('--debug') ? (e) => console.log(JSON.stringify(e)) : () => {});
+  const graph = createInterviewAgent(
+    config,
+    process.argv.includes('--debug') ? (e) => console.log(JSON.stringify(e)) : () => {},
+  );
   const cases = Object.entries(scenarios)
     .flatMap(([family, scenario]) => [0, 1].map((variant) => ({ family, scenario, variant })))
     .filter(
@@ -135,7 +138,7 @@ async function main() {
           ? 'mixed'
           : item.family === 'product'
             ? 'business_scenario'
-            : 'project_deep_dive',
+            : 'technical_qa',
         difficulty: '基础',
         duration_minutes: 10,
         interviewer_style: '标准',
@@ -170,7 +173,8 @@ async function main() {
             model: config.LLM_MODEL,
             job_title: job.title,
             knowledge: k,
-            prompt_version: 'interview-graph-v1',
+            prompt_version: 'interview-policy-v2',
+            interview_type: state.view.configuration.interview_type,
             rubric_version: 'evidence-uncalibrated-v1',
             runtime_version: 'graph-v1',
             resume_analysis: analysis,

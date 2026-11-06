@@ -1,6 +1,8 @@
 import {
   FEEDBACK_DIMENSIONS,
   reportFeedback,
+  feedbackScore,
+  HR_SCORING_VERSION,
   REPORT_INDICATORS,
   REPORT_RUBRIC,
   FRONTEND_RUBRIC_VERSION,
@@ -28,15 +30,15 @@ export function reportExportHtml(interview: Interview, report: InterviewReport):
   const progress = report.analysis_progress;
   const summary = report.summary;
   const feedback = reportFeedback(report);
-  const templateTotal = { score: report.overall_score, coverage: 100 };
+  const templateTotal = { ...feedbackScore(feedback), score: report.overall_score };
   const templateHtml = `<h2>五、评分汇总</h2><table><thead><tr><th>评价维度</th><th>权重</th><th>得分</th><th>具体行为依据</th></tr></thead><tbody>${FEEDBACK_DIMENSIONS.map(
     (d) => {
       const a = feedback?.assessments.find((a) => a.dimension === d.key);
-      return `<tr><td>${escape(d.label)}</td><td>${d.weight}</td><td>${a?.score == null ? '尚未生成' : `${Math.round(((a.score * d.weight) / 100) * 10) / 10} / ${d.weight}`}</td><td>${escape(a?.text ?? '评分尚未生成')}${a?.evidence_refs.map((r) => `<blockquote>回答 v${r.revision}：“${escape(r.quote)}”</blockquote>`).join('') ?? ''}</td></tr>`;
+      return `<tr><td>${escape(d.label)}</td><td>${d.weight}</td><td>${a?.score == null ? (report.question_scoring_version === HR_SCORING_VERSION ? '未考察' : '尚未生成') : `${Math.round(((a.score * d.weight) / 100) * 10) / 10} / ${d.weight}`}</td><td>${escape(a?.text ?? '评分尚未生成')}${a?.evidence_refs.map((r) => `<blockquote>回答 v${r.revision}：“${escape(r.quote)}”</blockquote>`).join('') ?? ''}</td></tr>`;
     },
   ).join(
     '',
-  )}</tbody></table><p>综合分：${templateTotal.score === null ? `暂不计算（已评价权重 ${templateTotal.coverage}/100）` : `${templateTotal.score}/100（已评价权重 ${templateTotal.coverage}/100，按六维权重加权）`}。六维全部计分，完全未体现可为0分。</p>`;
+  )}</tbody></table><p>综合分：${templateTotal.score === null ? `暂不计算（已评价权重 ${templateTotal.coverage}/100）` : `${templateTotal.score}/100（已评价权重 ${templateTotal.coverage}/100，按六维权重加权）`}。专业、业务、综合面六维计分；HR仅计算已考察维度，未考察不补零。</p>`;
 
   return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>${escape(interview.job_title)} · 面试复盘报告</title><style>
   @page { size: A4; margin: 18mm; }
