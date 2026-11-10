@@ -7,7 +7,7 @@ import type {
   InterviewRetrieval,
   KnowledgeChunk,
 } from '@interviewlab/core';
-import { getJob } from '../../content/index';
+import { getJob, teacherAgentQuestions } from '../../content/index';
 import type { BackendConfig } from '../../foundation/config';
 import { ServiceError } from '../../foundation/errors';
 import { structuredInterviewKnowledge } from '../interviews/knowledge';
@@ -72,7 +72,12 @@ export function createAllRoleKnowledge(config: BackendConfig): InterviewKnowledg
       sources: (id && active?.sources ? active.sources : catalogSources).filter(
         (s) =>
           base.sources.some((b) => b.id === s.id) ||
-          s.id.startsWith(`foundation-${getJob(c.job)?.category_id}-`),
+          s.id.startsWith(`foundation-${getJob(c.job)?.category_id}-`) ||
+          (id &&
+            c.career_stage === 'campus' &&
+            teacherAgentQuestions.some(
+              (set) => set.source.id === s.id && set.job === getJob(c.job)?.id,
+            )),
       ),
       missing_reason: id
         ? '岗位与原创问题已索引；专业摘要覆盖有限，非专家校准标准。'

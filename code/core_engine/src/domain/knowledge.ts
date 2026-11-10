@@ -5,7 +5,7 @@ export interface ContentSource {
   title: string;
   url: string;
   publisher: string;
-  kind: 'recruitment' | 'official_documentation';
+  kind: 'recruitment' | 'official_documentation' | 'course_feedback';
   usage: 'reference_only';
   verification: 'page_read' | 'search_index';
   acquired_at: string;

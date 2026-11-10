@@ -1,6 +1,30 @@
 import { CONTENT_SOURCES, JOBS, getJob, localKnowledgeRetriever, searchJobs } from '@interviewlab/backend/content';
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { buildCatalog, catalogManifest, catalogSources } from '../../code/backend/src/modules/knowledge/catalog';
+
+test('teacher questions are indexed for their matching campus roles with resolvable sources', () => {
+  const documents = buildCatalog();
+  const teacher = documents.filter((doc) => doc.id.startsWith('teacher-issue-'));
+  assert.equal(teacher.length, 98);
+  assert.equal(new Set(teacher.map((doc) => doc.id)).size, teacher.length);
+  assert.equal(catalogManifest(documents).questions, 8098);
+  const roles = new Map([
+    ['teacher-issue-12', 'agent-platform'],
+    ['teacher-issue-13', 'llm-app'],
+    ['teacher-issue-14', 'ai-agent-product'],
+    ['teacher-issue-15', 'llm-training'],
+  ]);
+  for (const doc of teacher) {
+    const [source] = doc.source_refs;
+    assert.equal(doc.kind, 'question');
+    assert.ok(catalogSources.some((entry) => entry.id === source && entry.kind === 'course_feedback'));
+    assert.equal(doc.bindings.length, 1);
+    assert.equal(doc.bindings[0].job, roles.get(source));
+    assert.deepEqual(doc.bindings[0].stages, ['campus']);
+    assert.ok(doc.bindings[0].types.includes('mixed'));
+  }
+});
 
 test('the current catalog publishes 1000 versioned roles and 8000 source-linked original questions', () => {
   assert.equal(JOBS.length,1000);

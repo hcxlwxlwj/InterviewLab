@@ -13,6 +13,7 @@ import {
   getJob,
   templateJd,
   frontendReportReference,
+  teacherAgentQuestions,
 } from '../../content/index';
 import { ServiceError } from '../../foundation/errors';
 import { professionalFoundations as professional } from '../../content/index';
@@ -153,6 +154,40 @@ export function buildCatalog(): CatalogDocument[] {
         ],
       });
   }
+  for (const { job, source, questions } of teacherAgentQuestions) {
+    if (!getJob(job)?.stages.includes('campus'))
+      throw new Error(`Teacher question set targets an unavailable campus role: ${job}`);
+    for (const q of questions) {
+      const experience = q.number.startsWith('A');
+      const scenario =
+        (source.id === 'teacher-issue-12' && q.number.startsWith('C')) ||
+        (source.id === 'teacher-issue-14' && /^[C-F]/.test(q.number));
+      documents.push({
+        id: `${source.id}-${q.number.toLowerCase()}-v1`,
+        kind: 'question',
+        evidence_level: 'source_summary',
+        source_refs: [source.id],
+        text: `${q.topic}（${q.difficulty}）\n题目：${q.text}${
+          q.notes ? `\n面试官参考（用于追问，不向候选人提示）：\n${q.notes}` : ''
+        }`,
+        bindings: [
+          {
+            job,
+            stages: ['campus'],
+            types: [
+              experience ? 'project_deep_dive' : scenario ? 'business_scenario' : 'technical_qa',
+              'mixed',
+            ],
+            goals: experience
+              ? ['contribution', 'motivation', 'verification']
+              : scenario
+                ? ['business', 'tradeoffs', 'verification']
+                : ['understanding', 'tradeoffs', 'verification'],
+          },
+        ],
+      });
+    }
+  }
   for (const card of professional)
     documents.push({
       id: card.id,
@@ -215,7 +250,7 @@ export function catalogManifest(documents = buildCatalog()) {
   return {
     format: CATALOG_FORMAT,
     jobs: JOBS.length,
-    questions: JOBS.reduce((n, j) => n + j.questions.length, 0),
+    questions: documents.filter((doc) => doc.kind === 'question').length,
     families: [...new Set(JOBS.map((j) => j.category_id))],
     documents: documents.length,
     tokenizer: TOKENIZER_VERSION,
@@ -248,4 +283,13 @@ export const professionalSources = professional.map((c) => ({
   reviewed_at: '2026-11-04',
   notes: '官方资料的团队摘要；页面核对不等于专家审核或完整岗位覆盖。',
 }));
-export const catalogSources = [...CONTENT_SOURCES, ...professionalSources];
+const teacherSources = teacherAgentQuestions.map(({ source }) => ({
+  ...source,
+  kind: 'course_feedback' as const,
+  usage: 'reference_only' as const,
+  verification: 'page_read' as const,
+  acquired_at: '2026-11-10',
+  reviewed_at: '2026-11-10',
+  notes: '课程反馈中的模拟题与追问参考，未作为统一评分标准校准。',
+}));
+export const catalogSources = [...CONTENT_SOURCES, ...professionalSources, ...teacherSources];

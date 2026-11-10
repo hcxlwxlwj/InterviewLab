@@ -14,7 +14,7 @@ const sourceSchema = z.object({
   title: z.string(),
   url: z.string(),
   publisher: z.string(),
-  kind: z.enum(['recruitment', 'official_documentation']),
+  kind: z.enum(['recruitment', 'official_documentation', 'course_feedback']),
   usage: z.literal('reference_only'),
   verification: z.enum(['page_read', 'search_index']),
   acquired_at: z.string(),

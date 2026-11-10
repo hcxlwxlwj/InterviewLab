@@ -116,7 +116,7 @@ test('all 1000 roles and 8000 original questions have applicable typed records, 
   );
   assert.ok(catalogTerms('数仓 数据约束 机器人 可用性 state effect').includes('state'));
   assert.ok(!catalogTerms('state effect').includes('副作用'));
-  assert.equal(manifest.questions, 8000);
+  assert.equal(manifest.questions, 8098);
   assert.equal(manifest.families.length, 9);
   assert.ok(manifest.coverage.every((c) => c.professional_cards >= 1));
   for (const job of JOBS) {
