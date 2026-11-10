@@ -118,10 +118,11 @@ test('business work judgement can retrieve professional foundations without inhe
     );
     assert.ok(professional.every((d) => d.bindings.every((b) => !b.types.includes('hr'))));
   }
-  assert.equal(documents.filter((d) => d.kind === 'question').length, 8000);
+  const originalQuestions = documents.filter(
+    (d) => d.kind === 'question' && d.evidence_level === 'platform_authored',
+  );
+  assert.equal(originalQuestions.length, 8000);
   assert.ok(
-    documents
-      .filter((d) => d.kind === 'question')
-      .every((d) => d.bindings.every((b) => !b.types.includes('business_scenario'))),
+    originalQuestions.every((d) => d.bindings.every((b) => !b.types.includes('business_scenario'))),
   );
 });

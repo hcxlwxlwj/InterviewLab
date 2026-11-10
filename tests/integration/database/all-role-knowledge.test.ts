@@ -91,7 +91,7 @@ test(
             "SELECT count(DISTINCT card_id)::int AS n FROM knowledge_v2_chunks WHERE kind='question'",
           )
         ).rows[0].n,
-        8000,
+        8098,
       );
       assert.ok(embeddingRequests < 2000, 'embedding is batched and hash deduplicated');
       assert.equal(

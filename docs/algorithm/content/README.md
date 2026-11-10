@@ -8,6 +8,7 @@
 
 - `jobs.json`：当前模板、职责/基础/加分项、6–10个主题、8道主问题及观察要点。当前版本覆盖1000个方向，分类可以扩展。
 - `categories.json`：方向注册表。兼容旧frontend/backend/algorithm/testing；岗位ID稳定，标题可改，不能让未知ID默认进入前端。
+- `teacher-agent-questions.json`：四套课程反馈中的 98 道 AI Agent 模拟题，保留原评论链接、题号、难度与面试官参考。绑定 Agent 平台工程师、大模型应用工程师、AI Agent 产品经理、大模型训练与微调工程师的校招阶段，通过全岗位知识库版本流程导入和审核。
 - `sources.json`：招聘或官方资料的URL、用途、可访问性、获取与核对日期。usage=reference_only；保留链接，不镜像整篇文章或复制企业JD全文。
 - `research/sources-2026-10-19.json`：检索词、初选路径和核对记录。聚合页含无关职位，只有相关职责用于原创归纳；search_index表示只能读取检索摘要，不能声称查阅了全文。
 - `research/sources-2026-10-28.json`：第二批12个岗位的字节跳动校园招聘检索词、详情页与官方资料核对记录；字段以recruit_*对应前一批的boss_*，同样只记录归纳依据，不复制企业JD全文。

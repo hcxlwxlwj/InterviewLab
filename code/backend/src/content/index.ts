@@ -11,3 +11,4 @@ export const { ALL_JOB_TEMPLATES, JOBS, getJob, searchJobs, localKnowledgeRetrie
 export { default as frontendReportReference } from '../../../../docs/algorithm/content/frontend-report-reference.json';
 
 export { default as professionalFoundations } from '../../../../docs/algorithm/content/professional-foundations.json';
+export { default as teacherAgentQuestions } from '../../../../docs/algorithm/content/teacher-agent-questions.json';
