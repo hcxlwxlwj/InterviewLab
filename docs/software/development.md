@@ -4,7 +4,7 @@
 
 ## 启动现有应用
 
-先保留本机改动，安装 `npm ci`。参考根 `.env.example` 在本机配置业务数据库、认证和模型，不提交 `.env`。数据库必须是明确选择的环境；`npm run db:migrate` 应用新增迁移，不清空表。
+先保留本机改动，安装 `npm ci`。参考根 `.env.example` 在本机配置业务数据库、认证和模型，不提交 `.env`。数据库必须是明确选择的环境；`npm run db:migrate` 应用尚未执行的迁移。首次升级已有库前检查迁移 SQL 与备份。历史报告重置迁移会清理派生报告及相关任务和幂等记录，保留面试原回答。详见[部署与迁移检查](deployment.md)。
 
 ```bash
 npm ci
@@ -13,6 +13,8 @@ npm run dev:api
 ```
 
 另开两个终端运行 `npm run dev:worker`、`npm run dev`。浏览器默认访问 `http://127.0.0.1:3000`，先注册或登录。`npm run auth:create-user` 可按其 CLI 提示创建本地账号。认证配置沿用[账号设计](account-management.md)。首页可单独浏览，业务页需要数据库和登录。
+
+根目录的 [个人 Compose](../../compose.personal.yaml) 和 [macOS 启动脚本](../../start-personal.command) 用于本地简历与偏好设置。该入口启动数据库、迁移、API 和 Web。完整面试按本节启动独立 worker，并检查 API 的 `/health/ready`。
 
 本仓库 Compose 与示例配置使用业务库端口 **5433**、知识库端口 **5434**。Docker Desktop 启动后，用 `docker compose -f code/backend/compose.yaml up -d --wait` 启动；保留原命名数据卷，不使用 `down -v`。已有业务数据先备份，再应用追加迁移。
 
