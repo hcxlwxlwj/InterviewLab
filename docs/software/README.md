@@ -10,6 +10,7 @@
 - [实时语音与视频](voice-interview.md)：ASR/TTS、端点、打断、默认设备与本机视频房间。
 - [账号管理](account-management.md)：认证、页面访问与会话变化。
 - [运行指南](development.md)：统一维护启动、知识构建发布、验证与回退命令。
+- [部署检查](deployment.md)、[代码质量](code_quality.md)、[代码评审](code_review.md)：运行检查、质量基线及评审证据。
 - [工程目录](repository_structure.md)、[原型](prototype/README.md)：源码归属及界面设计证据。
 
 算法细节和质量记录分别见[知识与 Agent](../algorithm/knowledge_and_agent.md)、[评测](../algorithm/evaluation.md)，不在多份软件文档复制参数和结果。

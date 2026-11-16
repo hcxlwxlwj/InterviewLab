@@ -166,7 +166,7 @@ erDiagram
 | InterviewTurn | interview_id、题干、主问题/追问序号、父回合、目标、来源、generation、展示/播放范围、回答状态 | 未回答问题也有记录；澄清和重复不伪造已完成答案 |
 | AnswerSegment/AnswerRevision | turn、实际 input_mode、片段序号与时间、原 ASR/text、缺口、提交标识、revision、误截追加关联 | 原轨迹不覆盖；跳过独立标记，不以空答案评分 |
 | AsrCorrection | turn、base/new revision、片段/字符区间、原文、更正、原因、时间 | 仅面后纠正识别，不补答；派生结果标过期 |
-| Report/ReportVersion | interview、输入/观测摘要、状态、引用、逐题分析、四维、覆盖、重练目标、版本、is_partial | 同输入版本任务去重；发布前校验引用及删除状态 |
+| Report/ReportVersion | interview、输入/观测摘要、状态、引用、逐题分析、六维反馈与历史四维字段、覆盖、重练目标、版本、is_partial | 同输入版本任务去重；发布前校验引用及删除状态 |
 | RetryRelation/Comparison | 原面试/题目/回答版本、重练面试、两份片段与模式、目标、共同标准、状态和限制 | 创建重练调用面试服务，不更新原答案 |
 | Export | report/version、状态、私有文件、到期、task_id | 固定版本导出，来源删除立即撤销访问 |
 | Knowledge/Question/Rubric/Source | 明确内容类型、岗位/主题/阶段/难度、版本、来源、审核与复核日、发布状态 | 不是无类型的通用 content；来源与题目/标准引用可核查 |
@@ -175,15 +175,15 @@ erDiagram
 | Invocation/Audit/Deletion | 调用标识、模型/提示版本、耗时、用量、错误；操作人与结果；删除范围和清理状态 | 日志无私有正文和密钥，删除阻止在途任务重建数据 |
 | 可选观测/媒体/代码 | 回答/提交版本、质量、授权、期限、执行限额与运行依据 | 单独生命周期，不能替代专业事实证据 |
 
-原目标合同使用 `Interview.mode=mock`；当前 InterviewConfig 不使用该字段，面试类型为 `technical_qa/project_deep_dive/hr/mixed/business_scenario`。配置包括岗位或个人 JD 及其版本、可选简历/经历版本、难度、时长 5/10 分钟（默认 10）、风格、代码开关、实际交互模式。目标支持实时语音，当前接口支持 text_fallback、realtime_voice 和 realtime_video；运行体验仍须实际设备验收。摄像头及复盘媒体初始均关闭，启用须核对能力和当场授权。
+原目标合同使用 `Interview.mode=mock`；当前 InterviewConfig 不使用该字段，新建面试类型为 `technical_qa/business_scenario/hr/mixed`，`project_deep_dive` 保留历史兼容。配置包括岗位或个人 JD 及其版本、可选简历/经历版本、难度、时长 10／20／30 分钟（默认 10）、风格、代码开关、实际交互模式。目标支持实时语音，当前接口支持 text_fallback、realtime_voice 和 realtime_video；运行体验仍须实际设备验收。摄像头及复盘媒体初始均关闭，启用须核对能力和当场授权。
 
 简历切换清除不属于新版本且未明确补充的经历；只选择当前用户已确认材料。删除默认简历置空，不自动另选。临时文件过期不能转入库；确认经历不代表系统核实真实性。
 
 ### 报告分数与证据
 
-四维固定为 `technical_knowledge/project_communication/coding_ability/logical_expression`。维度携带 `status=observed|not_observed`、`score`、解释和回答引用。`not_observed` 必须 `score=null`；零有效回答不评分。
+历史兼容字段 `dimensions` 的四个维度为 `technical_knowledge/project_communication/coding_ability/logical_expression`。维度携带 `status=observed|not_observed`、`score`、解释和回答引用。`not_observed` 必须 `score=null`；零有效回答不评分。
 
-真实报告当前支持 `scoring_status=uncalibrated|experimental`：uncalibrated 保留空分数；experimental 为明确标注“未经人工校准”的 AI 参考评分。模型基于对应维度的已校验评价选择 0–4 档，程序乘以 25 得到维度分，总分对已评分维度等权平均四舍五入。没有依据或未观察的维度始终为 null，不进入分母；不能把 observed 或参考分解释为校准后的能力判断。旧报告不会在读取时自动补分，可显式请求更新总结。未来 calibrated 仍需人工标准与质量验收，本轮不宣称实现。
+真实报告当前支持 `scoring_status=uncalibrated|experimental`：uncalibrated 保留空分数；experimental 为明确标注“未经人工校准”的 AI 参考评分。总分和证据覆盖随评分版本及面试类型计算。当前六维、HR 面、单题重练及历史四维的规则见[评分规则](../algorithm/knowledge_and_agent.md#当前六维与历史兼容)。旧报告不会在读取时自动补分，可显式请求更新总结。未来 calibrated 仍需人工标准与质量验收，本轮不宣称实现。
 
 引用包含对象/回答 ID、明确 revision、片段/字符范围和必要摘录；发布前核对原文存在及结论支持。语音/视觉独立展示，不参与专业总分。
 
@@ -205,7 +205,7 @@ erDiagram
 | 复盘媒体 | capturing/available/expired/deleted/failed；到期立即停止访问 |
 | 代码执行 | queued/running/succeeded/failed/timed_out/cancelled，逐例通过情况另列 |
 
-`ready` 不表示已冻结材料。start 再检查版本和确认状态；计时从服务端 start 成功起计算。最多 6 主问题、每题 2 次追问；目标 5/10 分钟提示收尾，含暂停/断线到 12 分钟强制封存。重连不重置预算。
+`ready` 不表示已冻结材料。start 再检查版本和确认状态；计时从服务端 start 成功起计算。题量、目标时长和含暂停及断线的硬上限见[功能需求](../requirements/functional_spec.md)。重连不重置预算。
 
 保存回答、更新回合/面试版本和 outbox 同事务；随后投递 pg-boss。任务键绑定对象、任务类型及输入版本摘要，投递和执行都允许恢复。LLM/语音/文件处理在事务外进行；完成时重新验证归属、版本、generation、状态和删除标记。取消、修订、结束后的旧结果不得覆盖新记录。
 
@@ -375,7 +375,7 @@ Agent 不是浏览器可任意调用的总入口。简历提取、JD 分析、�
 - 两账号覆盖列表、详情、预览、下载、任务、实时流和比较；维护角色不能读取私有材料。
 - 两份简历的创建/复制/默认/经历切换、收藏去重、个人 JD 保存及配置携带可完成；开始前版本变化须重新确认。
 - 提交成功后模拟模型断开、worker 重启及 outbox 重投，原回答只保存一次，下一题和报告不重复生效。
-- 暂停、结束、追加、纠错与生成并发时，旧 generation/输入版本结果无效；12 分钟含暂停预算不因恢复而重置。
+- 暂停、结束、追加、纠错与生成并发时，旧 generation/输入版本结果无效；含暂停的硬上限不因恢复而重置。
 - 报告只在面后可读；新规则每题六维全部给0–100分，无表现可为0分，固定权重加权并按主问题等权汇总。生成失败不伪造分数；历史辅助指标字段保留读取，不再用于新评分。experimental 显示为 AI 参考分，不宣称人工校准。
 - 原题重练与比较固定两份 revision，部分报告、模式差异、失效引用和媒体不可用有明确标记。
 - 临时文件/媒体/PDF 期限、授权撤回、删除级联与备份恢复清单实际验证；任务不能复活已删材料。
