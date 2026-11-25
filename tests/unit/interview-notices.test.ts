@@ -60,6 +60,7 @@ test('reaching the target time offers an extension and counts it into the hard d
   );
   assert.match(html, /继续 5 分钟/);
   assert.match(html, /结束并查看报告/);
+  assert.match(html, /已到设定的 25 分钟/);
   assert.match(html, /27 分钟（含暂停和断线）后会自动封存/);
   assert.doesNotMatch(html, /<button class="text-link" disabled="">继续 5 分钟/);
 });

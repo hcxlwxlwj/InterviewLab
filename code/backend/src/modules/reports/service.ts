@@ -23,6 +23,36 @@ import type { InterviewState } from '../interviews/repository';
 import { interviewInputDigest, type LiveInterviewsService } from '../interviews/service';
 import * as repository from './repository';
 
+type ReportSynthesisInput = {
+  interview_id: string;
+  report_id: string;
+  report_version: number;
+  input_digest: string;
+  evaluations_digest: string;
+};
+
+async function enqueueReportSynthesis(
+  tx: Transaction,
+  state: InterviewState,
+  report: InterviewReport,
+  type: 'reports.advice.v1' | 'reports.summarize.v1',
+) {
+  const digest = evaluationDigest(report.evaluations);
+  const task = await enqueueTask(tx, {
+    owner_id: state.owner,
+    type,
+    key: `${report.id}:${report.version}:${digest}`,
+    input: {
+      interview_id: state.view.id,
+      report_id: report.id,
+      report_version: report.version,
+      input_digest: interviewInputDigest(state),
+      evaluations_digest: digest,
+    },
+  });
+  return { task, digest };
+}
+
 export function createReportsService(
   database: Database,
   interviews: LiveInterviewsService,
@@ -32,14 +62,13 @@ export function createReportsService(
     const group = state.view.turns.filter(
       (t) => t.main_question_index === turn.main_question_index,
     );
+    const earlier = group.filter(
+      (t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered',
+    );
     return {
-      earlier_turns: group.filter(
-        (t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered',
-      ),
+      earlier_turns: earlier,
       main_question: group.find((t) => t.follow_up_index === 0)?.text ?? turn.text,
-      earlier_answers: group
-        .filter((t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered')
-        .map((t) => ({ question: t.text, answer: t.answer_text! })),
+      earlier_answers: earlier.map((t) => ({ question: t.text, answer: t.answer_text! })),
     };
   }
   function turnDigest(state: InterviewState, turn: InterviewState['view']['turns'][number]) {
@@ -226,19 +255,7 @@ export function createReportsService(
       )
     )
       return;
-    const digest = evaluationDigest(report.evaluations);
-    const task = await enqueueTask(tx, {
-      owner_id: state.owner,
-      type: 'reports.advice.v1',
-      key: `${report.id}:${report.version}:${digest}`,
-      input: {
-        interview_id: state.view.id,
-        report_id: report.id,
-        report_version: report.version,
-        input_digest: interviewInputDigest(state),
-        evaluations_digest: digest,
-      },
-    });
+    const { task } = await enqueueReportSynthesis(tx, state, report, 'reports.advice.v1');
     report.advice_task_id = task.id;
     report.advice_status = 'pending';
   }
@@ -265,19 +282,12 @@ export function createReportsService(
       report.status = 'ready';
       return;
     }
-    const digest = evaluationDigest(report.evaluations);
-    const task = await enqueueTask(tx, {
-      owner_id: state.owner,
-      type: 'reports.summarize.v1',
-      key: `${report.id}:${report.version}:${digest}`,
-      input: {
-        interview_id: state.view.id,
-        report_id: report.id,
-        report_version: report.version,
-        input_digest: interviewInputDigest(state),
-        evaluations_digest: digest,
-      },
-    });
+    const { task, digest } = await enqueueReportSynthesis(
+      tx,
+      state,
+      report,
+      'reports.summarize.v1',
+    );
     await repository.setSummaryTask(tx.client, report.id, task.id, digest);
     report.summary_status = 'pending';
     report.status = 'generating';
@@ -305,6 +315,15 @@ export function createReportsService(
     retryId: string,
   ) {
     for (const id of [originalId, retryId].sort()) await interviews.lock(tx, identity, id);
+  }
+  async function lockReportInterview(tx: Transaction, identity: RequestIdentity, id: string) {
+    try {
+      await interviews.lock(tx, identity, id);
+      return true;
+    } catch (error) {
+      if (error instanceof ServiceError && error.statusCode === 404) return false;
+      throw error;
+    }
   }
   async function getComparison(
     identity: RequestIdentity,
@@ -354,19 +373,10 @@ export function createReportsService(
     );
     if (!active || active.id !== input.report_id || active.version !== input.report_version)
       return { result_ref: null };
-    const group = state.view.turns.filter(
-      (t) => t.main_question_index === turn.main_question_index,
-    );
     const value = await agent.evaluate(turn, state.snapshot!, signal, task.attempts > 1, {
+      ...evaluationContext(state, turn),
       retrieval: state.retrievals?.[turn.id],
       scoring_rubric_version: input.scoring_rubric_version,
-      earlier_turns: group.filter(
-        (t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered',
-      ),
-      main_question: group.find((t) => t.follow_up_index === 0)?.text ?? turn.text,
-      earlier_answers: group
-        .filter((t) => t.follow_up_index < turn.follow_up_index && t.answer_status === 'answered')
-        .map((t) => ({ question: t.text, answer: t.answer_text! })),
     });
     const related = state.snapshot!.knowledge.questions.filter(
       (q) => q.id === turn.knowledge_question_id || q.topic === turn.topic,
@@ -382,15 +392,7 @@ export function createReportsService(
     );
     return {
       result_ref: { id: input.report_id, version: input.report_version },
-      lock: async (tx) => {
-        try {
-          await interviews.lock(tx, identity, input.interview_id);
-          return true;
-        } catch (e) {
-          if (e instanceof ServiceError && e.statusCode === 404) return false;
-          throw e;
-        }
-      },
+      lock: (tx) => lockReportInterview(tx, identity, input.interview_id),
       commit: async (tx) => {
         await interviews.lock(tx, identity, input.interview_id);
         const fresh = await interviews.readReportState(identity, input.interview_id, tx);
@@ -438,13 +440,7 @@ export function createReportsService(
     };
   };
   const advice: TaskHandler = async (task, signal) => {
-    const input = task.payload as {
-      interview_id: string;
-      report_id: string;
-      report_version: number;
-      input_digest: string;
-      evaluations_digest: string;
-    };
+    const input = task.payload as ReportSynthesisInput;
     const identity = { owner_id: task.owner_id, roles: [] };
     const state = await interviews.readFinalized(identity, input.interview_id);
     const row = await repository.reportByInterview(
@@ -475,15 +471,7 @@ export function createReportsService(
     );
     return {
       result_ref: { id: row.id, version: row.version },
-      lock: async (tx) => {
-        try {
-          await interviews.lock(tx, identity, input.interview_id);
-          return true;
-        } catch (e) {
-          if (e instanceof ServiceError && e.statusCode === 404) return false;
-          throw e;
-        }
-      },
+      lock: (tx) => lockReportInterview(tx, identity, input.interview_id),
       commit: async (tx) => {
         const fresh = await interviews.readReportState(identity, input.interview_id, tx);
         const current = await repository.reportByInterview(
@@ -512,13 +500,7 @@ export function createReportsService(
     };
   };
   const summarize: TaskHandler = async (task, signal) => {
-    const input = task.payload as {
-      interview_id: string;
-      report_id: string;
-      report_version: number;
-      input_digest: string;
-      evaluations_digest: string;
-    };
+    const input = task.payload as ReportSynthesisInput;
     const identity = { owner_id: task.owner_id, roles: [] };
     const state = await interviews.readReportState(identity, input.interview_id);
     const row = await repository.reportByInterview(
@@ -559,14 +541,7 @@ export function createReportsService(
     });
     return {
       result_ref: { id: row.id, version: row.version },
-      lock: async (tx) => {
-        try {
-          await interviews.lock(tx, identity, input.interview_id);
-        } catch (e) {
-          if (e instanceof ServiceError && e.statusCode === 404) return false;
-          throw e;
-        }
-      },
+      lock: (tx) => lockReportInterview(tx, identity, input.interview_id),
       commit: async (tx) => {
         await interviews.lock(tx, identity, input.interview_id);
         const fresh = await interviews.readReportState(identity, input.interview_id, tx);

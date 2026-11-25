@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { liveInterviewPath, type Interview, type InterviewReport } from '@interviewlab/core';
+import { interviewSetupPath } from './setup-state';
 import { Button } from '../../components/ui/button';
 import { ApiClientError } from '../../lib/api/http';
 import { interviewsApi } from '../../lib/api/interviews';
@@ -79,7 +80,7 @@ function AnalysisActions(props: AnalysisActionProps) {
       {empty && (
         <Button asChild>
           <Link
-            href={`/interview/setup?job=${encodeURIComponent(interview?.configuration.job ?? 'frontend')}`}
+            href={interviewSetupPath(interview?.configuration.job)}
           >
             重新开始练习
           </Link>

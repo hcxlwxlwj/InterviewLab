@@ -9,7 +9,11 @@ import type {
   InterviewQuestion,
   InterviewTurn,
 } from '@interviewlab/core';
-import { FEEDBACK_DIMENSIONS, FEEDBACK_TEMPLATE_VERSION, mainQuestionLimit } from '@interviewlab/core';
+import {
+  FEEDBACK_DIMENSIONS,
+  FEEDBACK_TEMPLATE_VERSION,
+  mainQuestionLimit,
+} from '@interviewlab/core';
 import { loadConfig } from '../../../code/backend/src/foundation/config';
 import { createDatabase, type Database } from '../../../code/backend/src/database/connection';
 import { migrateDatabase } from '../../../code/backend/src/database/migrate';
@@ -390,6 +394,52 @@ test('pause rejects submissions and resume regenerates only when there is no wai
   assert.equal(v.turns.length, 1);
   assert.equal(v.started_at, start);
 });
+test('time extension advances both deadlines once and preserves the waiting question', async () => {
+  let view = await started();
+  await database.pool.query(
+    "UPDATE interviews SET started_at=now()-interval '10 minutes 1 second' WHERE id=$1",
+    [view.id],
+  );
+  view = await runtime.interviews.read(identity, view.id);
+  const key = randomUUID();
+  const body = { version: view.version };
+  const extended = await runtime.interviews.extend(identity, view.id, body, key);
+  assert.equal(extended.extension_minutes, 5);
+  assert.equal(Date.parse(extended.target_at!) - Date.parse(view.target_at!), 300000);
+  assert.equal(Date.parse(extended.deadline_at!) - Date.parse(view.deadline_at!), 300000);
+  assert.equal(extended.turns.at(-1)?.id, view.turns.at(-1)?.id);
+  const replay = await runtime.interviews.extend(identity, view.id, body, key);
+  assert.equal(replay.extension_minutes, 5);
+  assert.equal(replay.version, extended.version);
+  assert.equal(replay.status, 'in_progress');
+});
+
+test('time extension before the target rejects without changing the interview', async () => {
+  const view = await started();
+  await assert.rejects(
+    runtime.interviews.extend(identity, view.id, { version: view.version }, randomUUID()),
+    ServiceError,
+  );
+  const after = await runtime.interviews.read(identity, view.id);
+  assert.equal(after.version, view.version);
+  assert.equal(after.extension_minutes, 0);
+  assert.equal(after.target_at, view.target_at);
+});
+
+test('extending after a saved answer queues the next question without changing that answer', async () => {
+  let view = await started();
+  await database.pool.query("UPDATE interviews SET started_at=now()-interval '10 minutes 1 second' WHERE id=$1", [view.id]);
+  view = await runtime.interviews.answer(identity, view.id, view.turns[0].id,
+    { version: view.version, text: '我用回归测试验证修改。' }, randomUUID());
+  assert.equal(view.generation_status, 'idle');
+  const extended = await runtime.interviews.extend(identity, view.id, { version: view.version }, randomUUID());
+  assert.equal(extended.extension_minutes, 5);
+  assert.equal(extended.generation_status, 'pending');
+  assert.ok(extended.task_id);
+  assert.equal(extended.turns[0].answer_text, view.turns[0].answer_text);
+  assert.equal(extended.turns[0].revision, view.turns[0].revision);
+});
+
 test('ending while the model is working fences late output and retains the saved answer', async () => {
   let v = await started();
   let release!: () => void;

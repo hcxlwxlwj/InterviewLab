@@ -1,0 +1,38 @@
+{
+  "ordinary": {
+    "passed": 351,
+    "skipped": 0
+  },
+  "database_full_before_last_added_case": {
+    "passed": 89,
+    "skipped": 0
+  },
+  "database_interview_final": {
+    "passed": 46,
+    "skipped": 0
+  },
+  "typecheck": "passed",
+  "backend_build": "passed",
+  "frontend_build": "passed in same-drive isolated copy",
+  "migrations": "0012 and 0013 applied after starting existing postgres containers",
+  "initial_database_attempt": "87/89: one wrong test fixture tried computed target_at column; one pgvector test used non-vector postgres. Fixture fixed to started_at; final dedicated pgvector database passed89; new saved-answer case then passed within46 interview tests.",
+  "gitleaks_findings": 0,
+  "duplicate_filter": "6 lines/50 tokens/mild; one existing 14-line matched block; no low-token zero-duplication claim",
+  "coverage": {
+    "covered": 178,
+    "inserted": 197,
+    "percentage": 90.36
+  },
+  "not_rerun": [
+    "real model/media",
+    "full-project lint",
+    "fresh full dependency audit",
+    "process and production proxy test suites"
+  ],
+  "docs": {
+    "markdown_files": 59,
+    "local_links": 558,
+    "result": "passed"
+  },
+  "source_hashes_match": true
+}

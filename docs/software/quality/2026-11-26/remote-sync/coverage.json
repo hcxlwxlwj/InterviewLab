@@ -1,0 +1,160 @@
+{
+  "baseline": "pre-sync working tree immutable stash snapshot, 18 product files; includes prior local remediation",
+  "sampling": "350 ordinary +46 interview database cases; final voice test file11 cases rerun includes1 new case (final ordinary total351). Repeats merged, not added as unique counts.",
+  "inserted": 197,
+  "covered": 178,
+  "percentage": 90.36,
+  "files": [
+    {
+      "file": "code/backend/src/modules/interviews/repository.ts",
+      "sha256": "d18bc3a8d1e2a3df1d7327e9bf051704bab45362a2e13898deab60bca393bd56",
+      "inserted": 7,
+      "covered": 7,
+      "uncovered": []
+    },
+    {
+      "file": "code/backend/src/modules/interviews/routes.ts",
+      "sha256": "d6df478297f94d2e16363316d627e6f95cbbac67ac90a09230e75d962b64a3a1",
+      "inserted": 1,
+      "covered": 1,
+      "uncovered": []
+    },
+    {
+      "file": "code/backend/src/modules/interviews/schema.ts",
+      "sha256": "bdf0d4012eaa4a7db515fd84816f9bec6f8a08814f5d8de141b2259c992976ce",
+      "inserted": 2,
+      "covered": 2,
+      "uncovered": []
+    },
+    {
+      "file": "code/backend/src/modules/interviews/schemas.ts",
+      "sha256": "8291919ab2468b3b5ab19c4ec2bc94a564504176e381dc053321bdffbcd4bff4",
+      "inserted": 1,
+      "covered": 1,
+      "uncovered": []
+    },
+    {
+      "file": "code/backend/src/modules/interviews/service.ts",
+      "sha256": "4cad177b892b3c2bdaac8fed123d3eb35d6d896526d98acd2369a295f316f6b5",
+      "inserted": 33,
+      "covered": 30,
+      "uncovered": [
+        533,
+        534,
+        693
+      ]
+    },
+    {
+      "file": "code/backend/src/modules/interviews/streaming-agent.ts",
+      "sha256": "243f3dd83bc8afe94e8c5af4d7f3b0f698c037f2bf5002739141ee5616a8a4e4",
+      "inserted": 11,
+      "covered": 11,
+      "uncovered": []
+    },
+    {
+      "file": "code/backend/src/modules/interviews/voice/session.ts",
+      "sha256": "826822a3a541b1bc1f68813396d9fc08f6a413954b786f2bef4ecb2590e6beca",
+      "inserted": 22,
+      "covered": 21,
+      "uncovered": [
+        679
+      ]
+    },
+    {
+      "file": "code/core_engine/src/interview-policy.ts",
+      "sha256": "1e0865bee2e52e53df5a5f5f3f2cd6584076f6d5e7e5f345d4fdf4c4edeb6ac9",
+      "inserted": 3,
+      "covered": 2,
+      "uncovered": [
+        1
+      ]
+    },
+    {
+      "file": "code/core_engine/src/live-interview.ts",
+      "sha256": "d922a04e9cdcda58440d8fc7cba96a23b5bf4b24878ab9994c4012e888379285",
+      "inserted": 6,
+      "covered": 5,
+      "uncovered": [
+        120
+      ]
+    },
+    {
+      "file": "code/frontend/components/interview-workspace.tsx",
+      "sha256": "20a9c2d46a8da6454c18c09dd2872e466007d3dc95f9a479900de906d9d8e251",
+      "inserted": 25,
+      "covered": 25,
+      "uncovered": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/interview-notices.tsx",
+      "sha256": "01a856e124622f61accd68ebd5c842abc3f7b0cd88c8ca5f01815b4d62498930",
+      "inserted": 54,
+      "covered": 54,
+      "uncovered": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/interview-presentation.ts",
+      "sha256": "bea0ad9d8b280758f9e7238515819f0ea063c3d49787a688199f7a2bbf5d965a",
+      "inserted": 7,
+      "covered": 7,
+      "uncovered": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/interview.tsx",
+      "sha256": "29615315db01b694515f19e27996cb12fe466b1ea63b662d081202000d27e925",
+      "inserted": 9,
+      "covered": 0,
+      "uncovered": [
+        3,
+        31,
+        168,
+        206,
+        220,
+        242,
+        243,
+        244,
+        256
+      ]
+    },
+    {
+      "file": "code/frontend/features/live-interview/setup.tsx",
+      "sha256": "8192c218bc316cf827eca881f5048a6982c5392f0b5dcfd04ee41020101b8c10",
+      "inserted": 0,
+      "covered": 0,
+      "uncovered": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/voice/controls.tsx",
+      "sha256": "c40e3c983cd164b398d5b6b8b1cbe4201e6fd47db11d3427c4305826c96fdac1",
+      "inserted": 1,
+      "covered": 1,
+      "uncovered": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/voice/use-voice.ts",
+      "sha256": "b5bfc0d908a1ef457df010a08e0af5d6eacce845a07d8c8acf59e573cb90ab87",
+      "inserted": 4,
+      "covered": 0,
+      "uncovered": [
+        170,
+        171,
+        172,
+        173
+      ]
+    },
+    {
+      "file": "code/frontend/features/live-interview/setup-panels.tsx",
+      "sha256": "28505c95589d0ca10a6dddb21674ab062972c61031b6c72cc5432e7e01a73d3b",
+      "inserted": 10,
+      "covered": 10,
+      "uncovered": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/setup-summary.tsx",
+      "sha256": "2c379eaa94b1de1882adc13c2f1ebae158fcf7f6bdd8c2b9ec66f96cc23a5d3c",
+      "inserted": 1,
+      "covered": 1,
+      "uncovered": []
+    }
+  ]
+}

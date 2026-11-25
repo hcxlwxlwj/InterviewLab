@@ -15,8 +15,18 @@ export const interviewsApi = {
       `/interview-profiles?job=${encodeURIComponent(job)}&career_stage=${encodeURIComponent(stage)}`,
       { signal },
     ),
-  jobs: (signal?: AbortSignal) =>
-    apiRequest<PageResult<JobTemplate>>('/job-templates?limit=50', { signal }),
+  async jobs(signal?: AbortSignal): Promise<PageResult<JobTemplate>> {
+    const items: JobTemplate[] = [];
+    let cursor: string | null = null;
+    do {
+      const query = new URLSearchParams({ limit: '50' });
+      if (cursor) query.set('cursor', cursor);
+      const page = await apiRequest<PageResult<JobTemplate>>(`/job-templates?${query}`, { signal });
+      items.push(...page.items);
+      cursor = page.next_cursor;
+    } while (cursor);
+    return { items, next_cursor: null };
+  },
   list: (query = '', signal?: AbortSignal) =>
     apiRequest<PageResult<Interview>>(`/interviews${query}`, { signal }),
   read: (id: string, signal?: AbortSignal) =>

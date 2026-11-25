@@ -3,15 +3,7 @@ import type { ReactNode } from 'react';
 import { ShieldCheck } from 'lucide-react';
 import { Breadcrumb, Footer, Header } from './shared';
 
-export function InterviewSetupPage({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description: ReactNode;
-  children: ReactNode;
-}) {
+export function InterviewSetupPage({ title, children }: { title: string; children: ReactNode }) {
   return (
     <>
       <Header />
@@ -20,7 +12,6 @@ export function InterviewSetupPage({
         <div className="page-heading">
           <div>
             <h1>{title}</h1>
-            <p>{description}</p>
           </div>
           <span className="badge badge-mint">
             <ShieldCheck size={13} />

@@ -2,7 +2,7 @@
 
 所有测试对应当前唯一 Agent、真实 HTTP 及账号流程，不再维护演示会话、预设题单或旧岗位专用运行时。
 
-- `npm run check`：依赖边界、类型、1000 岗位/8000 原创问题、单元及普通集成、文档检查。
+- `npm run check`：依赖边界、类型、内容、单元及普通集成、文档检查。当前内容校验覆盖 1269 个已发布岗位、10148 道活跃主问题、48 道独立补充题、98 道课程题及 1962 条来源；保留原始 8000 道问题记录中的 4 条合并历史，数量与层级见[内容清单](../docs/algorithm/content/README.md)。
 - `npm run build:backend`、`npm run build`：后端与前端构建；前端开发和构建不能同时占用同一 `.next`。
 - `npm run test:db`：独立 `interviewlab_test*` 数据库上的版本、准备、报告、任务、取消、删除竞态及全岗位 pgvector 导入；受控嵌入不代表语义质量。
 - `npm run test:process`：编译产物的 API/worker 启停、恢复和错误处理。

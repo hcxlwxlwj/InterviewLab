@@ -1,0 +1,959 @@
+{
+  "date": "2026-11-26",
+  "version": "1.7",
+  "strict": {
+    "function_effective_lines": 40,
+    "complexity": 10,
+    "cognitive_complexity": 15,
+    "depth": 3,
+    "parameters": 4,
+    "file_lines": 400
+  },
+  "tools": {
+    "ESLint": "9.39.5",
+    "typescript-eslint": "8.74.0",
+    "sonarjs": "3.0.7",
+    "TypeScript": "5.9.3"
+  },
+  "baseline": {
+    "head": "4b08a0f9ad307ad92e7e699577b5d8cf28187cc4",
+    "kind": "Immutable task-start UI sources before this review; includes earlier worktree inputs",
+    "files": {
+      "code/frontend/app/interview/setup/page.tsx": {
+        "sha256": "2dafd80ca690e6a418b76f63c41651d190be74a90eb631cfc642b61b7cd25755"
+      },
+      "code/frontend/components/interview-setup.tsx": {
+        "sha256": "8ed025d7062ff99528063676e8760cd0cc76bb343c96317d71bde9fb160b41d5"
+      },
+      "code/frontend/components/job-library.tsx": {
+        "sha256": "0368648abde860a420ba39c68bafacea2440a980e6829725170aea53fe940284"
+      },
+      "code/frontend/features/live-interview/analysis.tsx": {
+        "sha256": "3d603973ab4a5c487b666af85b62a8a0f860ce1c488a7f74d699cc0ca4a4a512"
+      },
+      "code/frontend/features/live-interview/preparation.tsx": {
+        "sha256": "332e29a6feb415e6a12b3384c0568c9bf42ea1500e619ab386de2f8a2607c4eb"
+      },
+      "code/frontend/features/live-interview/setup-state.ts": {
+        "sha256": "de1bd6fe5a03693073ef0de81f914849ae2d2dbd5f0626379399bb3f8473e5ce"
+      },
+      "code/frontend/features/live-interview/setup.tsx": {
+        "sha256": "404cd4e764007ff93d731cf7d2de7e02999933220ef8d4a667625592169588b3"
+      },
+      "code/frontend/features/live-interview/setup-fields.tsx": {
+        "sha256": "4bfdcc9b294736cc6593c25ef2df3eebca83894de2fd7447865492a54d5342ac"
+      },
+      "code/frontend/features/personal-center/materials-workspace.tsx": {
+        "sha256": "d6ef7b036781d84dddc807f2f0fcac19a5387b146fd68ca6a5346c3121223365"
+      }
+    }
+  },
+  "before": {
+    "product_files": 9,
+    "errors": 0,
+    "warnings": 13,
+    "rules": {
+      "max-lines-per-function": 8,
+      "complexity": 4,
+      "sonarjs/cognitive-complexity": 1
+    },
+    "files": [
+      {
+        "file": "code/frontend/app/interview/setup/page.tsx",
+        "sha256": "2dafd80ca690e6a418b76f63c41651d190be74a90eb631cfc642b61b7cd25755",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "code/frontend/components/interview-setup.tsx",
+        "sha256": "8ed025d7062ff99528063676e8760cd0cc76bb343c96317d71bde9fb160b41d5",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "code/frontend/components/job-library.tsx",
+        "sha256": "0368648abde860a420ba39c68bafacea2440a980e6829725170aea53fe940284",
+        "errors": 0,
+        "warnings": 3,
+        "messages": [
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'JobLibrary' has too many lines (159). Maximum allowed is 40.",
+            "line": 18,
+            "column": 8,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 176,
+            "endColumn": 2
+          },
+          {
+            "ruleId": "complexity",
+            "severity": 1,
+            "message": "Function 'JobLibrary' has a complexity of 12. Maximum allowed is 10.",
+            "line": 18,
+            "column": 8,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "complex",
+            "endLine": 18,
+            "endColumn": 27
+          },
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'JobDetail' has too many lines (159). Maximum allowed is 40.",
+            "line": 194,
+            "column": 8,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 352,
+            "endColumn": 2
+          }
+        ]
+      },
+      {
+        "file": "code/frontend/features/live-interview/analysis.tsx",
+        "sha256": "3d603973ab4a5c487b666af85b62a8a0f860ce1c488a7f74d699cc0ca4a4a512",
+        "errors": 0,
+        "warnings": 1,
+        "messages": [
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'AnalysisBody' has too many lines (44). Maximum allowed is 40.",
+            "line": 137,
+            "column": 1,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 180,
+            "endColumn": 2
+          }
+        ]
+      },
+      {
+        "file": "code/frontend/features/live-interview/preparation.tsx",
+        "sha256": "332e29a6feb415e6a12b3384c0568c9bf42ea1500e619ab386de2f8a2607c4eb",
+        "errors": 0,
+        "warnings": 4,
+        "messages": [
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'PreparationScreen' has too many lines (145). Maximum allowed is 40.",
+            "line": 13,
+            "column": 8,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 157,
+            "endColumn": 2
+          },
+          {
+            "ruleId": "complexity",
+            "severity": 1,
+            "message": "Function 'PreparationScreen' has a complexity of 48. Maximum allowed is 10.",
+            "line": 13,
+            "column": 8,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "complex",
+            "endLine": 13,
+            "endColumn": 34
+          },
+          {
+            "ruleId": "sonarjs/cognitive-complexity",
+            "severity": 1,
+            "message": "Refactor this function to reduce its Cognitive Complexity from 40 to the 15 allowed.",
+            "line": 13,
+            "column": 17,
+            "nodeType": null,
+            "messageId": "refactorFunction",
+            "endLine": 13,
+            "endColumn": 34
+          },
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'PreparationBody' has too many lines (80). Maximum allowed is 40.",
+            "line": 159,
+            "column": 1,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 238,
+            "endColumn": 2
+          }
+        ]
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-fields.tsx",
+        "sha256": "4bfdcc9b294736cc6593c25ef2df3eebca83894de2fd7447865492a54d5342ac",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-state.ts",
+        "sha256": "de1bd6fe5a03693073ef0de81f914849ae2d2dbd5f0626379399bb3f8473e5ce",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup.tsx",
+        "sha256": "404cd4e764007ff93d731cf7d2de7e02999933220ef8d4a667625592169588b3",
+        "errors": 0,
+        "warnings": 2,
+        "messages": [
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'ConfigurationForm' has too many lines (285). Maximum allowed is 40.",
+            "line": 58,
+            "column": 1,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 342,
+            "endColumn": 2
+          },
+          {
+            "ruleId": "complexity",
+            "severity": 1,
+            "message": "Function 'ConfigurationForm' has a complexity of 31. Maximum allowed is 10.",
+            "line": 58,
+            "column": 1,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "complex",
+            "endLine": 58,
+            "endColumn": 27
+          }
+        ]
+      },
+      {
+        "file": "code/frontend/features/personal-center/materials-workspace.tsx",
+        "sha256": "d6ef7b036781d84dddc807f2f0fcac19a5387b146fd68ca6a5346c3121223365",
+        "errors": 0,
+        "warnings": 3,
+        "messages": [
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'MaterialsWorkspace' has too many lines (204). Maximum allowed is 40.",
+            "line": 9,
+            "column": 16,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 216,
+            "endColumn": 2
+          },
+          {
+            "ruleId": "complexity",
+            "severity": 1,
+            "message": "Function 'MaterialsWorkspace' has a complexity of 19. Maximum allowed is 10.",
+            "line": 9,
+            "column": 16,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "complex",
+            "endLine": 9,
+            "endColumn": 43
+          },
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Async arrow function has too many lines (48). Maximum allowed is 40.",
+            "line": 99,
+            "column": 29,
+            "nodeType": "ArrowFunctionExpression",
+            "messageId": "exceed",
+            "endLine": 146,
+            "endColumn": 20
+          }
+        ]
+      }
+    ]
+  },
+  "after": {
+    "product_files": 12,
+    "test_files": 3,
+    "errors": 0,
+    "warnings": 11,
+    "rules": {
+      "max-lines-per-function": 7,
+      "complexity": 3,
+      "sonarjs/cognitive-complexity": 1
+    },
+    "files": [
+      {
+        "file": "code/frontend/app/interview/setup/page.tsx",
+        "sha256": "2dafd80ca690e6a418b76f63c41651d190be74a90eb631cfc642b61b7cd25755",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "code/frontend/components/interview-setup.tsx",
+        "sha256": "8ed025d7062ff99528063676e8760cd0cc76bb343c96317d71bde9fb160b41d5",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "code/frontend/components/job-library.tsx",
+        "sha256": "0368648abde860a420ba39c68bafacea2440a980e6829725170aea53fe940284",
+        "errors": 0,
+        "warnings": 3,
+        "messages": [
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'JobLibrary' has too many lines (159). Maximum allowed is 40.",
+            "line": 18,
+            "column": 8,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 176,
+            "endColumn": 2
+          },
+          {
+            "ruleId": "complexity",
+            "severity": 1,
+            "message": "Function 'JobLibrary' has a complexity of 12. Maximum allowed is 10.",
+            "line": 18,
+            "column": 8,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "complex",
+            "endLine": 18,
+            "endColumn": 27
+          },
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'JobDetail' has too many lines (159). Maximum allowed is 40.",
+            "line": 194,
+            "column": 8,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 352,
+            "endColumn": 2
+          }
+        ]
+      },
+      {
+        "file": "code/frontend/features/live-interview/analysis.tsx",
+        "sha256": "3d603973ab4a5c487b666af85b62a8a0f860ce1c488a7f74d699cc0ca4a4a512",
+        "errors": 0,
+        "warnings": 1,
+        "messages": [
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'AnalysisBody' has too many lines (44). Maximum allowed is 40.",
+            "line": 137,
+            "column": 1,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 180,
+            "endColumn": 2
+          }
+        ]
+      },
+      {
+        "file": "code/frontend/features/live-interview/preparation.tsx",
+        "sha256": "332e29a6feb415e6a12b3384c0568c9bf42ea1500e619ab386de2f8a2607c4eb",
+        "errors": 0,
+        "warnings": 4,
+        "messages": [
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'PreparationScreen' has too many lines (145). Maximum allowed is 40.",
+            "line": 13,
+            "column": 8,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 157,
+            "endColumn": 2
+          },
+          {
+            "ruleId": "complexity",
+            "severity": 1,
+            "message": "Function 'PreparationScreen' has a complexity of 48. Maximum allowed is 10.",
+            "line": 13,
+            "column": 8,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "complex",
+            "endLine": 13,
+            "endColumn": 34
+          },
+          {
+            "ruleId": "sonarjs/cognitive-complexity",
+            "severity": 1,
+            "message": "Refactor this function to reduce its Cognitive Complexity from 40 to the 15 allowed.",
+            "line": 13,
+            "column": 17,
+            "nodeType": null,
+            "messageId": "refactorFunction",
+            "endLine": 13,
+            "endColumn": 34
+          },
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'PreparationBody' has too many lines (80). Maximum allowed is 40.",
+            "line": 159,
+            "column": 1,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 238,
+            "endColumn": 2
+          }
+        ]
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "sha256": "1f10e4ad368c6a8b01c68083ccd18d6573dfef3da216d2bc212b14496221edd6",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-fields.tsx",
+        "sha256": "4bfdcc9b294736cc6593c25ef2df3eebca83894de2fd7447865492a54d5342ac",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "sha256": "e6763adc1583e59127f3ad5f07b066b8cc9fc69f2a732cee80b4ff1043f82496",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-state.ts",
+        "sha256": "de1bd6fe5a03693073ef0de81f914849ae2d2dbd5f0626379399bb3f8473e5ce",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-summary.tsx",
+        "sha256": "e6d9d00d8d1a23b06520dbc45ee8968001f21272ce34b5fbd3b027feb3393e45",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup.tsx",
+        "sha256": "8192c218bc316cf827eca881f5048a6982c5392f0b5dcfd04ee41020101b8c10",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "code/frontend/features/personal-center/materials-workspace.tsx",
+        "sha256": "d6ef7b036781d84dddc807f2f0fcac19a5387b146fd68ca6a5346c3121223365",
+        "errors": 0,
+        "warnings": 3,
+        "messages": [
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Function 'MaterialsWorkspace' has too many lines (204). Maximum allowed is 40.",
+            "line": 9,
+            "column": 16,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "exceed",
+            "endLine": 216,
+            "endColumn": 2
+          },
+          {
+            "ruleId": "complexity",
+            "severity": 1,
+            "message": "Function 'MaterialsWorkspace' has a complexity of 19. Maximum allowed is 10.",
+            "line": 9,
+            "column": 16,
+            "nodeType": "FunctionDeclaration",
+            "messageId": "complex",
+            "endLine": 9,
+            "endColumn": 43
+          },
+          {
+            "ruleId": "max-lines-per-function",
+            "severity": 1,
+            "message": "Async arrow function has too many lines (48). Maximum allowed is 40.",
+            "line": 99,
+            "column": 29,
+            "nodeType": "ArrowFunctionExpression",
+            "messageId": "exceed",
+            "endLine": 146,
+            "endColumn": 20
+          }
+        ]
+      },
+      {
+        "file": "tests/unit/interview-entry.test.ts",
+        "sha256": "9e8a5d2287adb3ac4b85a3330dc0faef5841d99080ed996dfff655bb7b7b1ac3",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "tests/unit/interview-setup.test.ts",
+        "sha256": "4484ee6dea23432fcebec68fd3347e91e0139970e2dca14e2164e5861d9512cc",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      },
+      {
+        "file": "tests/unit/setup-presentation.test.ts",
+        "sha256": "bb97a788e8ea54892190ddd1f4f4031771d3f5a981f0ce3c11b2b4582e198993",
+        "errors": 0,
+        "warnings": 0,
+        "messages": []
+      }
+    ]
+  },
+  "functions": {
+    "measurement_only": "Complexity threshold 0 emits every function solely to collect values; strict acceptance always uses the thresholds above.",
+    "before_ConfigurationForm": {
+      "effective_lines": 285,
+      "complexity": 31
+    },
+    "after_ConfigurationForm": {
+      "effective_lines": 11,
+      "complexity": 3
+    },
+    "max_complexity_in_five_setup_modules": 6,
+    "records": [
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 25,
+        "name": "Function 'useConfigurationInputs'",
+        "complexity": 2
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 30,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 34,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 36,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 38,
+        "name": "Arrow function",
+        "complexity": 2
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 39,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 40,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 42,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 49,
+        "name": "Function 'useResumeMaterials'",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 56,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 62,
+        "name": "Arrow function",
+        "complexity": 2
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 64,
+        "name": "Arrow function",
+        "complexity": 2
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 66,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 68,
+        "name": "Arrow function",
+        "complexity": 2
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 72,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 74,
+        "name": "Arrow function",
+        "complexity": 2
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 75,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 81,
+        "name": "Function 'useSetupFlow'",
+        "complexity": 5
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 87,
+        "name": "Arrow function",
+        "complexity": 2
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 97,
+        "name": "Function 'useSetupConfiguration'",
+        "complexity": 6
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 103,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 106,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 108,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-controller.ts",
+        "line": 114,
+        "name": "Arrow function",
+        "complexity": 2
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-fields.tsx",
+        "line": 4,
+        "name": "Function 'SetupJobSelection'",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-fields.tsx",
+        "line": 24,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-fields.tsx",
+        "line": 26,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-fields.tsx",
+        "line": 36,
+        "name": "Function 'SelectedSetupJob'",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-fields.tsx",
+        "line": 50,
+        "name": "Function 'SetupResumeSelection'",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-fields.tsx",
+        "line": 70,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-fields.tsx",
+        "line": 73,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 9,
+        "name": "Function 'SetupPanel'",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 31,
+        "name": "Function 'SetupStage'",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 40,
+        "name": "Arrow function",
+        "complexity": 2
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 41,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 47,
+        "name": "Function 'SetupInterviewType'",
+        "complexity": 3
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 50,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 55,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 59,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 68,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 74,
+        "name": "Function 'SetupDirection'",
+        "complexity": 3
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 104,
+        "name": "Function 'SetupPreferences'",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 116,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 123,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 124,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 132,
+        "name": "Function 'SetupResume'",
+        "complexity": 6
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 149,
+        "name": "Function 'SetupMediaPrivacy'",
+        "complexity": 3
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 169,
+        "name": "Function 'SetupInteraction'",
+        "complexity": 3
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 181,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-panels.tsx",
+        "line": 199,
+        "name": "Function 'SetupPanels'",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-summary.tsx",
+        "line": 7,
+        "name": "Function 'SetupAnswerMode'",
+        "complexity": 4
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-summary.tsx",
+        "line": 19,
+        "name": "Function 'SetupSummaryRows'",
+        "complexity": 3
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-summary.tsx",
+        "line": 36,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup-summary.tsx",
+        "line": 46,
+        "name": "Function 'SetupSummary'",
+        "complexity": 2
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup.tsx",
+        "line": 15,
+        "name": "Function 'CatalogNotice'",
+        "complexity": 3
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup.tsx",
+        "line": 29,
+        "name": "Function 'Form'",
+        "complexity": 5
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup.tsx",
+        "line": 32,
+        "name": "Async arrow function",
+        "complexity": 2
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup.tsx",
+        "line": 36,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup.tsx",
+        "line": 37,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup.tsx",
+        "line": 39,
+        "name": "Arrow function",
+        "complexity": 4
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup.tsx",
+        "line": 42,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup.tsx",
+        "line": 45,
+        "name": "Arrow function",
+        "complexity": 1
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup.tsx",
+        "line": 57,
+        "name": "Function 'ConfigurationForm'",
+        "complexity": 3
+      },
+      {
+        "file": "code/frontend/features/live-interview/setup.tsx",
+        "line": 69,
+        "name": "Function 'LiveSetup'",
+        "complexity": 1
+      }
+    ]
+  },
+  "source_diff": {
+    "baseline": "task-start snapshot, product sources only",
+    "insertions": 447,
+    "deletions": 313,
+    "total": 760,
+    "threshold": 400,
+    "passes": false,
+    "files": {
+      "setup-controller.ts": [
+        136,
+        0
+      ],
+      "setup-panels.tsx": [
+        211,
+        0
+      ],
+      "setup-summary.tsx": [
+        61,
+        0
+      ],
+      "setup.tsx": [
+        39,
+        313
+      ]
+    }
+  },
+  "limitations": [
+    "Scope changed only by adding the three extracted product files; remaining eleven warnings are in unchanged legacy functions of the touched pages.",
+    "v1.6 scan covered fifteen product files including six reverted navigation files; its 25 warnings must not be compared directly with this narrower 13 to 11 comparison.",
+    "No updated full-project Lint total is claimed.",
+    "New source and tests remain untracked/uncommitted."
+  ],
+  "config_files": [
+    {
+      "repository_path": "docs/software/quality/2026-11-25/followup/eslint.config.mjs",
+      "executed_config_sha256": "061ae39cbf85dc5d67c8bb4f8c81b496b6c209fdac44f5d77d6cd01924d09233",
+      "same_rules_as_repository_copy": true
+    },
+    {
+      "repository_path": "docs/software/quality/2026-11-25/followup/followup-strict.config.mjs",
+      "executed_config_sha256": "82dcd94fe0565602a4bc1f35833757960d0618ef18c003bc3908a7708cef81b2",
+      "same_rules_as_repository_copy": true
+    }
+  ]
+}

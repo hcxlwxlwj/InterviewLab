@@ -1,0 +1,5092 @@
+{
+  "tool": "c8 12.0.0 / Istanbul",
+  "commandScope": "321 ordinary + 87 database tests; --all includes unloaded code files as zero; excludes declarations/dist/.next",
+  "tests": {
+    "total": 408,
+    "ordinary": 321,
+    "database": 87,
+    "passed": 408,
+    "failed": 0,
+    "skipped": 0
+  },
+  "allSourceFiles": 184,
+  "allSource": {
+    "lines": {
+      "total": 24614,
+      "covered": 17456,
+      "skipped": 0,
+      "pct": 70.91
+    },
+    "statements": {
+      "total": 24614,
+      "covered": 17456,
+      "skipped": 0,
+      "pct": 70.91
+    },
+    "functions": {
+      "total": 1671,
+      "covered": 1416,
+      "skipped": 0,
+      "pct": 84.73
+    },
+    "branches": {
+      "total": 6598,
+      "covered": 5423,
+      "skipped": 0,
+      "pct": 82.19
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": "Unknown"
+    }
+  },
+  "coreSourceFiles": 18,
+  "coreEngine": {
+    "lines": {
+      "total": 1895,
+      "covered": 1424,
+      "skipped": 0,
+      "pct": 75.14
+    },
+    "statements": {
+      "total": 1895,
+      "covered": 1424,
+      "skipped": 0,
+      "pct": 75.14
+    },
+    "functions": {
+      "total": 208,
+      "covered": 171,
+      "skipped": 0,
+      "pct": 82.21
+    },
+    "branches": {
+      "total": 606,
+      "covered": 530,
+      "skipped": 0,
+      "pct": 87.45
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": "Unknown"
+    }
+  },
+  "insertedSourceLines": {
+    "baseline": "4b08a0f",
+    "rule": "Istanbul getLineCoverage matched against added TS/TSX/JS lines; unmapped lines disclosed separately; no branch threshold asserted",
+    "threshold": 80,
+    "mapped": 1070,
+    "covered": 921,
+    "percentage": 86.07476635514018,
+    "files": [
+      {
+        "file": "code/backend/src/modules/interviews/streaming-agent.ts",
+        "insertedLines": 94,
+        "mappedLines": 94,
+        "coveredLines": 94,
+        "unmappedLines": [],
+        "uncoveredLines": [],
+        "sourceLoaded": true
+      },
+      {
+        "file": "code/backend/src/modules/reports/service.ts",
+        "insertedLines": 57,
+        "mappedLines": 57,
+        "coveredLines": 56,
+        "unmappedLines": [],
+        "uncoveredLines": [
+          326
+        ],
+        "sourceLoaded": true
+      },
+      {
+        "file": "code/frontend/features/live-interview/report.tsx",
+        "insertedLines": 189,
+        "mappedLines": 189,
+        "coveredLines": 79,
+        "unmappedLines": [],
+        "uncoveredLines": [
+          34,
+          39,
+          42,
+          43,
+          46,
+          50,
+          53,
+          55,
+          61,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          73,
+          74,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155,
+          159,
+          165,
+          173,
+          174,
+          178,
+          179,
+          180,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187,
+          189,
+          190,
+          191,
+          192,
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          199,
+          210,
+          211,
+          212,
+          213,
+          215,
+          216,
+          217,
+          218,
+          219,
+          220,
+          221,
+          222,
+          224,
+          226,
+          227,
+          228,
+          229,
+          230,
+          231,
+          232,
+          233,
+          234,
+          237,
+          238,
+          239,
+          240,
+          241,
+          242,
+          243,
+          244,
+          245,
+          246,
+          247,
+          248,
+          249,
+          250,
+          251,
+          252,
+          253,
+          254,
+          255,
+          256,
+          257
+        ],
+        "sourceLoaded": true
+      },
+      {
+        "file": "code/frontend/features/live-interview/voice/controls.tsx",
+        "insertedLines": 211,
+        "mappedLines": 211,
+        "coveredLines": 195,
+        "unmappedLines": [],
+        "uncoveredLines": [
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          145,
+          146,
+          147,
+          148,
+          149,
+          150,
+          151,
+          152
+        ],
+        "sourceLoaded": true
+      },
+      {
+        "file": "code/frontend/features/live-interview/report-overview.tsx",
+        "insertedLines": 177,
+        "mappedLines": 177,
+        "coveredLines": 167,
+        "unmappedLines": [],
+        "uncoveredLines": [
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52
+        ],
+        "sourceLoaded": true
+      },
+      {
+        "file": "code/frontend/features/live-interview/report-practice.tsx",
+        "insertedLines": 291,
+        "mappedLines": 291,
+        "coveredLines": 280,
+        "unmappedLines": [],
+        "uncoveredLines": [
+          46,
+          112,
+          113,
+          114,
+          115,
+          116,
+          207,
+          208,
+          209,
+          210,
+          211
+        ],
+        "sourceLoaded": true
+      },
+      {
+        "file": "code/frontend/features/live-interview/voice/call-presentation.ts",
+        "insertedLines": 51,
+        "mappedLines": 51,
+        "coveredLines": 50,
+        "unmappedLines": [],
+        "uncoveredLines": [
+          50
+        ],
+        "sourceLoaded": true
+      }
+    ]
+  },
+  "files": {
+    "code/backend/drizzle.config.ts": {
+      "lines": {
+        "total": 17,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 17,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/backend/tsup.config.ts": {
+      "lines": {
+        "total": 12,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 12,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/backend/src/index.ts": {
+      "lines": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/backend/src/content/index.ts": {
+      "lines": {
+        "total": 59,
+        "covered": 58,
+        "skipped": 0,
+        "pct": 98.3
+      },
+      "functions": {
+        "total": 21,
+        "covered": 19,
+        "skipped": 0,
+        "pct": 90.47
+      },
+      "statements": {
+        "total": 59,
+        "covered": 58,
+        "skipped": 0,
+        "pct": 98.3
+      },
+      "branches": {
+        "total": 27,
+        "covered": 23,
+        "skipped": 0,
+        "pct": 85.18
+      }
+    },
+    "code/backend/src/database/<define:import.meta>": {
+      "lines": {
+        "total": 1,
+        "covered": 1,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 1,
+        "covered": 1,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
+    "code/backend/src/database/connection.ts": {
+      "lines": {
+        "total": 71,
+        "covered": 70,
+        "skipped": 0,
+        "pct": 98.59
+      },
+      "functions": {
+        "total": 10,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 71,
+        "covered": 70,
+        "skipped": 0,
+        "pct": 98.59
+      },
+      "branches": {
+        "total": 25,
+        "covered": 20,
+        "skipped": 0,
+        "pct": 80
+      }
+    },
+    "code/backend/src/database/migrate.ts": {
+      "lines": {
+        "total": 22,
+        "covered": 22,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 8,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 87.5
+      },
+      "statements": {
+        "total": 22,
+        "covered": 22,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 11,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 72.72
+      }
+    },
+    "code/backend/src/database/schema.ts": {
+      "lines": {
+        "total": 102,
+        "covered": 101,
+        "skipped": 0,
+        "pct": 99.01
+      },
+      "functions": {
+        "total": 10,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 90
+      },
+      "statements": {
+        "total": 102,
+        "covered": 101,
+        "skipped": 0,
+        "pct": 99.01
+      },
+      "branches": {
+        "total": 18,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 88.88
+      }
+    },
+    "code/backend/src/entrypoints/<define:import.meta>": {
+      "lines": {
+        "total": 1,
+        "covered": 1,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 1,
+        "covered": 1,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
+    "code/backend/src/entrypoints/api.ts": {
+      "lines": {
+        "total": 31,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 31,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/backend/src/entrypoints/create-user.ts": {
+      "lines": {
+        "total": 43,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 43,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/backend/src/entrypoints/environment.ts": {
+      "lines": {
+        "total": 42,
+        "covered": 20,
+        "skipped": 0,
+        "pct": 47.61
+      },
+      "functions": {
+        "total": 9,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 77.77
+      },
+      "statements": {
+        "total": 42,
+        "covered": 20,
+        "skipped": 0,
+        "pct": 47.61
+      },
+      "branches": {
+        "total": 16,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 81.25
+      }
+    },
+    "code/backend/src/entrypoints/migrate.ts": {
+      "lines": {
+        "total": 13,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 13,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/backend/src/entrypoints/openapi.ts": {
+      "lines": {
+        "total": 15,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 15,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/backend/src/entrypoints/worker.ts": {
+      "lines": {
+        "total": 41,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 41,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/backend/src/foundation/auth.ts": {
+      "lines": {
+        "total": 22,
+        "covered": 22,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 11,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 22,
+        "covered": 22,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 21,
+        "covered": 19,
+        "skipped": 0,
+        "pct": 90.47
+      }
+    },
+    "code/backend/src/foundation/config.ts": {
+      "lines": {
+        "total": 114,
+        "covered": 112,
+        "skipped": 0,
+        "pct": 98.24
+      },
+      "functions": {
+        "total": 11,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 90.9
+      },
+      "statements": {
+        "total": 114,
+        "covered": 112,
+        "skipped": 0,
+        "pct": 98.24
+      },
+      "branches": {
+        "total": 76,
+        "covered": 53,
+        "skipped": 0,
+        "pct": 69.73
+      }
+    },
+    "code/backend/src/foundation/errors.ts": {
+      "lines": {
+        "total": 57,
+        "covered": 55,
+        "skipped": 0,
+        "pct": 96.49
+      },
+      "functions": {
+        "total": 15,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 93.33
+      },
+      "statements": {
+        "total": 57,
+        "covered": 55,
+        "skipped": 0,
+        "pct": 96.49
+      },
+      "branches": {
+        "total": 31,
+        "covered": 28,
+        "skipped": 0,
+        "pct": 90.32
+      }
+    },
+    "code/backend/src/foundation/idempotency.ts": {
+      "lines": {
+        "total": 65,
+        "covered": 65,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 11,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 65,
+        "covered": 65,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 38,
+        "covered": 33,
+        "skipped": 0,
+        "pct": 86.84
+      }
+    },
+    "code/backend/src/foundation/schemas.ts": {
+      "lines": {
+        "total": 34,
+        "covered": 34,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 11,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 81.81
+      },
+      "statements": {
+        "total": 34,
+        "covered": 34,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 14,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 85.71
+      }
+    },
+    "code/backend/src/modules/contracts.ts": {
+      "lines": {
+        "total": 42,
+        "covered": 42,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 8,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 87.5
+      },
+      "statements": {
+        "total": 42,
+        "covered": 42,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 14,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 85.71
+      }
+    },
+    "code/backend/src/modules/interview-runtime.ts": {
+      "lines": {
+        "total": 130,
+        "covered": 103,
+        "skipped": 0,
+        "pct": 79.23
+      },
+      "functions": {
+        "total": 10,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 130,
+        "covered": 103,
+        "skipped": 0,
+        "pct": 79.23
+      },
+      "branches": {
+        "total": 30,
+        "covered": 24,
+        "skipped": 0,
+        "pct": 80
+      }
+    },
+    "code/backend/src/modules/accounts/auth-routes.ts": {
+      "lines": {
+        "total": 103,
+        "covered": 103,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 9,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 103,
+        "covered": 103,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 27,
+        "covered": 23,
+        "skipped": 0,
+        "pct": 85.18
+      }
+    },
+    "code/backend/src/modules/accounts/auth-schema.ts": {
+      "lines": {
+        "total": 87,
+        "covered": 87,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 12,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 83.33
+      },
+      "statements": {
+        "total": 87,
+        "covered": 87,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 19,
+        "covered": 17,
+        "skipped": 0,
+        "pct": 89.47
+      }
+    },
+    "code/backend/src/modules/accounts/auth-service.ts": {
+      "lines": {
+        "total": 182,
+        "covered": 166,
+        "skipped": 0,
+        "pct": 91.2
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 182,
+        "covered": 166,
+        "skipped": 0,
+        "pct": 91.2
+      },
+      "branches": {
+        "total": 39,
+        "covered": 34,
+        "skipped": 0,
+        "pct": 87.17
+      }
+    },
+    "code/backend/src/modules/accounts/provision.ts": {
+      "lines": {
+        "total": 42,
+        "covered": 42,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 42,
+        "covered": 42,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 13,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 84.61
+      }
+    },
+    "code/backend/src/modules/accounts/settings.ts": {
+      "lines": {
+        "total": 31,
+        "covered": 18,
+        "skipped": 0,
+        "pct": 58.06
+      },
+      "functions": {
+        "total": 8,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 31,
+        "covered": 18,
+        "skipped": 0,
+        "pct": 58.06
+      },
+      "branches": {
+        "total": 10,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 80
+      }
+    },
+    "code/backend/src/modules/interviews/agent.ts": {
+      "lines": {
+        "total": 52,
+        "covered": 52,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 9,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 88.88
+      },
+      "statements": {
+        "total": 52,
+        "covered": 52,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 16,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 81.25
+      }
+    },
+    "code/backend/src/modules/interviews/conversation.ts": {
+      "lines": {
+        "total": 154,
+        "covered": 153,
+        "skipped": 0,
+        "pct": 99.35
+      },
+      "functions": {
+        "total": 16,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 93.75
+      },
+      "statements": {
+        "total": 154,
+        "covered": 153,
+        "skipped": 0,
+        "pct": 99.35
+      },
+      "branches": {
+        "total": 98,
+        "covered": 87,
+        "skipped": 0,
+        "pct": 88.77
+      }
+    },
+    "code/backend/src/modules/interviews/events.ts": {
+      "lines": {
+        "total": 151,
+        "covered": 127,
+        "skipped": 0,
+        "pct": 84.1
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 151,
+        "covered": 127,
+        "skipped": 0,
+        "pct": 84.1
+      },
+      "branches": {
+        "total": 36,
+        "covered": 25,
+        "skipped": 0,
+        "pct": 69.44
+      }
+    },
+    "code/backend/src/modules/interviews/experience.ts": {
+      "lines": {
+        "total": 370,
+        "covered": 369,
+        "skipped": 0,
+        "pct": 99.72
+      },
+      "functions": {
+        "total": 23,
+        "covered": 23,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 370,
+        "covered": 369,
+        "skipped": 0,
+        "pct": 99.72
+      },
+      "branches": {
+        "total": 206,
+        "covered": 196,
+        "skipped": 0,
+        "pct": 95.14
+      }
+    },
+    "code/backend/src/modules/interviews/frontend-reference.ts": {
+      "lines": {
+        "total": 19,
+        "covered": 19,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 3,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 19,
+        "covered": 19,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
+    "code/backend/src/modules/interviews/graph.ts": {
+      "lines": {
+        "total": 47,
+        "covered": 47,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 8,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 87.5
+      },
+      "statements": {
+        "total": 47,
+        "covered": 47,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 24,
+        "covered": 20,
+        "skipped": 0,
+        "pct": 83.33
+      }
+    },
+    "code/backend/src/modules/interviews/knowledge.ts": {
+      "lines": {
+        "total": 41,
+        "covered": 38,
+        "skipped": 0,
+        "pct": 92.68
+      },
+      "functions": {
+        "total": 6,
+        "covered": 6,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 41,
+        "covered": 38,
+        "skipped": 0,
+        "pct": 92.68
+      },
+      "branches": {
+        "total": 15,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 60
+      }
+    },
+    "code/backend/src/modules/interviews/memory.ts": {
+      "lines": {
+        "total": 87,
+        "covered": 85,
+        "skipped": 0,
+        "pct": 97.7
+      },
+      "functions": {
+        "total": 10,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 90
+      },
+      "statements": {
+        "total": 87,
+        "covered": 85,
+        "skipped": 0,
+        "pct": 97.7
+      },
+      "branches": {
+        "total": 41,
+        "covered": 33,
+        "skipped": 0,
+        "pct": 80.48
+      }
+    },
+    "code/backend/src/modules/interviews/model-analysis.ts": {
+      "lines": {
+        "total": 324,
+        "covered": 320,
+        "skipped": 0,
+        "pct": 98.76
+      },
+      "functions": {
+        "total": 15,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 86.66
+      },
+      "statements": {
+        "total": 324,
+        "covered": 320,
+        "skipped": 0,
+        "pct": 98.76
+      },
+      "branches": {
+        "total": 96,
+        "covered": 84,
+        "skipped": 0,
+        "pct": 87.5
+      }
+    },
+    "code/backend/src/modules/interviews/model.ts": {
+      "lines": {
+        "total": 101,
+        "covered": 89,
+        "skipped": 0,
+        "pct": 88.11
+      },
+      "functions": {
+        "total": 9,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 88.88
+      },
+      "statements": {
+        "total": 101,
+        "covered": 89,
+        "skipped": 0,
+        "pct": 88.11
+      },
+      "branches": {
+        "total": 43,
+        "covered": 33,
+        "skipped": 0,
+        "pct": 76.74
+      }
+    },
+    "code/backend/src/modules/interviews/participation.ts": {
+      "lines": {
+        "total": 115,
+        "covered": 115,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 12,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 115,
+        "covered": 115,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 83,
+        "covered": 81,
+        "skipped": 0,
+        "pct": 97.59
+      }
+    },
+    "code/backend/src/modules/interviews/preparation.ts": {
+      "lines": {
+        "total": 326,
+        "covered": 305,
+        "skipped": 0,
+        "pct": 93.55
+      },
+      "functions": {
+        "total": 16,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 87.5
+      },
+      "statements": {
+        "total": 326,
+        "covered": 305,
+        "skipped": 0,
+        "pct": 93.55
+      },
+      "branches": {
+        "total": 92,
+        "covered": 70,
+        "skipped": 0,
+        "pct": 76.08
+      }
+    },
+    "code/backend/src/modules/interviews/question-policy.ts": {
+      "lines": {
+        "total": 27,
+        "covered": 27,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 9,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 27,
+        "covered": 27,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 21,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 76.19
+      }
+    },
+    "code/backend/src/modules/interviews/repository.ts": {
+      "lines": {
+        "total": 260,
+        "covered": 260,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 19,
+        "covered": 19,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 260,
+        "covered": 260,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 54,
+        "covered": 50,
+        "skipped": 0,
+        "pct": 92.59
+      }
+    },
+    "code/backend/src/modules/interviews/response-assessment.ts": {
+      "lines": {
+        "total": 138,
+        "covered": 138,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 16,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 93.75
+      },
+      "statements": {
+        "total": 138,
+        "covered": 138,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 53,
+        "covered": 50,
+        "skipped": 0,
+        "pct": 94.33
+      }
+    },
+    "code/backend/src/modules/interviews/routes.ts": {
+      "lines": {
+        "total": 287,
+        "covered": 239,
+        "skipped": 0,
+        "pct": 83.27
+      },
+      "functions": {
+        "total": 14,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 287,
+        "covered": 239,
+        "skipped": 0,
+        "pct": 83.27
+      },
+      "branches": {
+        "total": 38,
+        "covered": 29,
+        "skipped": 0,
+        "pct": 76.31
+      }
+    },
+    "code/backend/src/modules/interviews/schema.ts": {
+      "lines": {
+        "total": 128,
+        "covered": 128,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 11,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 72.72
+      },
+      "statements": {
+        "total": 128,
+        "covered": 128,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 14,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 85.71
+      }
+    },
+    "code/backend/src/modules/interviews/schemas.ts": {
+      "lines": {
+        "total": 159,
+        "covered": 159,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 19,
+        "covered": 18,
+        "skipped": 0,
+        "pct": 94.73
+      },
+      "statements": {
+        "total": 159,
+        "covered": 159,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 23,
+        "covered": 21,
+        "skipped": 0,
+        "pct": 91.3
+      }
+    },
+    "code/backend/src/modules/interviews/service.ts": {
+      "lines": {
+        "total": 950,
+        "covered": 895,
+        "skipped": 0,
+        "pct": 94.21
+      },
+      "functions": {
+        "total": 28,
+        "covered": 28,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 950,
+        "covered": 895,
+        "skipped": 0,
+        "pct": 94.21
+      },
+      "branches": {
+        "total": 282,
+        "covered": 211,
+        "skipped": 0,
+        "pct": 74.82
+      }
+    },
+    "code/backend/src/modules/interviews/stream-parser.ts": {
+      "lines": {
+        "total": 146,
+        "covered": 117,
+        "skipped": 0,
+        "pct": 80.13
+      },
+      "functions": {
+        "total": 9,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 146,
+        "covered": 117,
+        "skipped": 0,
+        "pct": 80.13
+      },
+      "branches": {
+        "total": 94,
+        "covered": 78,
+        "skipped": 0,
+        "pct": 82.97
+      }
+    },
+    "code/backend/src/modules/interviews/streaming-agent.ts": {
+      "lines": {
+        "total": 1315,
+        "covered": 1260,
+        "skipped": 0,
+        "pct": 95.81
+      },
+      "functions": {
+        "total": 34,
+        "covered": 33,
+        "skipped": 0,
+        "pct": 97.05
+      },
+      "statements": {
+        "total": 1315,
+        "covered": 1260,
+        "skipped": 0,
+        "pct": 95.81
+      },
+      "branches": {
+        "total": 460,
+        "covered": 408,
+        "skipped": 0,
+        "pct": 88.69
+      }
+    },
+    "code/backend/src/modules/interviews/streams.ts": {
+      "lines": {
+        "total": 88,
+        "covered": 79,
+        "skipped": 0,
+        "pct": 89.77
+      },
+      "functions": {
+        "total": 13,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 88,
+        "covered": 79,
+        "skipped": 0,
+        "pct": 89.77
+      },
+      "branches": {
+        "total": 29,
+        "covered": 23,
+        "skipped": 0,
+        "pct": 79.31
+      }
+    },
+    "code/backend/src/modules/interviews/workflow-models.ts": {
+      "lines": {
+        "total": 328,
+        "covered": 308,
+        "skipped": 0,
+        "pct": 93.9
+      },
+      "functions": {
+        "total": 17,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 94.11
+      },
+      "statements": {
+        "total": 328,
+        "covered": 308,
+        "skipped": 0,
+        "pct": 93.9
+      },
+      "branches": {
+        "total": 84,
+        "covered": 70,
+        "skipped": 0,
+        "pct": 83.33
+      }
+    },
+    "code/backend/src/modules/interviews/voice/activity.ts": {
+      "lines": {
+        "total": 85,
+        "covered": 85,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 9,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 85,
+        "covered": 85,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 26,
+        "covered": 22,
+        "skipped": 0,
+        "pct": 84.61
+      }
+    },
+    "code/backend/src/modules/interviews/voice/routes.ts": {
+      "lines": {
+        "total": 180,
+        "covered": 153,
+        "skipped": 0,
+        "pct": 85
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 180,
+        "covered": 153,
+        "skipped": 0,
+        "pct": 85
+      },
+      "branches": {
+        "total": 40,
+        "covered": 25,
+        "skipped": 0,
+        "pct": 62.5
+      }
+    },
+    "code/backend/src/modules/interviews/voice/session.ts": {
+      "lines": {
+        "total": 751,
+        "covered": 661,
+        "skipped": 0,
+        "pct": 88.01
+      },
+      "functions": {
+        "total": 27,
+        "covered": 26,
+        "skipped": 0,
+        "pct": 96.29
+      },
+      "statements": {
+        "total": 751,
+        "covered": 661,
+        "skipped": 0,
+        "pct": 88.01
+      },
+      "branches": {
+        "total": 266,
+        "covered": 208,
+        "skipped": 0,
+        "pct": 78.19
+      }
+    },
+    "code/backend/src/modules/interviews/voice/volcengine.ts": {
+      "lines": {
+        "total": 245,
+        "covered": 78,
+        "skipped": 0,
+        "pct": 31.83
+      },
+      "functions": {
+        "total": 15,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 80
+      },
+      "statements": {
+        "total": 245,
+        "covered": 78,
+        "skipped": 0,
+        "pct": 31.83
+      },
+      "branches": {
+        "total": 43,
+        "covered": 36,
+        "skipped": 0,
+        "pct": 83.72
+      }
+    },
+    "code/backend/src/modules/jobs/bookmarks.ts": {
+      "lines": {
+        "total": 20,
+        "covered": 17,
+        "skipped": 0,
+        "pct": 85
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 20,
+        "covered": 17,
+        "skipped": 0,
+        "pct": 85
+      },
+      "branches": {
+        "total": 9,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 77.77
+      }
+    },
+    "code/backend/src/modules/jobs/repository.ts": {
+      "lines": {
+        "total": 17,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 94.11
+      },
+      "functions": {
+        "total": 6,
+        "covered": 6,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 17,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 94.11
+      },
+      "branches": {
+        "total": 12,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 83.33
+      }
+    },
+    "code/backend/src/modules/jobs/routes.ts": {
+      "lines": {
+        "total": 155,
+        "covered": 155,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 9,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 88.88
+      },
+      "statements": {
+        "total": 155,
+        "covered": 155,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 16,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 87.5
+      }
+    },
+    "code/backend/src/modules/jobs/schema.ts": {
+      "lines": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/backend/src/modules/jobs/service.ts": {
+      "lines": {
+        "total": 59,
+        "covered": 59,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 9,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 59,
+        "covered": 59,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 29,
+        "covered": 27,
+        "skipped": 0,
+        "pct": 93.1
+      }
+    },
+    "code/backend/src/modules/knowledge/all-roles.ts": {
+      "lines": {
+        "total": 276,
+        "covered": 268,
+        "skipped": 0,
+        "pct": 97.1
+      },
+      "functions": {
+        "total": 12,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 276,
+        "covered": 268,
+        "skipped": 0,
+        "pct": 97.1
+      },
+      "branches": {
+        "total": 91,
+        "covered": 73,
+        "skipped": 0,
+        "pct": 80.21
+      }
+    },
+    "code/backend/src/modules/knowledge/catalog-command.ts": {
+      "lines": {
+        "total": 195,
+        "covered": 185,
+        "skipped": 0,
+        "pct": 94.87
+      },
+      "functions": {
+        "total": 2,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 195,
+        "covered": 185,
+        "skipped": 0,
+        "pct": 94.87
+      },
+      "branches": {
+        "total": 40,
+        "covered": 27,
+        "skipped": 0,
+        "pct": 67.5
+      }
+    },
+    "code/backend/src/modules/knowledge/catalog.ts": {
+      "lines": {
+        "total": 325,
+        "covered": 324,
+        "skipped": 0,
+        "pct": 99.69
+      },
+      "functions": {
+        "total": 27,
+        "covered": 21,
+        "skipped": 0,
+        "pct": 77.77
+      },
+      "statements": {
+        "total": 325,
+        "covered": 324,
+        "skipped": 0,
+        "pct": 99.69
+      },
+      "branches": {
+        "total": 133,
+        "covered": 121,
+        "skipped": 0,
+        "pct": 90.97
+      }
+    },
+    "code/backend/src/modules/knowledge/embedding.ts": {
+      "lines": {
+        "total": 38,
+        "covered": 38,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 8,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 38,
+        "covered": 38,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 29,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 51.72
+      }
+    },
+    "code/backend/src/modules/reports/agent.ts": {
+      "lines": {
+        "total": 146,
+        "covered": 117,
+        "skipped": 0,
+        "pct": 80.13
+      },
+      "functions": {
+        "total": 11,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 90.9
+      },
+      "statements": {
+        "total": 146,
+        "covered": 117,
+        "skipped": 0,
+        "pct": 80.13
+      },
+      "branches": {
+        "total": 31,
+        "covered": 24,
+        "skipped": 0,
+        "pct": 77.41
+      }
+    },
+    "code/backend/src/modules/reports/aggregate.ts": {
+      "lines": {
+        "total": 377,
+        "covered": 377,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 22,
+        "covered": 22,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 377,
+        "covered": 377,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 156,
+        "covered": 147,
+        "skipped": 0,
+        "pct": 94.23
+      }
+    },
+    "code/backend/src/modules/reports/analysis.ts": {
+      "lines": {
+        "total": 1233,
+        "covered": 899,
+        "skipped": 0,
+        "pct": 72.91
+      },
+      "functions": {
+        "total": 60,
+        "covered": 51,
+        "skipped": 0,
+        "pct": 85
+      },
+      "statements": {
+        "total": 1233,
+        "covered": 899,
+        "skipped": 0,
+        "pct": 72.91
+      },
+      "branches": {
+        "total": 664,
+        "covered": 534,
+        "skipped": 0,
+        "pct": 80.42
+      }
+    },
+    "code/backend/src/modules/reports/repository.ts": {
+      "lines": {
+        "total": 216,
+        "covered": 216,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 39,
+        "covered": 39,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 216,
+        "covered": 216,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 53,
+        "covered": 50,
+        "skipped": 0,
+        "pct": 94.33
+      }
+    },
+    "code/backend/src/modules/reports/routes.ts": {
+      "lines": {
+        "total": 113,
+        "covered": 83,
+        "skipped": 0,
+        "pct": 73.45
+      },
+      "functions": {
+        "total": 8,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 113,
+        "covered": 83,
+        "skipped": 0,
+        "pct": 73.45
+      },
+      "branches": {
+        "total": 14,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 78.57
+      }
+    },
+    "code/backend/src/modules/reports/schema.ts": {
+      "lines": {
+        "total": 60,
+        "covered": 59,
+        "skipped": 0,
+        "pct": 98.33
+      },
+      "functions": {
+        "total": 8,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 87.5
+      },
+      "statements": {
+        "total": 60,
+        "covered": 59,
+        "skipped": 0,
+        "pct": 98.33
+      },
+      "branches": {
+        "total": 14,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 85.71
+      }
+    },
+    "code/backend/src/modules/reports/schemas.ts": {
+      "lines": {
+        "total": 133,
+        "covered": 133,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 6,
+        "covered": 6,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 133,
+        "covered": 133,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 11,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 81.81
+      }
+    },
+    "code/backend/src/modules/reports/service.ts": {
+      "lines": {
+        "total": 981,
+        "covered": 896,
+        "skipped": 0,
+        "pct": 91.33
+      },
+      "functions": {
+        "total": 26,
+        "covered": 25,
+        "skipped": 0,
+        "pct": 96.15
+      },
+      "statements": {
+        "total": 981,
+        "covered": 896,
+        "skipped": 0,
+        "pct": 91.33
+      },
+      "branches": {
+        "total": 227,
+        "covered": 172,
+        "skipped": 0,
+        "pct": 75.77
+      }
+    },
+    "code/backend/src/modules/resumes/analysis.ts": {
+      "lines": {
+        "total": 175,
+        "covered": 175,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 11,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 175,
+        "covered": 175,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 39,
+        "covered": 29,
+        "skipped": 0,
+        "pct": 74.35
+      }
+    },
+    "code/backend/src/modules/resumes/pdf.ts": {
+      "lines": {
+        "total": 36,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 5.55
+      },
+      "functions": {
+        "total": 7,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 57.14
+      },
+      "statements": {
+        "total": 36,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 5.55
+      },
+      "branches": {
+        "total": 6,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 66.66
+      }
+    },
+    "code/backend/src/modules/resumes/routes.ts": {
+      "lines": {
+        "total": 97,
+        "covered": 79,
+        "skipped": 0,
+        "pct": 81.44
+      },
+      "functions": {
+        "total": 8,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 97,
+        "covered": 79,
+        "skipped": 0,
+        "pct": 81.44
+      },
+      "branches": {
+        "total": 10,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 80
+      }
+    },
+    "code/backend/src/modules/resumes/schema.ts": {
+      "lines": {
+        "total": 63,
+        "covered": 62,
+        "skipped": 0,
+        "pct": 98.41
+      },
+      "functions": {
+        "total": 8,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 63,
+        "covered": 62,
+        "skipped": 0,
+        "pct": 98.41
+      },
+      "branches": {
+        "total": 15,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 86.66
+      }
+    },
+    "code/backend/src/modules/resumes/service.ts": {
+      "lines": {
+        "total": 99,
+        "covered": 87,
+        "skipped": 0,
+        "pct": 87.87
+      },
+      "functions": {
+        "total": 13,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 84.61
+      },
+      "statements": {
+        "total": 99,
+        "covered": 87,
+        "skipped": 0,
+        "pct": 87.87
+      },
+      "branches": {
+        "total": 32,
+        "covered": 21,
+        "skipped": 0,
+        "pct": 65.62
+      }
+    },
+    "code/backend/src/server/app.ts": {
+      "lines": {
+        "total": 225,
+        "covered": 218,
+        "skipped": 0,
+        "pct": 96.88
+      },
+      "functions": {
+        "total": 9,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 225,
+        "covered": 218,
+        "skipped": 0,
+        "pct": 96.88
+      },
+      "branches": {
+        "total": 73,
+        "covered": 65,
+        "skipped": 0,
+        "pct": 89.04
+      }
+    },
+    "code/backend/src/tasks/outbox.ts": {
+      "lines": {
+        "total": 55,
+        "covered": 55,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 55,
+        "covered": 55,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 20,
+        "covered": 17,
+        "skipped": 0,
+        "pct": 85
+      }
+    },
+    "code/backend/src/tasks/queue.ts": {
+      "lines": {
+        "total": 15,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 10,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 15,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 15,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 80
+      }
+    },
+    "code/backend/src/tasks/runner.ts": {
+      "lines": {
+        "total": 157,
+        "covered": 154,
+        "skipped": 0,
+        "pct": 98.08
+      },
+      "functions": {
+        "total": 10,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 157,
+        "covered": 154,
+        "skipped": 0,
+        "pct": 98.08
+      },
+      "branches": {
+        "total": 77,
+        "covered": 71,
+        "skipped": 0,
+        "pct": 92.2
+      }
+    },
+    "code/backend/src/tasks/service.ts": {
+      "lines": {
+        "total": 88,
+        "covered": 88,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 12,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 91.66
+      },
+      "statements": {
+        "total": 88,
+        "covered": 88,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 23,
+        "covered": 20,
+        "skipped": 0,
+        "pct": 86.95
+      }
+    },
+    "code/backend/src/tasks/worker.ts": {
+      "lines": {
+        "total": 118,
+        "covered": 109,
+        "skipped": 0,
+        "pct": 92.37
+      },
+      "functions": {
+        "total": 8,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 118,
+        "covered": 109,
+        "skipped": 0,
+        "pct": 92.37
+      },
+      "branches": {
+        "total": 26,
+        "covered": 19,
+        "skipped": 0,
+        "pct": 73.07
+      }
+    },
+    "code/core_engine/src/agent-workflow.ts": {
+      "lines": {
+        "total": 43,
+        "covered": 42,
+        "skipped": 0,
+        "pct": 97.67
+      },
+      "functions": {
+        "total": 5,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 60
+      },
+      "statements": {
+        "total": 43,
+        "covered": 42,
+        "skipped": 0,
+        "pct": 97.67
+      },
+      "branches": {
+        "total": 5,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 60
+      }
+    },
+    "code/core_engine/src/configuration.ts": {
+      "lines": {
+        "total": 16,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 87.5
+      },
+      "functions": {
+        "total": 6,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 50
+      },
+      "statements": {
+        "total": 16,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 87.5
+      },
+      "branches": {
+        "total": 7,
+        "covered": 5,
+        "skipped": 0,
+        "pct": 71.42
+      }
+    },
+    "code/core_engine/src/feedback-template.ts": {
+      "lines": {
+        "total": 145,
+        "covered": 135,
+        "skipped": 0,
+        "pct": 93.1
+      },
+      "functions": {
+        "total": 15,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 93.33
+      },
+      "statements": {
+        "total": 145,
+        "covered": 135,
+        "skipped": 0,
+        "pct": 93.1
+      },
+      "branches": {
+        "total": 41,
+        "covered": 37,
+        "skipped": 0,
+        "pct": 90.24
+      }
+    },
+    "code/core_engine/src/foundation.ts": {
+      "lines": {
+        "total": 75,
+        "covered": 75,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 3,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 66.66
+      },
+      "statements": {
+        "total": 75,
+        "covered": 75,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 4,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 50
+      }
+    },
+    "code/core_engine/src/index.ts": {
+      "lines": {
+        "total": 22,
+        "covered": 22,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 4,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 22,
+        "covered": 22,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 9,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 77.77
+      }
+    },
+    "code/core_engine/src/interview-agent.ts": {
+      "lines": {
+        "total": 114,
+        "covered": 114,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 6,
+        "covered": 6,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 114,
+        "covered": 114,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 10,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 80
+      }
+    },
+    "code/core_engine/src/interview-policy.ts": {
+      "lines": {
+        "total": 164,
+        "covered": 131,
+        "skipped": 0,
+        "pct": 79.87
+      },
+      "functions": {
+        "total": 13,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 84.61
+      },
+      "statements": {
+        "total": 164,
+        "covered": 131,
+        "skipped": 0,
+        "pct": 79.87
+      },
+      "branches": {
+        "total": 82,
+        "covered": 74,
+        "skipped": 0,
+        "pct": 90.24
+      }
+    },
+    "code/core_engine/src/interview-response.ts": {
+      "lines": {
+        "total": 30,
+        "covered": 30,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 9,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 30,
+        "covered": 30,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 13,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 84.61
+      }
+    },
+    "code/core_engine/src/knowledge.ts": {
+      "lines": {
+        "total": 140,
+        "covered": 118,
+        "skipped": 0,
+        "pct": 84.28
+      },
+      "functions": {
+        "total": 25,
+        "covered": 24,
+        "skipped": 0,
+        "pct": 96
+      },
+      "statements": {
+        "total": 140,
+        "covered": 118,
+        "skipped": 0,
+        "pct": 84.28
+      },
+      "branches": {
+        "total": 88,
+        "covered": 77,
+        "skipped": 0,
+        "pct": 87.5
+      }
+    },
+    "code/core_engine/src/live-interview.ts": {
+      "lines": {
+        "total": 315,
+        "covered": 46,
+        "skipped": 0,
+        "pct": 14.6
+      },
+      "functions": {
+        "total": 32,
+        "covered": 23,
+        "skipped": 0,
+        "pct": 71.87
+      },
+      "statements": {
+        "total": 315,
+        "covered": 46,
+        "skipped": 0,
+        "pct": 14.6
+      },
+      "branches": {
+        "total": 63,
+        "covered": 58,
+        "skipped": 0,
+        "pct": 92.06
+      }
+    },
+    "code/core_engine/src/performance-profile.ts": {
+      "lines": {
+        "total": 68,
+        "covered": 65,
+        "skipped": 0,
+        "pct": 95.58
+      },
+      "functions": {
+        "total": 8,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 87.5
+      },
+      "statements": {
+        "total": 68,
+        "covered": 65,
+        "skipped": 0,
+        "pct": 95.58
+      },
+      "branches": {
+        "total": 41,
+        "covered": 38,
+        "skipped": 0,
+        "pct": 92.68
+      }
+    },
+    "code/core_engine/src/personal.ts": {
+      "lines": {
+        "total": 24,
+        "covered": 24,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 3,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 66.66
+      },
+      "statements": {
+        "total": 24,
+        "covered": 24,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 4,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 50
+      }
+    },
+    "code/core_engine/src/question-scoring.ts": {
+      "lines": {
+        "total": 246,
+        "covered": 144,
+        "skipped": 0,
+        "pct": 58.53
+      },
+      "functions": {
+        "total": 44,
+        "covered": 36,
+        "skipped": 0,
+        "pct": 81.81
+      },
+      "statements": {
+        "total": 246,
+        "covered": 144,
+        "skipped": 0,
+        "pct": 58.53
+      },
+      "branches": {
+        "total": 147,
+        "covered": 132,
+        "skipped": 0,
+        "pct": 89.79
+      }
+    },
+    "code/core_engine/src/report-rubric.ts": {
+      "lines": {
+        "total": 253,
+        "covered": 229,
+        "skipped": 0,
+        "pct": 90.51
+      },
+      "functions": {
+        "total": 14,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 85.71
+      },
+      "statements": {
+        "total": 253,
+        "covered": 229,
+        "skipped": 0,
+        "pct": 90.51
+      },
+      "branches": {
+        "total": 46,
+        "covered": 42,
+        "skipped": 0,
+        "pct": 91.3
+      }
+    },
+    "code/core_engine/src/resume-template.ts": {
+      "lines": {
+        "total": 41,
+        "covered": 37,
+        "skipped": 0,
+        "pct": 90.24
+      },
+      "functions": {
+        "total": 10,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 80
+      },
+      "statements": {
+        "total": 41,
+        "covered": 37,
+        "skipped": 0,
+        "pct": 90.24
+      },
+      "branches": {
+        "total": 33,
+        "covered": 27,
+        "skipped": 0,
+        "pct": 81.81
+      }
+    },
+    "code/core_engine/src/voice.ts": {
+      "lines": {
+        "total": 29,
+        "covered": 29,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 3,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 66.66
+      },
+      "statements": {
+        "total": 29,
+        "covered": 29,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 4,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 50
+      }
+    },
+    "code/core_engine/src/domain/interview.ts": {
+      "lines": {
+        "total": 14,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 3,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 66.66
+      },
+      "statements": {
+        "total": 14,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 4,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 50
+      }
+    },
+    "code/core_engine/src/domain/knowledge.ts": {
+      "lines": {
+        "total": 156,
+        "covered": 155,
+        "skipped": 0,
+        "pct": 99.35
+      },
+      "functions": {
+        "total": 5,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 60
+      },
+      "statements": {
+        "total": 156,
+        "covered": 155,
+        "skipped": 0,
+        "pct": 99.35
+      },
+      "branches": {
+        "total": 5,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 60
+      }
+    },
+    "code/frontend/next.config.ts": {
+      "lines": {
+        "total": 22,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 22,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/error.tsx": {
+      "lines": {
+        "total": 12,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 12,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/layout.tsx": {
+      "lines": {
+        "total": 38,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 38,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/loading.tsx": {
+      "lines": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/not-found.tsx": {
+      "lines": {
+        "total": 12,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 12,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/page.tsx": {
+      "lines": {
+        "total": 286,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 286,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/interview/layout.tsx": {
+      "lines": {
+        "total": 6,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 6,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/interview/[id]/page.tsx": {
+      "lines": {
+        "total": 6,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 6,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/interview/[id]/analysis/page.tsx": {
+      "lines": {
+        "total": 16,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 16,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/interview/[id]/prepare/page.tsx": {
+      "lines": {
+        "total": 7,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 7,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/interview/[id]/video/page.tsx": {
+      "lines": {
+        "total": 8,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 8,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/interview/setup/page.tsx": {
+      "lines": {
+        "total": 5,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 5,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/jobs/page.tsx": {
+      "lines": {
+        "total": 9,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 9,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/jobs/[slug]/page.tsx": {
+      "lines": {
+        "total": 5,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 5,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/login/page.tsx": {
+      "lines": {
+        "total": 32,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 32,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/me/page.tsx": {
+      "lines": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/me/interviews/page.tsx": {
+      "lines": {
+        "total": 3,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 3,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/me/preferences/page.tsx": {
+      "lines": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/me/profile/page.tsx": {
+      "lines": {
+        "total": 3,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 3,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/me/resumes/page.tsx": {
+      "lines": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/me/resumes/[id]/page.tsx": {
+      "lines": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/me/saved-jobs/page.tsx": {
+      "lines": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/reports/[id]/page.tsx": {
+      "lines": {
+        "total": 6,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 6,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/app/reports/[id]/practice/page.tsx": {
+      "lines": {
+        "total": 15,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 15,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/components/account-access.tsx": {
+      "lines": {
+        "total": 97,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 97,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/components/account-controls.tsx": {
+      "lines": {
+        "total": 48,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 16.66
+      },
+      "functions": {
+        "total": 8,
+        "covered": 5,
+        "skipped": 0,
+        "pct": 62.5
+      },
+      "statements": {
+        "total": 48,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 16.66
+      },
+      "branches": {
+        "total": 10,
+        "covered": 6,
+        "skipped": 0,
+        "pct": 60
+      }
+    },
+    "code/frontend/components/auth-form.tsx": {
+      "lines": {
+        "total": 152,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 152,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/components/bookmark-button.tsx": {
+      "lines": {
+        "total": 9,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 9,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/components/interview-setup.tsx": {
+      "lines": {
+        "total": 70,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 70,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/components/interview-workspace.tsx": {
+      "lines": {
+        "total": 353,
+        "covered": 259,
+        "skipped": 0,
+        "pct": 73.37
+      },
+      "functions": {
+        "total": 11,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 72.72
+      },
+      "statements": {
+        "total": 353,
+        "covered": 259,
+        "skipped": 0,
+        "pct": 73.37
+      },
+      "branches": {
+        "total": 41,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 34.14
+      }
+    },
+    "code/frontend/components/job-library.tsx": {
+      "lines": {
+        "total": 355,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 355,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/components/session-provider.tsx": {
+      "lines": {
+        "total": 87,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 18.39
+      },
+      "functions": {
+        "total": 9,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 44.44
+      },
+      "statements": {
+        "total": 87,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 18.39
+      },
+      "branches": {
+        "total": 8,
+        "covered": 6,
+        "skipped": 0,
+        "pct": 75
+      }
+    },
+    "code/frontend/components/shared.tsx": {
+      "lines": {
+        "total": 230,
+        "covered": 45,
+        "skipped": 0,
+        "pct": 19.56
+      },
+      "functions": {
+        "total": 26,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 38.46
+      },
+      "statements": {
+        "total": 230,
+        "covered": 45,
+        "skipped": 0,
+        "pct": 19.56
+      },
+      "branches": {
+        "total": 16,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 75
+      }
+    },
+    "code/frontend/components/ui/button.tsx": {
+      "lines": {
+        "total": 27,
+        "covered": 27,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 8,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 27,
+        "covered": 27,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 15,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 73.33
+      }
+    },
+    "code/frontend/features/live-interview/analysis-state.ts": {
+      "lines": {
+        "total": 161,
+        "covered": 160,
+        "skipped": 0,
+        "pct": 99.37
+      },
+      "functions": {
+        "total": 13,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 161,
+        "covered": 160,
+        "skipped": 0,
+        "pct": 99.37
+      },
+      "branches": {
+        "total": 78,
+        "covered": 72,
+        "skipped": 0,
+        "pct": 92.3
+      }
+    },
+    "code/frontend/features/live-interview/analysis.tsx": {
+      "lines": {
+        "total": 187,
+        "covered": 128,
+        "skipped": 0,
+        "pct": 68.44
+      },
+      "functions": {
+        "total": 13,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 76.92
+      },
+      "statements": {
+        "total": 187,
+        "covered": 128,
+        "skipped": 0,
+        "pct": 68.44
+      },
+      "branches": {
+        "total": 33,
+        "covered": 26,
+        "skipped": 0,
+        "pct": 78.78
+      }
+    },
+    "code/frontend/features/live-interview/common.tsx": {
+      "lines": {
+        "total": 201,
+        "covered": 29,
+        "skipped": 0,
+        "pct": 14.42
+      },
+      "functions": {
+        "total": 20,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 40
+      },
+      "statements": {
+        "total": 201,
+        "covered": 29,
+        "skipped": 0,
+        "pct": 14.42
+      },
+      "branches": {
+        "total": 14,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 71.42
+      }
+    },
+    "code/frontend/features/live-interview/entry-request.ts": {
+      "lines": {
+        "total": 20,
+        "covered": 20,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 20,
+        "covered": 20,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 18,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 88.88
+      }
+    },
+    "code/frontend/features/live-interview/flow-provider.tsx": {
+      "lines": {
+        "total": 347,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 347,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/live-interview/history.tsx": {
+      "lines": {
+        "total": 215,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 215,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/live-interview/interview-notices.tsx": {
+      "lines": {
+        "total": 84,
+        "covered": 81,
+        "skipped": 0,
+        "pct": 96.42
+      },
+      "functions": {
+        "total": 11,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 81.81
+      },
+      "statements": {
+        "total": 84,
+        "covered": 81,
+        "skipped": 0,
+        "pct": 96.42
+      },
+      "branches": {
+        "total": 18,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 77.77
+      }
+    },
+    "code/frontend/features/live-interview/interview-presentation.ts": {
+      "lines": {
+        "total": 90,
+        "covered": 88,
+        "skipped": 0,
+        "pct": 97.77
+      },
+      "functions": {
+        "total": 11,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 90,
+        "covered": 88,
+        "skipped": 0,
+        "pct": 97.77
+      },
+      "branches": {
+        "total": 38,
+        "covered": 33,
+        "skipped": 0,
+        "pct": 86.84
+      }
+    },
+    "code/frontend/features/live-interview/interview.tsx": {
+      "lines": {
+        "total": 356,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 356,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/live-interview/preparation.tsx": {
+      "lines": {
+        "total": 244,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 244,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/live-interview/presentation-request.ts": {
+      "lines": {
+        "total": 44,
+        "covered": 41,
+        "skipped": 0,
+        "pct": 93.18
+      },
+      "functions": {
+        "total": 9,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 44,
+        "covered": 41,
+        "skipped": 0,
+        "pct": 93.18
+      },
+      "branches": {
+        "total": 28,
+        "covered": 22,
+        "skipped": 0,
+        "pct": 78.57
+      }
+    },
+    "code/frontend/features/live-interview/question-scores.tsx": {
+      "lines": {
+        "total": 177,
+        "covered": 167,
+        "skipped": 0,
+        "pct": 94.35
+      },
+      "functions": {
+        "total": 11,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 90.9
+      },
+      "statements": {
+        "total": 177,
+        "covered": 167,
+        "skipped": 0,
+        "pct": 94.35
+      },
+      "branches": {
+        "total": 59,
+        "covered": 49,
+        "skipped": 0,
+        "pct": 83.05
+      }
+    },
+    "code/frontend/features/live-interview/report-charts.tsx": {
+      "lines": {
+        "total": 332,
+        "covered": 295,
+        "skipped": 0,
+        "pct": 88.85
+      },
+      "functions": {
+        "total": 16,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 81.25
+      },
+      "statements": {
+        "total": 332,
+        "covered": 295,
+        "skipped": 0,
+        "pct": 88.85
+      },
+      "branches": {
+        "total": 75,
+        "covered": 57,
+        "skipped": 0,
+        "pct": 76
+      }
+    },
+    "code/frontend/features/live-interview/report-export.ts": {
+      "lines": {
+        "total": 108,
+        "covered": 82,
+        "skipped": 0,
+        "pct": 75.92
+      },
+      "functions": {
+        "total": 9,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 88.88
+      },
+      "statements": {
+        "total": 108,
+        "covered": 82,
+        "skipped": 0,
+        "pct": 75.92
+      },
+      "branches": {
+        "total": 59,
+        "covered": 44,
+        "skipped": 0,
+        "pct": 74.57
+      }
+    },
+    "code/frontend/features/live-interview/report-insights.tsx": {
+      "lines": {
+        "total": 163,
+        "covered": 158,
+        "skipped": 0,
+        "pct": 96.93
+      },
+      "functions": {
+        "total": 10,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 70
+      },
+      "statements": {
+        "total": 163,
+        "covered": 158,
+        "skipped": 0,
+        "pct": 96.93
+      },
+      "branches": {
+        "total": 24,
+        "covered": 19,
+        "skipped": 0,
+        "pct": 79.16
+      }
+    },
+    "code/frontend/features/live-interview/report-overview.tsx": {
+      "lines": {
+        "total": 177,
+        "covered": 167,
+        "skipped": 0,
+        "pct": 94.35
+      },
+      "functions": {
+        "total": 13,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 92.3
+      },
+      "statements": {
+        "total": 177,
+        "covered": 167,
+        "skipped": 0,
+        "pct": 94.35
+      },
+      "branches": {
+        "total": 40,
+        "covered": 32,
+        "skipped": 0,
+        "pct": 80
+      }
+    },
+    "code/frontend/features/live-interview/report-practice.tsx": {
+      "lines": {
+        "total": 291,
+        "covered": 280,
+        "skipped": 0,
+        "pct": 96.21
+      },
+      "functions": {
+        "total": 20,
+        "covered": 17,
+        "skipped": 0,
+        "pct": 85
+      },
+      "statements": {
+        "total": 291,
+        "covered": 280,
+        "skipped": 0,
+        "pct": 96.21
+      },
+      "branches": {
+        "total": 62,
+        "covered": 55,
+        "skipped": 0,
+        "pct": 88.7
+      }
+    },
+    "code/frontend/features/live-interview/report-progress.tsx": {
+      "lines": {
+        "total": 144,
+        "covered": 56,
+        "skipped": 0,
+        "pct": 38.88
+      },
+      "functions": {
+        "total": 13,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 84.61
+      },
+      "statements": {
+        "total": 144,
+        "covered": 56,
+        "skipped": 0,
+        "pct": 38.88
+      },
+      "branches": {
+        "total": 52,
+        "covered": 49,
+        "skipped": 0,
+        "pct": 94.23
+      }
+    },
+    "code/frontend/features/live-interview/report-standard.tsx": {
+      "lines": {
+        "total": 27,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 11.11
+      },
+      "functions": {
+        "total": 7,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 57.14
+      },
+      "statements": {
+        "total": 27,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 11.11
+      },
+      "branches": {
+        "total": 6,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 66.66
+      }
+    },
+    "code/frontend/features/live-interview/report.tsx": {
+      "lines": {
+        "total": 274,
+        "covered": 88,
+        "skipped": 0,
+        "pct": 32.11
+      },
+      "functions": {
+        "total": 19,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 52.63
+      },
+      "statements": {
+        "total": 274,
+        "covered": 88,
+        "skipped": 0,
+        "pct": 32.11
+      },
+      "branches": {
+        "total": 19,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 78.94
+      }
+    },
+    "code/frontend/features/live-interview/review-advice.ts": {
+      "lines": {
+        "total": 15,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 15,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 15,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 86.66
+      }
+    },
+    "code/frontend/features/live-interview/review-conversation.tsx": {
+      "lines": {
+        "total": 78,
+        "covered": 78,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 78,
+        "covered": 78,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 22,
+        "covered": 20,
+        "skipped": 0,
+        "pct": 90.9
+      }
+    },
+    "code/frontend/features/live-interview/setup-state.ts": {
+      "lines": {
+        "total": 16,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 16,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 11,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 81.81
+      }
+    },
+    "code/frontend/features/live-interview/setup.tsx": {
+      "lines": {
+        "total": 376,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 376,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/live-interview/start-request.ts": {
+      "lines": {
+        "total": 85,
+        "covered": 76,
+        "skipped": 0,
+        "pct": 89.41
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 85,
+        "covered": 76,
+        "skipped": 0,
+        "pct": 89.41
+      },
+      "branches": {
+        "total": 44,
+        "covered": 31,
+        "skipped": 0,
+        "pct": 70.45
+      }
+    },
+    "code/frontend/features/live-interview/stream.ts": {
+      "lines": {
+        "total": 82,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 82,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/live-interview/transition-screen.tsx": {
+      "lines": {
+        "total": 157,
+        "covered": 117,
+        "skipped": 0,
+        "pct": 74.52
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 157,
+        "covered": 117,
+        "skipped": 0,
+        "pct": 74.52
+      },
+      "branches": {
+        "total": 45,
+        "covered": 42,
+        "skipped": 0,
+        "pct": 93.33
+      }
+    },
+    "code/frontend/features/live-interview/use-prepared-devices.ts": {
+      "lines": {
+        "total": 67,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 67,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/live-interview/use-question-presentation.ts": {
+      "lines": {
+        "total": 35,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 35,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/live-interview/voice/call-presentation.ts": {
+      "lines": {
+        "total": 51,
+        "covered": 50,
+        "skipped": 0,
+        "pct": 98.03
+      },
+      "functions": {
+        "total": 12,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 51,
+        "covered": 50,
+        "skipped": 0,
+        "pct": 98.03
+      },
+      "branches": {
+        "total": 37,
+        "covered": 33,
+        "skipped": 0,
+        "pct": 89.18
+      }
+    },
+    "code/frontend/features/live-interview/voice/client.ts": {
+      "lines": {
+        "total": 303,
+        "covered": 283,
+        "skipped": 0,
+        "pct": 93.39
+      },
+      "functions": {
+        "total": 31,
+        "covered": 27,
+        "skipped": 0,
+        "pct": 87.09
+      },
+      "statements": {
+        "total": 303,
+        "covered": 283,
+        "skipped": 0,
+        "pct": 93.39
+      },
+      "branches": {
+        "total": 138,
+        "covered": 111,
+        "skipped": 0,
+        "pct": 80.43
+      }
+    },
+    "code/frontend/features/live-interview/voice/controls.tsx": {
+      "lines": {
+        "total": 291,
+        "covered": 275,
+        "skipped": 0,
+        "pct": 94.5
+      },
+      "functions": {
+        "total": 21,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 76.19
+      },
+      "statements": {
+        "total": 291,
+        "covered": 275,
+        "skipped": 0,
+        "pct": 94.5
+      },
+      "branches": {
+        "total": 58,
+        "covered": 52,
+        "skipped": 0,
+        "pct": 89.65
+      }
+    },
+    "code/frontend/features/live-interview/voice/devices.ts": {
+      "lines": {
+        "total": 83,
+        "covered": 83,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 13,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 83,
+        "covered": 83,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 51,
+        "covered": 37,
+        "skipped": 0,
+        "pct": 72.54
+      }
+    },
+    "code/frontend/features/live-interview/voice/playback.ts": {
+      "lines": {
+        "total": 89,
+        "covered": 88,
+        "skipped": 0,
+        "pct": 98.87
+      },
+      "functions": {
+        "total": 15,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 89,
+        "covered": 88,
+        "skipped": 0,
+        "pct": 98.87
+      },
+      "branches": {
+        "total": 49,
+        "covered": 43,
+        "skipped": 0,
+        "pct": 87.75
+      }
+    },
+    "code/frontend/features/live-interview/voice/use-voice.ts": {
+      "lines": {
+        "total": 319,
+        "covered": 29,
+        "skipped": 0,
+        "pct": 9.09
+      },
+      "functions": {
+        "total": 9,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 77.77
+      },
+      "statements": {
+        "total": 319,
+        "covered": 29,
+        "skipped": 0,
+        "pct": 9.09
+      },
+      "branches": {
+        "total": 17,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 88.23
+      }
+    },
+    "code/frontend/features/personal-center/live-workspace.tsx": {
+      "lines": {
+        "total": 111,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 111,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/personal-center/materials-workspace.tsx": {
+      "lines": {
+        "total": 217,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 217,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/personal-center/profile-overview.tsx": {
+      "lines": {
+        "total": 183,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 183,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/personal-center/resume-records.tsx": {
+      "lines": {
+        "total": 19,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 19,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/personal-center/saved-jobs-live.tsx": {
+      "lines": {
+        "total": 122,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 122,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/personal-center/workspace-frame.tsx": {
+      "lines": {
+        "total": 47,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 47,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    },
+    "code/frontend/features/video-interview/interviewer-avatar.tsx": {
+      "lines": {
+        "total": 46,
+        "covered": 36,
+        "skipped": 0,
+        "pct": 78.26
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 46,
+        "covered": 36,
+        "skipped": 0,
+        "pct": 78.26
+      },
+      "branches": {
+        "total": 9,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 77.77
+      }
+    },
+    "code/frontend/features/video-interview/media-preview.tsx": {
+      "lines": {
+        "total": 23,
+        "covered": 5,
+        "skipped": 0,
+        "pct": 21.73
+      },
+      "functions": {
+        "total": 7,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 57.14
+      },
+      "statements": {
+        "total": 23,
+        "covered": 5,
+        "skipped": 0,
+        "pct": 21.73
+      },
+      "branches": {
+        "total": 6,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 66.66
+      }
+    },
+    "code/frontend/features/video-interview/room.tsx": {
+      "lines": {
+        "total": 328,
+        "covered": 195,
+        "skipped": 0,
+        "pct": 59.45
+      },
+      "functions": {
+        "total": 18,
+        "covered": 9,
+        "skipped": 0,
+        "pct": 50
+      },
+      "statements": {
+        "total": 328,
+        "covered": 195,
+        "skipped": 0,
+        "pct": 59.45
+      },
+      "branches": {
+        "total": 31,
+        "covered": 10,
+        "skipped": 0,
+        "pct": 32.25
+      }
+    },
+    "code/frontend/lib/access.ts": {
+      "lines": {
+        "total": 16,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 11,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 16,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 26,
+        "covered": 23,
+        "skipped": 0,
+        "pct": 88.46
+      }
+    },
+    "code/frontend/lib/utils.ts": {
+      "lines": {
+        "total": 5,
+        "covered": 5,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 5,
+        "covered": 5,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 9,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 77.77
+      }
+    },
+    "code/frontend/lib/api/auth.ts": {
+      "lines": {
+        "total": 18,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 38.88
+      },
+      "functions": {
+        "total": 9,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 44.44
+      },
+      "statements": {
+        "total": 18,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 38.88
+      },
+      "branches": {
+        "total": 6,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 66.66
+      }
+    },
+    "code/frontend/lib/api/http.ts": {
+      "lines": {
+        "total": 142,
+        "covered": 122,
+        "skipped": 0,
+        "pct": 85.91
+      },
+      "functions": {
+        "total": 23,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 69.56
+      },
+      "statements": {
+        "total": 142,
+        "covered": 122,
+        "skipped": 0,
+        "pct": 85.91
+      },
+      "branches": {
+        "total": 68,
+        "covered": 59,
+        "skipped": 0,
+        "pct": 86.76
+      }
+    },
+    "code/frontend/lib/api/interviews.ts": {
+      "lines": {
+        "total": 81,
+        "covered": 24,
+        "skipped": 0,
+        "pct": 29.62
+      },
+      "functions": {
+        "total": 6,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 66.66
+      },
+      "statements": {
+        "total": 81,
+        "covered": 24,
+        "skipped": 0,
+        "pct": 29.62
+      },
+      "branches": {
+        "total": 6,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 66.66
+      }
+    },
+    "code/frontend/lib/api/jobs.ts": {
+      "lines": {
+        "total": 13,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 13,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    }
+  }
+}

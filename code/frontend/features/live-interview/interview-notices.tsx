@@ -1,5 +1,20 @@
-import { interviewDurationMinutes, type Interview, type InterviewPreview } from '@interviewlab/core';
+import {
+  interviewDurationMinutes,
+  type Interview,
+  type InterviewPreview,
+} from '@interviewlab/core';
 import { Button } from '../../components/ui/button';
+
+type ProgressNoticeProps = {
+  view: Interview;
+  continuation: boolean;
+  targetReached: boolean;
+  canContinue: boolean;
+  onContinue: () => void;
+  canExtend: boolean;
+  onExtend: () => void;
+  onFinish: () => void;
+};
 
 export function InterviewProgressNotice({
   view,
@@ -10,16 +25,7 @@ export function InterviewProgressNotice({
   canExtend,
   onExtend,
   onFinish,
-}: {
-  view: Interview;
-  continuation: boolean;
-  targetReached: boolean;
-  canContinue: boolean;
-  onContinue: () => void;
-  canExtend: boolean;
-  onExtend: () => void;
-  onFinish: () => void;
-}) {
+}: ProgressNoticeProps) {
   return (
     <>
       {continuation && (
@@ -40,23 +46,39 @@ export function InterviewProgressNotice({
       )}
       {view.retry_goal && <p className="notice">单题重练目标：{view.retry_goal}</p>}
       {targetReached && (
-        <div className="notice" role="status">
-          <span>
-            已到设定的 {view.configuration.duration_minutes} 分钟。如果还在回答，可以先把当前问题讲完；
-            也可以继续面试或结束查看报告。
-          </span>
-          <button className="text-link" disabled={!canExtend} onClick={onExtend}>
-            继续 5 分钟
-          </button>
-          <button className="text-link" disabled={!canExtend} onClick={onFinish}>
-            结束并查看报告
-          </button>
-          <span>
-            {Math.max(10, interviewDurationMinutes(view)) + 2} 分钟（含暂停和断线）后会自动封存。
-          </span>
-        </div>
+        <InterviewTimeDecision
+          view={view}
+          canExtend={canExtend}
+          onExtend={onExtend}
+          onFinish={onFinish}
+        />
       )}
     </>
+  );
+}
+
+function InterviewTimeDecision({
+  view,
+  canExtend,
+  onExtend,
+  onFinish,
+}: Pick<ProgressNoticeProps, 'view' | 'canExtend' | 'onExtend' | 'onFinish'>) {
+  return (
+    <div className="notice" role="status">
+      <span>
+        已到设定的 {interviewDurationMinutes(view)} 分钟。如果还在回答，可以先把当前问题讲完；
+        也可以继续面试或结束查看报告。
+      </span>
+      <button className="text-link" disabled={!canExtend} onClick={onExtend}>
+        继续 5 分钟
+      </button>
+      <button className="text-link" disabled={!canExtend} onClick={onFinish}>
+        结束并查看报告
+      </button>
+      <span>
+        {Math.max(10, interviewDurationMinutes(view)) + 2} 分钟（含暂停和断线）后会自动封存。
+      </span>
+    </div>
   );
 }
 

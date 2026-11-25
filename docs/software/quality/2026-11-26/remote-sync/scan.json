@@ -1,0 +1,2701 @@
+{
+  "date": "2026-11-26",
+  "old_head": "4b08a0f",
+  "new_head": "be648d9",
+  "commits": [
+    "8c9d137",
+    "cbb2c0a",
+    "be648d9"
+  ],
+  "remote_files": 36,
+  "remote_insertions": 428,
+  "remote_deletions": 187,
+  "baseline": "pre-sync working tree; backup stash retained",
+  "strict_thresholds": {
+    "function_lines": 40,
+    "complexity": 10,
+    "cognitive": 15,
+    "depth": 3,
+    "params": 4,
+    "file_lines": 400
+  },
+  "before": [
+    {
+      "file": "code/backend/src/modules/interviews/repository.ts",
+      "errors": 0,
+      "warnings": 4,
+      "sha256": "99db89e48ff1b3b1e76b015d71da962e149aad64b40b3f7149faf1ccddbfa129",
+      "messages": [
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async function 'loadInterview' has too many lines (73). Maximum allowed is 40.",
+          "line": 29,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 101,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async function 'loadInterview' has a complexity of 13. Maximum allowed is 10.",
+          "line": 29,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 29,
+          "endColumn": 36
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async function 'saveInterview' has too many lines (81). Maximum allowed is 40.",
+          "line": 102,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 182,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Async function 'interviewEvent' has too many parameters (5). Maximum allowed is 4.",
+          "line": 216,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 216,
+          "endColumn": 37
+        }
+      ]
+    },
+    {
+      "file": "code/backend/src/modules/interviews/routes.ts",
+      "errors": 0,
+      "warnings": 4,
+      "sha256": "447b9a78a99886eb0265911ed9679a420433ac72b1bac45a0c4189ff6e18af05",
+      "messages": [
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'interviewsModule' has too many lines (264). Maximum allowed is 40.",
+          "line": 24,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 287,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'register' has too many lines (256). Maximum allowed is 40.",
+          "line": 30,
+          "column": 5,
+          "nodeType": "Property",
+          "messageId": "exceed",
+          "endLine": 285,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'turnCommand' has too many lines (44). Maximum allowed is 40.",
+          "line": 194,
+          "column": 7,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 237,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Function has too many parameters (5). Maximum allowed is 4.",
+          "line": 197,
+          "column": 14,
+          "nodeType": "TSFunctionType",
+          "messageId": "exceed",
+          "endLine": 197,
+          "endColumn": 14
+        }
+      ]
+    },
+    {
+      "file": "code/backend/src/modules/interviews/schema.ts",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "84afbd1182554778b552812e5f97cf0ae60c0902438f8091e1ec634f0e4610aa",
+      "messages": []
+    },
+    {
+      "file": "code/backend/src/modules/interviews/schemas.ts",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "636b3caffa6888bd0263778dec93d91641ca6a08fd523d96be17072ea4bb96bb",
+      "messages": []
+    },
+    {
+      "file": "code/backend/src/modules/interviews/service.ts",
+      "errors": 0,
+      "warnings": 25,
+      "sha256": "a421e5b1b772143f6cf824d1505d240594a98ee8596c0156a4405c976dc5c830",
+      "messages": [
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'fallbackQuestion' has a complexity of 12. Maximum allowed is 10.",
+          "line": 87,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 87,
+          "endColumn": 26
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createInterviewsService' has too many lines (813). Maximum allowed is 40.",
+          "line": 133,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 949,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Function 'createInterviewsService' has too many parameters (7). Maximum allowed is 4.",
+          "line": 133,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 133,
+          "endColumn": 40
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async function 'mutate' has too many lines (46). Maximum allowed is 40.",
+          "line": 190,
+          "column": 3,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 235,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Async function 'mutate' has too many parameters (6). Maximum allowed is 4.",
+          "line": 190,
+          "column": 3,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 190,
+          "endColumn": 24
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async function 'advanceAfterAnswer' has a complexity of 12. Maximum allowed is 10.",
+          "line": 262,
+          "column": 3,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 262,
+          "endColumn": 36
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async function 'start' has too many lines (77). Maximum allowed is 40.",
+          "line": 318,
+          "column": 3,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 397,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async arrow function has too many lines (49). Maximum allowed is 40.",
+          "line": 346,
+          "column": 53,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 396,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 15. Maximum allowed is 10.",
+          "line": 346,
+          "column": 72,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 346,
+          "endColumn": 74
+        },
+        {
+          "ruleId": "max-lines",
+          "severity": 1,
+          "message": "File has too many lines (950). Maximum allowed is 400.",
+          "line": 401,
+          "column": 1,
+          "nodeType": null,
+          "messageId": "exceed",
+          "endLine": 951,
+          "endColumn": 1
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async arrow function has too many lines (145). Maximum allowed is 40.",
+          "line": 410,
+          "column": 32,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 554,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 30. Maximum allowed is 10.",
+          "line": 410,
+          "column": 53,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 410,
+          "endColumn": 55
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async method 'commit' has a complexity of 23. Maximum allowed is 10.",
+          "line": 504,
+          "column": 7,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 504,
+          "endColumn": 21
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'commit' has too many lines (49). Maximum allowed is 40.",
+          "line": 504,
+          "column": 15,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 552,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'list' has too many lines (47). Maximum allowed is 40.",
+          "line": 583,
+          "column": 5,
+          "nodeType": "Property",
+          "messageId": "exceed",
+          "endLine": 629,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async method 'list' has a complexity of 17. Maximum allowed is 10.",
+          "line": 583,
+          "column": 5,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 583,
+          "endColumn": 15
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Method 'answer' has too many parameters (5). Maximum allowed is 4.",
+          "line": 678,
+          "column": 5,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 678,
+          "endColumn": 13
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Method 'continueVoice' has too many parameters (5). Maximum allowed is 4.",
+          "line": 714,
+          "column": 5,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 714,
+          "endColumn": 20
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 13. Maximum allowed is 10.",
+          "line": 721,
+          "column": 85,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 721,
+          "endColumn": 87
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Method 'presented' has too many parameters (5). Maximum allowed is 4.",
+          "line": 755,
+          "column": 5,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 755,
+          "endColumn": 16
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Method 'action' has too many parameters (5). Maximum allowed is 4.",
+          "line": 766,
+          "column": 5,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 766,
+          "endColumn": 13
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 12. Maximum allowed is 10.",
+          "line": 808,
+          "column": 77,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 808,
+          "endColumn": 79
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'createRetry' has too many lines (55). Maximum allowed is 40.",
+          "line": 834,
+          "column": 5,
+          "nodeType": "Property",
+          "messageId": "exceed",
+          "endLine": 889,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'maintain' has too many lines (42). Maximum allowed is 40.",
+          "line": 906,
+          "column": 5,
+          "nodeType": "Property",
+          "messageId": "exceed",
+          "endLine": 947,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 12. Maximum allowed is 10.",
+          "line": 916,
+          "column": 47,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 916,
+          "endColumn": 49
+        }
+      ]
+    },
+    {
+      "file": "code/backend/src/modules/interviews/streaming-agent.ts",
+      "errors": 0,
+      "warnings": 35,
+      "sha256": "e4eec78ddcd0748995f90155a669fc5caa5e7c6bfbeb202a8c4915c20fb119d4",
+      "messages": [
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'canFinishAdvance' has a complexity of 16. Maximum allowed is 10.",
+          "line": 122,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 122,
+          "endColumn": 26
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'backgroundGoals' has a complexity of 19. Maximum allowed is 10.",
+          "line": 161,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 161,
+          "endColumn": 25
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.",
+          "line": 161,
+          "column": 10,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 161,
+          "endColumn": 25
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'selectGoalOptions' has too many lines (42). Maximum allowed is 40.",
+          "line": 241,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 282,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'prepareAdvancePlan' has too many lines (63). Maximum allowed is 40.",
+          "line": 283,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 345,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'prepareAdvancePlan' has a complexity of 15. Maximum allowed is 10.",
+          "line": 283,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 283,
+          "endColumn": 28
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'advanceGoalIndices' has too many lines (44). Maximum allowed is 40.",
+          "line": 391,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 435,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-lines",
+          "severity": 1,
+          "message": "File has too many lines (1315). Maximum allowed is 400.",
+          "line": 401,
+          "column": 1,
+          "nodeType": null,
+          "messageId": "exceed",
+          "endLine": 1316,
+          "endColumn": 1
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createAdvanceSchemas' has too many lines (109). Maximum allowed is 40.",
+          "line": 484,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 592,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'buildAdvanceMessages' has too many lines (162). Maximum allowed is 40.",
+          "line": 595,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 756,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'buildAdvanceMessages' has a complexity of 21. Maximum allowed is 10.",
+          "line": 595,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 595,
+          "endColumn": 30
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed.",
+          "line": 595,
+          "column": 10,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 595,
+          "endColumn": 30
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createAdvanceChecks' has too many lines (140). Maximum allowed is 40.",
+          "line": 757,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 896,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Arrow function has a complexity of 11. Maximum allowed is 10.",
+          "line": 787,
+          "column": 47,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 787,
+          "endColumn": 49
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Arrow function has too many lines (58). Maximum allowed is 40.",
+          "line": 819,
+          "column": 17,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 876,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed.",
+          "line": 819,
+          "column": 36,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 819,
+          "endColumn": 38
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Arrow function has a complexity of 33. Maximum allowed is 10.",
+          "line": 819,
+          "column": 36,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 819,
+          "endColumn": 38
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createPreviewHandler' has too many lines (72). Maximum allowed is 40.",
+          "line": 898,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 972,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async arrow function has too many lines (61). Maximum allowed is 40.",
+          "line": 908,
+          "column": 10,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 971,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 25 to the 15 allowed.",
+          "line": 908,
+          "column": 31,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 908,
+          "endColumn": 33
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 23. Maximum allowed is 10.",
+          "line": 908,
+          "column": 31,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 908,
+          "endColumn": 33
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'advanceDecision' has too many lines (42). Maximum allowed is 40.",
+          "line": 975,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 1016,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'advanceObservation' has a complexity of 13. Maximum allowed is 10.",
+          "line": 1018,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 1018,
+          "endColumn": 28
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createAdvanceMemory' has too many lines (53). Maximum allowed is 40.",
+          "line": 1043,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 1095,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'createAdvanceMemory' has a complexity of 16. Maximum allowed is 10.",
+          "line": 1043,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 1043,
+          "endColumn": 29
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.",
+          "line": 1043,
+          "column": 10,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 1043,
+          "endColumn": 29
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createAdvanceQuestion' has too many lines (67). Maximum allowed is 40.",
+          "line": 1096,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 1162,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'createAdvanceQuestion' has a complexity of 24. Maximum allowed is 10.",
+          "line": 1096,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 1096,
+          "endColumn": 31
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 45 to the 15 allowed.",
+          "line": 1096,
+          "column": 10,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 1096,
+          "endColumn": 31
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Function 'buildAdvanceResult' has too many parameters (5). Maximum allowed is 4.",
+          "line": 1180,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 1180,
+          "endColumn": 28
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createStreamingAgent' has too many lines (115). Maximum allowed is 40.",
+          "line": 1201,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 1315,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'advance' has too many lines (105). Maximum allowed is 40.",
+          "line": 1209,
+          "column": 5,
+          "nodeType": "Property",
+          "messageId": "exceed",
+          "endLine": 1313,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Async method 'advance' has too many parameters (6). Maximum allowed is 4.",
+          "line": 1209,
+          "column": 5,
+          "nodeType": "FunctionExpression",
+          "messageId": "exceed",
+          "endLine": 1209,
+          "endColumn": 18
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async method 'advance' has a complexity of 14. Maximum allowed is 10.",
+          "line": 1209,
+          "column": 5,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 1209,
+          "endColumn": 18
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 25 to the 15 allowed.",
+          "line": 1209,
+          "column": 11,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 1209,
+          "endColumn": 18
+        }
+      ]
+    },
+    {
+      "file": "code/backend/src/modules/interviews/voice/session.ts",
+      "errors": 0,
+      "warnings": 25,
+      "sha256": "c44cb22410b253205e8c7ff8652037fdea46bc89f90a068e3e36d1eb20cbb17a",
+      "messages": [
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Constructor has too many parameters (7). Maximum allowed is 4.",
+          "line": 61,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "exceed",
+          "endLine": 61,
+          "endColumn": 14
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'start' has too many lines (48). Maximum allowed is 40.",
+          "line": 103,
+          "column": 3,
+          "nodeType": "MethodDefinition",
+          "messageId": "exceed",
+          "endLine": 150,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Method 'audio' has a complexity of 16. Maximum allowed is 10.",
+          "line": 151,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 151,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Method 'control' has too many lines (99). Maximum allowed is 40.",
+          "line": 195,
+          "column": 3,
+          "nodeType": "MethodDefinition",
+          "messageId": "exceed",
+          "endLine": 295,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Method 'control' has a complexity of 15. Maximum allowed is 10.",
+          "line": 195,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 195,
+          "endColumn": 10
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async arrow function has too many lines (76). Maximum allowed is 40.",
+          "line": 218,
+          "column": 18,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 294,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 29 to the 15 allowed.",
+          "line": 218,
+          "column": 27,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 218,
+          "endColumn": 29
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 22. Maximum allowed is 10.",
+          "line": 218,
+          "column": 27,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 218,
+          "endColumn": 29
+        },
+        {
+          "ruleId": "max-depth",
+          "severity": 1,
+          "message": "Blocks are nested too deeply (4). Maximum allowed is 3.",
+          "line": 232,
+          "column": 13,
+          "nodeType": "IfStatement",
+          "messageId": "tooDeeply",
+          "endLine": 235,
+          "endColumn": 14
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'reserveInputActivity' has too many lines (48). Maximum allowed is 40.",
+          "line": 296,
+          "column": 3,
+          "nodeType": "MethodDefinition",
+          "messageId": "exceed",
+          "endLine": 343,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async method 'reserveInputActivity' has a complexity of 15. Maximum allowed is 10.",
+          "line": 296,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 296,
+          "endColumn": 37
+        },
+        {
+          "ruleId": "max-lines",
+          "severity": 1,
+          "message": "File has too many lines (751). Maximum allowed is 400.",
+          "line": 401,
+          "column": 1,
+          "nodeType": null,
+          "messageId": "exceed",
+          "endLine": 752,
+          "endColumn": 1
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'resetRecognition' has too many lines (126). Maximum allowed is 40.",
+          "line": 471,
+          "column": 3,
+          "nodeType": "MethodDefinition",
+          "messageId": "exceed",
+          "endLine": 599,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Arrow function has too many lines (94). Maximum allowed is 40.",
+          "line": 482,
+          "column": 7,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 578,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async arrow function has too many lines (91). Maximum allowed is 40.",
+          "line": 484,
+          "column": 22,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 577,
+          "endColumn": 10
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 45 to the 15 allowed.",
+          "line": 484,
+          "column": 31,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 484,
+          "endColumn": 33
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 50. Maximum allowed is 10.",
+          "line": 484,
+          "column": 31,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 484,
+          "endColumn": 33
+        },
+        {
+          "ruleId": "max-depth",
+          "severity": 1,
+          "message": "Blocks are nested too deeply (4). Maximum allowed is 3.",
+          "line": 525,
+          "column": 17,
+          "nodeType": "IfStatement",
+          "messageId": "tooDeeply",
+          "endLine": 529,
+          "endColumn": 90
+        },
+        {
+          "ruleId": "max-depth",
+          "severity": 1,
+          "message": "Blocks are nested too deeply (4). Maximum allowed is 3.",
+          "line": 533,
+          "column": 17,
+          "nodeType": "IfStatement",
+          "messageId": "tooDeeply",
+          "endLine": 533,
+          "endColumn": 95
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'submit' has too many lines (61). Maximum allowed is 40.",
+          "line": 600,
+          "column": 3,
+          "nodeType": "MethodDefinition",
+          "messageId": "exceed",
+          "endLine": 660,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async method 'submit' has a complexity of 26. Maximum allowed is 10.",
+          "line": 600,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 600,
+          "endColumn": 23
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.",
+          "line": 600,
+          "column": 17,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 600,
+          "endColumn": 23
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Method 'publish' has a complexity of 11. Maximum allowed is 10.",
+          "line": 661,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 661,
+          "endColumn": 18
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Method 'say' has too many lines (44). Maximum allowed is 40.",
+          "line": 687,
+          "column": 3,
+          "nodeType": "MethodDefinition",
+          "messageId": "exceed",
+          "endLine": 730,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Method 'say' has a complexity of 12. Maximum allowed is 10.",
+          "line": 687,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 687,
+          "endColumn": 14
+        }
+      ]
+    },
+    {
+      "file": "code/core_engine/src/interview-policy.ts",
+      "errors": 0,
+      "warnings": 5,
+      "sha256": "2c4b267c9d177ebc2c25de5abec81b2dbbbec300cb9c29b25826f30a22613244",
+      "messages": [
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'interviewPolicy' has too many lines (88). Maximum allowed is 40.",
+          "line": 19,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 106,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'interviewPolicy' has a complexity of 17. Maximum allowed is 10.",
+          "line": 19,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 19,
+          "endColumn": 32
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 27 to the 15 allowed.",
+          "line": 19,
+          "column": 17,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 19,
+          "endColumn": 32
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'interviewPacing' has too many lines (57). Maximum allowed is 40.",
+          "line": 108,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 164,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'interviewPacing' has a complexity of 31. Maximum allowed is 10.",
+          "line": 108,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 108,
+          "endColumn": 32
+        }
+      ]
+    },
+    {
+      "file": "code/core_engine/src/live-interview.ts",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "cc1251b56c4c0aad43d425334366b0834d050b10421435fcae351b5332129037",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/components/interview-workspace.tsx",
+      "errors": 0,
+      "warnings": 3,
+      "sha256": "56c8d95fd9c6248761c25cc902076b9c620bc9c67fc29eddebb6890f5058f4a1",
+      "messages": [
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'InterviewWorkspace' has too many lines (285). Maximum allowed is 40.",
+          "line": 69,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 353,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'InterviewWorkspace' has a complexity of 36. Maximum allowed is 10.",
+          "line": 69,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 69,
+          "endColumn": 35
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.",
+          "line": 69,
+          "column": 17,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 69,
+          "endColumn": 35
+        }
+      ]
+    },
+    {
+      "file": "code/frontend/features/live-interview/interview-notices.tsx",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "ab4c2e4f68a24263953597299aa779fd9c3aa068bd9f062194f22c36e483f443",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/interview-presentation.ts",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "f6ea4731eb54d1897241734578c91c8b7ccd312aeef83fb411740e219efb2665",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/interview.tsx",
+      "errors": 0,
+      "warnings": 2,
+      "sha256": "c63e6e52e0568dfe2721c9fe217d39fde1d492f42c616124dd3c4a33f1d48f8a",
+      "messages": [
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'InterviewBody' has too many lines (315). Maximum allowed is 40.",
+          "line": 22,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 337,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'InterviewBody' has a complexity of 40. Maximum allowed is 10.",
+          "line": 22,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 22,
+          "endColumn": 23
+        }
+      ]
+    },
+    {
+      "file": "code/frontend/features/live-interview/setup-panels.tsx",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "e6763adc1583e59127f3ad5f07b066b8cc9fc69f2a732cee80b4ff1043f82496",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/setup-summary.tsx",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "e6d9d00d8d1a23b06520dbc45ee8968001f21272ce34b5fbd3b027feb3393e45",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/setup.tsx",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "8192c218bc316cf827eca881f5048a6982c5392f0b5dcfd04ee41020101b8c10",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/voice/controls.tsx",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "5e8681aa455e56511fe8ad407bd5400fbf53fa8f05cc96fdb434f964f6252633",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/voice/use-voice.ts",
+      "errors": 0,
+      "warnings": 6,
+      "sha256": "2a51fd2356b40c2229cc4c1eed8b3c73152b4c33910c9c4bb93ee6244b33f451",
+      "messages": [
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'useInterviewVoice' has too many lines (288). Maximum allowed is 40.",
+          "line": 30,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 319,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'useInterviewVoice' has a complexity of 12. Maximum allowed is 10.",
+          "line": 30,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 30,
+          "endColumn": 34
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createConnection' has too many lines (71). Maximum allowed is 40.",
+          "line": 112,
+          "column": 3,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 184,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Arrow function has too many lines (56). Maximum allowed is 40.",
+          "line": 115,
+          "column": 7,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 172,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.",
+          "line": 115,
+          "column": 33,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 115,
+          "endColumn": 35
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Arrow function has a complexity of 20. Maximum allowed is 10.",
+          "line": 115,
+          "column": 33,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 115,
+          "endColumn": 35
+        }
+      ]
+    }
+  ],
+  "after": [
+    {
+      "file": "code/backend/src/modules/interviews/repository.ts",
+      "errors": 0,
+      "warnings": 4,
+      "sha256": "d18bc3a8d1e2a3df1d7327e9bf051704bab45362a2e13898deab60bca393bd56",
+      "messages": [
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async function 'loadInterview' has too many lines (74). Maximum allowed is 40.",
+          "line": 29,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 102,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async function 'loadInterview' has a complexity of 16. Maximum allowed is 10.",
+          "line": 29,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 29,
+          "endColumn": 36
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async function 'saveInterview' has too many lines (82). Maximum allowed is 40.",
+          "line": 103,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 184,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Async function 'interviewEvent' has too many parameters (5). Maximum allowed is 4.",
+          "line": 218,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 218,
+          "endColumn": 37
+        }
+      ]
+    },
+    {
+      "file": "code/backend/src/modules/interviews/routes.ts",
+      "errors": 0,
+      "warnings": 4,
+      "sha256": "d6df478297f94d2e16363316d627e6f95cbbac67ac90a09230e75d962b64a3a1",
+      "messages": [
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'interviewsModule' has too many lines (265). Maximum allowed is 40.",
+          "line": 24,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 288,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'register' has too many lines (257). Maximum allowed is 40.",
+          "line": 30,
+          "column": 5,
+          "nodeType": "Property",
+          "messageId": "exceed",
+          "endLine": 286,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'turnCommand' has too many lines (44). Maximum allowed is 40.",
+          "line": 195,
+          "column": 7,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 238,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Function has too many parameters (5). Maximum allowed is 4.",
+          "line": 198,
+          "column": 14,
+          "nodeType": "TSFunctionType",
+          "messageId": "exceed",
+          "endLine": 198,
+          "endColumn": 14
+        }
+      ]
+    },
+    {
+      "file": "code/backend/src/modules/interviews/schema.ts",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "bdf0d4012eaa4a7db515fd84816f9bec6f8a08814f5d8de141b2259c992976ce",
+      "messages": []
+    },
+    {
+      "file": "code/backend/src/modules/interviews/schemas.ts",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "8291919ab2468b3b5ab19c4ec2bc94a564504176e381dc053321bdffbcd4bff4",
+      "messages": []
+    },
+    {
+      "file": "code/backend/src/modules/interviews/service.ts",
+      "errors": 0,
+      "warnings": 25,
+      "sha256": "4cad177b892b3c2bdaac8fed123d3eb35d6d896526d98acd2369a295f316f6b5",
+      "messages": [
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'fallbackQuestion' has a complexity of 12. Maximum allowed is 10.",
+          "line": 89,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 89,
+          "endColumn": 26
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createInterviewsService' has too many lines (833). Maximum allowed is 40.",
+          "line": 135,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 971,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Function 'createInterviewsService' has too many parameters (7). Maximum allowed is 4.",
+          "line": 135,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 135,
+          "endColumn": 40
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async function 'mutate' has too many lines (46). Maximum allowed is 40.",
+          "line": 192,
+          "column": 3,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 237,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Async function 'mutate' has too many parameters (6). Maximum allowed is 4.",
+          "line": 192,
+          "column": 3,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 192,
+          "endColumn": 24
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async function 'advanceAfterAnswer' has a complexity of 11. Maximum allowed is 10.",
+          "line": 270,
+          "column": 3,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 270,
+          "endColumn": 36
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async function 'start' has too many lines (77). Maximum allowed is 40.",
+          "line": 326,
+          "column": 3,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 405,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async arrow function has too many lines (49). Maximum allowed is 40.",
+          "line": 354,
+          "column": 53,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 404,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 15. Maximum allowed is 10.",
+          "line": 354,
+          "column": 72,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 354,
+          "endColumn": 74
+        },
+        {
+          "ruleId": "max-lines",
+          "severity": 1,
+          "message": "File has too many lines (972). Maximum allowed is 400.",
+          "line": 401,
+          "column": 1,
+          "nodeType": null,
+          "messageId": "exceed",
+          "endLine": 973,
+          "endColumn": 1
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async arrow function has too many lines (146). Maximum allowed is 40.",
+          "line": 418,
+          "column": 32,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 563,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 30. Maximum allowed is 10.",
+          "line": 418,
+          "column": 53,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 418,
+          "endColumn": 55
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async method 'commit' has a complexity of 23. Maximum allowed is 10.",
+          "line": 512,
+          "column": 7,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 512,
+          "endColumn": 21
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'commit' has too many lines (50). Maximum allowed is 40.",
+          "line": 512,
+          "column": 15,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 561,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'list' has too many lines (47). Maximum allowed is 40.",
+          "line": 592,
+          "column": 5,
+          "nodeType": "Property",
+          "messageId": "exceed",
+          "endLine": 638,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async method 'list' has a complexity of 17. Maximum allowed is 10.",
+          "line": 592,
+          "column": 5,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 592,
+          "endColumn": 15
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Method 'answer' has too many parameters (5). Maximum allowed is 4.",
+          "line": 700,
+          "column": 5,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 700,
+          "endColumn": 13
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Method 'continueVoice' has too many parameters (5). Maximum allowed is 4.",
+          "line": 736,
+          "column": 5,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 736,
+          "endColumn": 20
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 13. Maximum allowed is 10.",
+          "line": 743,
+          "column": 85,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 743,
+          "endColumn": 87
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Method 'presented' has too many parameters (5). Maximum allowed is 4.",
+          "line": 777,
+          "column": 5,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 777,
+          "endColumn": 16
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Method 'action' has too many parameters (5). Maximum allowed is 4.",
+          "line": 788,
+          "column": 5,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 788,
+          "endColumn": 13
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 12. Maximum allowed is 10.",
+          "line": 830,
+          "column": 77,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 830,
+          "endColumn": 79
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'createRetry' has too many lines (55). Maximum allowed is 40.",
+          "line": 856,
+          "column": 5,
+          "nodeType": "Property",
+          "messageId": "exceed",
+          "endLine": 911,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'maintain' has too many lines (42). Maximum allowed is 40.",
+          "line": 928,
+          "column": 5,
+          "nodeType": "Property",
+          "messageId": "exceed",
+          "endLine": 969,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 12. Maximum allowed is 10.",
+          "line": 938,
+          "column": 47,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 938,
+          "endColumn": 49
+        }
+      ]
+    },
+    {
+      "file": "code/backend/src/modules/interviews/streaming-agent.ts",
+      "errors": 0,
+      "warnings": 35,
+      "sha256": "243f3dd83bc8afe94e8c5af4d7f3b0f698c037f2bf5002739141ee5616a8a4e4",
+      "messages": [
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'canFinishAdvance' has a complexity of 16. Maximum allowed is 10.",
+          "line": 127,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 127,
+          "endColumn": 26
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'backgroundGoals' has a complexity of 19. Maximum allowed is 10.",
+          "line": 166,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 166,
+          "endColumn": 25
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.",
+          "line": 166,
+          "column": 10,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 166,
+          "endColumn": 25
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'selectGoalOptions' has too many lines (42). Maximum allowed is 40.",
+          "line": 246,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 287,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'prepareAdvancePlan' has too many lines (63). Maximum allowed is 40.",
+          "line": 288,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 350,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'prepareAdvancePlan' has a complexity of 15. Maximum allowed is 10.",
+          "line": 288,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 288,
+          "endColumn": 28
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'advanceGoalIndices' has too many lines (44). Maximum allowed is 40.",
+          "line": 396,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 440,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-lines",
+          "severity": 1,
+          "message": "File has too many lines (1321). Maximum allowed is 400.",
+          "line": 401,
+          "column": 1,
+          "nodeType": null,
+          "messageId": "exceed",
+          "endLine": 1322,
+          "endColumn": 1
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createAdvanceSchemas' has too many lines (109). Maximum allowed is 40.",
+          "line": 489,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 597,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'buildAdvanceMessages' has too many lines (163). Maximum allowed is 40.",
+          "line": 600,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 762,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'buildAdvanceMessages' has a complexity of 21. Maximum allowed is 10.",
+          "line": 600,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 600,
+          "endColumn": 30
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed.",
+          "line": 600,
+          "column": 10,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 600,
+          "endColumn": 30
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createAdvanceChecks' has too many lines (140). Maximum allowed is 40.",
+          "line": 763,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 902,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Arrow function has a complexity of 11. Maximum allowed is 10.",
+          "line": 793,
+          "column": 47,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 793,
+          "endColumn": 49
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Arrow function has too many lines (58). Maximum allowed is 40.",
+          "line": 825,
+          "column": 17,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 882,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed.",
+          "line": 825,
+          "column": 36,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 825,
+          "endColumn": 38
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Arrow function has a complexity of 33. Maximum allowed is 10.",
+          "line": 825,
+          "column": 36,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 825,
+          "endColumn": 38
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createPreviewHandler' has too many lines (72). Maximum allowed is 40.",
+          "line": 904,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 978,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async arrow function has too many lines (61). Maximum allowed is 40.",
+          "line": 914,
+          "column": 10,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 977,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 25 to the 15 allowed.",
+          "line": 914,
+          "column": 31,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 914,
+          "endColumn": 33
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 23. Maximum allowed is 10.",
+          "line": 914,
+          "column": 31,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 914,
+          "endColumn": 33
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'advanceDecision' has too many lines (42). Maximum allowed is 40.",
+          "line": 981,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 1022,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'advanceObservation' has a complexity of 13. Maximum allowed is 10.",
+          "line": 1024,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 1024,
+          "endColumn": 28
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createAdvanceMemory' has too many lines (53). Maximum allowed is 40.",
+          "line": 1049,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 1101,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'createAdvanceMemory' has a complexity of 16. Maximum allowed is 10.",
+          "line": 1049,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 1049,
+          "endColumn": 29
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.",
+          "line": 1049,
+          "column": 10,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 1049,
+          "endColumn": 29
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createAdvanceQuestion' has too many lines (67). Maximum allowed is 40.",
+          "line": 1102,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 1168,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'createAdvanceQuestion' has a complexity of 24. Maximum allowed is 10.",
+          "line": 1102,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 1102,
+          "endColumn": 31
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 45 to the 15 allowed.",
+          "line": 1102,
+          "column": 10,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 1102,
+          "endColumn": 31
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Function 'buildAdvanceResult' has too many parameters (5). Maximum allowed is 4.",
+          "line": 1186,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 1186,
+          "endColumn": 28
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createStreamingAgent' has too many lines (115). Maximum allowed is 40.",
+          "line": 1207,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 1321,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'advance' has too many lines (105). Maximum allowed is 40.",
+          "line": 1215,
+          "column": 5,
+          "nodeType": "Property",
+          "messageId": "exceed",
+          "endLine": 1319,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Async method 'advance' has too many parameters (6). Maximum allowed is 4.",
+          "line": 1215,
+          "column": 5,
+          "nodeType": "FunctionExpression",
+          "messageId": "exceed",
+          "endLine": 1215,
+          "endColumn": 18
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async method 'advance' has a complexity of 14. Maximum allowed is 10.",
+          "line": 1215,
+          "column": 5,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 1215,
+          "endColumn": 18
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 25 to the 15 allowed.",
+          "line": 1215,
+          "column": 11,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 1215,
+          "endColumn": 18
+        }
+      ]
+    },
+    {
+      "file": "code/backend/src/modules/interviews/voice/session.ts",
+      "errors": 0,
+      "warnings": 25,
+      "sha256": "826822a3a541b1bc1f68813396d9fc08f6a413954b786f2bef4ecb2590e6beca",
+      "messages": [
+        {
+          "ruleId": "max-params",
+          "severity": 1,
+          "message": "Constructor has too many parameters (7). Maximum allowed is 4.",
+          "line": 62,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "exceed",
+          "endLine": 62,
+          "endColumn": 14
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'start' has too many lines (48). Maximum allowed is 40.",
+          "line": 104,
+          "column": 3,
+          "nodeType": "MethodDefinition",
+          "messageId": "exceed",
+          "endLine": 151,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Method 'audio' has a complexity of 17. Maximum allowed is 10.",
+          "line": 152,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 152,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Method 'control' has too many lines (108). Maximum allowed is 40.",
+          "line": 196,
+          "column": 3,
+          "nodeType": "MethodDefinition",
+          "messageId": "exceed",
+          "endLine": 305,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Method 'control' has a complexity of 23. Maximum allowed is 10.",
+          "line": 196,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 196,
+          "endColumn": 10
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async arrow function has too many lines (76). Maximum allowed is 40.",
+          "line": 228,
+          "column": 18,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 304,
+          "endColumn": 6
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 29 to the 15 allowed.",
+          "line": 228,
+          "column": 27,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 228,
+          "endColumn": 29
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 22. Maximum allowed is 10.",
+          "line": 228,
+          "column": 27,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 228,
+          "endColumn": 29
+        },
+        {
+          "ruleId": "max-depth",
+          "severity": 1,
+          "message": "Blocks are nested too deeply (4). Maximum allowed is 3.",
+          "line": 242,
+          "column": 13,
+          "nodeType": "IfStatement",
+          "messageId": "tooDeeply",
+          "endLine": 245,
+          "endColumn": 14
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'reserveInputActivity' has too many lines (48). Maximum allowed is 40.",
+          "line": 306,
+          "column": 3,
+          "nodeType": "MethodDefinition",
+          "messageId": "exceed",
+          "endLine": 353,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async method 'reserveInputActivity' has a complexity of 15. Maximum allowed is 10.",
+          "line": 306,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 306,
+          "endColumn": 37
+        },
+        {
+          "ruleId": "max-lines",
+          "severity": 1,
+          "message": "File has too many lines (770). Maximum allowed is 400.",
+          "line": 401,
+          "column": 1,
+          "nodeType": null,
+          "messageId": "exceed",
+          "endLine": 771,
+          "endColumn": 1
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'resetRecognition' has too many lines (126). Maximum allowed is 40.",
+          "line": 481,
+          "column": 3,
+          "nodeType": "MethodDefinition",
+          "messageId": "exceed",
+          "endLine": 609,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Arrow function has too many lines (94). Maximum allowed is 40.",
+          "line": 492,
+          "column": 7,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 588,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async arrow function has too many lines (91). Maximum allowed is 40.",
+          "line": 494,
+          "column": 22,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 587,
+          "endColumn": 10
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 45 to the 15 allowed.",
+          "line": 494,
+          "column": 31,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 494,
+          "endColumn": 33
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async arrow function has a complexity of 50. Maximum allowed is 10.",
+          "line": 494,
+          "column": 31,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 494,
+          "endColumn": 33
+        },
+        {
+          "ruleId": "max-depth",
+          "severity": 1,
+          "message": "Blocks are nested too deeply (4). Maximum allowed is 3.",
+          "line": 535,
+          "column": 17,
+          "nodeType": "IfStatement",
+          "messageId": "tooDeeply",
+          "endLine": 539,
+          "endColumn": 90
+        },
+        {
+          "ruleId": "max-depth",
+          "severity": 1,
+          "message": "Blocks are nested too deeply (4). Maximum allowed is 3.",
+          "line": 543,
+          "column": 17,
+          "nodeType": "IfStatement",
+          "messageId": "tooDeeply",
+          "endLine": 543,
+          "endColumn": 95
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Async method 'submit' has too many lines (62). Maximum allowed is 40.",
+          "line": 610,
+          "column": 3,
+          "nodeType": "MethodDefinition",
+          "messageId": "exceed",
+          "endLine": 671,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Async method 'submit' has a complexity of 26. Maximum allowed is 10.",
+          "line": 610,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 610,
+          "endColumn": 23
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.",
+          "line": 610,
+          "column": 17,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 610,
+          "endColumn": 23
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Method 'publish' has a complexity of 17. Maximum allowed is 10.",
+          "line": 672,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 672,
+          "endColumn": 18
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Method 'say' has too many lines (44). Maximum allowed is 40.",
+          "line": 706,
+          "column": 3,
+          "nodeType": "MethodDefinition",
+          "messageId": "exceed",
+          "endLine": 749,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Method 'say' has a complexity of 12. Maximum allowed is 10.",
+          "line": 706,
+          "column": 3,
+          "nodeType": "FunctionExpression",
+          "messageId": "complex",
+          "endLine": 706,
+          "endColumn": 14
+        }
+      ]
+    },
+    {
+      "file": "code/core_engine/src/interview-policy.ts",
+      "errors": 0,
+      "warnings": 5,
+      "sha256": "1e0865bee2e52e53df5a5f5f3f2cd6584076f6d5e7e5f345d4fdf4c4edeb6ac9",
+      "messages": [
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'interviewPolicy' has too many lines (88). Maximum allowed is 40.",
+          "line": 20,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 107,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'interviewPolicy' has a complexity of 17. Maximum allowed is 10.",
+          "line": 20,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 20,
+          "endColumn": 32
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 27 to the 15 allowed.",
+          "line": 20,
+          "column": 17,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 20,
+          "endColumn": 32
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'interviewPacing' has too many lines (57). Maximum allowed is 40.",
+          "line": 109,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 165,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'interviewPacing' has a complexity of 31. Maximum allowed is 10.",
+          "line": 109,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 109,
+          "endColumn": 32
+        }
+      ]
+    },
+    {
+      "file": "code/core_engine/src/live-interview.ts",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "d922a04e9cdcda58440d8fc7cba96a23b5bf4b24878ab9994c4012e888379285",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/components/interview-workspace.tsx",
+      "errors": 0,
+      "warnings": 3,
+      "sha256": "20a9c2d46a8da6454c18c09dd2872e466007d3dc95f9a479900de906d9d8e251",
+      "messages": [
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'InterviewWorkspace' has too many lines (309). Maximum allowed is 40.",
+          "line": 69,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 377,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'InterviewWorkspace' has a complexity of 41. Maximum allowed is 10.",
+          "line": 69,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 69,
+          "endColumn": 35
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.",
+          "line": 69,
+          "column": 17,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 69,
+          "endColumn": 35
+        }
+      ]
+    },
+    {
+      "file": "code/frontend/features/live-interview/interview-notices.tsx",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "01a856e124622f61accd68ebd5c842abc3f7b0cd88c8ca5f01815b4d62498930",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/interview-presentation.ts",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "bea0ad9d8b280758f9e7238515819f0ea063c3d49787a688199f7a2bbf5d965a",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/interview.tsx",
+      "errors": 0,
+      "warnings": 2,
+      "sha256": "29615315db01b694515f19e27996cb12fe466b1ea63b662d081202000d27e925",
+      "messages": [
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'InterviewBody' has too many lines (305). Maximum allowed is 40.",
+          "line": 22,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 327,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'InterviewBody' has a complexity of 40. Maximum allowed is 10.",
+          "line": 22,
+          "column": 1,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 22,
+          "endColumn": 23
+        }
+      ]
+    },
+    {
+      "file": "code/frontend/features/live-interview/setup-panels.tsx",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "28505c95589d0ca10a6dddb21674ab062972c61031b6c72cc5432e7e01a73d3b",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/setup-summary.tsx",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "2c379eaa94b1de1882adc13c2f1ebae158fcf7f6bdd8c2b9ec66f96cc23a5d3c",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/setup.tsx",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "8192c218bc316cf827eca881f5048a6982c5392f0b5dcfd04ee41020101b8c10",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/voice/controls.tsx",
+      "errors": 0,
+      "warnings": 0,
+      "sha256": "c40e3c983cd164b398d5b6b8b1cbe4201e6fd47db11d3427c4305826c96fdac1",
+      "messages": []
+    },
+    {
+      "file": "code/frontend/features/live-interview/voice/use-voice.ts",
+      "errors": 0,
+      "warnings": 6,
+      "sha256": "b5bfc0d908a1ef457df010a08e0af5d6eacce845a07d8c8acf59e573cb90ab87",
+      "messages": [
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'useInterviewVoice' has too many lines (291). Maximum allowed is 40.",
+          "line": 30,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 322,
+          "endColumn": 2
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Function 'useInterviewVoice' has a complexity of 12. Maximum allowed is 10.",
+          "line": 30,
+          "column": 8,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "complex",
+          "endLine": 30,
+          "endColumn": 34
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Function 'createConnection' has too many lines (74). Maximum allowed is 40.",
+          "line": 112,
+          "column": 3,
+          "nodeType": "FunctionDeclaration",
+          "messageId": "exceed",
+          "endLine": 187,
+          "endColumn": 4
+        },
+        {
+          "ruleId": "max-lines-per-function",
+          "severity": 1,
+          "message": "Arrow function has too many lines (59). Maximum allowed is 40.",
+          "line": 115,
+          "column": 7,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "exceed",
+          "endLine": 175,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "sonarjs/cognitive-complexity",
+          "severity": 1,
+          "message": "Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.",
+          "line": 115,
+          "column": 33,
+          "nodeType": null,
+          "messageId": "refactorFunction",
+          "endLine": 115,
+          "endColumn": 35
+        },
+        {
+          "ruleId": "complexity",
+          "severity": 1,
+          "message": "Arrow function has a complexity of 20. Maximum allowed is 10.",
+          "line": 115,
+          "column": 33,
+          "nodeType": "ArrowFunctionExpression",
+          "messageId": "complex",
+          "endLine": 115,
+          "endColumn": 35
+        }
+      ]
+    }
+  ],
+  "errors": 0,
+  "warnings": 109,
+  "limits": [
+    "18 product files only; not a full-project count.",
+    "Existing long functions and changed metrics retained; no waiver.",
+    "Template overall strict result remains not passed."
+  ]
+}

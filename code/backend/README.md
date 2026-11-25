@@ -7,17 +7,17 @@ Fastify API 与 pg-boss worker 共用一个后端包。公共基础统一维护�
 | 能力 | 状态 |
 | --- | --- |
 | 独立 API、配置校验、错误、日志、OpenAPI、构建 | 已实现 |
-| 岗位分类、分页列表、详情及来源 | 已实现，读取现有 1000 个公开岗位 |
+| 岗位分类、分页列表、详情及来源 | 已实现，读取现有 1269 个公开岗位；主问题与补充层的统计见[内容清单](../../docs/algorithm/content/README.md) |
 | PostgreSQL 迁移、事务、幂等、outbox、任务执行、worker 心跳 | 已实现公共基础，业务处理器另行注册 |
 | 同源代理、公共 HTTP 客户端和登录入口 | 已实现，见[前端接入](../frontend/README.md) |
 | Better Auth、Cookie 会话、角色校验、注册及受邀账号命令 | 已实现，配置后启用公开邮箱密码注册 |
 | 任务查询 | 已实现 Cookie 身份和资源归属校验 |
 | 真实文字面试、证据报告、单题重练、比较、历史和删除 | 已实现，真实模型效果单独验收 |
 | ecnu-plus 兼容模型适配、冻结知识接口、本地公开内容适配 | 已实现；须配置本机 LLM_API_KEY，真实效果尚待验收 |
-| 账号设置、结构化文本简历及版本 | 已实现，当前工作流增加分析任务与准备状态 |
-| 个人 JD/收藏、文件上传 | 不属于本次新增能力 |
+| 账号设置、结构化文本简历及版本 | 已实现，含文字版 PDF 提取、简历核对、分析任务与准备状态；不保存原 PDF |
+| 个人 JD/收藏、原文件存储与 OCR | 尚未形成完整真实链路；文字版 PDF 提取不等同于 OCR 或文件存储 |
 | 全岗位知识、LangChain/LangGraph、简历及准备 | graph 唯一运行时；全量编译/索引流水线已实现，真实正式索引与人工效果待验收；见[Agent 架构](../../docs/software/interview-agent-implementation.md) |
-| 实时语音/视频 | 保留 ASR/TTS 与本机视频预览；真实媒体体验单独验收，文件未接通 |
+| 实时语音/视频 | 保留 ASR/TTS 与本机视频预览；真实媒体体验单独验收，媒体文件存储未接通 |
 
 [架构](../../docs/software/architecture.md)和[数据合同](../../docs/software/data_and_interfaces.md)区分当前能力与目标方案；规划接口不等于已实现接口。
 
@@ -49,7 +49,7 @@ npm run openapi:generate
 npm run start:api
 ~~~
 
-生产运行不依赖 tsx。OpenAPI 离线导出到 code/backend/dist/openapi.json；构建会清理 dist，先构建再导出。生产环境不开放 OpenAPI HTTP 地址。现有 npm run dev/build/start 继续服务前端演示。
+生产运行不依赖 tsx。OpenAPI 离线导出到 code/backend/dist/openapi.json；构建会清理 dist，先构建再导出。生产环境不开放 OpenAPI HTTP 地址。根目录 npm run dev/build/start 对应真实 Next.js 前端；前端通过同源代理访问 API。报告的 PDF 导出使用浏览器打印，后端不生成或存储 PDF 报告文件。
 
 ## 数据库与 worker
 
@@ -72,7 +72,7 @@ PostgreSQL 16 仅映射本机 5433。示例是公开本地凭证，生产必须�
 
 入口从仓库根 .env 加载，显式环境变量优先；范围见 src/foundation/config.ts。API 启动不迁移应用表。应用表通过追加迁移 db:migrate 建立；首次 worker 启动会初始化/升级 pg-boss 自有 pgboss schema，部署升级前应审核版本。
 
-worker 入口已注册面试规划/推进、逐题报告、比较，以及独立队列的简历分析/面前规划处理器，并每秒处理期限、最终失败和报告汇总。默认 ecnu-plus，配置项及真实/演示入口见[文字面试接入](../../docs/software/interview-agent-implementation.md)。没有 LLM_API_KEY 时能力明确不可用，不能把心跳当成模型成功。未注册类型仍显式失败。
+worker 入口已注册面试规划/推进、逐题报告、比较，以及独立队列的简历分析/面前规划处理器，并每秒处理期限、最终失败和报告汇总。默认 ecnu-plus，配置项及当前真实流程见[文字面试接入](../../docs/software/interview-agent-implementation.md)。没有 LLM_API_KEY 时能力明确不可用，不能把心跳当成模型成功。未注册类型仍显式失败。
 
 停止本项目数据库可执行 docker compose -f code/backend/compose.yaml stop；卷保留。不要删除其他成员的数据库或使用生产数据测试。
 
@@ -116,7 +116,7 @@ AUTH_ENABLED=false 时会话接口返回明确 501；设为 true 但缺库或密
 
 模块为 accounts、resumes、jobs、interviews、reports、knowledge。知识模块负责发布内容，岗位模块提供查询；后续内容仓储可替换本地公开文件。纯核心只存共享 DTO、规则和必要端口。
 
-services.ts、http/ 和后端根 exports 保留旧演示合同。新服务使用 modules/contracts.ts、foundation 和 server。不要把真实业务加进同步演示 DataClient。
+旧演示 services.ts、http/ 和同步 DataClient 已清退。当前业务使用 modules/contracts.ts、foundation 和 server，通过 src/server/app.ts 装配 HTTP 模块，API 与 worker 入口复用真实服务。
 
 ### 成员添加模块的步骤
 

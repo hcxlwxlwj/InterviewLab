@@ -25,6 +25,24 @@
   font-size: 15px;
   padding-top: 12px;
 }
+
+.setup-selected-job {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.setup-selected-job .field-label {
+  margin-bottom: 6px;
+}
+.setup-selected-job strong {
+  font-size: 18px;
+}
+.setup-resume-link {
+  display: inline-block;
+  margin-top: 14px;
+}
 .live-page .panel {
   padding: 26px;
   margin-bottom: 20px;
