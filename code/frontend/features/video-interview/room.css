@@ -3,8 +3,8 @@
   min-height: 540px;
   display: flex;
   flex-direction: column;
-  background: #f5f6f8;
-  color: #34404c;
+  background: var(--background);
+  color: var(--foreground);
 }
 .video-room-header {
   height: 72px;
@@ -14,8 +14,8 @@
   justify-content: space-between;
   gap: 20px;
   padding: 0 28px;
-  background: #fff;
-  border-bottom: 1px solid #e9ebef;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
 }
 .video-room-title {
   display: flex;
@@ -28,15 +28,15 @@
 }
 .video-room-title small {
   display: block;
-  color: #929ba5;
+  color: var(--muted);
   font-size: 11px;
   margin-top: 3px;
 }
 .video-room-mark {
   display: grid;
   place-items: center;
-  background: #eaf3f0;
-  color: #659183;
+  background: #fff0e4;
+  color: var(--primary-foreground);
   border-radius: 10px;
   width: 38px;
   height: 38px;
@@ -46,7 +46,7 @@
   gap: 24px;
   align-items: center;
   font-size: 13px;
-  color: #86919c;
+  color: var(--muted);
 }
 .video-room-header-actions span {
   font-variant-numeric: tabular-nums;
@@ -63,8 +63,8 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: #fff;
-  border: 1px solid #e9ebef;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -91,13 +91,13 @@
   justify-items: center;
   text-align: center;
   padding: 12vh 0;
-  color: #87919c;
+  color: var(--muted);
   gap: 15px;
 }
 .video-room-welcome h1 {
   font-size: 23px;
   font-weight: 500;
-  color: #53616d;
+  color: var(--foreground);
 }
 .video-room-welcome p {
   max-width: 420px;
@@ -116,7 +116,7 @@
 .video-room-ai > span,
 .video-room-answer > span {
   font-size: 11px;
-  color: #8f9ba7;
+  color: var(--muted);
 }
 .video-room-ai p,
 .video-room-answer p {
@@ -124,14 +124,14 @@
   margin: 6px 0;
 }
 .video-room-answer {
-  background: #f1f3f5;
+  background: #fff1e7;
   border-radius: 13px;
   padding: 15px 20px;
   margin: 20px 0 0 7%;
 }
 .video-room-draft {
-  border: 1px dashed #d8e1e8;
-  background: #f7fafb;
+  border: 1px dashed #e9cbb5;
+  background: #fffcf7;
 }
 .video-room-composer {
   padding: 14px 26px 20px;
@@ -140,8 +140,8 @@
 .video-room-composer form {
   display: flex;
   gap: 12px;
-  background: #f6f7f8;
-  border: 1px solid #e3e6ea;
+  background: var(--background);
+  border: 1px solid var(--border);
   padding: 10px 12px;
   border-radius: 12px;
 }
@@ -159,12 +159,12 @@
   height: 34px;
   display: grid;
   place-items: center;
-  background: #f4df9a;
-  color: #746438;
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 .video-room-composer > p {
   font-size: 13px;
-  color: #82918c;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -175,7 +175,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #75a895;
+  background: #65a092;
 }
 .video-room-sidebar {
   min-height: 0;
@@ -189,7 +189,7 @@
   position: relative;
   aspect-ratio: 4/3;
   flex-shrink: 0;
-  background: #e8ebed;
+  background: #f2eee6;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -199,8 +199,8 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: radial-gradient(circle at 40% 25%, #e7f5ed, #c5d7d0);
-  color: #58766c;
+  background: radial-gradient(circle at 40% 25%, #fff0e4, #f3d7bd);
+  color: var(--foreground);
 }
 .video-room-agent strong {
   font-weight: 500;
@@ -208,7 +208,7 @@
 }
 .video-room-agent > p {
   font-size: 12px;
-  color: #748b81;
+  color: var(--muted);
 }
 .video-room-camera {
   height: 100%;
@@ -221,7 +221,7 @@
   height: 100%;
   place-content: center;
   justify-items: center;
-  color: #9ca5ad;
+  color: var(--muted);
   font-size: 13px;
   gap: 10px;
 }
@@ -230,14 +230,14 @@
   bottom: 10px;
   left: 10px;
   border-radius: 5px;
-  background: #283631b5;
-  color: #fff;
+  background: #303c6ccc;
+  color: var(--card);
   padding: 5px 8px;
   font-size: 11px;
 }
 .video-room-tips {
-  background: #fff;
-  border: 1px solid #e9ebef;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 18px;
 }
@@ -247,7 +247,7 @@
 }
 .video-room-tips p {
   font-size: 12px;
-  color: #88929c;
+  color: var(--muted);
   line-height: 1.85;
   margin: 10px 0;
 }
@@ -257,11 +257,11 @@
 }
 .video-room-side-actions button {
   flex: 1;
-  border: 1px solid #dce4e3;
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 9px;
-  background: #fff;
-  color: #69867a;
+  background: var(--card);
+  color: var(--foreground);
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -270,7 +270,7 @@
 }
 .video-room-share {
   margin: 10px 20px 0;
-  background: #f0f3f6;
+  background: #f5efe6;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -278,20 +278,20 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 12px;
-  color: #7b8791;
+  color: var(--muted);
   font-size: 12px;
 }
 .video-room-share button {
   border: 0;
   background: none;
-  color: #657f99;
+  color: var(--foreground);
 }
 .video-room-share video {
   display: block;
   width: 100%;
   max-height: 30vh;
   object-fit: contain;
-  background: #e1e5e9;
+  background: #eee6db;
 }
 .video-room-footer {
   display: flex;
@@ -300,8 +300,8 @@
   gap: 30px;
   min-height: 85px;
   flex-shrink: 0;
-  background: #fff;
-  border-top: 1px solid #e8ebee;
+  background: var(--card);
+  border-top: 1px solid var(--border);
   padding: 10px 16px;
 }
 .video-room-footer button {
@@ -311,7 +311,7 @@
   gap: 6px;
   border: 0;
   background: none;
-  color: #7a8792;
+  color: var(--foreground);
   font-size: 11px;
   cursor: pointer;
 }
@@ -320,10 +320,10 @@
   height: 22px;
 }
 .video-room-footer .video-room-end {
-  color: #bd7672;
+  color: #b95343;
 }
 .video-room-footer .video-room-start {
-  color: #648c7a;
+  color: var(--primary-hover);
 }
 .video-room button:disabled {
   opacity: 0.4;
@@ -331,7 +331,7 @@
 }
 .video-room button:focus-visible,
 .video-room a:focus-visible {
-  outline: 2px solid #85a8b5;
+  outline: 2px solid var(--ring);
   outline-offset: 4px;
   border-radius: 5px;
 }
@@ -400,7 +400,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #d6d6da;
+  background: #f2eee6;
 }
 .interviewer-portrait-frame {
   position: absolute;
@@ -424,15 +424,15 @@
   gap: 3px;
   padding: 5px 8px;
   border-radius: 6px;
-  background: #ffffffcf;
+  background: #fffcf7e8;
   text-align: left;
 }
 .interviewer-avatar-caption strong {
   font-size: 12px;
-  color: #34404c;
+  color: var(--foreground);
   font-weight: 600;
 }
 .interviewer-avatar-caption span {
   font-size: 10px;
-  color: #63717b;
+  color: var(--muted);
 }

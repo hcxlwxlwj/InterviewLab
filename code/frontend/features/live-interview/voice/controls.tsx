@@ -1,16 +1,6 @@
 'use client';
 import { useState } from 'react';
-import {
-  Mic,
-  MicOff,
-  Keyboard,
-  PhoneOff,
-  Volume2,
-  Hand,
-  CircleStop,
-  ArrowUp,
-  MessageSquare,
-} from 'lucide-react';
+import { Mic, MicOff, Keyboard, Hand, MessageSquare } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import type { useInterviewVoice } from './use-voice';
 
@@ -77,7 +67,6 @@ export function VoiceControls({
               <Mic size={17} />
               实时语音
             </strong>
-            <p>像打电话一样交流，面试官说完后自动恢复收音。</p>
           </div>
           <Button
             type="button"
@@ -222,50 +211,15 @@ export function VoiceControls({
             <Hand />
             <span>{voice.hold ? '继续接话' : '让我想想'}</span>
           </button>
-          <button
-            type="button"
-            className="voice-round-button voice-hangup"
-            onClick={voice.stop}
-            aria-label="挂断语音，保留面试和记录"
-          >
-            <PhoneOff />
-            <span>挂断语音</span>
-          </button>
         </div>
       )}
       <div className="voice-call-secondary">
-        {voice.active && (
-          <>
-            <button
-              type="button"
-              disabled={voice.connecting || !voice.draft.trim()}
-              onClick={voice.commit}
-            >
-              <ArrowUp size={14} />
-              我说完了
-            </button>
-            <button type="button" disabled={!voice.playing} onClick={voice.interrupt}>
-              <CircleStop size={14} />
-              停止播报
-            </button>
-            <button
-              type="button"
-              disabled={voice.connecting || voice.thinking}
-              onClick={voice.repeat}
-            >
-              <Volume2 size={14} />
-              重听
-            </button>
-          </>
-        )}
         <button type="button" onClick={voice.switchToText}>
           <Keyboard size={14} />
           切回文字
         </button>
       </div>
-      <p className="voice-call-save">
-        {voice.active ? '讲话会自动转写保存，无需逐条点击发送' : '语音与文字共用同一份面试记录'}
-      </p>
+
       <details className="voice-call-transcript">
         <summary>
           <MessageSquare size={14} />

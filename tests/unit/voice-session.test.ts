@@ -487,3 +487,26 @@ test('a failed next-question generation is reported without closing voice or los
   await waitFor(() => f.continuations.length === 1);
   assert.equal(f.fixture.view.generation_status, 'pending');
 });
+
+test('explicit completion cannot be withdrawn by new microphone activity or background noise', async (t) => {
+  const f = create();
+  t.after(() => f.session.close());
+  await startListening(f);
+  f.session.control({ type: 'speech_start' });
+  f.recognize({ text: '我先记录耗时，再验证改动。', final: false });
+  await waitFor(() => f.events.some((event) => event.type === 'transcript'));
+  f.session.control({ type: 'commit' });
+  await waitFor(() => f.metrics().finishes === 1);
+  f.session.control({ type: 'speech_start' });
+  f.session.audio(new Uint8Array(6400).fill(100));
+  f.recognize({ text: '我先记录耗时，再验证改动。', final: true });
+  await waitFor(() => f.answers.length === 1);
+  assert.equal(f.answers[0], '我先记录耗时，再验证改动。');
+  f.session.control({ type: 'speech_start' });
+  await new Promise((resolve) => setTimeout(resolve, 60));
+  assert.equal(
+    f.activities.some((activity) => activity.active),
+    false,
+  );
+  assert.equal(f.continuations.length, 0);
+});

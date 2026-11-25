@@ -254,3 +254,59 @@
 .report-original-answer {
   margin: 16px 0;
 }
+
+/* Keep interview controls and supporting text readable in the text and voice rooms. */
+.session-shell .field-help,
+.session-shell .question-meta,
+.session-shell .history-question small,
+.session-shell .message small,
+.session-shell .composer-heading span,
+.session-shell .composer-bottom,
+.session-shell .session-tools,
+.session-shell .voice-call-topline,
+.session-shell .voice-call-secondary button,
+.session-shell .voice-round-button span,
+.session-shell .voice-call-consent,
+.session-shell .voice-call-transcript,
+.session-shell .interviewer-foot {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #53645d;
+}
+.session-shell .answer-composer textarea {
+  font-size: 16px;
+  line-height: 1.8;
+}
+.session-shell .notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.setup-media-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.setup-media-status > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.setup-media-status svg {
+  color: var(--foreground);
+  flex-shrink: 0;
+}
+.setup-interaction-panel > .field-help {
+  max-width: 68ch;
+  margin-top: 12px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.8;
+}

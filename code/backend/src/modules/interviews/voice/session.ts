@@ -41,6 +41,7 @@ export class InterviewVoiceSession {
   private talking = false;
   private hold = false;
   private manual = false;
+  private committedTurn: string | null = null;
   private flushing = false;
   private recognitionPrefix = '';
   private lastAudioVoiceAt = 0;
@@ -155,7 +156,7 @@ export class InterviewVoiceSession {
       this.protocolError();
       return;
     }
-    if (this.speech) {
+    if (this.speech || this.committedTurn) {
       // ASR rejects a stream with no audio packets (45000081). Keep its clock alive
       // without forwarding microphone samples or treating echo as candidate speech.
       this.asr?.write(new Uint8Array(pcm.byteLength));
@@ -194,7 +195,16 @@ export class InterviewVoiceSession {
   }
   control(event: VoiceClientEvent) {
     if (!this.initialized || this.closed) return;
-    if (this.speech && ['speech_start', 'speech_end', 'commit'].includes(event.type)) return;
+    if (
+      (this.speech || this.committedTurn) &&
+      ['speech_start', 'speech_end', 'commit'].includes(event.type)
+    )
+      return;
+    if (event.type === 'commit' && (this.text.trim() || this.talking || this.capturedTurn)) {
+      this.committedTurn = this.capturedTurn ?? this.view.turns.at(-1)?.id ?? null;
+      this.talking = false;
+      clearTimeout(this.timer);
+    }
     const resumeFlushed = event.type === 'speech_start' && this.flushing;
     const activityRevision = ['speech_start', 'speech_end'].includes(event.type)
       ? ++this.activityRevision
@@ -451,7 +461,7 @@ export class InterviewVoiceSession {
       this.send({
         type: 'error',
         code: 'voice_final_pending',
-        message: '正在等待最终识别，可点击“我说完了”，或切回文字确认草稿。',
+        message: '正在等待最终识别，可切回文字确认并提交草稿。',
         retryable: true,
       });
       this.manual = false;
@@ -602,6 +612,7 @@ export class InterviewVoiceSession {
     if (this.talking || this.hold || this.closed || this.speech) return;
     const text = this.text.trim();
     if (!text) {
+      this.committedTurn = null;
       this.interruptedTurn = null;
       await this.releaseInputActivity();
       this.capturedTurn = null;
@@ -661,6 +672,14 @@ export class InterviewVoiceSession {
   private publish(next: Interview, force = false) {
     const changed = force || this.view?.version !== next.version;
     this.view = next;
+    const current = next.turns.at(-1);
+    if (
+      this.committedTurn &&
+      current?.id !== this.committedTurn &&
+      current?.answer_status === 'waiting'
+    )
+      this.committedTurn = null;
+    if (next.generation_status === 'failed') this.committedTurn = null;
     if (changed) this.send({ type: 'interview', interview: next });
     if (next.status !== 'in_progress' && next.status !== 'ready') {
       this.stopSpeech();

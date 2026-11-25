@@ -68,11 +68,12 @@ export async function loadInterview(
       generation_status: row.generation_status as Interview['generation_status'],
       task_id: row.task_id,
       clarification: row.clarification,
+      extension_minutes: row.extension_minutes ?? 0,
       target_at: started
-        ? new Date(Date.parse(started) + row.configuration.duration_minutes * 60000).toISOString()
+        ? new Date(Date.parse(started) + (row.configuration.duration_minutes + (row.extension_minutes ?? 0)) * 60000).toISOString()
         : null,
       deadline_at: started
-        ? new Date(interviewDeadline(started, row.configuration.duration_minutes)).toISOString()
+        ? new Date(interviewDeadline(started, row.configuration.duration_minutes + (row.extension_minutes ?? 0))).toISOString()
         : null,
       parent_interview_id: row.parent_interview_id,
       parent_turn_id: row.parent_turn_id,
@@ -103,12 +104,12 @@ export async function saveInterview(executor: Executor, state: InterviewState) {
   const v = state.view;
   await executor.query(
     `INSERT INTO interviews (id,owner_id,configuration,version,status,snapshot,plan,generation_id,generation_kind,generation_status,task_id,clarification,
-    parent_interview_id,parent_turn_id,parent_revision,retry_question,retry_goal,created_at,started_at,ended_at,end_reason,agent_memory,preparation)
-    VALUES ($1,$2,$3::jsonb,$4,$5,$6::jsonb,$7::jsonb,$8,$9,$10,$11,$12,$13,$14,$15,$16::jsonb,$17,$18,$19,$20,$21,$22::jsonb,$23::jsonb)
+    parent_interview_id,parent_turn_id,parent_revision,retry_question,retry_goal,created_at,started_at,ended_at,end_reason,agent_memory,preparation,extension_minutes)
+    VALUES ($1,$2,$3::jsonb,$4,$5,$6::jsonb,$7::jsonb,$8,$9,$10,$11,$12,$13,$14,$15,$16::jsonb,$17,$18,$19,$20,$21,$22::jsonb,$23::jsonb,$24)
     ON CONFLICT(id) DO UPDATE SET configuration=EXCLUDED.configuration,version=EXCLUDED.version,status=EXCLUDED.status,snapshot=EXCLUDED.snapshot,plan=EXCLUDED.plan,
       generation_id=EXCLUDED.generation_id,generation_kind=EXCLUDED.generation_kind,generation_status=EXCLUDED.generation_status,task_id=EXCLUDED.task_id,clarification=EXCLUDED.clarification,
       parent_interview_id=EXCLUDED.parent_interview_id,parent_turn_id=EXCLUDED.parent_turn_id,parent_revision=EXCLUDED.parent_revision,retry_question=EXCLUDED.retry_question,
-      retry_goal=EXCLUDED.retry_goal,started_at=EXCLUDED.started_at,ended_at=EXCLUDED.ended_at,end_reason=EXCLUDED.end_reason,agent_memory=EXCLUDED.agent_memory,preparation=EXCLUDED.preparation`,
+      retry_goal=EXCLUDED.retry_goal,started_at=EXCLUDED.started_at,ended_at=EXCLUDED.ended_at,end_reason=EXCLUDED.end_reason,agent_memory=EXCLUDED.agent_memory,preparation=EXCLUDED.preparation,extension_minutes=EXCLUDED.extension_minutes`,
     [
       v.id,
       state.owner,
@@ -133,6 +134,7 @@ export async function saveInterview(executor: Executor, state: InterviewState) {
       v.end_reason,
       JSON.stringify(state.memory ?? null),
       JSON.stringify(v.preparation ?? null),
+      v.extension_minutes ?? 0,
     ],
   );
   if (v.generation_status !== 'pending')

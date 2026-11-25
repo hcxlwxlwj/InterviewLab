@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   mainQuestionLimit,
+  interviewDurationMinutes,
   INTERVIEW_POLICY_VERSION,
   type InterviewResponseAssessment,
   interviewPolicy,
@@ -123,13 +124,13 @@ function canFinishAdvance(state: PlanningState) {
   const { interview, context, modern, semantic, isHR, pacing, grounding, missingFeedback } = state;
   const last = interview.turns.at(-1)!;
   const hasCoverageTime =
-    last.main_question_index < mainQuestionLimit(interview.configuration.duration_minutes) &&
+    last.main_question_index < mainQuestionLimit(interviewDurationMinutes(interview)) &&
     (!interview.target_at || Date.parse(interview.target_at) - Date.now() > 30000);
   return (
     canSuggestInterviewFinish(interview) &&
     (!modern ||
       pacing.phase === 'closing' ||
-      last.main_question_index >= mainQuestionLimit(interview.configuration.duration_minutes)) &&
+      last.main_question_index >= mainQuestionLimit(interviewDurationMinutes(interview))) &&
     (!modern ||
       !isHR ||
       !hasCoverageTime ||
@@ -386,7 +387,7 @@ function createAdvanceSchemas(plan: AdvancePlan, clarify: boolean) {
       : (['n', ...(canFinish ? ['e' as const] : [])] as const);
   const states = ['needs_probe', 'covered', 'inconclusive', 'not_applicable'] as const;
   const remainingMain =
-    mainQuestionLimit(interview.configuration.duration_minutes) - last.main_question_index;
+    mainQuestionLimit(interviewDurationMinutes(interview)) - last.main_question_index;
   const allGoalIndices = goalOptions.map((_, index) => index);
   const currentGoal = context.memory?.focus;
   const missingNext = missingFeedback.filter((dimension) => dimension.key !== 'communication');
@@ -708,7 +709,7 @@ motivation：候选人明确零基础时，从为什么选择岗位或对岗位�
         clarify,
         can_finish: canFinish,
         remaining_main:
-          mainQuestionLimit(interview.configuration.duration_minutes) - last.main_question_index,
+          mainQuestionLimit(interviewDurationMinutes(interview)) - last.main_question_index,
         remaining_follow_up: 2 - last.follow_up_index,
       }),
     },

@@ -1,4 +1,9 @@
-import { LIVE_TYPE_LABELS, type Interview, type InterviewPreview } from '@interviewlab/core';
+import {
+  interviewDurationMinutes,
+  LIVE_TYPE_LABELS,
+  type Interview,
+  type InterviewPreview,
+} from '@interviewlab/core';
 import type { WorkspaceTurn } from '../../components/interview-workspace';
 
 const STAGES = {
@@ -63,7 +68,7 @@ function elapsedSeconds(view: Interview, now: number) {
   const terminal = view.status === 'completed' || view.status === 'failed';
   const end = terminal && view.ended_at ? Date.parse(view.ended_at) : now;
   return Math.min(
-    (Math.max(10, view.configuration.duration_minutes) + 2) * 60,
+    (Math.max(10, interviewDurationMinutes(view)) + 2) * 60,
     Math.max(0, Math.floor((end - Date.parse(view.started_at)) / 1000)),
   );
 }

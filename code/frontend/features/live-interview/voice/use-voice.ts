@@ -167,7 +167,10 @@ export function useInterviewVoice(options: {
           }
         }
         if (event.type === 'status') setThinking(event.state === 'thinking');
-        if (event.type === 'error' && event.code !== 'voice_previous_draft')
+        if (
+          event.type === 'error' &&
+          !['voice_previous_draft', 'voice_generation_failed'].includes(event.code)
+        )
           setError(event.message);
       },
       setPlaying,

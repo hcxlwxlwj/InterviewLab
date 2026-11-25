@@ -131,6 +131,7 @@ export const interviewSchema = z.object({
   generation_status: z.enum(['idle', 'pending', 'ready', 'failed']),
   task_id: z.string().nullable(),
   clarification: z.string().nullable(),
+  extension_minutes: z.number().int().nonnegative().optional(),
   target_at: z.string().nullable(),
   deadline_at: z.string().nullable(),
   parent_interview_id: z.string().nullable(),

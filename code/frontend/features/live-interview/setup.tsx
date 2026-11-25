@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { ArrowRight, CameraOff, Check, Keyboard, Mic, MicOff } from 'lucide-react';
+import { ArrowRight, Camera, CameraOff, Check, Keyboard, Mic, MicOff } from 'lucide-react';
 import { Choices, InterviewSetupPage } from '../../components/interview-setup';
 import { Button } from '../../components/ui/button';
 import { apiRequest } from '../../lib/api/http';
@@ -249,7 +249,7 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
             管理多份简历 / 新增岗位版简历 →
           </Link>
         </section>
-        <section className="panel form-panel">
+        <section className="panel form-panel setup-interaction-panel">
           <div className="form-panel-title">
             <span className="section-number">04</span>
             <div>
@@ -268,18 +268,22 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
             onChange={(v) => change('interaction_mode', v)}
             disabled={command.blocked}
           />
-          <div className="privacy-checks">
+          <div className="setup-media-status">
             <span>
-              {config.interaction_mode === 'realtime_voice' ? (
+              {config.interaction_mode !== 'text_fallback' ? (
                 <Mic size={14} />
               ) : (
                 <MicOff size={14} />
               )}
-              {config.interaction_mode === 'realtime_voice' ? '准备时授权麦克风' : '麦克风未采集'}
+              {config.interaction_mode !== 'text_fallback' ? '准备时授权麦克风' : '麦克风未采集'}
             </span>
             <span>
-              <CameraOff size={14} />
-              摄像头关闭
+              {config.interaction_mode === 'realtime_video' ? (
+                <Camera size={14} />
+              ) : (
+                <CameraOff size={14} />
+              )}
+              {config.interaction_mode === 'realtime_video' ? '准备时授权摄像头' : '摄像头关闭'}
             </span>
             <span>
               <Check size={14} />
@@ -288,8 +292,7 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
           </div>
           {config.interaction_mode === 'realtime_video' && (
             <p className="field-help">
-              准备时申请麦克风和摄像头，完成后自动进入视频房间。屏幕共享由你主动开启。画面不上传、不录像，语音沿用当前面试
-              Agent。
+              准备完成后自动进入视频面试。摄像头画面仅在本机预览，屏幕共享由你主动开启。音频用于实时转写，本站保存转写文字。
             </p>
           )}
           {config.interaction_mode === 'realtime_voice' && (
@@ -327,7 +330,7 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
           <div className="summary-row">
             <span>实际作答</span>
             <strong>
-              {config.interaction_mode === 'realtime_voice' ? (
+              {config.interaction_mode !== 'text_fallback' ? (
                 <Mic size={13} />
               ) : (
                 <Keyboard size={13} />

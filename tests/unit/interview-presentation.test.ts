@@ -32,6 +32,15 @@ test('running presentation preserves turn labels, saved answers and the selected
   assert.equal(JSON.stringify(state), before);
 });
 
+test('an extension raises the displayed hard-deadline ceiling without mutating the view', () => {
+  const state = view();
+  state.extension_minutes = 5;
+  const before = JSON.stringify(state);
+  const result = interviewPresentation(state, Date.parse(state.started_at!) + 30 * 60000, null);
+  assert.equal(result.seconds, 27 * 60);
+  assert.equal(JSON.stringify(state), before);
+});
+
 test('pending preview and paused state retain their original display priority', () => {
   const state = view();
   state.generation_status = 'pending';

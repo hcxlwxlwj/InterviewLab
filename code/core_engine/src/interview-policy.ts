@@ -1,3 +1,4 @@
+import { interviewDurationMinutes } from './live-interview';
 import type { InterviewConfig, Interview } from './live-interview';
 import type { InterviewMemory as Memory } from './interview-agent';
 import { mainQuestionLimit } from './live-interview';
@@ -133,11 +134,11 @@ export function interviewPacing(interview: Interview, memory: Memory | null, now
   const mixedFocus =
     elapsedCore >= policy.core_seconds * 0.8 ||
     (last?.main_question_index ?? 0) >=
-      Math.ceil(mainQuestionLimit(interview.configuration.duration_minutes) * 0.8)
+      Math.ceil(mainQuestionLimit(interviewDurationMinutes(interview)) * 0.8)
       ? 'hr'
       : elapsedCore >= policy.core_seconds * 0.5 ||
           (last?.main_question_index ?? 0) >=
-            Math.ceil(mainQuestionLimit(interview.configuration.duration_minutes) * 0.6)
+            Math.ceil(mainQuestionLimit(interviewDurationMinutes(interview)) * 0.6)
         ? 'business'
         : 'professional';
   return {

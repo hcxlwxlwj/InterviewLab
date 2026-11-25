@@ -140,11 +140,34 @@ export function InterviewWorkspace(p: Props) {
               <h1>
                 {p.current?.text ?? (p.ended ? '本场面试已结束。' : '准备好后，点击开始面试。')}
               </h1>
-              {p.current && (
+              {p.current && !p.voiceView && (
                 <button className="text-link" disabled={!p.canAnswer} onClick={p.onRepeat}>
                   <VolumeX size={14} />
                   再看一遍题目
                 </button>
+              )}
+              {p.voiceView && p.current && (
+                <div className="live-actions">
+                  {p.onClarify && (
+                    <button
+                      type="button"
+                      className="text-link"
+                      disabled={!p.canAnswer}
+                      onClick={p.onClarify}
+                    >
+                      澄清题意
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="text-link"
+                    disabled={!p.canAnswer}
+                    onClick={p.onSkip}
+                  >
+                    <SkipForward size={14} />
+                    跳过本题
+                  </button>
+                </div>
               )}
               {p.explanation && (
                 <p className="repeated-question" role="status">
@@ -251,6 +274,7 @@ export function InterviewWorkspace(p: Props) {
                 )}
               </div>
             )}
+            {p.voiceView && p.conversationNotice}
             {p.workspace}
             {!p.voiceView && (
               <form

@@ -82,6 +82,9 @@ test('call UI has a voice orb, 3-second automatic turn hint, real mute control a
   assert.match(html, /<details class="voice-call-transcript">/);
   assert.doesNotMatch(html, /<details[^>]* open/);
   assert.match(html, /尚未提交的转写/);
+  assert.match(html, /让我想想/);
+  assert.match(html, /切回文字/);
+  assert.doesNotMatch(html, /我说完了|停止播报|重听|挂断语音/);
   assert.doesNotMatch(html, /麦克风输入设备|麦克风输入音量|实时转写：/);
   assert.equal(loadConfig({}).VOICE_SILENCE_MS, 1800);
 });
@@ -195,6 +198,26 @@ test('video room renders a separate call layout without acquiring camera or repl
   assert.match(html, /视频中的完整旧题补充/);
   assert.match(html, /复制补充/);
   assert.doesNotMatch(html, /voice-orb|srcObject=|<video/);
+
+  // The video room shares the same notice slot and duration budget as the text/voice rooms.
+  const timeDecision = renderToStaticMarkup(
+    React.createElement(VideoInterviewWorkspace, {
+      ...workspace,
+      voice,
+      onStart: noop,
+      durationMinutes: 15,
+      notice: React.createElement(
+        'div',
+        { className: 'notice' },
+        '继续 5 分钟',
+        React.createElement('button', {}, '结束并查看报告'),
+      ),
+    }),
+  );
+  assert.match(timeDecision, /继续 5 分钟/);
+  assert.match(timeDecision, /结束并查看报告/);
+  assert.match(timeDecision, /15:00/);
+
   for (const interaction_mode of ['text_fallback', 'realtime_voice', 'realtime_video'] as const) {
     const path = liveInterviewPath({
       id: 'test-id',
@@ -224,4 +247,16 @@ test('ready voice room directs users to the start button and has no separate ena
   assert.match(html, /点击右上角开始面试/);
   assert.match(html, /麦克风权限/);
   assert.doesNotMatch(html, /开启实时语音|连接语音<|开启麦克风进入通话/);
+});
+
+test('voice mode retains generation recovery controls outside its hidden conversation log', () => {
+  const html = renderToStaticMarkup(
+    React.createElement(InterviewWorkspace, {
+      ...workspace,
+      voiceView: true,
+      conversationNotice: React.createElement('button', {}, '重试生成'),
+    }),
+  );
+  assert.match(html, /重试生成/);
+  assert.doesNotMatch(html, /aria-label="面试对话记录"/);
 });

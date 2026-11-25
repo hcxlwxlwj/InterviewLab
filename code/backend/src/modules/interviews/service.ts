@@ -20,6 +20,7 @@ import {
   INTERVIEW_MAX_ANSWER,
   INTERVIEW_RUBRIC_VERSION,
   interviewDeadline,
+  interviewDurationMinutes,
   interviewOpening,
   canSuggestInterviewFinish,
   nextQuestionPosition,
@@ -61,6 +62,7 @@ const ended = (state: InterviewState) => ['completed', 'failed'].includes(state.
 export function interviewInputDigest(state: InterviewState) {
   return inputDigest({
     configuration: state.view.configuration,
+    extension_minutes: state.view.extension_minutes ?? 0,
     snapshot: state.snapshot,
     ...(state.snapshot?.prompt_version === INTERVIEW_V3 ||
     state.snapshot?.runtime_version === 'graph-v1'
@@ -111,7 +113,7 @@ function addQuestion(state: InterviewState, question: InterviewQuestion, followU
   const position = nextQuestionPosition(
     state.view.turns,
     followUp,
-    state.view.configuration.duration_minutes,
+    interviewDurationMinutes(state.view),
   );
   if (!position) return false;
   state.view.turns.push({
@@ -210,7 +212,7 @@ export function createInterviewsService(
           !ended(state) &&
           state.view.started_at &&
           Date.now() >=
-            interviewDeadline(state.view.started_at, state.view.configuration.duration_minutes)
+            interviewDeadline(state.view.started_at, interviewDurationMinutes(state.view))
         )
           await seal(tx, state, 'hard_deadline');
         else {
@@ -259,10 +261,16 @@ export function createInterviewsService(
       turn.answered_at = new Date().toISOString();
     }
   }
+  function waitForTimeDecision(state: InterviewState) {
+    state.view.generation_id = randomUUID();
+    state.view.generation_status = state.view.turns.at(-1)?.answer_status === 'waiting' ? 'ready' : 'idle';
+    state.view.task_id = null;
+    state.generationKind = null;
+  }
   async function advanceAfterAnswer(tx: Transaction, state: InterviewState) {
     await cancelInterviewTasks(tx.client, state.view.id);
-    if (state.retryQuestion || Date.now() >= Date.parse(state.view.target_at!))
-      await seal(tx, state, state.retryQuestion ? 'single_retry_complete' : 'target_reached');
+    if (state.retryQuestion) await seal(tx, state, 'single_retry_complete');
+    else if (Date.now() >= Date.parse(state.view.target_at!)) waitForTimeDecision(state);
     else {
       const notice =
         state.snapshot?.prompt_version === INTERVIEW_V3 ||
@@ -368,7 +376,7 @@ export function createInterviewsService(
         Date.now() + state.view.configuration.duration_minutes * 60000,
       ).toISOString();
       state.view.deadline_at = new Date(
-        interviewDeadline(state.view.started_at!, state.view.configuration.duration_minutes),
+        interviewDeadline(state.view.started_at!, interviewDurationMinutes(state.view)),
       ).toISOString();
       state.view.status = 'in_progress';
       if (state.retryQuestion) {
@@ -512,7 +520,7 @@ export function createInterviewsService(
         fresh.view.version++;
         if (
           Date.now() >=
-          interviewDeadline(fresh.view.started_at!, fresh.view.configuration.duration_minutes)
+          interviewDeadline(fresh.view.started_at!, interviewDurationMinutes(fresh.view))
         ) {
           await seal(tx, fresh, 'hard_deadline');
           return;
@@ -522,7 +530,8 @@ export function createInterviewsService(
           fresh.view.turns.length &&
           Date.now() >= Date.parse(fresh.view.target_at!)
         ) {
-          await seal(tx, fresh, 'target_reached');
+          waitForTimeDecision(fresh);
+          await saveInterview(tx.client, fresh);
           return;
         }
         if (next?.action === 'clarify') {
@@ -652,6 +661,19 @@ export function createInterviewsService(
           state.view.preparation = { status: 'pending', task_id: null, error_code: null };
         state.view.configuration = body.configuration;
       }),
+    extend: (identity: RequestIdentity, id: string, body: { version: number }, key: string) =>
+      mutate(identity, id, 'extend', key, body, async (tx, state) => {
+        if (state.view.status !== 'in_progress' || state.retryQuestion || !state.view.target_at || Date.now() < Date.parse(state.view.target_at))
+          throw invalid('到设定时长后可以继续面试');
+        await cancelInterviewTasks(tx.client, id);
+        state.view.extension_minutes = (state.view.extension_minutes ?? 0) + 5;
+        state.view.target_at = new Date(Date.parse(state.view.target_at) + 5 * 60000).toISOString();
+        state.view.deadline_at = new Date(Date.parse(state.view.deadline_at!) + 5 * 60000).toISOString();
+        waitForTimeDecision(state);
+        if (state.view.turns.at(-1)?.answer_status === 'answered' || state.view.turns.at(-1)?.answer_status === 'skipped')
+          await generate(tx, state, 'advance');
+        await interviewEvent(tx.client, id, 'time_extended');
+      }),
     pause: (identity: RequestIdentity, id: string, body: { version: number }, key: string) =>
       mutate(identity, id, 'pause', key, body, async (tx, state) => {
         if (state.view.status !== 'in_progress') throw invalid();
@@ -668,7 +690,7 @@ export function createInterviewsService(
         const waiting = state.view.turns.at(-1)?.answer_status === 'waiting';
         if (!waiting) {
           if (state.view.turns.length && Date.now() >= Date.parse(state.view.target_at!))
-            await seal(tx, state, 'target_reached');
+            waitForTimeDecision(state);
           else await generate(tx, state, state.view.turns.length ? 'advance' : 'plan');
         } else {
           state.view.generation_status = 'ready';
@@ -818,7 +840,7 @@ export function createInterviewsService(
           state.view.generation_id = randomUUID();
           const q = fallbackQuestion(state);
           if (state.view.turns.length && Date.now() >= Date.parse(state.view.target_at!))
-            await seal(tx, state, 'target_reached');
+            waitForTimeDecision(state);
           else if (!addQuestion(state, q, false)) await seal(tx, state, 'questions_complete');
           else {
             if (!state.view.plan.length) state.view.plan = [q.topic];
@@ -909,7 +931,7 @@ export function createInterviewsService(
         id: string;
         owner_id: string;
       }>(`SELECT id,owner_id FROM interviews WHERE deleted_at IS NULL AND
-        status IN ('in_progress','paused') AND (started_at<=now()-(greatest(10,(configuration->>'duration_minutes')::integer)+2)*interval '1 minute' OR
+        status IN ('in_progress','paused') AND (started_at<=now()-(greatest(10,(configuration->>'duration_minutes')::integer)+extension_minutes+2)*interval '1 minute' OR
         (generation_status='pending' AND EXISTS (SELECT 1 FROM tasks t WHERE t.id=interviews.task_id AND t.status='failed' AND (t.attempts>=t.max_attempts OR t.error_code='unsupported_task_type'))))
         ORDER BY started_at LIMIT 100`);
       for (const row of rows.rows)
@@ -924,7 +946,7 @@ export function createInterviewsService(
           if (ended(state)) return;
           if (
             Date.now() >=
-            interviewDeadline(state.view.started_at!, state.view.configuration.duration_minutes)
+            interviewDeadline(state.view.started_at!, interviewDurationMinutes(state.view))
           ) {
             state.view.version++;
             await seal(tx, state, 'hard_deadline');

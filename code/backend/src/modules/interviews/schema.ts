@@ -54,6 +54,7 @@ export const interviews = pgTable(
     retry_question: jsonb().$type<InterviewQuestion>(),
     retry_goal: text(),
     created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    extension_minutes: integer().notNull().default(0),
     started_at: timestamp({ withTimezone: true }),
     ended_at: timestamp({ withTimezone: true }),
     end_reason: text(),

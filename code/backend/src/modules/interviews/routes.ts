@@ -132,6 +132,7 @@ export function interviewsModule(
       );
       command('/prepare', s.preparationBody, (...args) => ready().prepare(...args));
       command('/start', s.versionBody, (...args) => ready().start(...args));
+      command('/extend', s.versionBody, (...args) => ready().extend(...args));
       command('/pause', s.versionBody, (...args) => ready().pause(...args));
       command('/resume', s.versionBody, (...args) => ready().resume(...args));
       command('/finish', s.finishBody, (...args) => ready().finish(...args));

@@ -1,4 +1,4 @@
-import type { Interview, InterviewPreview } from '@interviewlab/core';
+import { interviewDurationMinutes, type Interview, type InterviewPreview } from '@interviewlab/core';
 import { Button } from '../../components/ui/button';
 
 export function InterviewProgressNotice({
@@ -7,18 +7,26 @@ export function InterviewProgressNotice({
   targetReached,
   canContinue,
   onContinue,
+  canExtend,
+  onExtend,
+  onFinish,
 }: {
   view: Interview;
   continuation: boolean;
   targetReached: boolean;
   canContinue: boolean;
   onContinue: () => void;
+  canExtend: boolean;
+  onExtend: () => void;
+  onFinish: () => void;
 }) {
   return (
     <>
       {continuation && (
         <p className="notice" role="status">
-          旧问题生成已被你的补充打断。可继续补充回答，或{' '}
+          {view.generation_status === 'failed'
+            ? '回答已保存。可继续补充回答，或 '
+            : '旧问题生成已被你的补充打断。可继续补充回答，或 '}
           <button className="text-link" disabled={!canContinue} onClick={onContinue}>
             按已保存的回答继续提问
           </button>
@@ -32,11 +40,21 @@ export function InterviewProgressNotice({
       )}
       {view.retry_goal && <p className="notice">单题重练目标：{view.retry_goal}</p>}
       {targetReached && (
-        <p className="notice" role="status">
-          已到目标时长，请完成当前回答后收尾。
-          {Math.max(10, view.configuration.duration_minutes) + 2}{' '}
-          分钟后会自动封存，暂停和断线仍计时。
-        </p>
+        <div className="notice" role="status">
+          <span>
+            已到设定的 {view.configuration.duration_minutes} 分钟。如果还在回答，可以先把当前问题讲完；
+            也可以继续面试或结束查看报告。
+          </span>
+          <button className="text-link" disabled={!canExtend} onClick={onExtend}>
+            继续 5 分钟
+          </button>
+          <button className="text-link" disabled={!canExtend} onClick={onFinish}>
+            结束并查看报告
+          </button>
+          <span>
+            {Math.max(10, interviewDurationMinutes(view)) + 2} 分钟（含暂停和断线）后会自动封存。
+          </span>
+        </div>
       )}
     </>
   );

@@ -117,6 +117,7 @@ export interface Interview {
   generation_status: 'idle' | 'pending' | 'ready' | 'failed';
   task_id: string | null;
   clarification: string | null;
+  extension_minutes?: number;
   target_at: string | null;
   deadline_at: string | null;
   parent_interview_id: string | null;
@@ -276,11 +277,14 @@ export function interviewConversationHistory(turns: InterviewTurn[]) {
 export function canSuggestInterviewFinish(interview: Interview): boolean {
   return (
     interview.turns.filter((turn) => turn.answer_status === 'answered').length >= 3 ||
-    !nextQuestionPosition(interview.turns, false, interview.configuration.duration_minutes) ||
+    !nextQuestionPosition(interview.turns, false, interviewDurationMinutes(interview)) ||
     Boolean(interview.target_at && Date.now() >= Date.parse(interview.target_at))
   );
 }
 export const INTERVIEW_DURATIONS = [10, 20, 30] as const;
+export function interviewDurationMinutes(interview: Pick<Interview, 'configuration' | 'extension_minutes'>): number {
+  return interview.configuration.duration_minutes + (interview.extension_minutes ?? 0);
+}
 export function mainQuestionLimit(durationMinutes = 10): number {
   return durationMinutes <= 10 ? 6 : durationMinutes <= 20 ? 10 : 14;
 }

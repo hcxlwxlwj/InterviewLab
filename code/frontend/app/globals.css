@@ -1462,8 +1462,6 @@ input::placeholder {
 .voice-round-button > svg { width: 52px; height: 52px; padding: 16px; border-radius: 50%; background: #edf2f7; color: #42556b; transition: background .2s, transform .2s; box-sizing: border-box; }
 .voice-round-button:hover > svg { background: #dfeaf4; transform: translateY(-2px); }
 .voice-round-button[aria-pressed=true] > svg { background: #d9e8f8; color: #386fa6; }
-.voice-round-button.voice-hangup > svg { color: #fff; background: #d87875; }
-.voice-round-button.voice-hangup:hover > svg { background: #c66563; }
 .voice-round-button:focus-visible, .voice-call-secondary button:focus-visible { outline: 2px solid #659dbd; outline-offset: 5px; border-radius: 8px; }
 .voice-round-button:disabled { opacity: .4; cursor: default; }
 .voice-call-secondary { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 18px; }

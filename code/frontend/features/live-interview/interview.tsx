@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { INTERVIEW_MAX_ANSWER, type Interview } from '@interviewlab/core';
+import { INTERVIEW_MAX_ANSWER, interviewDurationMinutes, type Interview } from '@interviewlab/core';
 import { useRouter } from 'next/navigation';
 import { interviewsApi } from '../../lib/api/interviews';
 import { useSession } from '../../components/session-provider';
@@ -25,15 +25,13 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
   const Workspace = videoRoom ? VideoInterviewWorkspace : InterviewWorkspace;
   const { state: account } = useSession();
   const load = useCallback((signal: AbortSignal) => interviewsApi.read(id, signal), [id]);
-  const [streamConnected, setStreamConnected] = useState(false);
   const resource = useLiveResource(
     load,
     (v) =>
-      (v.generation_status === 'pending' && !streamConnected) ||
+      v.generation_status === 'pending' ||
       ['pending', 'waiting_material'].includes(v.preparation?.status ?? ''),
   );
   const stream = useInterviewStream(id, resource.value, resource.accept, resource.refresh);
-  useEffect(() => setStreamConnected(stream.connected), [stream.connected]);
   const command = useLiveCommand(() => void resource.refresh());
   const [draft, setDraft] = useState({ key: '', text: '' });
   const [storageError, setStorageError] = useState('');
@@ -167,7 +165,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
   const waiting = turn?.answer_status === 'waiting';
   const continuation =
     turn?.answer_status === 'answered' &&
-    v.generation_status === 'idle' &&
+    ['idle', 'failed'].includes(v.generation_status) &&
     v.status === 'in_progress';
   const canAnswer =
     (waiting || continuation) &&
@@ -205,7 +203,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
         interviewerLabel="AI 面试官"
         interviewerStatus={workspace.interviewerStatus}
         seconds={workspace.seconds}
-        durationMinutes={v.configuration.duration_minutes}
+        durationMinutes={interviewDurationMinutes(v)}
         turns={workspace.turns}
         current={workspace.current}
         draft={text}
@@ -219,12 +217,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
         paused={v.status === 'paused'}
         ended={Boolean(terminal)}
         saveLabel={workspace.saveLabel}
-        draftHint={
-          storageError ||
-          (terminal && text
-            ? '此草稿尚未提交，你仍可复制保存。'
-            : '草稿保留在当前标签页，提交确认后清除。')
-        }
+        draftHint={storageError || (terminal && text ? '此草稿尚未提交，你仍可复制保存。' : '')}
         explanation={v.clarification}
         voiceActive={voice.active}
         voiceView={voice.display}
@@ -246,6 +239,9 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
               targetReached={Boolean(targetReached)}
               canContinue={!command.blocked && !voice.active}
               onContinue={() => act('voice/continue', { turn_id: turn!.id, text: '' })}
+              canExtend={!command.blocked}
+              onExtend={() => act('extend', {})}
+              onFinish={() => changeFinish(true)}
             />
           </>
         }
@@ -257,13 +253,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
             onRetry={(fallback) => act('generation/retry', { fallback })}
           />
         }
-        interviewerNote={
-          <>
-            结合自己的实际经历回答，不熟悉的内容可以直接说明。
-            <br />
-            面试中不展示评价和参考答案。
-          </>
-        }
+        interviewerNote={<>不熟悉的内容可以直接说明，也可以跳过本题。</>}
         recordsHref="/me/interviews"
         reportHref={`/reports/${id}`}
         onText={setText}
