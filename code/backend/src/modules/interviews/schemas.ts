@@ -139,7 +139,6 @@ export const interviewSchema = z.object({
   parent_revision: z.number().int().nullable(),
   retry_goal: z.string().nullable(),
 }) satisfies z.ZodType<Interview>;
-export { reportSchema } from '../reports/schemas';
 export const comparisonSchema = z.object({
   id: z.string(),
   version: z.number().int(),

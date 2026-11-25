@@ -58,7 +58,6 @@ export default function MaterialsWorkspace() {
         {!loaded && !error && <p>正在加载…</p>}
         {loaded && (
           <>
-            <p>可分别创建“前端实习版”“后端校招版”等多份简历。每次模拟面试可单独选择一份。</p>
             <details className="resume-editor-panel" open={editorOpen || !!editing || !items.length} onToggle={e=>setEditorOpen(e.currentTarget.open)}><summary>{editing?'编辑简历':'＋ 新建一份简历'}</summary>
             <form
               className="material-form"
@@ -156,7 +155,7 @@ export default function MaterialsWorkspace() {
                 </button>
                 {filename && <span className="material-filename">已导入：{filename}</span>}
               </div>
-            <section className="resume-template resume-review"><h2>整理你的简历信息</h2><p className="resume-review-status">已填入 {Object.values(draft.structure).filter(value => value.trim()).length} / {Object.keys(RESUME_FIELDS).length} 项 · 未识别的字段保留空白</p><p>可以直接修改识别结果或补充信息，系统不会补写事实。</p><button type="button" disabled={busy||importing||!draft.text.trim()} onClick={()=>{if(Object.values(draft.structure).some(value=>value.trim())&&!window.confirm('重新识别会覆盖当前模板中的手动修改，是否继续？'))return;setDraft({...draft,structure:extractResumeTemplate(draft.text)});setNotice('已重新整理简历信息。');}}>重新识别原文</button><ResumeRecords value={draft.structure} onChange={structure=>setDraft({...draft,structure})} /></section>
+            <section className="resume-template resume-review"><h2>整理你的简历信息</h2><p className="resume-review-status">已填入 {Object.values(draft.structure).filter(value => value.trim()).length} / {Object.keys(RESUME_FIELDS).length} 项</p><p>请核对并补充简历信息。</p><button type="button" disabled={busy||importing||!draft.text.trim()} onClick={()=>{if(Object.values(draft.structure).some(value=>value.trim())&&!window.confirm('重新识别会覆盖当前模板中的手动修改，是否继续？'))return;setDraft({...draft,structure:extractResumeTemplate(draft.text)});setNotice('已重新整理简历信息。');}}>重新识别原文</button><ResumeRecords value={draft.structure} onChange={structure=>setDraft({...draft,structure})} /></section>
               <button disabled={busy || importing}>保存档案</button>
               <button
                 type="button"
@@ -171,7 +170,7 @@ export default function MaterialsWorkspace() {
               </button>
             </form></details>
             {!items.length && <p>还没有简历或经历，可以在上方创建。</p>}
-            <h2>已保存的档案（{items.length}）</h2><p><a className="text-link" href="/interview/setup">选择一份简历开始模拟面试 →</a></p>
+            <h2>已保存的档案（{items.length}）</h2><p><a className="text-link" href="/jobs">选择岗位开始面试 →</a></p>
             {items.map((item) => (
               <article key={item.id} className="resume-summary-row">
                 <div>

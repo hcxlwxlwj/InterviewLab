@@ -1,0 +1,183 @@
+{
+  "date": "2026-11-26",
+  "scope": {
+    "products": [
+      "code/frontend/app/interview/setup/page.tsx",
+      "code/frontend/components/interview-setup.tsx",
+      "code/frontend/components/job-library.tsx",
+      "code/frontend/features/live-interview/analysis.tsx",
+      "code/frontend/features/live-interview/preparation.tsx",
+      "code/frontend/features/live-interview/setup-controller.ts",
+      "code/frontend/features/live-interview/setup-fields.tsx",
+      "code/frontend/features/live-interview/setup-panels.tsx",
+      "code/frontend/features/live-interview/setup-state.ts",
+      "code/frontend/features/live-interview/setup-summary.tsx",
+      "code/frontend/features/live-interview/setup.tsx",
+      "code/frontend/features/personal-center/materials-workspace.tsx"
+    ],
+    "tests": [
+      "tests/unit/interview-entry.test.ts",
+      "tests/unit/interview-setup.test.ts",
+      "tests/unit/setup-presentation.test.ts"
+    ],
+    "source_sha256": {
+      "code/frontend/app/interview/setup/page.tsx": "2dafd80ca690e6a418b76f63c41651d190be74a90eb631cfc642b61b7cd25755",
+      "code/frontend/components/interview-setup.tsx": "8ed025d7062ff99528063676e8760cd0cc76bb343c96317d71bde9fb160b41d5",
+      "code/frontend/components/job-library.tsx": "0368648abde860a420ba39c68bafacea2440a980e6829725170aea53fe940284",
+      "code/frontend/features/live-interview/analysis.tsx": "3d603973ab4a5c487b666af85b62a8a0f860ce1c488a7f74d699cc0ca4a4a512",
+      "code/frontend/features/live-interview/preparation.tsx": "332e29a6feb415e6a12b3384c0568c9bf42ea1500e619ab386de2f8a2607c4eb",
+      "code/frontend/features/live-interview/setup-controller.ts": "1f10e4ad368c6a8b01c68083ccd18d6573dfef3da216d2bc212b14496221edd6",
+      "code/frontend/features/live-interview/setup-fields.tsx": "4bfdcc9b294736cc6593c25ef2df3eebca83894de2fd7447865492a54d5342ac",
+      "code/frontend/features/live-interview/setup-panels.tsx": "e6763adc1583e59127f3ad5f07b066b8cc9fc69f2a732cee80b4ff1043f82496",
+      "code/frontend/features/live-interview/setup-state.ts": "de1bd6fe5a03693073ef0de81f914849ae2d2dbd5f0626379399bb3f8473e5ce",
+      "code/frontend/features/live-interview/setup-summary.tsx": "e6d9d00d8d1a23b06520dbc45ee8968001f21272ce34b5fbd3b027feb3393e45",
+      "code/frontend/features/live-interview/setup.tsx": "8192c218bc316cf827eca881f5048a6982c5392f0b5dcfd04ee41020101b8c10",
+      "code/frontend/features/personal-center/materials-workspace.tsx": "d6ef7b036781d84dddc807f2f0fcac19a5387b146fd68ca6a5346c3121223365",
+      "tests/unit/interview-entry.test.ts": "9e8a5d2287adb3ac4b85a3330dc0faef5841d99080ed996dfff655bb7b7b1ac3",
+      "tests/unit/interview-setup.test.ts": "4484ee6dea23432fcebec68fd3347e91e0139970e2dca14e2164e5861d9512cc",
+      "tests/unit/setup-presentation.test.ts": "bb97a788e8ea54892190ddd1f4f4031771d3f5a981f0ce3c11b2b4582e198993"
+    }
+  },
+  "dependency_audit": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 217,
+      "dev": 118,
+      "optional": 156,
+      "peer": 1,
+      "peerOptional": 0,
+      "total": 412
+    }
+  },
+  "secrets": {
+    "tool": "Gitleaks 8.30.1",
+    "binary_sha256": "17157e2ee8b76fc8b1d8bee607a250e34b8a8023c8bc81822d4b5ee4d78fcb7c",
+    "configuration": "default; no GITLEAKS_CONFIG environment override; redaction 100%; ignore inline allow comments; no ignore file",
+    "files": 15,
+    "findings": 0,
+    "scope": "immutable source/test snapshot only; no .env, database data or Git history"
+  },
+  "module_graph": {
+    "source_files": 259,
+    "runtime_cycles": {
+      "runtime_static": {
+        "cycle_components": 0,
+        "cyclic_modules": 0
+      },
+      "runtime_including_literal_dynamic": {
+        "cycle_components": 0,
+        "cyclic_modules": 0
+      },
+      "all_including_explicit_types": {
+        "cycle_components": 2,
+        "cyclic_modules": 10
+      }
+    },
+    "generated_declarations": [
+      {
+        "from": "code/frontend/next-env.d.ts",
+        "line": 3,
+        "column": 1,
+        "kind": "import",
+        "mode": "type-only",
+        "specifier": "./.next/dev/types/routes.d.ts",
+        "resolution": "source-outside-inventory",
+        "target": "code/frontend/.next/dev/types/routes.d.ts",
+        "exists": true,
+        "classification": "Resolved generated Next.js type declaration outside tracked source inventory; not a missing runtime module"
+      },
+      {
+        "from": "code/frontend/next-env.d.ts",
+        "line": 4,
+        "column": 1,
+        "kind": "import",
+        "mode": "type-only",
+        "specifier": "./.next/dev/types/root-params.d.ts",
+        "resolution": "source-outside-inventory",
+        "target": "code/frontend/.next/dev/types/root-params.d.ts",
+        "exists": true,
+        "classification": "Resolved generated Next.js type declaration outside tracked source inventory; not a missing runtime module"
+      }
+    ],
+    "parse_diagnostics": [],
+    "snapshot_stable": true,
+    "limitations": [
+      "Whole repository tracked plus untracked module graph; not a whole-project structural lint rescan.",
+      "Type-only cycles are distinct from runtime cycles.",
+      "Object-reference leaks, dynamic nonliteral runtime import and long-run resources are not exhaustively verified."
+    ]
+  },
+  "conditions": {
+    "scope": "12 touched/current UI product files",
+    "rule": "existing TypeScript AST boolean-leaf counter; threshold three",
+    "records": [
+      {
+        "file": "code/frontend/features/live-interview/preparation.tsx",
+        "line": 185,
+        "column": 7,
+        "boolean_leaves": 4
+      }
+    ],
+    "notes": [
+      "Independent review found only existing preparation.tsx:185 (four leaves); same HEAD statement was at line184. New configuration modules have none."
+    ],
+    "records_are": "Only conditions exceeding three leaves, as returned by the unchanged repository audit script."
+  },
+  "todo_fixme_in_review_scope": [],
+  "backend_restart": {
+    "date": "2026-11-26",
+    "roles": [
+      "api",
+      "worker"
+    ],
+    "api_port": 3003,
+    "frontend_port": 3000,
+    "direct_health_status": 200,
+    "direct_ready_status": 200,
+    "proxy_ready_status": 200,
+    "database": true,
+    "worker": true,
+    "changed_environment": false,
+    "started_real_interview": false
+  },
+  "verification": {
+    "ordinary_tests": {
+      "passed": 345,
+      "failed": 0,
+      "skipped": 0
+    },
+    "targeted_three_files": {
+      "passed": 24,
+      "failed": 0
+    },
+    "typecheck": "passed",
+    "boundaries": "passed",
+    "content": "passed",
+    "frontend_build": {
+      "command": "npm run build --workspace @interviewlab/web -- --webpack",
+      "isolated_same_drive": true,
+      "result": "passed",
+      "static_pages": 12
+    },
+    "initial_build_wrapper": "Root npm build did not forward --webpack to inner workspace command; isolated Turbopack dependency-root failure corrected by explicit workspace command.",
+    "real_models_media_database_process_proxy_tests": "not rerun in this UI review",
+    "final_source_and_test_sha256_matches_scan_and_coverage": true,
+    "documentation": {
+      "markdown_files": 59,
+      "local_links": 550,
+      "result": "passed"
+    },
+    "diff_whitespace_check": "passed"
+  },
+  "limits": [
+    "No full injection, IDOR or long-lived browser resource audit is claimed.",
+    "Raw source and test hashes establish the inspected snapshot; .env and private user content are excluded."
+  ]
+}

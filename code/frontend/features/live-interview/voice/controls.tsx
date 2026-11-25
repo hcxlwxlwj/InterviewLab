@@ -3,6 +3,16 @@ import { useState } from 'react';
 import { Mic, MicOff, Keyboard, Hand, MessageSquare } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import type { useInterviewVoice } from './use-voice';
+import { callState, callHint, callLabel, type VoiceState } from './call-presentation';
+
+async function copySupplement(text: string, onStatus: (message: string) => void) {
+  try {
+    await navigator.clipboard.writeText(text);
+    onStatus('已复制补充内容。');
+  } catch {
+    onStatus('暂时无法复制，可选中上方文字手动复制。');
+  }
+}
 
 export function VoiceDraftRecovery({
   voice,
@@ -23,14 +33,7 @@ export function VoiceDraftRecovery({
             type="button"
             variant="outline"
             size="sm"
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(supplement.text);
-                setCopyStatus('已复制补充内容。');
-              } catch {
-                setCopyStatus('暂时无法复制，可选中上方文字手动复制。');
-              }
-            }}
+            onClick={() => void copySupplement(supplement.text, setCopyStatus)}
           >
             复制补充
           </Button>{' '}
@@ -49,74 +52,178 @@ export function VoiceDraftRecovery({
   );
 }
 
-export function VoiceControls({
-  voice,
-  disabled,
-  preferred = false,
-}: {
-  voice: ReturnType<typeof useInterviewVoice>;
-  disabled: boolean;
-  preferred?: boolean;
-}) {
-  if (!voice.display)
-    return (
-      <section className="voice-controls" aria-label="实时语音面试">
-        <div className="voice-heading">
-          <div>
-            <strong>
-              <Mic size={17} />
-              实时语音
-            </strong>
-          </div>
-          <Button
-            type="button"
-            size="sm"
-            disabled={disabled || !voice.capabilities?.available}
-            onClick={() => void voice.start()}
-          >
-            <Mic size={15} />
-            开启实时语音
-          </Button>
+type VoiceControlsProps = { voice: VoiceState; disabled: boolean; preferred?: boolean };
+
+function VoiceCallNotices({ voice, className }: { voice: VoiceState; className: string }) {
+  return (
+    <>
+      {voice.error && (
+        <p className={className} role="alert">
+          {voice.error}
+        </p>
+      )}
+      <VoiceDraftRecovery voice={voice} />
+    </>
+  );
+}
+
+function VoicePreview({ voice, disabled }: VoiceControlsProps) {
+  return (
+    <section className="voice-controls" aria-label="实时语音面试">
+      <div className="voice-heading">
+        <div>
+          <strong>
+            <Mic size={17} />
+            实时语音
+          </strong>
         </div>
-        {voice.capabilities?.reason && <p className="field-help">{voice.capabilities.reason}</p>}
-        {voice.error && (
-          <p className="error-inline" role="alert">
-            {voice.error}
-          </p>
+        <Button
+          type="button"
+          size="sm"
+          disabled={disabled || !voice.capabilities?.available}
+          onClick={() => void voice.start()}
+        >
+          <Mic size={15} />
+          开启实时语音
+        </Button>
+      </div>
+      {voice.capabilities?.reason && <p className="field-help">{voice.capabilities.reason}</p>}
+      <VoiceCallNotices voice={voice} className="error-inline" />
+    </section>
+  );
+}
+
+function VoiceCallHeading({
+  voice,
+  state,
+  ended,
+  preferred,
+}: {
+  voice: VoiceState;
+  state: ReturnType<typeof callState>;
+  ended: boolean;
+  preferred: boolean;
+}) {
+  return (
+    <div className="voice-call-center">
+      <div className="voice-orb-scene" aria-hidden="true">
+        <div className="voice-orb-halo" />
+        <div className="voice-orb">
+          <span />
+          <span />
+          <span />
+        </div>
+      </div>
+      <div className="voice-call-wave" aria-hidden="true">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <i key={i} style={{ animationDelay: `${i * 0.12}s` }} />
+        ))}
+      </div>
+      <h2 role="status" aria-live="polite">
+        {callLabel(voice, state)}
+      </h2>
+      <p>{callHint(voice, ended, preferred)}</p>
+    </div>
+  );
+}
+
+function VoiceConnection({ voice, disabled }: VoiceControlsProps) {
+  return (
+    <>
+      {voice.sessionStatus !== 'ready' && (
+        <Button
+          type="button"
+          disabled={disabled || !voice.capabilities?.available}
+          onClick={() => void voice.start()}
+        >
+          <Mic size={17} />
+          连接语音
+        </Button>
+      )}
+      <p className="voice-call-consent">
+        开始语音面试时请求麦克风权限，音频实时发送至火山引擎识别。本站保存转写，不保存原始录音。
+      </p>
+      {voice.capabilities?.reason && <p className="field-help">{voice.capabilities.reason}</p>}
+    </>
+  );
+}
+
+function VoiceCallButtons({ voice }: { voice: VoiceState }) {
+  return (
+    <div className="voice-call-buttons">
+      <button
+        type="button"
+        className={`voice-round-button ${voice.muted ? 'is-muted' : ''}`}
+        disabled={voice.connecting}
+        onClick={voice.toggleMute}
+        aria-label={voice.muted ? '取消静音' : '静音麦克风'}
+        aria-pressed={voice.muted}
+      >
+        {voice.muted ? <MicOff /> : <Mic />}
+        <span>{voice.muted ? '取消静音' : '静音'}</span>
+      </button>
+      <button
+        type="button"
+        className="voice-round-button"
+        disabled={voice.connecting}
+        onClick={voice.toggleHold}
+        aria-label={voice.hold ? '继续自动接话' : '让我想想'}
+        aria-pressed={voice.hold}
+      >
+        <Hand />
+        <span>{voice.hold ? '继续接话' : '让我想想'}</span>
+      </button>
+    </div>
+  );
+}
+
+function VoiceCallSecondary({ voice }: { voice: VoiceState }) {
+  return (
+    <div className="voice-call-secondary">
+      <button type="button" onClick={voice.switchToText}>
+        <Keyboard size={14} />
+        切回文字
+      </button>
+    </div>
+  );
+}
+
+function VoiceTranscript({ voice }: { voice: VoiceState }) {
+  return (
+    <details className="voice-call-transcript">
+      <summary>
+        <MessageSquare size={14} />
+        查看对话记录
+      </summary>
+      <div>
+        {voice.turns.map((turn) => (
+          <div key={turn.id}>
+            <small>面试官</small>
+            <p>{turn.text}</p>
+            {turn.answer_text && (
+              <>
+                <small>我 · 已保存</small>
+                <p>{turn.answer_text}</p>
+              </>
+            )}
+          </div>
+        ))}
+        {voice.draft && (
+          <div>
+            <small>我 · 尚未提交</small>
+            <p>{voice.draft}</p>
+          </div>
         )}
-        <VoiceDraftRecovery voice={voice} />
-      </section>
-    );
+        {!voice.turns.length && <p>开始面试后，这里会保留对话记录。</p>}
+      </div>
+    </details>
+  );
+}
+
+export function VoiceControls({ voice, disabled, preferred = false }: VoiceControlsProps) {
+  if (!voice.display) return <VoicePreview voice={voice} disabled={disabled} />;
   const ended = voice.sessionStatus === 'completed' || voice.sessionStatus === 'failed';
-  const state = ended
-    ? 'ended'
-    : voice.connecting
-      ? 'connecting'
-      : !voice.active
-        ? 'idle'
-        : voice.muted
-          ? 'muted'
-          : voice.hold
-            ? 'hold'
-            : voice.playing
-              ? 'speaking'
-              : voice.talking
-                ? 'hearing'
-                : voice.thinking
-                  ? 'thinking'
-                  : 'listening';
-  const labels = {
-    ended: '本场通话已结束',
-    connecting: '正在连接…',
-    idle: voice.sessionStatus === 'ready' ? '准备好，就开始聊吧' : '语音通话待连接',
-    muted: '麦克风已静音',
-    hold: '慢慢想，我在这里',
-    speaking: '面试官正在说话',
-    hearing: '正在听你说',
-    thinking: '正在思考你的回答',
-    listening: '我在听，你可以直接说话',
-  };
-  const silence = Math.round((voice.capabilities?.silence_ms ?? 3000) / 1000);
+  const state = callState(voice, ended);
   return (
     <section className={`voice-call voice-call-${state}`} aria-label="语音通话">
       <div className="voice-call-topline">
@@ -126,127 +233,12 @@ export function VoiceControls({
         </span>
         <span>AI 面试官</span>
       </div>
-      <div className="voice-call-center">
-        <div className="voice-orb-scene" aria-hidden="true">
-          <div className="voice-orb-halo" />
-          <div className="voice-orb">
-            <span />
-            <span />
-            <span />
-          </div>
-        </div>
-        <div className="voice-call-wave" aria-hidden="true">
-          {[0, 1, 2, 3, 4].map((i) => (
-            <i key={i} style={{ animationDelay: `${i * 0.12}s` }} />
-          ))}
-        </div>
-        <h2 role="status" aria-live="polite">
-          {labels[state]}
-        </h2>
-        <p>
-          {voice.active
-            ? voice.muted
-              ? '取消静音后继续说话'
-              : voice.hold
-                ? '准备好后点一下“继续接话”'
-                : voice.playing
-                  ? '麦克风已自动暂停，听完后再回答'
-                  : voice.thinking
-                    ? '想到新的内容，也可以继续补充'
-                    : `说完停顿约 ${silence} 秒，我会接着问`
-            : ended
-              ? '已提交的讲话内容保存在面试记录中'
-              : preferred
-                ? voice.sessionStatus === 'ready'
-                  ? '点击右上角开始面试，允许麦克风后直接进入通话'
-                  : '语音已断开，可重新连接继续回答'
-                : '开启麦克风，直接说出你的回答'}
-        </p>
-      </div>
-      {voice.error && (
-        <p className="voice-call-error" role="alert">
-          {voice.error}
-        </p>
-      )}
-      <VoiceDraftRecovery voice={voice} />
-      {!voice.active && !ended && (
-        <>
-          {voice.sessionStatus !== 'ready' && (
-            <Button
-              type="button"
-              disabled={disabled || !voice.capabilities?.available}
-              onClick={() => void voice.start()}
-            >
-              <Mic size={17} />
-              连接语音
-            </Button>
-          )}
-          <p className="voice-call-consent">
-            开始语音面试时请求麦克风权限，音频实时发送至火山引擎识别。本站保存转写，不保存原始录音。
-          </p>
-          {voice.capabilities?.reason && <p className="field-help">{voice.capabilities.reason}</p>}
-        </>
-      )}
-      {voice.active && (
-        <div className="voice-call-buttons">
-          <button
-            type="button"
-            className={`voice-round-button ${voice.muted ? 'is-muted' : ''}`}
-            disabled={voice.connecting}
-            onClick={voice.toggleMute}
-            aria-label={voice.muted ? '取消静音' : '静音麦克风'}
-            aria-pressed={voice.muted}
-          >
-            {voice.muted ? <MicOff /> : <Mic />}
-            <span>{voice.muted ? '取消静音' : '静音'}</span>
-          </button>
-          <button
-            type="button"
-            className="voice-round-button"
-            disabled={voice.connecting}
-            onClick={voice.toggleHold}
-            aria-label={voice.hold ? '继续自动接话' : '让我想想'}
-            aria-pressed={voice.hold}
-          >
-            <Hand />
-            <span>{voice.hold ? '继续接话' : '让我想想'}</span>
-          </button>
-        </div>
-      )}
-      <div className="voice-call-secondary">
-        <button type="button" onClick={voice.switchToText}>
-          <Keyboard size={14} />
-          切回文字
-        </button>
-      </div>
-
-      <details className="voice-call-transcript">
-        <summary>
-          <MessageSquare size={14} />
-          查看对话记录
-        </summary>
-        <div>
-          {voice.turns.map((turn) => (
-            <div key={turn.id}>
-              <small>面试官</small>
-              <p>{turn.text}</p>
-              {turn.answer_text && (
-                <>
-                  <small>我 · 已保存</small>
-                  <p>{turn.answer_text}</p>
-                </>
-              )}
-            </div>
-          ))}
-          {voice.draft && (
-            <div>
-              <small>我 · 尚未提交</small>
-              <p>{voice.draft}</p>
-            </div>
-          )}
-          {!voice.turns.length && <p>开始面试后，这里会保留对话记录。</p>}
-        </div>
-      </details>
+      <VoiceCallHeading voice={voice} state={state} ended={ended} preferred={preferred} />
+      <VoiceCallNotices voice={voice} className="voice-call-error" />
+      {!voice.active && !ended && <VoiceConnection voice={voice} disabled={disabled} />}
+      {voice.active && <VoiceCallButtons voice={voice} />}
+      <VoiceCallSecondary voice={voice} />
+      <VoiceTranscript voice={voice} />
     </section>
   );
 }

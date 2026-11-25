@@ -343,9 +343,6 @@ export function JobDetail({ job, sources }: { job: JobTemplate; sources: Content
               <Copy size={17} />
               个人 JD 暂未开放
             </Button>
-            <p className="muted">
-              简历与个人 JD 维护尚未接入真实账号，可直接使用岗位模板开始文字面试。
-            </p>
           </aside>
         </div>
       </main>

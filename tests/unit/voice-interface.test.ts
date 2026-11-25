@@ -249,6 +249,18 @@ test('ready voice room directs users to the start button and has no separate ena
   assert.doesNotMatch(html, /开启实时语音|连接语音<|开启麦克风进入通话/);
 });
 
+test('voice mode retains clarification and skip actions for the current question', () => {
+  const html = renderToStaticMarkup(React.createElement(InterviewWorkspace, {
+    ...workspace,
+    voiceView: true,
+    current: { id: 'current', label: '第1题', text: '说明你的验证方法', status: 'waiting', answer: null },
+    onClarify: noop,
+  }));
+  assert.match(html, /澄清题意/);
+  assert.match(html, /跳过本题/);
+  assert.doesNotMatch(html, /再看一遍题目/);
+});
+
 test('voice mode retains generation recovery controls outside its hidden conversation log', () => {
   const html = renderToStaticMarkup(
     React.createElement(InterviewWorkspace, {
@@ -259,4 +271,89 @@ test('voice mode retains generation recovery controls outside its hidden convers
   );
   assert.match(html, /重试生成/);
   assert.doesNotMatch(html, /aria-label="面试对话记录"/);
+});
+
+test('call status preserves mute, hold, playback and speech precedence while keeping recovery controls', () => {
+  const cases = [
+    {
+      flags: { muted: true, hold: true, playing: true },
+      state: 'muted',
+      label: '麦克风已静音',
+      hint: '取消静音后继续说话',
+    },
+    {
+      flags: { hold: true, playing: true },
+      state: 'hold',
+      label: '慢慢想，我在这里',
+      hint: '准备好后点一下“继续接话”',
+    },
+    {
+      flags: { playing: true, talking: true },
+      state: 'speaking',
+      label: '面试官正在说话',
+      hint: '麦克风已自动暂停，听完后再回答',
+    },
+    {
+      flags: { talking: true, thinking: true },
+      state: 'hearing',
+      label: '正在听你说',
+      hint: '想到新的内容，也可以继续补充',
+    },
+    {
+      flags: { thinking: true },
+      state: 'thinking',
+      label: '正在思考你的回答',
+      hint: '想到新的内容，也可以继续补充',
+    },
+    { flags: {}, state: 'listening', label: '我在听，你可以直接说话', hint: '说完停顿约 3 秒' },
+  ];
+  for (const { flags, state, label, hint } of cases) {
+    const voice = {
+      display: true,
+      active: true,
+      sessionStatus: 'in_progress',
+      connecting: false,
+      muted: false,
+      hold: false,
+      playing: false,
+      talking: false,
+      thinking: false,
+      capabilities: { available: true, silence_ms: 3000 },
+      turns: [],
+      draft: '',
+      error: '',
+      ...flags,
+    } as unknown as ReturnType<typeof useInterviewVoice>;
+    const html = renderToStaticMarkup(
+      React.createElement(VoiceControls, { voice, disabled: false }),
+    );
+    assert.ok(html.includes(`voice-call-${state}`));
+    assert.ok(html.includes(label));
+    assert.ok(html.includes(hint));
+    assert.match(html, /挂断语音，保留面试和记录|切回文字/);
+    assert.match(html, /aria-pressed="(?:true|false)"/);
+  }
+});
+
+test('ended calls retain saved transcripts and drafts without offering a new connection', () => {
+  for (const sessionStatus of ['completed', 'failed']) {
+    const voice = {
+      display: true,
+      active: false,
+      sessionStatus,
+      capabilities: { available: true },
+      error: '服务暂不可用',
+      turns: [{ id: 'turn', text: '原问题', answer_text: '已保存的回答' }],
+      draft: '尚未提交的补充',
+    } as unknown as ReturnType<typeof useInterviewVoice>;
+    const html = renderToStaticMarkup(
+      React.createElement(VoiceControls, { voice, disabled: false, preferred: true }),
+    );
+    assert.match(html, /本场通话已结束/);
+    assert.match(html, /原问题|已保存的回答/);
+    assert.match(html, /尚未提交的补充/);
+    assert.match(html, /role="alert"/);
+    assert.doesNotMatch(html, /连接语音<|voice-call-consent|voice-call-buttons/);
+    assert.match(html, /切回文字/);
+  }
 });

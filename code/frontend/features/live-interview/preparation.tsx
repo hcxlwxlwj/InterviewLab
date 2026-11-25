@@ -8,6 +8,7 @@ import { Button } from '../../components/ui/button';
 import { useInterviewFlow } from './flow-provider';
 import { SessionGate, useLiveCommand, useLiveResource } from './common';
 import { TransitionScreen, type TransitionStep } from './transition-screen';
+import { interviewSetupPath } from './setup-state';
 
 export function PreparationScreen({
   view,
@@ -56,7 +57,7 @@ export function PreparationScreen({
   ];
   const returnToConfig = () => {
     flow.abandon();
-    router.replace('/interview/setup');
+    router.replace(interviewSetupPath(config?.job));
   };
   const retry = () => {
     if (failed && view)

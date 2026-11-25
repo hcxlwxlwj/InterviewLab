@@ -357,39 +357,44 @@ type Control = {
   v?: number[];
   o?: number;
 };
-function createAdvanceSchemas(plan: AdvancePlan, clarify: boolean) {
-  const {
-    interview,
-    snapshot,
-    context,
-    semantic,
-    modern,
-    isHR,
-    grounding,
-    policy,
-    pacing,
-    missingFeedback,
-    canFinish,
-    sourceOptions,
-    anchors,
-    goalOptions,
-    release,
-    last,
-  } = plan;
-  const maxAnchor = Math.max(0, anchors.length - 1),
-    maxSource = Math.max(0, sourceOptions.length - 1);
-  const actionNames = { f: 'follow_up', n: 'next', e: 'finish', c: 'clarify' } as const;
-  const actions = clarify
+function allowAdvanceFollowUp(plan: AdvancePlan) {
+  const { last, modern, pacing, semantic, context, grounding } = plan;
+  return (
+    last.follow_up_index < 2 &&
+    (!modern ||
+      pacing.allow_follow_up ||
+      (semantic && last.stage === 'introduction' && !context.memory?.introduction_complete)) &&
+    last.answer_status === 'answered' &&
+    grounding.conversation.last_act !== 'decline_topic'
+  );
+}
+
+function advanceActionOptions(plan: AdvancePlan, clarify: boolean) {
+  return clarify
     ? (['c'] as const)
-    : last.follow_up_index < 2 &&
-        (!modern ||
-          pacing.allow_follow_up ||
-          (semantic && last.stage === 'introduction' && !context.memory?.introduction_complete)) &&
-        last.answer_status === 'answered' &&
-        grounding.conversation.last_act !== 'decline_topic'
-      ? (['f', 'n', ...(canFinish ? ['e' as const] : [])] as const)
-      : (['n', ...(canFinish ? ['e' as const] : [])] as const);
-  const states = ['needs_probe', 'covered', 'inconclusive', 'not_applicable'] as const;
+    : allowAdvanceFollowUp(plan)
+      ? (['f', 'n', ...(plan.canFinish ? ['e' as const] : [])] as const)
+      : (['n', ...(plan.canFinish ? ['e' as const] : [])] as const);
+}
+
+function reserveNextGoalOpportunity(
+  plan: AdvancePlan,
+  remainingMain: number,
+  missingCount: number,
+) {
+  const { semantic, isHR, pacing, policy, grounding } = plan;
+  return (
+    semantic &&
+    !isHR &&
+    pacing.remaining_seconds > policy.closing_seconds &&
+    grounding.next_step !== 'introduction' &&
+    remainingMain > 0 &&
+    remainingMain <= missingCount
+  );
+}
+
+function advanceGoalIndices(plan: AdvancePlan) {
+  const { interview, last, goalOptions, context, missingFeedback, release } = plan;
   const remainingMain =
     mainQuestionLimit(interviewDurationMinutes(interview)) - last.main_question_index;
   const allGoalIndices = goalOptions.map((_, index) => index);
@@ -411,13 +416,7 @@ function createAdvanceSchemas(plan: AdvancePlan, clarify: boolean) {
       ),
   );
   const nextGoalIndices =
-    semantic &&
-    !isHR &&
-    pacing.remaining_seconds > policy.closing_seconds &&
-    grounding.next_step !== 'introduction' &&
-    remainingMain > 0 &&
-    remainingMain <= missingNext.length &&
-    priorityIndices.length
+    reserveNextGoalOpportunity(plan, remainingMain, missingNext.length) && priorityIndices.length
       ? otherOpportunityIndices.length
         ? otherOpportunityIndices
         : priorityIndices
@@ -428,7 +427,21 @@ function createAdvanceSchemas(plan: AdvancePlan, clarify: boolean) {
     ...goalOptions,
     ...release.profile.goals.filter((goal) => !goalOptions.includes(goal)),
   ];
-  const goalContracts = observableGoals.map((goal, index) => {
+  return {
+    remainingMain,
+    allGoalIndices,
+    currentGoal,
+    missingNext,
+    currentOpportunity,
+    nextGoalIndices,
+    followUpGoalIndices,
+    observableGoals,
+  };
+}
+
+function advanceGoalContracts(plan: AdvancePlan, observableGoals: string[]) {
+  const { release, policy, isHR, interview } = plan;
+  return observableGoals.map((goal, index) => {
     const card = release.competencies.find((candidate) => candidate.id === goal)!;
     const theme = policy.themes.find((candidate) => candidate.goal === goal);
     const typeBoundary = isHR
@@ -447,20 +460,12 @@ function createAdvanceSchemas(plan: AdvancePlan, clarify: boolean) {
       boundary: GOAL_CONTRACTS[goal].boundary + typeBoundary,
     };
   });
-  const indexSchema = (indices: number[]) => z.union(indices.map((index) => z.literal(index)));
-  const decisionBranch = (action: (typeof actions)[number]) =>
-    z
-      .object({
-        a: z.literal(action),
-        g: indexSchema(
-          action === 'n' ? nextGoalIndices : action === 'f' ? followUpGoalIndices : allGoalIndices,
-        ),
-      })
-      .strict();
-  const decisionSchema = z.union([
-    decisionBranch(actions[0]),
-    ...actions.slice(1).map(decisionBranch),
-  ]);
+}
+
+function advanceReferenceSchemas(plan: AdvancePlan) {
+  const { anchors, snapshot, sourceOptions } = plan;
+  const maxAnchor = Math.max(0, anchors.length - 1),
+    maxSource = Math.max(0, sourceOptions.length - 1);
   const evidenceIndex = anchors.length
     ? z.number().int().min(0).max(maxAnchor).nullable()
     : z.null();
@@ -478,6 +483,41 @@ function createAdvanceSchemas(plan: AdvancePlan, clarify: boolean) {
   const sourceIndicesSchema = z
     .array(z.number().int().min(0).max(maxSource))
     .max(sourceOptions.length ? 2 : 0);
+  return { evidenceIndex, resumeFacts, materialIndicesSchema, sourceIndicesSchema };
+}
+
+function createAdvanceSchemas(plan: AdvancePlan, clarify: boolean) {
+  const { semantic, modern, snapshot, sourceOptions } = plan;
+  const actions = advanceActionOptions(plan, clarify);
+  const actionNames = { f: 'follow_up', n: 'next', e: 'finish', c: 'clarify' } as const;
+  const states = ['needs_probe', 'covered', 'inconclusive', 'not_applicable'] as const;
+  const {
+    remainingMain,
+    allGoalIndices,
+    currentGoal,
+    missingNext,
+    currentOpportunity,
+    nextGoalIndices,
+    followUpGoalIndices,
+    observableGoals,
+  } = advanceGoalIndices(plan);
+  const goalContracts = advanceGoalContracts(plan, observableGoals);
+  const { evidenceIndex, resumeFacts, materialIndicesSchema, sourceIndicesSchema } =
+    advanceReferenceSchemas(plan);
+  const indexSchema = (indices: number[]) => z.union(indices.map((index) => z.literal(index)));
+  const decisionBranch = (action: (typeof actions)[number]) =>
+    z
+      .object({
+        a: z.literal(action),
+        g: indexSchema(
+          action === 'n' ? nextGoalIndices : action === 'f' ? followUpGoalIndices : allGoalIndices,
+        ),
+      })
+      .strict();
+  const decisionSchema = z.union([
+    decisionBranch(actions[0]),
+    ...actions.slice(1).map(decisionBranch),
+  ]);
   const head = semantic
     ? z.object({
         h: streamResponseStateSchema,

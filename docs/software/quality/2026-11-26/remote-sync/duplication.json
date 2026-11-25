@@ -1,0 +1,393 @@
+{
+  "statistics": {
+    "detectionDate": "2026-11-25T17:52:27.781Z",
+    "formats": {
+      "typescript": {
+        "sources": {
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/backend/src/modules/interviews/voice/session.ts": {
+            "lines": 769,
+            "tokens": 8405,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/voice/use-voice.ts": {
+            "lines": 321,
+            "tokens": 3350,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/backend/src/modules/interviews/service.ts": {
+            "lines": 971,
+            "tokens": 11858,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/backend/src/modules/interviews/schemas.ts": {
+            "lines": 159,
+            "tokens": 2115,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/backend/src/modules/interviews/schema.ts": {
+            "lines": 128,
+            "tokens": 1283,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/backend/src/modules/interviews/routes.ts": {
+            "lines": 287,
+            "tokens": 3163,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 28,
+            "duplicatedTokens": 222,
+            "percentage": 9.76,
+            "percentageTokens": 7.02,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/backend/src/modules/interviews/repository.ts": {
+            "lines": 261,
+            "tokens": 2277,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/interview-presentation.ts": {
+            "lines": 94,
+            "tokens": 913,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/core_engine/src/live-interview.ts": {
+            "lines": 318,
+            "tokens": 3119,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/core_engine/src/interview-policy.ts": {
+            "lines": 164,
+            "tokens": 1665,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 3472,
+          "tokens": 38148,
+          "sources": 10,
+          "clones": 1,
+          "duplicatedLines": 14,
+          "duplicatedTokens": 111,
+          "percentage": 0.4,
+          "percentageTokens": 0.29,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "javascript": {
+        "sources": {
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/voice/controls.tsx": {
+            "lines": 212,
+            "tokens": 1973,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/setup.tsx": {
+            "lines": 55,
+            "tokens": 619,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/setup-summary.tsx": {
+            "lines": 44,
+            "tokens": 491,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/setup-panels.tsx": {
+            "lines": 190,
+            "tokens": 1717,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/interview.tsx": {
+            "lines": 198,
+            "tokens": 1803,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/interview-notices.tsx": {
+            "lines": 81,
+            "tokens": 706,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/components/interview-workspace.tsx": {
+            "lines": 279,
+            "tokens": 2658,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 1059,
+          "tokens": 9967,
+          "sources": 7,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "tsx": {
+        "sources": {
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/voice/controls.tsx": {
+            "lines": 243,
+            "tokens": 2295,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/setup.tsx": {
+            "lines": 76,
+            "tokens": 855,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/setup-summary.tsx": {
+            "lines": 60,
+            "tokens": 696,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/setup-panels.tsx": {
+            "lines": 213,
+            "tokens": 1924,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/interview.tsx": {
+            "lines": 345,
+            "tokens": 3681,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/features/live-interview/interview-notices.tsx": {
+            "lines": 123,
+            "tokens": 983,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "C:/Users/18251/AppData/Local/Temp/interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84/after/code/frontend/components/interview-workspace.tsx": {
+            "lines": 376,
+            "tokens": 3488,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 1436,
+          "tokens": 13922,
+          "sources": 7,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 5967,
+      "tokens": 62037,
+      "sources": 24,
+      "clones": 1,
+      "duplicatedLines": 14,
+      "duplicatedTokens": 111,
+      "percentage": 0.23,
+      "percentageTokens": 0.18,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "typescript",
+      "lines": 15,
+      "fragment": ",\n              request.body as B,\n              request.headers['idempotency-key'] as string,\n            );\n            return reply\n              .code(\n                result.generation_status === 'pending' ||\n                  (path === '/prepare' &&\n                    ['pending', 'waiting_material'].includes(result.preparation?.status ?? ''))\n                  ? 202\n                  : 200,\n              )\n              .send(result);\n          },\n        )",
+      "tokens": 0,
+      "firstFile": {
+        "name": "C:\\Users\\18251\\AppData\\Local\\Temp\\interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84\\after\\code\\backend\\src\\modules\\interviews\\routes.ts",
+        "start": 223,
+        "end": 237,
+        "startLoc": {
+          "line": 223,
+          "column": 8,
+          "position": 2560
+        },
+        "endLoc": {
+          "line": 237,
+          "column": 2,
+          "position": 2671
+        }
+      },
+      "secondFile": {
+        "name": "C:\\Users\\18251\\AppData\\Local\\Temp\\interviewlab-remote-review-1d0df62e4f0b4b2681885f4f7de59e84\\after\\code\\backend\\src\\modules\\interviews\\routes.ts",
+        "start": 111,
+        "end": 125,
+        "startLoc": {
+          "line": 111,
+          "column": 3,
+          "position": 1263
+        },
+        "endLoc": {
+          "line": 125,
+          "column": 2,
+          "position": 1374
+        }
+      }
+    }
+  ]
+}
