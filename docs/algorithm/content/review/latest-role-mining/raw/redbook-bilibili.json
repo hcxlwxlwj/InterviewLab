@@ -1,0 +1,3314 @@
+{
+  "metadata": {
+    "dataset": "latest-role-mining-review-supplement",
+    "protocol_version": "latest-role-mining-v1",
+    "as_of": "2026-11-25",
+    "created_at": "2026-11-25",
+    "status": "in_review",
+    "human_approved": false,
+    "release_eligible": false,
+    "runtime_enabled": false,
+    "scope": {
+      "sources": [
+        "Xiaohongshu/RED official campus recruitment",
+        "Bilibili official campus recruitment"
+      ],
+      "maximum_total": 112,
+      "maximum_per_domain": 40,
+      "freshness_window": {
+        "start": "2026-07-01",
+        "end": "2026-11-25"
+      },
+      "date_rule": "published_at or updated_at must be explicit and within the window; accessed_at is not used as a substitute",
+      "summary_rule": "Short original paraphrases based on the full public JD fields returned by the official listings",
+      "evidence_note": "All records are grade A because the official public listing payloads contained complete responsibility and requirement text for every selected posting."
+    },
+    "counts": {
+      "total": 110,
+      "by_domain": {
+        "job.xiaohongshu.com": 71,
+        "jobs.bilibili.com": 39
+      },
+      "by_publisher": {
+        "小红书": 71,
+        "哔哩哔哩": 39
+      },
+      "by_evidence_grade": {
+        "A": 110
+      },
+      "by_career_stage": {
+        "internship": 65,
+        "campus": 45
+      }
+    },
+    "sources": [
+      {
+        "publisher": "小红书",
+        "entry_url": "https://job.xiaohongshu.com/campus",
+        "source_domain": "job.xiaohongshu.com",
+        "access_method": "Official public campus and internship pages; same public pageQueryPosition endpoint loaded by the site; complete JD fields read from the public list response",
+        "date_field": "publishTime"
+      },
+      {
+        "publisher": "哔哩哔哩",
+        "entry_url": "https://jobs.bilibili.com/campus/positions",
+        "source_domain": "jobs.bilibili.com",
+        "access_method": "Official public campus positions page and its public positionList endpoint; full positionDescription read for selected records; standard public CSRF token flow used without bypassing access controls",
+        "date_field": "pushTime"
+      }
+    ],
+    "blockers": [
+      "Bilibili public listing page contained 35 additional in-scope postings beyond the requested per-domain cap of 40; they were not collected to honor the cap.",
+      "Both sources expose a publication timestamp but no separate explicit update timestamp; updated_at is therefore null.",
+      "No login, paywall, captcha, robots, or anti-bot control was bypassed. No personal names or contact data were retained."
+    ],
+    "validation": {
+      "json_valid": true,
+      "unique_candidate_ids": true,
+      "unique_source_posting_ids_within_domain": true,
+      "unique_source_urls": true,
+      "total_at_most_112": true,
+      "each_domain_at_most_40": true,
+      "at_least_one_explicit_date_in_window": true,
+      "no_exact_existing_title_matches": true,
+      "no_duplicate_normalized_titles_within_publisher": true,
+      "nearest_existing_job_ids_resolve": true,
+      "full_jd_fields_read_for_grade_a": true,
+      "existing_repository_files_modified": false
+    }
+  },
+  "records": [
+    {
+      "candidate_id": "redbook-21802",
+      "source_posting_id": "21802",
+      "title_zh": "大模型资源产品实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/21802",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 产品",
+      "responsibilities_summary_zh": "围绕训练、推理和GPU资源申请、使用与治理开展需求调研和产品设计，并协同工程算法团队推进上线。",
+      "requirements_summary_zh": "关注大模型训练推理平台、云计算或MaaS产品，能将技术问题转化为产品方案并持续跟进落地。",
+      "nearest_existing_job_ids": [
+        "ai-product",
+        "platform-product"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-21999",
+      "source_posting_id": "21999",
+      "title_zh": "【2027校招】产品经理（Trust&Safety）-rednote国际化",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/21999",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "新加坡、上海市、北京市",
+      "category_hint": "技术类 / 产品",
+      "responsibilities_summary_zh": "参与AI原生安全治理平台、审核申诉与国际化治理产品设计，协同多团队完成从需求到上线闭环。",
+      "requirements_summary_zh": "关注平台治理和LLM/Agent应用，具备系统思维、数据驱动意识及跨团队沟通能力。",
+      "nearest_existing_job_ids": [
+        "content-safety-product",
+        "ai-product",
+        "risk-product"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-20617",
+      "source_posting_id": "20617",
+      "title_zh": "【28/29届】国际化PE后端实习生（有转正机会）",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/20617",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "深圳市、北京市、上海市",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "负责国际化业务服务端开发与维护，参与核心模块技术选型、架构设计及数据分析工作。",
+      "requirements_summary_zh": "计算机相关专业，掌握Java/Go/Python之一及MySQL/Redis基础，有RPC/HTTP开发经验优先。",
+      "nearest_existing_job_ids": [
+        "i18n-backend",
+        "backend"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-20868",
+      "source_posting_id": "20868",
+      "title_zh": "【REDstar】用户理解算法工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/20868",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 搜索、推荐、广告",
+      "responsibilities_summary_zh": "面向用户理解场景开展算法研究，结合业务数据完成模型训练、效果评估与持续迭代。",
+      "requirements_summary_zh": "具备机器学习、深度学习和数据挖掘基础，熟练使用深度学习框架及至少一门编程语言。",
+      "nearest_existing_job_ids": [
+        "video-understanding",
+        "multimodal",
+        "nlp"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-21829",
+      "source_posting_id": "21829",
+      "title_zh": "【2027校招】Dots-大模型高性能计算工程师- AI infra",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/21829",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 大模型Infra",
+      "responsibilities_summary_zh": "负责大模型训练与推理的高性能计算优化，覆盖并行策略、通信、显存及集群稳定性。",
+      "requirements_summary_zh": "具备AI Infra和分布式训练基础，熟悉GPU、并行计算与训练框架优化。",
+      "nearest_existing_job_ids": [
+        "ai-infra",
+        "distributed-training",
+        "high-speed-interconnect"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-21005",
+      "source_posting_id": "21005",
+      "title_zh": "【2027校招】基础模型算法工程师-Post-training",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/21005",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 大模型",
+      "responsibilities_summary_zh": "参与基础大模型后训练，包括监督微调、偏好优化和强化学习实验，并评估模型能力变化。",
+      "requirements_summary_zh": "熟悉大模型训练流程、PyTorch及常用后训练方法，具备实验设计与问题分析能力。",
+      "nearest_existing_job_ids": [
+        "content-community-llm-train",
+        "llm-training"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-21002",
+      "source_posting_id": "21002",
+      "title_zh": "【2027校招】智能客服算法工程师（LLM Agent方向）",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/21002",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、杭州市、上海市",
+      "category_hint": "技术类 / 大模型",
+      "responsibilities_summary_zh": "研究LLM与Agent在智能客服场景的算法应用，推进对话理解、工具调用和业务链路落地。",
+      "requirements_summary_zh": "具备NLP或大模型基础，熟悉Agent相关技术并有工程实现与实验分析能力。",
+      "nearest_existing_job_ids": [
+        "ai-cs-product",
+        "llm-app",
+        "ai-agent-product"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22025",
+      "source_posting_id": "22025",
+      "title_zh": "【2027校招】Product Engineer产品工程师（AI与全栈方向）-跨境电商&交易平台",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22025",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "杭州市、上海市",
+      "category_hint": "技术类 / 产品工程师",
+      "responsibilities_summary_zh": "参与跨境电商与交易平台的产品工程实践，结合AI和全栈能力完成需求分析、原型与系统实现。",
+      "requirements_summary_zh": "具备计算机基础、编程和产品思维，了解AI工具及全栈开发流程。",
+      "nearest_existing_job_ids": [
+        "ecommerce-fullstack",
+        "fullstack",
+        "ai-product"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22024",
+      "source_posting_id": "22024",
+      "title_zh": "【2027校招】Product Engineer-产品工程师（AI Coding 基建方向）-PE Infra",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22024",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "上海市、杭州市",
+      "category_hint": "技术类 / 产品工程师",
+      "responsibilities_summary_zh": "参与AI Coding研发基建，围绕研发协作、代码智能和工程平台开展产品设计与技术实现。",
+      "requirements_summary_zh": "具备全栈开发基础，对AI Coding、Agent工作流及研发效能有实践经验。",
+      "nearest_existing_job_ids": [
+        "dev-efficiency",
+        "agent-platform",
+        "llm-app"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22081",
+      "source_posting_id": "22081",
+      "title_zh": "【2027校招】Product Engineer-产品工程师（AI与全栈方向）-增长产品",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22081",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 产品工程师",
+      "responsibilities_summary_zh": "参与增长产品需求分析与方案落地，协同设计研发团队通过实验和数据迭代提升增长效果。",
+      "requirements_summary_zh": "具备产品思维、数据分析能力和项目推进能力，了解AI与全栈产品实践。",
+      "nearest_existing_job_ids": [
+        "growth-product",
+        "ai-product"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22077",
+      "source_posting_id": "22077",
+      "title_zh": "【2027校招】Product Engineer-产品工程师（基建方向）",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22077",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "上海市、北京市",
+      "category_hint": "技术类 / 产品工程师",
+      "responsibilities_summary_zh": "参与内部基建方向产品工程，将业务问题转化为产品方案并推进原型、研发和上线。",
+      "requirements_summary_zh": "具备计算机基础和全栈实践能力，有良好的逻辑分析、沟通及协作能力。",
+      "nearest_existing_job_ids": [
+        "platform-product",
+        "fullstack"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22071",
+      "source_posting_id": "22071",
+      "title_zh": "【2027校招】内容治理算法工程师-T&S",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22071",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 视觉与多模态",
+      "responsibilities_summary_zh": "开展内容治理算法研发，运用多模态理解与大模型技术识别内容风险并支持治理策略。",
+      "requirements_summary_zh": "具备计算机视觉、多模态或大模型基础，熟悉模型训练、评估及工程应用。",
+      "nearest_existing_job_ids": [
+        "ai-moderation",
+        "content-multimodal"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22038",
+      "source_posting_id": "22038",
+      "title_zh": "【2027校招】AI安全研发工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22038",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 安全",
+      "responsibilities_summary_zh": "研发AI安全能力，围绕模型与业务安全风险进行技术设计、攻防验证和系统建设。",
+      "requirements_summary_zh": "具备AI、安全或后端开发基础，了解大模型安全风险及工程防护方法。",
+      "nearest_existing_job_ids": [
+        "llm-security",
+        "security"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22039",
+      "source_posting_id": "22039",
+      "title_zh": "【2027校招】安全合规治理与数据安全工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22039",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 安全",
+      "responsibilities_summary_zh": "参与安全合规治理和数据安全体系建设，推进数据全生命周期安全管控与风险治理。",
+      "requirements_summary_zh": "具备数据安全、安全合规或相关工程基础，能够开展风险分析与方案落地。",
+      "nearest_existing_job_ids": [
+        "data-security",
+        "security"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22045",
+      "source_posting_id": "22045",
+      "title_zh": "【2027校招】SRE工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22045",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "负责业务系统稳定性保障，开展监控告警、故障应急、容量治理和运维自动化建设。",
+      "requirements_summary_zh": "具备Linux、网络和分布式系统基础，掌握脚本或编程能力并重视稳定性。",
+      "nearest_existing_job_ids": [
+        "sre",
+        "stability-engineer"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22043",
+      "source_posting_id": "22043",
+      "title_zh": "【2027校招】AI可观测研发工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22043",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "建设AI场景可观测能力，覆盖指标、日志、链路和智能分析，支持问题定位与系统治理。",
+      "requirements_summary_zh": "具备后端或平台开发基础，了解可观测体系及AI在运维分析中的应用。",
+      "nearest_existing_job_ids": [
+        "observability",
+        "observability-platform"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22048",
+      "source_posting_id": "22048",
+      "title_zh": "【2027校招】云原生开发工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22048",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "参与云原生平台核心建设，优化Kubernetes、容器调度、GPU调度和Agent Infra能力。",
+      "requirements_summary_zh": "熟悉容器、Kubernetes及分布式系统，具备Go/Python等平台开发能力。",
+      "nearest_existing_job_ids": [
+        "devops",
+        "ai-compute-scheduling"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22060",
+      "source_posting_id": "22060",
+      "title_zh": "【2027校招】大模型平台全栈研发工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22060",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 大模型Infra",
+      "responsibilities_summary_zh": "参与大模型平台全栈研发，建设训练推理相关平台能力并连接前端交互与后端服务。",
+      "requirements_summary_zh": "具备全栈开发能力，了解大模型训练或推理流程及平台化建设。",
+      "nearest_existing_job_ids": [
+        "ai-infra",
+        "fullstack"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22059",
+      "source_posting_id": "22059",
+      "title_zh": "【2027校招】Agent平台全栈研发工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22059",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 大模型Infra",
+      "responsibilities_summary_zh": "参与Agent平台全栈研发，建设工具调用、工作流编排和平台服务能力。",
+      "requirements_summary_zh": "具备全栈开发基础，了解Agent框架、大模型应用及平台工程实践。",
+      "nearest_existing_job_ids": [
+        "agent-platform",
+        "fullstack"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22062",
+      "source_posting_id": "22062",
+      "title_zh": "【2027校招】AI Agent Infra 工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22062",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 大模型Infra",
+      "responsibilities_summary_zh": "建设Agent Infra，围绕Agent运行、工具调用、上下文和资源调度等底层能力开展研发。",
+      "requirements_summary_zh": "具备后端、分布式系统或AI Infra基础，了解Agent运行机制与工程优化。",
+      "nearest_existing_job_ids": [
+        "agent-platform",
+        "ai-infra"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22054",
+      "source_posting_id": "22054",
+      "title_zh": "【2027校招】AI Infra网络通信工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22054",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、杭州市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "优化AI Infra网络通信，协同网络拓扑、通信库和大模型训推框架提升算力利用效率。",
+      "requirements_summary_zh": "具备网络、并行计算或分布式训练基础，了解集合通信和高性能通信优化。",
+      "nearest_existing_job_ids": [
+        "high-speed-interconnect",
+        "ai-infra",
+        "rdma-network"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22030",
+      "source_posting_id": "22030",
+      "title_zh": "【2027校招】搜广推索引存储架构工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22030",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 引擎架构",
+      "responsibilities_summary_zh": "负责搜广推索引与存储架构，设计高性能检索存储方案并支撑大规模线上服务。",
+      "requirements_summary_zh": "具备存储、索引或分布式系统基础，熟悉数据库、搜索引擎及性能优化。",
+      "nearest_existing_job_ids": [
+        "storage-engine",
+        "search-platform"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-21991",
+      "source_posting_id": "21991",
+      "title_zh": "【2027校招】数据引擎AIOps/Agent研发",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/21991",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 引擎架构",
+      "responsibilities_summary_zh": "参与数据引擎AIOps与Agent能力研发，将智能分析、自动诊断和修复流程融入数据平台。",
+      "requirements_summary_zh": "具备数据平台、后端或AI应用开发基础，了解AIOps及Agent工程实践。",
+      "nearest_existing_job_ids": [
+        "ai-infra",
+        "observability"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-21537",
+      "source_posting_id": "21537",
+      "title_zh": "NLP/多模态/大模型 实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/21537",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市",
+      "category_hint": "技术类 / 搜索、推荐、广告",
+      "responsibilities_summary_zh": "参与NLP、多模态和大模型方向的算法研发，围绕业务问题开展模型训练、评估与迭代。",
+      "requirements_summary_zh": "相关专业硕士及以上，熟悉深度学习框架、Python及大模型或多模态技术。",
+      "nearest_existing_job_ids": [
+        "multimodal",
+        "nlp",
+        "llm-training"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22033",
+      "source_posting_id": "22033",
+      "title_zh": "【2027校招】网络工程师-IT",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22033",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "负责IT网络规划、建设与运维，保障网络稳定性并推进自动化和安全管理。",
+      "requirements_summary_zh": "具备计算机网络基础，了解路由交换、网络安全及网络自动化。",
+      "nearest_existing_job_ids": [
+        "network",
+        "security"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22046",
+      "source_posting_id": "22046",
+      "title_zh": "【2027校招】AI 算力评测与仿真工程师（测试开发）",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22046",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "杭州市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "开展AI算力评测与仿真，设计算力、通信和训练性能测试方案并分析瓶颈。",
+      "requirements_summary_zh": "具备测试开发、AI Infra或高性能计算基础，能够使用编程与性能分析工具。",
+      "nearest_existing_job_ids": [
+        "llm-eval",
+        "ai-testing"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22036",
+      "source_posting_id": "22036",
+      "title_zh": "【2027校招】对象&文件存储研发",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22036",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "参与对象与文件存储研发，优化存储系统性能、可靠性和元数据管理。",
+      "requirements_summary_zh": "具备存储系统、后端开发和分布式系统基础，熟悉性能分析方法。",
+      "nearest_existing_job_ids": [
+        "distributed-storage-dev",
+        "storage-engine"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22050",
+      "source_posting_id": "22050",
+      "title_zh": "【2027校招】接入层开发工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22050",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "负责接入层研发与架构优化，保障高并发流量下的连接管理、稳定性和扩展性。",
+      "requirements_summary_zh": "具备后端开发和网络基础，熟悉高并发服务及接入层相关技术。",
+      "nearest_existing_job_ids": [
+        "ha-architecture",
+        "backend"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22051",
+      "source_posting_id": "22051",
+      "title_zh": "【2027校招】业务网关开发工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22051",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "参与业务网关研发，建设统一接入、路由、鉴权和流量治理能力。",
+      "requirements_summary_zh": "具备后端开发基础，了解网关、RPC、网络及高可用架构。",
+      "nearest_existing_job_ids": [
+        "api-gateway-dev",
+        "backend"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22052",
+      "source_posting_id": "22052",
+      "title_zh": "【2027校招】混合云 FinOPS 研发工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22052",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "参与混合云FinOps研发，通过成本分析、资源治理和平台能力提升云资源使用效率。",
+      "requirements_summary_zh": "具备云平台或后端开发基础，了解容器、资源调度及成本分析。",
+      "nearest_existing_job_ids": [
+        "cloud-sre",
+        "devops"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22049",
+      "source_posting_id": "22049",
+      "title_zh": "【2027校招】系统软件开发工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22049",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "参与系统软件研发，围绕底层能力、运行时和系统性能开展设计与实现。",
+      "requirements_summary_zh": "具备扎实的计算机基础和系统编程能力，熟悉操作系统与性能分析。",
+      "nearest_existing_job_ids": [
+        "cpp-systems",
+        "backend"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22053",
+      "source_posting_id": "22053",
+      "title_zh": "【2027校招】中间件研发工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22053",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "参与中间件研发，建设消息、缓存或服务治理等基础能力并优化性能与稳定性。",
+      "requirements_summary_zh": "具备分布式系统和后端开发基础，熟悉至少一种中间件原理与实践。",
+      "nearest_existing_job_ids": [
+        "message-queue",
+        "cache-middleware"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22588",
+      "source_posting_id": "22588",
+      "title_zh": "【2027校招】网络系统开发工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22588",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、杭州市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "参与网络系统研发，围绕网络协议、转发性能和系统可靠性开展工程实现。",
+      "requirements_summary_zh": "具备计算机网络、操作系统和编程基础，能够分析并解决系统问题。",
+      "nearest_existing_job_ids": [
+        "network",
+        "backend"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22044",
+      "source_posting_id": "22044",
+      "title_zh": "【2027校招】业务架构研发工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22044",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 基础后端",
+      "responsibilities_summary_zh": "参与业务架构研发，抽象通用服务与组件，推动复杂业务系统的平台化和持续演进。",
+      "requirements_summary_zh": "具备后端、分布式系统和架构设计基础，有大型业务系统实践经验。",
+      "nearest_existing_job_ids": [
+        "ha-architecture",
+        "backend"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22027",
+      "source_posting_id": "22027",
+      "title_zh": "【2027校招】搜广推 × AI 应用工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22027",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "深圳市、北京市、上海市",
+      "category_hint": "技术类 / 引擎架构",
+      "responsibilities_summary_zh": "参与搜广推及电商引擎研发，并推动AI原生应用与底层能力的平台化落地。",
+      "requirements_summary_zh": "具备搜索推荐、广告或电商后端基础，了解AI应用工程及性能优化。",
+      "nearest_existing_job_ids": [
+        "recommendation",
+        "llm-app",
+        "ads-platform"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22021",
+      "source_posting_id": "22021",
+      "title_zh": "【2027校招】AI 应用研发工程师-社区工程",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22021",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 产品工程师",
+      "responsibilities_summary_zh": "参与社区AI应用研发，将大模型能力与社区业务场景结合并持续优化产品体验。",
+      "requirements_summary_zh": "具备AI应用、后端或全栈开发能力，了解大模型调用及Agent工程实践。",
+      "nearest_existing_job_ids": [
+        "content-community-llm-app",
+        "llm-app"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-21969",
+      "source_posting_id": "21969",
+      "title_zh": "【2027校招】AI Agent工程师（大模型 AI 应用开发方向）-审核研发",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/21969",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 产品工程师",
+      "responsibilities_summary_zh": "参与审核研发场景的AI Agent应用开发，连接大模型能力与内容治理业务流程。",
+      "requirements_summary_zh": "具备LLM、Agent或后端开发基础，了解内容安全及工程化落地。",
+      "nearest_existing_job_ids": [
+        "llm-app",
+        "ai-moderation",
+        "security-platform-backend"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22018",
+      "source_posting_id": "22018",
+      "title_zh": "【2027校招】AI Agent工程师-社区工程",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22018",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 产品工程师",
+      "responsibilities_summary_zh": "参与社区工程AI Agent研发，建设面向社区业务的智能体能力和应用链路。",
+      "requirements_summary_zh": "具备后端、Agent或大模型应用开发经验，能够完成工程实现与迭代。",
+      "nearest_existing_job_ids": [
+        "content-community-llm-app",
+        "agent-platform"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22022",
+      "source_posting_id": "22022",
+      "title_zh": "【2027校招】交互技术研究员/Agent 工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22022",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 产品工程师",
+      "responsibilities_summary_zh": "研究交互技术与Agent结合，探索智能交互、工具调用和多模态体验的技术实现。",
+      "requirements_summary_zh": "具备Agent、人机交互或全栈开发基础，对新型交互技术有研究兴趣。",
+      "nearest_existing_job_ids": [
+        "agent-platform",
+        "ux"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22079",
+      "source_posting_id": "22079",
+      "title_zh": "【2027校招】大模型 Agent 开发工程师（AI Coding方向）",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22079",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 产品工程师",
+      "responsibilities_summary_zh": "参与AI Coding方向的大模型Agent开发，建设代码生成、工具调用和智能研发工作流。",
+      "requirements_summary_zh": "具备大模型、Agent或全栈开发基础，了解AI Coding相关技术生态。",
+      "nearest_existing_job_ids": [
+        "llm-app",
+        "agent-platform"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22486",
+      "source_posting_id": "22486",
+      "title_zh": "【2027校招】Agent 应用算法工程师-创新业务",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22486",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、杭州市、上海市",
+      "category_hint": "技术类 / 大模型",
+      "responsibilities_summary_zh": "研究Agent应用算法，围绕创新业务探索智能体规划、工具使用与任务执行能力。",
+      "requirements_summary_zh": "具备大模型、Agent、强化学习或相关算法基础及工程实践能力。",
+      "nearest_existing_job_ids": [
+        "content-community-llm-app",
+        "llm-training"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-21013",
+      "source_posting_id": "21013",
+      "title_zh": "【2027校招】图像渲染算法工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/21013",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 视觉与多模态",
+      "responsibilities_summary_zh": "开展图像渲染与图形算法研究，优化视觉生成质量、渲染效率和真实感表现。",
+      "requirements_summary_zh": "具备计算机图形学、视觉算法或深度学习基础，熟悉渲染与优化方法。",
+      "nearest_existing_job_ids": [
+        "neural-rendering",
+        "graphics-engine"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22011",
+      "source_posting_id": "22011",
+      "title_zh": "【2027校招】端智能图像算法工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22011",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 多媒体",
+      "responsibilities_summary_zh": "参与端侧智能图像算法研发，优化端上模型效果、性能和部署体验。",
+      "requirements_summary_zh": "具备计算机视觉、深度学习和端侧部署基础，了解模型压缩与推理优化。",
+      "nearest_existing_job_ids": [
+        "edge-inference-engine",
+        "cv"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22013",
+      "source_posting_id": "22013",
+      "title_zh": "【2027校招】媒体网络研发工程师-流媒体方向",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22013",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 多媒体",
+      "responsibilities_summary_zh": "参与流媒体网络研发，优化传输协议、链路质量和复杂网络下的播放体验。",
+      "requirements_summary_zh": "具备网络、流媒体或音视频基础，了解传输优化和性能分析方法。",
+      "nearest_existing_job_ids": [
+        "media-transport",
+        "network"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22014",
+      "source_posting_id": "22014",
+      "title_zh": "【2027校招】媒体网络研发工程师-CDN方向",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22014",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、深圳市",
+      "category_hint": "技术类 / 多媒体",
+      "responsibilities_summary_zh": "参与CDN网络研发，优化内容分发、缓存调度和边缘节点服务能力。",
+      "requirements_summary_zh": "具备计算机网络、CDN或分布式系统基础，能够开展性能与稳定性优化。",
+      "nearest_existing_job_ids": [
+        "cloud-network",
+        "media-transport"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22016",
+      "source_posting_id": "22016",
+      "title_zh": "【2027校招】媒体处理研发工程师-媒体引擎",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22016",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 多媒体",
+      "responsibilities_summary_zh": "参与媒体处理引擎研发，建设音视频处理、转码和渲染等核心媒体能力。",
+      "requirements_summary_zh": "具备音视频、C/C++或媒体处理基础，了解编解码和性能优化。",
+      "nearest_existing_job_ids": [
+        "media-transport",
+        "video-codec"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22012",
+      "source_posting_id": "22012",
+      "title_zh": "【2027校招】多媒体SDK研发工程师-网络方向",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22012",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 多媒体",
+      "responsibilities_summary_zh": "参与多媒体SDK研发，负责网络传输、音视频能力封装及多端集成。",
+      "requirements_summary_zh": "具备网络编程、音视频或客户端开发基础，熟悉SDK设计与调试。",
+      "nearest_existing_job_ids": [
+        "rtc-dev",
+        "media-transport"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22006",
+      "source_posting_id": "22006",
+      "title_zh": "【2027校招】智能流媒体传输算法工程师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/position/22006",
+      "source_page_url": "https://job.xiaohongshu.com/campus/position",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 多媒体",
+      "responsibilities_summary_zh": "研究智能流媒体传输算法，利用数据与模型优化码率、拥塞控制和播放质量。",
+      "requirements_summary_zh": "具备网络、流媒体或算法基础，了解机器学习与传输优化方法。",
+      "nearest_existing_job_ids": [
+        "media-transport",
+        "recommendation"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-13695",
+      "source_posting_id": "13695",
+      "title_zh": "Dots-AI infra实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/13695",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-24",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "北京市、上海市、杭州市",
+      "category_hint": "技术类 / 大模型Infra",
+      "responsibilities_summary_zh": "参与大模型AI Infra建设，围绕训练、推理和资源平台开展研发与性能优化。",
+      "requirements_summary_zh": "具备AI Infra、分布式系统或平台开发基础，了解大模型训练推理流程。",
+      "nearest_existing_job_ids": [
+        "ai-infra",
+        "gpu-cluster"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22773",
+      "source_posting_id": "22773",
+      "title_zh": "Backend Engineering Intern - rednote ",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/22773",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-19",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "美国",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "负责后端系统研发与维护，参与服务设计、接口实现、数据存储和线上问题排查。",
+      "requirements_summary_zh": "具备计算机基础，熟练掌握后端语言、数据库及常见服务框架。",
+      "nearest_existing_job_ids": [
+        "backend",
+        "fullstack"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22774",
+      "source_posting_id": "22774",
+      "title_zh": "Client Engineering Intern — rednote",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/22774",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-24",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "美国",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "参与客户端工程建设，负责多端能力实现、性能优化和与产品设计研发协作。",
+      "requirements_summary_zh": "具备客户端开发基础，熟悉至少一个客户端平台及工程化工具。",
+      "nearest_existing_job_ids": [
+        "desktop-client",
+        "cross-platform"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-23187",
+      "source_posting_id": "23187",
+      "title_zh": "【2028实习】PE工程师实习生（全栈）-社区互动",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/23187",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-24",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 产品工程师",
+      "responsibilities_summary_zh": "参与社区互动产品工程实践，结合全栈能力完成需求分析、功能实现和上线迭代。",
+      "requirements_summary_zh": "具备全栈开发基础、产品思维及良好的沟通协作能力。",
+      "nearest_existing_job_ids": [
+        "fullstack",
+        "community-product"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-21987",
+      "source_posting_id": "21987",
+      "title_zh": "安全研发方向（日常实习生）",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/21987",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-23",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市、北京市",
+      "category_hint": "技术类 / 安全",
+      "responsibilities_summary_zh": "参与基础安全研发，围绕系统、平台或业务安全风险开展技术分析与防护实现。",
+      "requirements_summary_zh": "具备安全、后端或系统开发基础，了解常见安全风险与工程防护。",
+      "nearest_existing_job_ids": [
+        "security",
+        "llm-security"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-23176",
+      "source_posting_id": "23176",
+      "title_zh": "IT应用安全实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/23176",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-23",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市、北京市",
+      "category_hint": "技术类 / 安全",
+      "responsibilities_summary_zh": "参与IT应用安全建设，开展应用安全测试、风险治理和安全能力落地。",
+      "requirements_summary_zh": "具备应用安全、网络或开发基础，了解常见漏洞与安全治理流程。",
+      "nearest_existing_job_ids": [
+        "security",
+        "security-platform-backend"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-23054",
+      "source_posting_id": "23054",
+      "title_zh": "AI Agents 创造者工具产品经理实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/23054",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-23",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "杭州市",
+      "category_hint": "技术类 / 产品",
+      "responsibilities_summary_zh": "参与AI Agents创作者工具产品设计，将大模型能力转化为创作者工作流和产品体验。",
+      "requirements_summary_zh": "具备产品思维和AI Agent工具使用经验，能够完成需求分析与方案设计。",
+      "nearest_existing_job_ids": [
+        "ai-agent-product",
+        "creator-tool-designer"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22863",
+      "source_posting_id": "22863",
+      "title_zh": "后端实习生-内容安全方向T&S",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/22863",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-23",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "武汉市、北京市",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "参与内容安全后端研发，建设审核、风控及相关平台服务并保障系统稳定。",
+      "requirements_summary_zh": "具备后端开发、数据库和分布式系统基础，了解内容安全业务。",
+      "nearest_existing_job_ids": [
+        "security-platform-backend",
+        "content-backend"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22977",
+      "source_posting_id": "22977",
+      "title_zh": "搜索广告产品实习生｜AIGC方向",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/22977",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-23",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 产品",
+      "responsibilities_summary_zh": "参与搜索广告产品工作，围绕AIGC方向开展需求分析、策略设计与产品迭代。",
+      "requirements_summary_zh": "具备产品思维、数据分析和搜索广告基础，对AIGC技术及应用有兴趣。",
+      "nearest_existing_job_ids": [
+        "ads-product",
+        "ai-product"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-22982",
+      "source_posting_id": "22982",
+      "title_zh": "点点AI 产品经理实习生｜AIGC 生图方向",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/22982",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-21",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-21",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 产品",
+      "responsibilities_summary_zh": "参与AIGC生图方向产品设计，连接图像生成能力与用户场景并推动产品落地。",
+      "requirements_summary_zh": "具备AI产品思维、用户洞察和数据分析能力，了解生成式AI能力边界。",
+      "nearest_existing_job_ids": [
+        "multimodal-product",
+        "ai-product"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-23160",
+      "source_posting_id": "23160",
+      "title_zh": "【实习】体验设计师",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/23160",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-20",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市",
+      "category_hint": "技术类 / 设计",
+      "responsibilities_summary_zh": "参与产品体验设计，通过界面、交互和视觉方案优化用户体验并协同研发落地。",
+      "requirements_summary_zh": "具备体验设计基础、审美能力和设计工具使用经验，关注用户需求。",
+      "nearest_existing_job_ids": [
+        "ux",
+        "ai-designer"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-23120",
+      "source_posting_id": "23120",
+      "title_zh": "产品体验设计实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/23120",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-20",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市",
+      "category_hint": "技术类 / 设计",
+      "responsibilities_summary_zh": "参与产品体验设计，完成界面方案、交互细节和设计规范并推动实现。",
+      "requirements_summary_zh": "具备UI/UX设计基础，熟练使用设计工具并具备良好的沟通协作能力。",
+      "nearest_existing_job_ids": [
+        "ux",
+        "ecommerce-ux"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-21430",
+      "source_posting_id": "21430",
+      "title_zh": "用户研究实习生（社区方向）",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/21430",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-20",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市",
+      "category_hint": "技术类 / 职能",
+      "responsibilities_summary_zh": "参与社区用户研究，通过访谈、问卷和可用性测试等研究方法输出体验洞察。",
+      "requirements_summary_zh": "掌握用户研究方法，具备资料整理、数据分析和研究报告能力。",
+      "nearest_existing_job_ids": [
+        "content-research",
+        "user-research"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-23154",
+      "source_posting_id": "23154",
+      "title_zh": "货架流量策略产品实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/23154",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-20",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市",
+      "category_hint": "技术类 / 产品",
+      "responsibilities_summary_zh": "参与货架流量策略产品，分析流量分发和转化数据并推动策略方案落地。",
+      "requirements_summary_zh": "具备产品思维、SQL和数据分析能力，能够推进项目并总结效果。",
+      "nearest_existing_job_ids": [
+        "ads-product",
+        "growth-product"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-23036",
+      "source_posting_id": "23036",
+      "title_zh": "电商搜索策略产品实习生-综搜方向",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/23036",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-20",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市",
+      "category_hint": "技术类 / 产品",
+      "responsibilities_summary_zh": "参与电商搜索策略产品，围绕搜索体验、相关性和转化效果开展分析与迭代。",
+      "requirements_summary_zh": "具备产品、搜索或数据分析基础，了解搜索推荐及策略评估。",
+      "nearest_existing_job_ids": [
+        "ads-product",
+        "ecommerce-search-ai"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-21870",
+      "source_posting_id": "21870",
+      "title_zh": "交易体验设计实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/21870",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-24",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市",
+      "category_hint": "技术类 / 设计",
+      "responsibilities_summary_zh": "参与交易体验设计，通过用户研究和数据分析优化交易链路与设计规范。",
+      "requirements_summary_zh": "具备交互设计基础、设计工具使用能力和用户洞察，熟悉电商场景优先。",
+      "nearest_existing_job_ids": [
+        "ecommerce-ux",
+        "ux"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-18199",
+      "source_posting_id": "18199",
+      "title_zh": "大模型训推基础架构实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/18199",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-19",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 引擎架构",
+      "responsibilities_summary_zh": "参与大模型训练与推理基础架构研发，优化训练任务、资源调度和平台稳定性。",
+      "requirements_summary_zh": "具备AI Infra、分布式系统或平台开发基础，了解大模型训推流程。",
+      "nearest_existing_job_ids": [
+        "ai-infra",
+        "distributed-training"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-23137",
+      "source_posting_id": "23137",
+      "title_zh": "多模态数据库研发实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/23137",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-18",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-18",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市、北京市、杭州市",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "参与多模态数据库研发，围绕多模态数据存储、检索和查询能力开展工程实现。",
+      "requirements_summary_zh": "具备数据库、后端或分布式系统基础，了解向量检索和多模态数据。",
+      "nearest_existing_job_ids": [
+        "database",
+        "storage-engine"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-16554",
+      "source_posting_id": "16554",
+      "title_zh": "数据计算引擎研发实习生 - 搜广推",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/16554",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-18",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-18",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市、北京市",
+      "category_hint": "技术类 / 引擎架构",
+      "responsibilities_summary_zh": "参与搜广推数据计算引擎研发，优化离线或实时计算任务的性能和稳定性。",
+      "requirements_summary_zh": "具备数据引擎、分布式计算或后端开发基础，熟悉大数据处理技术。",
+      "nearest_existing_job_ids": [
+        "realtime-computing",
+        "data-engineering"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-23007",
+      "source_posting_id": "23007",
+      "title_zh": "投放平台产品实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/23007",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-18",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-18",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市",
+      "category_hint": "技术类 / 产品",
+      "responsibilities_summary_zh": "参与广告投放平台产品，围绕投放流程、数据能力和平台效率开展需求分析与迭代。",
+      "requirements_summary_zh": "具备产品思维、数据分析和平台产品经验，了解广告投放业务。",
+      "nearest_existing_job_ids": [
+        "ad-delivery-product",
+        "platform-product"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-23133",
+      "source_posting_id": "23133",
+      "title_zh": "小红书国际化产品经理实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/23133",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-18",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-18",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 产品",
+      "responsibilities_summary_zh": "参与国际化产品经理工作，围绕海外用户需求完成产品分析、方案设计和迭代推进。",
+      "requirements_summary_zh": "具备产品思维、沟通协作和数据分析能力，有国际化产品兴趣或经验。",
+      "nearest_existing_job_ids": [
+        "cross-border-product",
+        "product"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-23127",
+      "source_posting_id": "23127",
+      "title_zh": "国际化后端开发实习生",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/23127",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-18",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-18",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "北京市、深圳市",
+      "category_hint": "技术类 / 产品工程师",
+      "responsibilities_summary_zh": "负责国际化业务服务端研发，参与核心模块设计并保障多地域系统的稳定性。",
+      "requirements_summary_zh": "计算机相关专业，熟悉Java/Go/Python及MySQL/Redis，有RPC/HTTP经验优先。",
+      "nearest_existing_job_ids": [
+        "i18n-backend",
+        "backend"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "redbook-18795",
+      "source_posting_id": "18795",
+      "title_zh": "大模型算法实习生-社区治理",
+      "publisher": "小红书",
+      "source_domain": "job.xiaohongshu.com",
+      "source_url": "https://job.xiaohongshu.com/campus/intern/18795",
+      "source_page_url": "https://job.xiaohongshu.com/campus/intern",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-18",
+      "updated_at": null,
+      "freshness_basis": "publishTime=2026-11-18",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海市、北京市、杭州市",
+      "category_hint": "技术类 / 安全",
+      "responsibilities_summary_zh": "参与社区治理大模型应用，探索LLM/VLM、Agent、RAG和后训练在风控治理中的落地。",
+      "requirements_summary_zh": "熟悉LLM、VLM或强化学习至少一项，具备Python/SQL和算法工程能力。",
+      "nearest_existing_job_ids": [
+        "llm-app",
+        "risk-control",
+        "ai-moderation"
+      ],
+      "limitations": [
+        "公开职位列表包含完整职责与要求，已据此阅读并原创概述；职责要求摘要未逐字复制原文。",
+        "发布日期取自公开列表字段publishTime；详情接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31504",
+      "source_posting_id": "31504",
+      "title_zh": "FDE研发实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31504",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-25 16:37:24；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "负责AI原生研发协作平台的前后端与Agent运行时开发，完成业务交付、系统集成和发布运维。",
+      "requirements_summary_zh": "掌握Go或Node.js、React和TypeScript，熟悉数据库、测试及大模型Agent应用开发。",
+      "nearest_existing_job_ids": [
+        "dev-efficiency",
+        "fullstack",
+        "agent-platform"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-30970",
+      "source_posting_id": "30970",
+      "title_zh": "AI玩法产品实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/30970",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-25",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-25 16:30:55；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "产品运营类",
+      "responsibilities_summary_zh": "探索视频实时生成与互动玩法，完成产品概念验证、demo实现和用户体验优化。",
+      "requirements_summary_zh": "关注大模型和多模态生成，具备AI应用实践、产品洞察和AI Coding能力。",
+      "nearest_existing_job_ids": [
+        "ai-product",
+        "multimodal-product"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31465",
+      "source_posting_id": "31465",
+      "title_zh": "AI Infra研发实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31465",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-20 20:41:30；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "优化音视频生成模型的预训练与后训练Infra，覆盖并行策略、算子、通信、显存及RL训练系统。",
+      "requirements_summary_zh": "熟悉PyTorch分布式、GPU架构和C++/CUDA或Triton，了解Megatron或verl等框架。",
+      "nearest_existing_job_ids": [
+        "ai-infra",
+        "distributed-training",
+        "gpu-operator-opt"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31461",
+      "source_posting_id": "31461",
+      "title_zh": "音视频生成算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31461",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-20 20:27:08；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "研究视频生成的步数蒸馏、超分与后训练策略，构建数据评测并优化推理速度。",
+      "requirements_summary_zh": "熟悉扩散模型和PyTorch，具备论文复现、模型训练及独立实验设计能力。",
+      "nearest_existing_job_ids": [
+        "aigc-video",
+        "llm-training",
+        "model-quantization"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31459",
+      "source_posting_id": "31459",
+      "title_zh": "音视频理解算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31459",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-20 20:20:23；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "研究音视频理解与生成，覆盖长视频Agent、代码视频模型、PE数据和视频理解RL。",
+      "requirements_summary_zh": "熟悉LLM/VLM、Agent工具调用及PyTorch，具备工程实现或模型训练经验。",
+      "nearest_existing_job_ids": [
+        "video-understanding",
+        "llm-app",
+        "multimodal"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31281",
+      "source_posting_id": "31281",
+      "title_zh": "视频生成超分算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31281",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-20 20:07:19；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "研发视频超分与画质增强算法，优化多帧对齐、时序一致性和生成模型协同效果。",
+      "requirements_summary_zh": "具备深度学习和计算机视觉基础，熟悉视频复原、扩散模型及模型部署优化。",
+      "nearest_existing_job_ids": [
+        "aigc-video",
+        "cv",
+        "neural-rendering"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-29247",
+      "source_posting_id": "29247",
+      "title_zh": "多模态数据工程实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/29247",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-20 20:05:46；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "AI类",
+      "responsibilities_summary_zh": "构建高性能音视频理解数据Pipeline，优化多模态模型推理、数据质量和处理效率。",
+      "requirements_summary_zh": "熟悉Transformer、VLM及TensorRT/ONNX/CUDA，具备音视频工程和大规模Pipeline经验。",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "multimodal",
+        "ai-infra"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-30408",
+      "source_posting_id": "30408",
+      "title_zh": "AI Infra实习生训练方向-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/30408",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-20 20:05:17；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "AI类",
+      "responsibilities_summary_zh": "优化大模型训练和推理Infra，覆盖分布式框架、算子、通信、容错、存储与GPU资源调度。",
+      "requirements_summary_zh": "具备系统编程、GPU和PyTorch基础，熟悉Megatron、vLLM等训练推理技术。",
+      "nearest_existing_job_ids": [
+        "ai-infra",
+        "distributed-training",
+        "inference-serving"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-29539",
+      "source_posting_id": "29539",
+      "title_zh": "强化学习infra训练框架实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/29539",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-20 20:04:21；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "北京、上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "参与强化学习训练框架研发，定位计算、通信和存储瓶颈并提升大规模训练效率。",
+      "requirements_summary_zh": "掌握Python或C++，了解DiT/VLM、GRPO等RL算法及verl等训练框架。",
+      "nearest_existing_job_ids": [
+        "reinforcement-learning",
+        "ai-infra",
+        "distributed-training"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-30879",
+      "source_posting_id": "30879",
+      "title_zh": "视频参考数据管线实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/30879",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-20 20:01:48；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "AI类",
+      "responsibilities_summary_zh": "构建视频编辑训练样本，利用多模态模型完成自动打标、质量评测、筛选和数据配比优化。",
+      "requirements_summary_zh": "相关专业在读，了解多模态理解与生成模型的数据需求，有数据集构建经验优先。",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "short-video-data-eng",
+        "video-understanding"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31087",
+      "source_posting_id": "31087",
+      "title_zh": "游戏AI算法实习生（强化学习 / 卡牌博弈方向）",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31087",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-20 16:10:54；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "研究卡牌博弈与不完全信息场景的强化学习Bot，完成状态动作建模、训练评测和策略泛化。",
+      "requirements_summary_zh": "具备强化学习、搜索和PyTorch基础，有完整RL项目、自博弈或博弈论研究经验。",
+      "nearest_existing_job_ids": [
+        "game-ai",
+        "reinforcement-learning"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31446",
+      "source_posting_id": "31446",
+      "title_zh": "推荐算法实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31446",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-20 11:41:17；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "参与推荐算法研发，优化用户兴趣建模、召回排序，并探索LLM与个性化内容生成。",
+      "requirements_summary_zh": "具备数学和计算机基础，了解推荐系统流程，熟练使用Python和深度学习框架。",
+      "nearest_existing_job_ids": [
+        "recommendation",
+        "content-community-llm-app"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31251",
+      "source_posting_id": "31251",
+      "title_zh": "多模态大模型实习生（音频方向）-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31251",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-20",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-20 11:28:03；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "参与音频大模型预训练、微调和对齐，融合语音、音乐、ASR/TTS及音频数据构建。",
+      "requirements_summary_zh": "熟悉PyTorch、Megatron或verl等训练框架，掌握SFT、RL和生成模型基础。",
+      "nearest_existing_job_ids": [
+        "speech",
+        "llm-training",
+        "multimodal"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31440",
+      "source_posting_id": "31440",
+      "title_zh": "视频生成后训练算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31440",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:35:41；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "研究视频生成后训练，对比DPO、ReFL和GRPO等策略，设计奖励组合并分析奖励作弊。",
+      "requirements_summary_zh": "熟悉扩散或flow matching、至少一种RL方法和PyTorch，能够独立设计消融实验。",
+      "nearest_existing_job_ids": [
+        "llm-rl",
+        "aigc-video",
+        "llm-training"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31438",
+      "source_posting_id": "31438",
+      "title_zh": "视频生成自动化评测算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31438",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:34:54；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "AI类",
+      "responsibilities_summary_zh": "设计视频生成自动评测流程，利用Agent生成测试、模型打分和人评校准，输出badcase分析。",
+      "requirements_summary_zh": "熟悉VLM、Agent开发和Python，有视频生成评测、benchmark或LLM-as-judge经验。",
+      "nearest_existing_job_ids": [
+        "llm-eval",
+        "ai-agent-test",
+        "aigc-video"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31436",
+      "source_posting_id": "31436",
+      "title_zh": "视频生成步数蒸馏实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31436",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:33:28；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "研究MoE DiT视频生成的少步蒸馏与加速，结合量化、稀疏注意力和并行推理提升效率。",
+      "requirements_summary_zh": "熟悉扩散模型和PyTorch，能够复现蒸馏论文并独立定义研究问题。",
+      "nearest_existing_job_ids": [
+        "model-quantization",
+        "aigc-video",
+        "llm-training"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31434",
+      "source_posting_id": "31434",
+      "title_zh": "全模态表征模型算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31434",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:31:29；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "AI类",
+      "responsibilities_summary_zh": "训练全模态表征模型，支持音视频去重、检索、聚类、配比及参考配对，并优化推理部署。",
+      "requirements_summary_zh": "熟悉对比学习和多模态表征，掌握PyTorch和分布式训练，能够独立设计实验。",
+      "nearest_existing_job_ids": [
+        "multimodal",
+        "content-community-llm-train",
+        "data-engineering"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31432",
+      "source_posting_id": "31432",
+      "title_zh": "视频理解RL算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31432",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:30:57；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "在verl等框架上开展视频理解强化学习，设计奖励、优化长视频rollout并分析奖励作弊。",
+      "requirements_summary_zh": "熟悉至少两种RL算法及训练框架，具备VLM后训练经验。",
+      "nearest_existing_job_ids": [
+        "llm-rl",
+        "video-understanding",
+        "multimodal"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31430",
+      "source_posting_id": "31430",
+      "title_zh": "音频参考与编辑数据算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31430",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:29:16；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "AI类",
+      "responsibilities_summary_zh": "构建音色参考和音频编辑数据，覆盖说话人配对、音频编辑对、口型同步及评测集。",
+      "requirements_summary_zh": "熟悉说话人表征、TTS或音频编辑至少一项，掌握Python和PyTorch。",
+      "nearest_existing_job_ids": [
+        "speech",
+        "audio-generation",
+        "data-engineering"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31428",
+      "source_posting_id": "31428",
+      "title_zh": "视频理解PE数据算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31428",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:28:58；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "分析真实用户提示词分布，构造视频生成训练与偏好数据，并维护PE评测集。",
+      "requirements_summary_zh": "熟悉LLM SFT、偏好数据构建和Python，理解视频生成模型对提示词的敏感性。",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "video-understanding",
+        "llm-training"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31426",
+      "source_posting_id": "31426",
+      "title_zh": "图像编辑与参考数据算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31426",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:26:50；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "AI类",
+      "responsibilities_summary_zh": "构建图像编辑与参考数据，挖掘真实样本、合成编辑三元组，并建立质量和一致性评测集。",
+      "requirements_summary_zh": "熟悉图像生成编辑、VLM和PyTorch，能够定义数据规范并产出数据集。",
+      "nearest_existing_job_ids": [
+        "aigc-image",
+        "image-editing",
+        "data-engineering"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31424",
+      "source_posting_id": "31424",
+      "title_zh": "代码驱动视频生成算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31424",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:26:15；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "利用代码Agent生成渲染代码和合成训练视频，构建code-to-video数据及对齐奖励。",
+      "requirements_summary_zh": "熟悉LLM代码生成、Agent及PyTorch，能够使用Blender/Python或图形学工具。",
+      "nearest_existing_job_ids": [
+        "aigc-video",
+        "agent-platform",
+        "game-asset-pipeline"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31034",
+      "source_posting_id": "31034",
+      "title_zh": "多模态大模型数据开发实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31034",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:26:02；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "开发多模态数据处理管线，完成数据接入、清洗去重、分布式任务调优和监控告警。",
+      "requirements_summary_zh": "熟悉Ray、Spark或Flink及对象存储，具备大规模数据处理和工程调试能力。",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "short-video-data-eng",
+        "realtime-computing"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31422",
+      "source_posting_id": "31422",
+      "title_zh": "长视频生成Agent算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31422",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:24:24；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "搭建长视频生成Agent，管理规划、工具调用、记忆与跨镜头一致性，并建立质量评测闭环。",
+      "requirements_summary_zh": "熟悉LLM/VLM、Agent工作流和工程实现，能够将原型推进为稳定系统。",
+      "nearest_existing_job_ids": [
+        "llm-app",
+        "aigc-video",
+        "agent-platform"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31420",
+      "source_posting_id": "31420",
+      "title_zh": "视频参考与驱动数据算法实习生-bilibili",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31420",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:23:26；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "AI类",
+      "responsibilities_summary_zh": "构建视频参考与驱动数据，提取姿态、光流和相机轨迹，并建设一致性与驱动准确性评测集。",
+      "requirements_summary_zh": "熟悉人脸识别、姿态、光流或相机位姿至少一项，具备PyTorch和大规模数据处理经验。",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "aigc-video",
+        "cv"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31418",
+      "source_posting_id": "31418",
+      "title_zh": "多模态数据AI Infra实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31418",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-19",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-19 20:19:09；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "AI类",
+      "responsibilities_summary_zh": "建设多模态数据湖元数据、向量检索、标签检索和数据回流平台，并优化训练读取与存储IO。",
+      "requirements_summary_zh": "掌握Go、Python或Java及MySQL/Redis，了解向量库、数据湖和分布式系统。",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "ai-infra",
+        "database"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31394",
+      "source_posting_id": "31394",
+      "title_zh": "体验设计实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31394",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-18",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-18 15:50:29；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "设计类",
+      "responsibilities_summary_zh": "参与交易生态体验设计，通过用户研究和数据分析制定优化方案，并推动设计规范落地。",
+      "requirements_summary_zh": "具备交互设计基础、Figma等工具能力、用户洞察和跨团队协作能力。",
+      "nearest_existing_job_ids": [
+        "ecommerce-ux",
+        "ux",
+        "user-research"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31389",
+      "source_posting_id": "31389",
+      "title_zh": "UE特效师（实习）",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31389",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-18",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-18 12:10:45；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "设计类",
+      "responsibilities_summary_zh": "使用UE Niagara制作实时特效资产，完成材质调试、引擎合入和特效性能优化。",
+      "requirements_summary_zh": "熟练使用Niagara，理解材质动画、实时渲染和UE资产制作流程。",
+      "nearest_existing_job_ids": [
+        "vfx-ta",
+        "technical-artist",
+        "render-engine"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31385",
+      "source_posting_id": "31385",
+      "title_zh": "商业产品经理实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31385",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-17",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-17 21:09:14；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "产品运营类",
+      "responsibilities_summary_zh": "参与广告流量场景变现产品，分析客户需求和业务数据，推进产品方案与技术迭代。",
+      "requirements_summary_zh": "具备产品逻辑、数据分析和沟通协作能力，理工科背景优先。",
+      "nearest_existing_job_ids": [
+        "ads-product",
+        "product"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31373",
+      "source_posting_id": "31373",
+      "title_zh": "创意设计实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31373",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-17",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-17 19:13:42；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "设计类",
+      "responsibilities_summary_zh": "负责动画、娱乐和纪录片等内容的创意设计，参与视觉构思、物料制作和效果还原。",
+      "requirements_summary_zh": "具备插画手绘与平面设计能力，熟练使用Sketch、PS、AI和AE等工具。",
+      "nearest_existing_job_ids": [
+        "ad-creative-designer",
+        "visual-design"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31371",
+      "source_posting_id": "31371",
+      "title_zh": "用户研究实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31371",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-17",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-17 19:11:26；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "产品运营类",
+      "responsibilities_summary_zh": "开展交易链路用户研究，完成问卷、访谈、焦点小组和体验诊断，输出转化与复购洞察。",
+      "requirements_summary_zh": "掌握定性定量研究方法及SQL/SPSS/Python等工具，了解二次元电商消费场景。",
+      "nearest_existing_job_ids": [
+        "ecommerce-research",
+        "user-research",
+        "data-analysis"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31358",
+      "source_posting_id": "31358",
+      "title_zh": "风控算法实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31358",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-17",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-17 12:10:38；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "建设活动、社区互动和账号风控策略，利用异常识别、图算法和大模型能力打击黑灰产。",
+      "requirements_summary_zh": "具备数据分析和建模基础，熟悉SQL/Python、异常检测、图算法及LLM应用。",
+      "nearest_existing_job_ids": [
+        "risk-engine",
+        "risk-control",
+        "financial-risk"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31344",
+      "source_posting_id": "31344",
+      "title_zh": "流量策略产品实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31344",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-16",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-16 14:32:22；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "产品运营类",
+      "responsibilities_summary_zh": "参与充电、短剧和课堂等业务流量策略，分析漏斗与内容转化特征并推动策略落地。",
+      "requirements_summary_zh": "熟练使用SQL，具备数据分析、策略评估和项目推进能力。",
+      "nearest_existing_job_ids": [
+        "ads-product",
+        "growth-product"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31332",
+      "source_posting_id": "31332",
+      "title_zh": "广告投放平台产品经理",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31332",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-13",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-13 17:46:58；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "产品运营类",
+      "responsibilities_summary_zh": "参与效果广告投放平台产品建设，覆盖投放结构、账户、资产和数据能力并推进系统迭代。",
+      "requirements_summary_zh": "具备系统思维、产品设计和AI Agent工具使用经验，了解竞价广告优先。",
+      "nearest_existing_job_ids": [
+        "ad-delivery-product",
+        "ads-product",
+        "ai-agent-product"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31322",
+      "source_posting_id": "31322",
+      "title_zh": "Agent 研发实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31322",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-12",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-12 21:37:37；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "参与AI视频创作平台的Agent和分布式系统开发，实现任务流程、异常处理及多模态能力对接。",
+      "requirements_summary_zh": "具备计算机基础和Python开发能力，了解Agent框架并有模块开发或项目实践。",
+      "nearest_existing_job_ids": [
+        "agent-platform",
+        "llm-app"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31293",
+      "source_posting_id": "31293",
+      "title_zh": "AIGC产品经理实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31293",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-11",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-11 14:19:38；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "产品运营类",
+      "responsibilities_summary_zh": "负责商业化AIGC素材生成产品，提升封面、标题和视频素材的质量与生产效率，并建立效果评价标准。",
+      "requirements_summary_zh": "具备AIGC、内容创作或商业化产品经验，了解大模型与多模态能力并能协同算法工程团队。",
+      "nearest_existing_job_ids": [
+        "ai-product",
+        "ad-creative-designer",
+        "multimodal-product"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31263",
+      "source_posting_id": "31263",
+      "title_zh": "AI创作项目研发实习生【2027届】",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31263",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-09",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-09 17:05:33；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "参与AI Agent视频创作系统研发，建设素材组织、内容生成、自动视频生产和AI工具链。",
+      "requirements_summary_zh": "2027届毕业生，具备编程和AI/Agent基础，了解LLM、多模态及自动化工作流。",
+      "nearest_existing_job_ids": [
+        "llm-app",
+        "agent-platform",
+        "aigc-video"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-29558",
+      "source_posting_id": "29558",
+      "title_zh": "【B-UP】强化学习训练算法工程师（实习）",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/29558",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-09",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-09 10:49:56；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "研究视频生成或理解的强化学习，覆盖奖励模型、偏好数据、分布式训练和评测体系建设。",
+      "requirements_summary_zh": "掌握机器学习和RL基础，熟悉PPO、DPO或GRPO等方法及PyTorch。",
+      "nearest_existing_job_ids": [
+        "llm-rl",
+        "reinforcement-learning",
+        "video-understanding"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    },
+    {
+      "candidate_id": "bilibili-31247",
+      "source_posting_id": "31247",
+      "title_zh": "多屏业务后端开发实习生",
+      "publisher": "哔哩哔哩",
+      "source_domain": "jobs.bilibili.com",
+      "source_url": "https://jobs.bilibili.com/campus/positions/31247",
+      "source_page_url": "https://jobs.bilibili.com/campus/positions",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-06",
+      "updated_at": null,
+      "freshness_basis": "pushTime=2026-11-06 19:04:36；职位列表显示“发布”",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "上海",
+      "category_hint": "技术类 / 研发",
+      "responsibilities_summary_zh": "参与OTT多屏后端系统开发与优化，完成服务设计、性能提升和线上稳定性保障。",
+      "requirements_summary_zh": "熟悉Go、Java、C/C++或Python之一，具备Linux、并发和网络编程基础。",
+      "nearest_existing_job_ids": [
+        "backend",
+        "sre"
+      ],
+      "limitations": [
+        "已读取官方公开职位列表中的完整职责与要求，并完成简短原创概述，未复制大段JD原文。",
+        "发布日期取自公开列表字段pushTime；公开接口未提供独立更新时间，updated_at留空。",
+        "仅记录2026-11-25访问时公开可见的在招状态，不保证之后仍有效。"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2583 @@
+{
+  "metadata": {
+    "dataset": "latest-role-mining-public-candidates",
+    "protocol_version": "latest-role-mining-v1",
+    "as_of": "2026-11-25",
+    "status": "in_review",
+    "review_only": true,
+    "human_approved": false,
+    "release_eligible": false,
+    "runtime_enabled": false,
+    "existing_repository_files_modified_by_this_collection": false,
+    "freshness_window": {
+      "start": "2026-07-01",
+      "end": "2026-11-25"
+    },
+    "limits": {
+      "total_candidates": 100,
+      "per_source_domain": 80,
+      "per_listing_page": 60
+    },
+    "sources": [
+      {
+        "publisher": "小米集团",
+        "source_domain": "xiaomi.jobs.f.mioffice.cn",
+        "listing_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+        "detail_url_pattern": "https://xiaomi.jobs.f.mioffice.cn/campus/position/{jobPostId}/detail",
+        "date_field": "publishTime"
+      },
+      {
+        "publisher": "华为",
+        "source_domain": "career.huawei.com",
+        "listing_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+        "detail_url_pattern": "https://career.huawei.com/cn/job-details?advertisementId={advertisementId}",
+        "date_field": "lastUpdateDate"
+      },
+      {
+        "publisher": "阿里巴巴集团",
+        "source_domain": "campus-talent.alibaba.com",
+        "listing_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+        "detail_url_pattern": "https://campus-talent.alibaba.com/campus/position/{id}",
+        "date_field": "modifyTime"
+      }
+    ],
+    "counts": {
+      "total": 91,
+      "by_domain": {
+        "campus-talent.alibaba.com": 30,
+        "career.huawei.com": 29,
+        "xiaomi.jobs.f.mioffice.cn": 32
+      },
+      "by_evidence_grade": {
+        "A": 72,
+        "B": 19
+      },
+      "by_domain_and_evidence_grade": {
+        "campus-talent.alibaba.com:A": 30,
+        "career.huawei.com:A": 10,
+        "career.huawei.com:B": 19,
+        "xiaomi.jobs.f.mioffice.cn:A": 32
+      },
+      "by_career_stage": {
+        "campus": 91
+      },
+      "by_listing_page": {
+        "alibaba:1": 8,
+        "alibaba:2": 9,
+        "alibaba:3": 5,
+        "alibaba:4": 8,
+        "huawei:1": 17,
+        "huawei:2": 12,
+        "xiaomi:1": 32
+      }
+    },
+    "method_notes": [
+      "仅使用三家官方校园招聘公开页面及其页面正常调用的公开接口。",
+      "A级记录的完整职责/要求字段已读取并仅保留简短概述；B级记录职责与要求均为空。",
+      "阿里巴巴 modifyTime 统一按 Asia/Shanghai 转换为日期；华为使用页面“更新于”与 lastUpdateDate；小米使用 publishTime。",
+      "候选按企业、岗位方向和现有标题去重，不足100条时不补齐。"
+    ],
+    "blockers_or_limitations": [
+      "小米接口的普通命令行请求返回403；同一公开接口经WebFetch成功读取，未尝试绕过访问控制。",
+      "阿里巴巴接口的普通命令行请求返回403；公开浏览器页面正常加载，仅读取页面自身产生的公开XHR响应，未尝试绕过访问控制。",
+      "已检查的华为实习岗位公开日期均早于2026-07-01，未纳入。",
+      "小米与阿里巴巴A级记录使用公开职位接口中的完整职责/要求字段，未逐条另开详情页。",
+      "华为部分岗位详情仅指向岗位意向，未读取完整JD的19条记录保留为B级且概述留空。"
+    ],
+    "exclusions": {
+      "exact_existing_title_duplicates": [
+        {
+          "publisher": "小米集团",
+          "title": "测试开发工程师",
+          "existing_job_id": "sdet"
+        },
+        {
+          "publisher": "华为",
+          "title": "AI Infra工程师",
+          "existing_job_id": "ai-infra"
+        },
+        {
+          "publisher": "阿里巴巴集团",
+          "title": "AI Infra工程师",
+          "existing_job_id": "ai-infra"
+        }
+      ],
+      "obvious_near_duplicates": [
+        {
+          "publisher": "小米集团",
+          "title": "国际视觉设计师",
+          "nearest_existing_job_id": "visual-design"
+        },
+        {
+          "publisher": "小米集团",
+          "title": "搜索与推荐算法工程师",
+          "nearest_existing_job_id": "recommendation"
+        }
+      ],
+      "generic_roles_not_selected": [
+        "人力资源",
+        "财务财经",
+        "销售客户经理",
+        "法务",
+        "行政审计",
+        "秘书",
+        "通用运营及游戏策划"
+      ]
+    },
+    "validation": {
+      "json_valid": true,
+      "required_fields_present": true,
+      "candidate_ids_unique": true,
+      "source_posting_ids_unique": true,
+      "normalized_titles_unique_within_file": true,
+      "no_exact_normalized_title_match_to_existing_jobs": true,
+      "all_dates_within_window": true,
+      "all_sources_official_https": true,
+      "domain_limit_passed": true,
+      "listing_page_limit_passed": true,
+      "nearest_existing_job_ids_valid": true,
+      "b_grade_summaries_empty": true,
+      "generic_excluded_roles_absent": true
+    }
+  },
+  "records": [
+    {
+      "candidate_id": "xiaomi-7703754263457450282",
+      "source_posting_id": "7703754263457450282",
+      "title_zh": "信息安全产品经理",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7703754263457450282/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-03",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-11-03\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "武汉",
+      "category_hint": "产品/安全",
+      "responsibilities_summary_zh": "规划信息安全产品需求与方案，跟踪设计、研发、测试和上线迭代。",
+      "requirements_summary_zh": "信息安全或计算机相关优先，具备编程基础、产品文档能力和数据分析能力。",
+      "nearest_existing_job_ids": [
+        "content-safety-product"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7699101736816036138",
+      "source_posting_id": "7699101736816036138",
+      "title_zh": "技术支持工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7699101736816036138/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-10-21",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-10-21\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "技术支持/解决方案",
+      "responsibilities_summary_zh": "预警产品质量问题，完善技术文档与服务培训，推动故障分析和升级鉴定。",
+      "requirements_summary_zh": "计算机系统架构或数据分析相关优先，具备问题拆解、文档和跨部门沟通能力。",
+      "nearest_existing_job_ids": [
+        "tech-writing"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7697241412202432822",
+      "source_posting_id": "7697241412202432822",
+      "title_zh": "数字芯片验证工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7697241412202432822/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-10-16",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-10-16\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "上海",
+      "category_hint": "芯片/验证",
+      "responsibilities_summary_zh": "搭建UVM验证平台，制定验证策略，执行功能、性能、覆盖率和时序验证。",
+      "requirements_summary_zh": "微电子、通信、计算机等相关硕士，熟悉Verilog/SystemVerilog及FPGA/ASIC验证。",
+      "nearest_existing_job_ids": [
+        "chip-verification",
+        "chip-verification-software"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670891952493545755",
+      "source_posting_id": "7670891952493545755",
+      "title_zh": "人因仿真工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670891952493545755/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-10-08",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-10-08\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "用户研究/人因工程",
+      "responsibilities_summary_zh": "开展穿戴产品人因力学仿真建模、问题拆解和技术落地。",
+      "requirements_summary_zh": "人机交互、机械或生物力学背景，了解实验设计与统计，熟悉仿真工具优先。",
+      "nearest_existing_job_ids": [
+        "robot-simulation",
+        "user-research"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670885167280900393",
+      "source_posting_id": "7670885167280900393",
+      "title_zh": "客户端工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670885167280900393/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-09-21",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-09-21\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/南京",
+      "category_hint": "研发/客户端",
+      "responsibilities_summary_zh": "建设AI多模态客户端架构，开发Flutter跨端核心功能并优化音视频性能。",
+      "requirements_summary_zh": "精通Flutter/Dart与Android/iOS原生开发，具备扎实计算机基础和源码分析能力。",
+      "nearest_existing_job_ids": [
+        "flutter-app",
+        "android",
+        "ios"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670915181790447899",
+      "source_posting_id": "7670915181790447899",
+      "title_zh": "全栈开发工程师-汽车",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670915181790447899/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-09-17",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-09-17\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "南京",
+      "category_hint": "研发/全栈",
+      "responsibilities_summary_zh": "开发汽车Web前后端、接口与数据逻辑，参与性能优化和自动化部署。",
+      "requirements_summary_zh": "掌握Java、Spring生态、MySQL/Redis及Spark/Flink等数据技术。",
+      "nearest_existing_job_ids": [
+        "fullstack",
+        "automotive-backend"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670924324123527460",
+      "source_posting_id": "7670924324123527460",
+      "title_zh": "车载Audio软件工程师-汽车",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670924324123527460/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-09-11",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-09-11\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "上海",
+      "category_hint": "汽车电子/软件",
+      "responsibilities_summary_zh": "参与车载音频HAL、中间件和DSP开发，实现路由、混音与多通道处理。",
+      "requirements_summary_zh": "熟悉C/C++及Linux/Android/RTOS/QNX，有音频或嵌入式开发经验优先。",
+      "nearest_existing_job_ids": [
+        "car-audio-driver",
+        "multi-zone-audio"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7680536313443600659",
+      "source_posting_id": "7680536313443600659",
+      "title_zh": "AI软件工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7680536313443600659/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-09-01",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-09-01\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "成都",
+      "category_hint": "AI/芯片软件",
+      "responsibilities_summary_zh": "开发芯片驱动、高性能算子、推理框架和图编译器，优化模型性能与功耗。",
+      "requirements_summary_zh": "图像或机器学习相关硕士，精通C/C++/Python，熟悉AI框架及Linux/RTOS。",
+      "nearest_existing_job_ids": [
+        "ai-chip-software",
+        "edge-inference-engine"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670918894160677171",
+      "source_posting_id": "7670918894160677171",
+      "title_zh": "MCU底层软件开发工程师-汽车",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670918894160677171/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-31",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-31\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "南京",
+      "category_hint": "汽车电子/嵌入式",
+      "responsibilities_summary_zh": "负责MCU软件集成、MCAL/OS/RTE配置、硬件调试与系统问题排查。",
+      "requirements_summary_zh": "汽车电子或计算机相关研究生，精通C语言和MISRA-C，了解单片机开发。",
+      "nearest_existing_job_ids": [
+        "car-mcu-software",
+        "automotive-embedded"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7671290338011056435",
+      "source_posting_id": "7671290338011056435",
+      "title_zh": "大数据研发工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7671290338011056435/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-31",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-31\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/南京/武汉",
+      "category_hint": "数据/数据仓库",
+      "responsibilities_summary_zh": "设计数仓模型，开发ETL和数据集成流程，监控质量并支持BI分析。",
+      "requirements_summary_zh": "掌握SQL、ETL与数据建模，了解Hadoop/Spark/Hive/Flink等优先。",
+      "nearest_existing_job_ids": [
+        "data-warehouse",
+        "data-engineering"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7671129386385705257",
+      "source_posting_id": "7671129386385705257",
+      "title_zh": "嵌入式软件工程师-芯片",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7671129386385705257/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-26",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-26\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "西安/上海",
+      "category_hint": "芯片/嵌入式",
+      "responsibilities_summary_zh": "开发并验证USB、PCIe、DVFS、时钟电源及Bootrom/存储驱动。",
+      "requirements_summary_zh": "精通C/C++和Linux Kernel，有嵌入式Linux/RTOS驱动开发经验优先。",
+      "nearest_existing_job_ids": [
+        "embedded",
+        "chip-system"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670893428431718702",
+      "source_posting_id": "7670893428431718702",
+      "title_zh": "无线通信物理层软件工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670893428431718702/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-26",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-26\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/西安/上海",
+      "category_hint": "通信/嵌入式软件",
+      "responsibilities_summary_zh": "设计、实现并测试4G/5G物理层和射频子系统软件。",
+      "requirements_summary_zh": "通信、信号处理等相关专业，掌握C/C++/Python/汇编，有DSP或嵌入式经验优先。",
+      "nearest_existing_job_ids": [
+        "communication-chip-software",
+        "high-speed-interconnect"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670910501493131547",
+      "source_posting_id": "7670910501493131547",
+      "title_zh": "短距通信自动化测试开发工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670910501493131547/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-26",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-26\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "上海",
+      "category_hint": "芯片/测试开发",
+      "responsibilities_summary_zh": "开发芯片方案自动化测试框架、脚本与环境，提升测试效率和稳定性。",
+      "requirements_summary_zh": "计算机或电子相关本科，熟悉C++/Python/Java、Linux及自动化接口开发。",
+      "nearest_existing_job_ids": [
+        "sdet",
+        "chip-verification-software"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7671129598676125993",
+      "source_posting_id": "7671129598676125993",
+      "title_zh": "软件开发工程师-影像方向",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7671129598676125993/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-26",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-26\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "西安/上海",
+      "category_hint": "软件/影像",
+      "responsibilities_summary_zh": "设计Android Camera架构，优化影像性能功耗并协同自研芯片和AI能力。",
+      "requirements_summary_zh": "计算机或软件工程优先，精通C/C++，有图像或嵌入式项目经验优先。",
+      "nearest_existing_job_ids": [
+        "car-isp",
+        "android"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7671129267694897427",
+      "source_posting_id": "7671129267694897427",
+      "title_zh": "芯片物理设计工程师（AI方向）",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7671129267694897427/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-26",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-26\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "上海",
+      "category_hint": "芯片/物理设计",
+      "responsibilities_summary_zh": "推进SoC物理设计全流程，并将机器学习或Agent用于EDA自动化和PPA优化。",
+      "requirements_summary_zh": "熟悉IC后端流程、PPA与EDA工具，掌握Python/Tcl及机器学习基础。",
+      "nearest_existing_job_ids": [
+        "chip-verification"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670907285460371738",
+      "source_posting_id": "7670907285460371738",
+      "title_zh": "NPU编译器开发工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670907285460371738/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-26",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-26\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "AI/编译器",
+      "responsibilities_summary_zh": "开发异构编译器、LLVM后端、编程语言前端及汇编链接工具链。",
+      "requirements_summary_zh": "计算机或体系结构相关硕士，熟悉编译器原理、LLVM Pass和C++。",
+      "nearest_existing_job_ids": [
+        "ai-chip-compiler",
+        "compiler-runtime"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7671129304001382675",
+      "source_posting_id": "7671129304001382675",
+      "title_zh": "AI Compiler 开发工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7671129304001382675/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-26",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-26\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "AI/编译器",
+      "responsibilities_summary_zh": "面向自研NPU设计编译器与DSL，开展模型和硬件协同优化。",
+      "requirements_summary_zh": "编译器或体系结构背景博士优先，熟悉LLVM、GPGPU及算子优化。",
+      "nearest_existing_job_ids": [
+        "ai-chip-compiler",
+        "compiler-runtime"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7671129007186315547",
+      "source_posting_id": "7671129007186315547",
+      "title_zh": "芯片设计实现工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7671129007186315547/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-26",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-26\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "西安/上海",
+      "category_hint": "芯片/设计实现",
+      "responsibilities_summary_zh": "完成综合、时序、形式验证和功耗签核，制定投片标准并导入先进工艺。",
+      "requirements_summary_zh": "微电子或计算机硕士，熟悉数字IC流程、Verilog、STA及DC/Genus。",
+      "nearest_existing_job_ids": [
+        "chip-verification"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670910435231303987",
+      "source_posting_id": "7670910435231303987",
+      "title_zh": "SOC设计工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670910435231303987/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-26",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-26\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "西安/上海",
+      "category_hint": "芯片/SoC设计",
+      "responsibilities_summary_zh": "参与SoC顶层与子模块设计、RTL实现和质量检查，探索Chiplet等技术。",
+      "requirements_summary_zh": "微电子、集成电路等相关专业，了解SoC流程、Verilog及AMBA总线。",
+      "nearest_existing_job_ids": [
+        "soc-chip-software"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7676005513680030006",
+      "source_posting_id": "7676005513680030006",
+      "title_zh": "大模型网关服务端开发工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7676005513680030006/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-20",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-20\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "服务端/AI基础设施",
+      "responsibilities_summary_zh": "设计高并发大模型网关，实现协议转换、动态路由、熔断和可观测性。",
+      "requirements_summary_zh": "有服务端经验，熟悉OpenAI/Anthropic接口、MySQL/Redis和计算机基础。",
+      "nearest_existing_job_ids": [
+        "model-service-gateway",
+        "api-gateway-dev"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670924160045992246",
+      "source_posting_id": "7670924160045992246",
+      "title_zh": "产品经理-汽车座舱/APP",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670924160045992246/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-18",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-18\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "产品/智能座舱",
+      "responsibilities_summary_zh": "调研智能座舱需求与竞品，设计功能方案并协同研发测试推动交付。",
+      "requirements_summary_zh": "计算机、人机交互或车辆工程相关优先，具备逻辑表达和AI/HMI经验加分。",
+      "nearest_existing_job_ids": [
+        "cockpit-product",
+        "product"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7671292350148888870",
+      "source_posting_id": "7671292350148888870",
+      "title_zh": "算法部署工程师-生态链",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7671292350148888870/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-12",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-12\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "武汉",
+      "category_hint": "AI/推理部署",
+      "responsibilities_summary_zh": "部署端侧模型并优化量化推理、CUDA算子、KV Cache和动态批处理。",
+      "requirements_summary_zh": "精通C/C++/Python，熟悉Transformer、vLLM/TensorRT及CUDA优先。",
+      "nearest_existing_job_ids": [
+        "av-model-deploy",
+        "edge-inference-engine"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7671294704499296539",
+      "source_posting_id": "7671294704499296539",
+      "title_zh": "测试开发工程师（声学测试方向）",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7671294704499296539/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-11",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-11\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "南京",
+      "category_hint": "测试/声学",
+      "responsibilities_summary_zh": "设计音频测试方案，使用专业设备评估音质、性能与兼容性并推动修复。",
+      "requirements_summary_zh": "音频、电子或计算机相关，熟悉声学原理、测试标准和音频分析工具。",
+      "nearest_existing_job_ids": [
+        "car-acoustic-nr",
+        "testing"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670930577323280646",
+      "source_posting_id": "7670930577323280646",
+      "title_zh": "应用软件研发工程师-汽车",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670930577323280646/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-11",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-11\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "南京",
+      "category_hint": "软件/后端",
+      "responsibilities_summary_zh": "参与汽车业务系统设计开发、接口实现、性能优化和全生命周期维护。",
+      "requirements_summary_zh": "掌握C++/Java/Python、Spring/MyBatis、MySQL及基础前端工具链。",
+      "nearest_existing_job_ids": [
+        "automotive-backend",
+        "backend"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7671292578125449522",
+      "source_posting_id": "7671292578125449522",
+      "title_zh": "SLAM算法工程师-扫地机",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7671292578125449522/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-11",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-11\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "武汉",
+      "category_hint": "机器人/算法",
+      "responsibilities_summary_zh": "推进扫地机器人SLAM技术落地与前沿预研，融合多传感器定位建图。",
+      "requirements_summary_zh": "熟悉SLAM、滤波与因子图优化，精通C++并了解深度学习框架。",
+      "nearest_existing_job_ids": [
+        "robot-slam",
+        "av-slam"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670923458582907199",
+      "source_posting_id": "7670923458582907199",
+      "title_zh": "DBA工程师",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670923458582907199/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-11",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-11\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "武汉/北京",
+      "category_hint": "数据库/SRE",
+      "responsibilities_summary_zh": "运维MySQL/Redis/OceanBase，参与架构设计、故障处理和数据库平台研发。",
+      "requirements_summary_zh": "掌握Golang/Python和Linux，具备算法基础，有云原生或KV开发经验优先。",
+      "nearest_existing_job_ids": [
+        "database",
+        "cloud-sre"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670924463416445190",
+      "source_posting_id": "7670924463416445190",
+      "title_zh": "手车互联研发工程师-汽车",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670924463416445190/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-11",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-11\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "南京",
+      "category_hint": "汽车电子/中间件",
+      "responsibilities_summary_zh": "开发手车互联应用与中间件，优化连接、性能、功耗和稳定性。",
+      "requirements_summary_zh": "熟悉Java/C/C++/Kotlin及RTOS，了解蓝牙、Wi-Fi和IoT通信协议。",
+      "nearest_existing_job_ids": [
+        "car-middleware",
+        "automotive-embedded"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670918533031184666",
+      "source_posting_id": "7670918533031184666",
+      "title_zh": "安全工程师（测试验证）-汽车",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670918533031184666/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-11",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-11\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "南京",
+      "category_hint": "汽车/测试安全",
+      "responsibilities_summary_zh": "建立高压与道路测试安全体系，制定SOP、培训演练并开展风险检查。",
+      "requirements_summary_zh": "本科，了解新能源汽车高压系统，具备体系思维和沟通协调能力。",
+      "nearest_existing_job_ids": [
+        "auto-functional-safety-test",
+        "reliability-testing"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670918956709906715",
+      "source_posting_id": "7670918956709906715",
+      "title_zh": "嵌入式测试开发工程师-汽车",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670918956709906715/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-11",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-11\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "南京",
+      "category_hint": "汽车电子/测试开发",
+      "responsibilities_summary_zh": "开发ECU底软测试环境、硬件与脚本，覆盖通信、诊断、驱动和功能安全。",
+      "requirements_summary_zh": "电子或计算机相关，熟悉MCU、RTOS、CAN/LIN及EDA和调试工具。",
+      "nearest_existing_job_ids": [
+        "automotive-embedded",
+        "auto-functional-safety-test"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670918956711135515",
+      "source_posting_id": "7670918956711135515",
+      "title_zh": "VMOS算法开发工程师-汽车",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670918956711135515/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-11",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-11\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "南京",
+      "category_hint": "汽车电子/控制算法",
+      "responsibilities_summary_zh": "开发VCU扭矩分配策略，完成信号仿真、MIL/SIL/HIL测试和实车标定。",
+      "requirements_summary_zh": "车辆或控制相关，掌握车辆动力学和MATLAB/Simulink。",
+      "nearest_existing_job_ids": [
+        "av-control",
+        "vehicle-energy-mgmt"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670918646432975113",
+      "source_posting_id": "7670918646432975113",
+      "title_zh": "产品经理-驾驶安全方向",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670918646432975113/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-11",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-11\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "产品/驾驶安全",
+      "responsibilities_summary_zh": "规划驾驶安全产品，开展用户竞品研究并协同智驾座舱团队落地迭代。",
+      "requirements_summary_zh": "硕士，重视产品体验，具备协同表达能力，有驾驶经验和汽车背景优先。",
+      "nearest_existing_job_ids": [
+        "driver-monitoring",
+        "product"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "xiaomi-7670919156380502298",
+      "source_posting_id": "7670919156380502298",
+      "title_zh": "域控制器硬件开发工程师-汽车",
+      "publisher": "小米集团",
+      "source_domain": "xiaomi.jobs.f.mioffice.cn",
+      "source_url": "https://xiaomi.jobs.f.mioffice.cn/campus/position/7670919156380502298/detail",
+      "source_page_url": "https://hr.xiaomi.com/website/opportunities.html",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-11",
+      "updated_at": null,
+      "freshness_basis": "\"publishTime\": \"2026-08-11\"",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "上海",
+      "category_hint": "汽车电子/硬件",
+      "responsibilities_summary_zh": "设计车身电控单元硬件电路，开展集成、电信号和整车台架测试。",
+      "requirements_summary_zh": "电子相关硕士，熟悉数模电并具备电路设计项目经验。",
+      "nearest_existing_job_ids": [
+        "hardware-reliability-test"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开搜索接口完整字段；页面卡片未直接显示日期，日期取 publishTime 原始字段。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36390",
+      "source_posting_id": "36390",
+      "title_zh": "AI应用工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36390",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/长沙/济南",
+      "category_hint": "研发类-AI应用",
+      "responsibilities_summary_zh": "负责大模型与算法在业务场景的集成、微调、RAG和效果评估。",
+      "requirements_summary_zh": "人工智能、计算机等相关专业，熟悉主流大模型框架及Python/C++/Java等语言。",
+      "nearest_existing_job_ids": [
+        "llm-app",
+        "automotive-llm-app"
+      ],
+      "limitations": [
+        "详情接口仅指向岗位意向；职责与要求依据官网公开岗位意向全文概述，可能汇总多个岗位意向。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36383",
+      "source_posting_id": "36383",
+      "title_zh": "AI模型工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36383",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/长沙/济南/合肥",
+      "category_hint": "研发类-大模型",
+      "responsibilities_summary_zh": "参与大模型研发、训练与优化，覆盖多个业务方向和前沿技术课题。",
+      "requirements_summary_zh": "人工智能、计算机等相关专业，具备深度学习、分布式训练和深度学习框架实践经验。",
+      "nearest_existing_job_ids": [
+        "llm-training",
+        "distributed-training"
+      ],
+      "limitations": [
+        "详情接口仅指向岗位意向；职责与要求依据官网公开岗位意向全文概述，可能汇总多个岗位意向。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36397",
+      "source_posting_id": "36397",
+      "title_zh": "AI安全与隐私工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36397",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/长沙/济南",
+      "category_hint": "研发类-AI安全",
+      "responsibilities_summary_zh": "开展AI数据安全、模型安全与密码技术工程化，支撑业务安全需求。",
+      "requirements_summary_zh": "信息安全、计算机等相关专业，掌握AI框架、安全技术和至少一门编程语言。",
+      "nearest_existing_job_ids": [
+        "llm-security",
+        "data-security"
+      ],
+      "limitations": [
+        "详情接口仅指向岗位意向；职责与要求依据官网公开岗位意向全文概述，可能汇总多个岗位意向。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36386",
+      "source_posting_id": "36386",
+      "title_zh": "硬件技术工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36386",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/合肥",
+      "category_hint": "研发类-硬件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "hardware-reliability-test"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36373",
+      "source_posting_id": "36373",
+      "title_zh": "软件开发工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36373",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/长沙/济南",
+      "category_hint": "研发类-软件",
+      "responsibilities_summary_zh": "参与终端、云、ICT等方向软件研发，完成模块设计、编码、调试与交付。",
+      "requirements_summary_zh": "计算机、软件工程等相关专业，具备编程基础和系统开发能力。",
+      "nearest_existing_job_ids": [
+        "backend",
+        "frontend"
+      ],
+      "limitations": [
+        "详情接口仅指向岗位意向；职责与要求依据官网公开岗位意向全文概述，可能汇总多个岗位意向。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36387",
+      "source_posting_id": "36387",
+      "title_zh": "芯片与器件设计工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36387",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州",
+      "category_hint": "研发类-芯片",
+      "responsibilities_summary_zh": "参与芯片与器件设计、验证及软硬件协同，推进产品实现。",
+      "requirements_summary_zh": "微电子、电子、计算机等相关专业，熟悉IC设计流程、Verilog和EDA工具。",
+      "nearest_existing_job_ids": [
+        "chip-verification",
+        "soc-chip-software"
+      ],
+      "limitations": [
+        "详情接口仅指向岗位意向；职责与要求依据官网公开岗位意向全文概述，可能汇总多个岗位意向。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36392",
+      "source_posting_id": "36392",
+      "title_zh": "数据科学工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36392",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州",
+      "category_hint": "研发类-数据科学",
+      "responsibilities_summary_zh": "运用统计建模和机器学习分析业务问题，输出数据洞察与解决方案。",
+      "requirements_summary_zh": "统计、数学、计算机等相关专业，掌握SQL/Python及机器学习方法。",
+      "nearest_existing_job_ids": [
+        "data-science",
+        "data-analysis"
+      ],
+      "limitations": [
+        "详情接口仅指向岗位意向；职责与要求依据官网公开岗位意向全文概述，可能汇总多个岗位意向。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36395",
+      "source_posting_id": "36395",
+      "title_zh": "云服务开发工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36395",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州",
+      "category_hint": "研发类-云服务",
+      "responsibilities_summary_zh": "参与云服务与云原生平台研发，支撑服务能力建设和稳定运行。",
+      "requirements_summary_zh": "计算机等相关专业，熟悉编程、云原生、容器和分布式系统基础。",
+      "nearest_existing_job_ids": [
+        "cloud-console-backend",
+        "devops"
+      ],
+      "limitations": [
+        "详情接口仅指向岗位意向；职责与要求依据官网公开岗位意向全文概述，可能汇总多个岗位意向。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36394",
+      "source_posting_id": "36394",
+      "title_zh": "人因与用户体验工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36394",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉",
+      "category_hint": "研发类-人因/用户体验",
+      "responsibilities_summary_zh": "开展用户研究、人因分析和体验评估，推动产品体验优化。",
+      "requirements_summary_zh": "人因、心理、工业设计等相关专业，掌握研究实验方法和数据分析能力。",
+      "nearest_existing_job_ids": [
+        "user-research",
+        "ux"
+      ],
+      "limitations": [
+        "详情接口仅指向岗位意向；职责与要求依据官网公开岗位意向全文概述，可能汇总多个岗位意向。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36396",
+      "source_posting_id": "36396",
+      "title_zh": "ID与UX设计师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36396",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉",
+      "category_hint": "研发类-ID/UX",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ux",
+        "automotive-interaction"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36385",
+      "source_posting_id": "36385",
+      "title_zh": "算法工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36385",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/长沙/济南/合肥",
+      "category_hint": "研发类-算法",
+      "responsibilities_summary_zh": "参与多领域算法研发与实验，覆盖AI、通信、影像等方向。",
+      "requirements_summary_zh": "计算机、人工智能、数学等相关专业，具备机器学习、编程和实验分析能力。",
+      "nearest_existing_job_ids": [
+        "recommendation",
+        "multimodal"
+      ],
+      "limitations": [
+        "详情接口仅指向岗位意向；职责与要求依据官网公开岗位意向全文概述，可能汇总多个岗位意向。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36393",
+      "source_posting_id": "36393",
+      "title_zh": "技术研究工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36393",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/长沙/济南/合肥",
+      "category_hint": "研发类-技术研究",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-training"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36388",
+      "source_posting_id": "36388",
+      "title_zh": "网络安全与隐私保护工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36388",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/长沙/济南",
+      "category_hint": "研发类-网络安全",
+      "responsibilities_summary_zh": "参与网络、数据和终端安全建设及隐私保护，支撑安全方案落地。",
+      "requirements_summary_zh": "网络空间安全、计算机等相关专业，掌握安全技术、编程和工程实践能力。",
+      "nearest_existing_job_ids": [
+        "security",
+        "privacy-computing"
+      ],
+      "limitations": [
+        "详情接口仅指向岗位意向；职责与要求依据官网公开岗位意向全文概述，可能汇总多个岗位意向。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-47357",
+      "source_posting_id": "47357",
+      "title_zh": "AI模型使能与优化服务工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=47357",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-06",
+      "freshness_basis": "更新于2026-11-06",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "全球",
+      "category_hint": "服务类-AI服务",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "inference-serving",
+        "model-service-gateway"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-46722",
+      "source_posting_id": "46722",
+      "title_zh": "算力平台交付项目经理",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=46722",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-02",
+      "freshness_basis": "更新于2026-11-02",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "全球",
+      "category_hint": "服务类-算力交付",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "cloud-sre"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-46720",
+      "source_posting_id": "46720",
+      "title_zh": "ICT网络技术工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=46720",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-02",
+      "freshness_basis": "更新于2026-11-02",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "全球",
+      "category_hint": "服务类-ICT网络",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "network",
+        "cloud-network"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-46719",
+      "source_posting_id": "46719",
+      "title_zh": "云计算服务工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=46719",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-02",
+      "freshness_basis": "更新于2026-11-02",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "全球",
+      "category_hint": "服务类-云服务",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "devops",
+        "cloud-sre"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36414",
+      "source_posting_id": "36414",
+      "title_zh": "芯片与器件设计高级工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36414",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-07-23",
+      "freshness_basis": "更新于2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/合肥",
+      "category_hint": "研发类-芯片",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "chip-verification",
+        "soc-chip-software"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36422",
+      "source_posting_id": "36422",
+      "title_zh": "网络安全与隐私保护研究员",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36422",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-07-23",
+      "freshness_basis": "更新于2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉",
+      "category_hint": "研发类-网络安全研究",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "security",
+        "llm-security"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36412",
+      "source_posting_id": "36412",
+      "title_zh": "算法研究员",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36412",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-07-23",
+      "freshness_basis": "更新于2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/长沙/济南/合肥",
+      "category_hint": "研发类-算法研究",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "recommendation",
+        "multimodal"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36411",
+      "source_posting_id": "36411",
+      "title_zh": "AI模型研究员",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36411",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-07-23",
+      "freshness_basis": "更新于2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/长沙/济南/合肥",
+      "category_hint": "研发类-AI模型研究",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-training"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36572",
+      "source_posting_id": "36572",
+      "title_zh": "AI安全与隐私研究员",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36572",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-07-23",
+      "freshness_basis": "更新于2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/长沙/济南",
+      "category_hint": "研发类-AI安全研究",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-security",
+        "data-security"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36415",
+      "source_posting_id": "36415",
+      "title_zh": "AI Infra研究员",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36415",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-07-23",
+      "freshness_basis": "更新于2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/长沙/济南/合肥",
+      "category_hint": "研发类-AI Infra研究",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-infra"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36424",
+      "source_posting_id": "36424",
+      "title_zh": "无线技术研究员",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36424",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-07-16",
+      "freshness_basis": "更新于2026-07-16",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/苏州",
+      "category_hint": "研发类-无线研究",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "communication-chip-software",
+        "high-speed-interconnect"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36421",
+      "source_posting_id": "36421",
+      "title_zh": "网络技术研究员",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36421",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-07-16",
+      "freshness_basis": "更新于2026-07-16",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/合肥",
+      "category_hint": "研发类-网络研究",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "network",
+        "cloud-network"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36420",
+      "source_posting_id": "36420",
+      "title_zh": "计算技术研究员",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36420",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-07-16",
+      "freshness_basis": "更新于2026-07-16",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/合肥",
+      "category_hint": "研发类-计算研究",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "distributed-training",
+        "gpu-cluster"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36419",
+      "source_posting_id": "36419",
+      "title_zh": "AI应用研究员",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36419",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-07-16",
+      "freshness_basis": "更新于2026-07-16",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州/长沙/济南/合肥",
+      "category_hint": "研发类-AI应用研究",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-app"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36413",
+      "source_posting_id": "36413",
+      "title_zh": "硬件技术高级工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36413",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-07-16",
+      "freshness_basis": "更新于2026-07-16",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州",
+      "category_hint": "研发类-硬件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "hardware-reliability-test"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "huawei-36400",
+      "source_posting_id": "36400",
+      "title_zh": "软件开发高级工程师",
+      "publisher": "华为",
+      "source_domain": "career.huawei.com",
+      "source_url": "https://career.huawei.com/cn/job-details?advertisementId=36400",
+      "source_page_url": "https://career.huawei.com/cn/campus-recruitment-job-list?recruitmentType=FRESH_GRADUATE",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-07-16",
+      "freshness_basis": "更新于2026-07-16",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳/上海/北京/南京/杭州/西安/东莞/成都/武汉/苏州",
+      "category_hint": "研发类-软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "backend",
+        "frontend"
+      ],
+      "limitations": [
+        "公开详情接口仅指向岗位意向，未读取完整岗位意向JD；职责与要求留空。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199908340004",
+      "source_posting_id": "199908340004",
+      "title_zh": "算法工程师-Agent User Alignment 算法研究",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199908340004",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-10",
+      "freshness_basis": "更新于 2026-11-10",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-AI研究",
+      "responsibilities_summary_zh": "研究Coding Agent用户对齐、奖励建模、强化学习和数据飞轮。",
+      "requirements_summary_zh": "计算机或人工智能相关，熟悉SFT/RL、奖励建模，能独立设计实验。",
+      "nearest_existing_job_ids": [
+        "llm-rl",
+        "agent-platform"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907680030",
+      "source_posting_id": "199907680030",
+      "title_zh": "算法工程师-供应链和定价 AI",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907680030",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-05",
+      "freshness_basis": "更新于 2026-11-05",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "杭州/上海",
+      "category_hint": "技术类-算法/运筹",
+      "responsibilities_summary_zh": "用预测、运筹、强化学习和大模型优化供应链与定价。",
+      "requirements_summary_zh": "机器学习、运筹等相关硕士，熟悉编程和业务抽象建模。",
+      "nearest_existing_job_ids": [
+        "operations-research",
+        "pricing-strategy"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907720108",
+      "source_posting_id": "199907720108",
+      "title_zh": "大模型新范式与前沿技术研究-阿里星",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907720108",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-04",
+      "freshness_basis": "更新于 2026-11-04",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-大模型研究",
+      "responsibilities_summary_zh": "探索下一代模型架构、原生多模态和可解释性。",
+      "requirements_summary_zh": "相关专业博士，具备数理基础、PyTorch和系统性研究经验。",
+      "nearest_existing_job_ids": [
+        "llm-training",
+        "multimodal"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199910320002",
+      "source_posting_id": "199910320002",
+      "title_zh": "大模型攻击和防御技术研究-阿里星",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199910320002",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-27",
+      "freshness_basis": "更新于 2026-10-27",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "杭州",
+      "category_hint": "技术类-大模型安全",
+      "responsibilities_summary_zh": "研究提示注入、越狱、投毒等攻击，建设防御与评测体系。",
+      "requirements_summary_zh": "安全或人工智能相关硕士，熟悉LLM、Python及攻防实战。",
+      "nearest_existing_job_ids": [
+        "llm-security",
+        "security"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907720035",
+      "source_posting_id": "199907720035",
+      "title_zh": "多模态Search Agent研究&应用-阿里星/C-Star",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907720035",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-27",
+      "freshness_basis": "更新于 2026-10-27",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "杭州",
+      "category_hint": "技术类-多模态Agent",
+      "responsibilities_summary_zh": "优化多模态Search Agent的强化学习、奖励体系和模型合版。",
+      "requirements_summary_zh": "相关专业硕博，有多模态、Agentic RL研究经验。",
+      "nearest_existing_job_ids": [
+        "multimodal",
+        "llm-app"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199910080010",
+      "source_posting_id": "199910080010",
+      "title_zh": "全模态实时双工视听交互-阿里星",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199910080010",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-22",
+      "freshness_basis": "更新于 2026-10-22",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-多模态交互",
+      "responsibilities_summary_zh": "研发实时双工多模态交互模型，优化流式协同、记忆与Agent机制。",
+      "requirements_summary_zh": "有多模态或生成模型资深背景及主流大模型实战经验。",
+      "nearest_existing_job_ids": [
+        "multimodal",
+        "aigc-video"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907820076",
+      "source_posting_id": "199907820076",
+      "title_zh": "AI运营专员",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907820076",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-19",
+      "freshness_basis": "更新于 2026-10-19",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "广州",
+      "category_hint": "游戏类-AI运营",
+      "responsibilities_summary_zh": "搭建Skill、工作流和Agent，运营AI工具并评估任务效果。",
+      "requirements_summary_zh": "理解大模型与Agent，具备流程编排、数据分析和文档能力。",
+      "nearest_existing_job_ids": [
+        "agent-platform",
+        "llm-app"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199908260001",
+      "source_posting_id": "199908260001",
+      "title_zh": "算法工程师-AI For Science",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199908260001",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-15",
+      "freshness_basis": "更新于 2026-10-15",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-AI for Science",
+      "responsibilities_summary_zh": "研发科学基础模型、多模态科学数据表征和智能科研Agent。",
+      "requirements_summary_zh": "人工智能或数学相关硕博，熟悉深度学习框架和科研项目。",
+      "nearest_existing_job_ids": [],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199910100002",
+      "source_posting_id": "199910100002",
+      "title_zh": "技术运营（AI / 开源生态方向）",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199910100002",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-14",
+      "freshness_basis": "更新于 2026-10-14",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "杭州",
+      "category_hint": "技术类-技术运营/开源",
+      "responsibilities_summary_zh": "运营模型与开源项目，推动发布、社区协作和生态集成。",
+      "requirements_summary_zh": "计算机或人工智能本科，理解模型部署与开源生态，具备技术传播能力。",
+      "nearest_existing_job_ids": [
+        "agent-platform",
+        "llm-app"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907740040",
+      "source_posting_id": "199907740040",
+      "title_zh": "AI应用算法工程师",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907740040",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-03",
+      "freshness_basis": "更新于 2026-09-03",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/广州/杭州/上海",
+      "category_hint": "技术类-AI应用算法",
+      "responsibilities_summary_zh": "设计RAG/Agent应用架构，建设数据飞轮、后训练与评测闭环。",
+      "requirements_summary_zh": "熟悉LLM、SFT/DPO/RL及Agent工程，具备Python能力。",
+      "nearest_existing_job_ids": [
+        "llm-app",
+        "llm-training"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907640058",
+      "source_posting_id": "199907640058",
+      "title_zh": "Agent Infra工程师",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907640058",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-03",
+      "freshness_basis": "更新于 2026-09-03",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/广州/杭州/上海/深圳",
+      "category_hint": "技术类-Agent Infra",
+      "responsibilities_summary_zh": "构建Agent运行时、沙箱、调度、状态与服务平台。",
+      "requirements_summary_zh": "熟悉后端、云原生、安全隔离和至少一种Agent框架。",
+      "nearest_existing_job_ids": [
+        "agent-platform",
+        "llm-app"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907620013",
+      "source_posting_id": "199907620013",
+      "title_zh": "AI应用研发工程师",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907620013",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-24",
+      "freshness_basis": "更新于 2026-08-24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/广州/杭州/厦门/上海/深圳",
+      "category_hint": "技术类-AI应用研发",
+      "responsibilities_summary_zh": "将业务问题转化为AI系统，开发Agent核心模块与知识环境。",
+      "requirements_summary_zh": "熟练使用AI编程工具，理解LLM、Agent及风险工程化。",
+      "nearest_existing_job_ids": [
+        "llm-app",
+        "agent-platform"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907720043",
+      "source_posting_id": "199907720043",
+      "title_zh": "AI Agent优化工程师-训练/数据/评测",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907720043",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-24",
+      "freshness_basis": "更新于 2026-08-24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-Agent优化",
+      "responsibilities_summary_zh": "建设训练数据、自动评测与后训练链路，优化真实业务AI应用。",
+      "requirements_summary_zh": "熟悉Transformer、后训练、RAG/Memory及分布式训练框架。",
+      "nearest_existing_job_ids": [
+        "llm-rl",
+        "llm-eval"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907640071",
+      "source_posting_id": "199907640071",
+      "title_zh": "AI数据工程师",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907640071",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-24",
+      "freshness_basis": "更新于 2026-08-24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-AI数据",
+      "responsibilities_summary_zh": "建设全模态数据处理、合成、标注与评测基础设施。",
+      "requirements_summary_zh": "熟悉Spark/Flink/Ray，理解LLM及大规模数据系统。",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "llm-training"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907820042",
+      "source_posting_id": "199907820042",
+      "title_zh": "AI SRE",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907820042",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-24",
+      "freshness_basis": "更新于 2026-08-24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/广州/杭州",
+      "category_hint": "技术类-SRE",
+      "responsibilities_summary_zh": "建设AI Ops、SRE Agent、可观测性和故障治理能力。",
+      "requirements_summary_zh": "熟悉分布式系统、云原生、Kubernetes及LLM/Agent技术。",
+      "nearest_existing_job_ids": [
+        "sre",
+        "cloud-sre"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907740037",
+      "source_posting_id": "199907740037",
+      "title_zh": "Agent 原子能力平台研发-阿里星",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907740037",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026-11-25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-Agent平台",
+      "responsibilities_summary_zh": "研发搜索、记忆、上下文、执行基础设施等Agent原子能力服务。",
+      "requirements_summary_zh": "博士应届，精通系统设计与编程，有Agent相关深入积累。",
+      "nearest_existing_job_ids": [
+        "agent-platform",
+        "llm-app"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907720116",
+      "source_posting_id": "199907720116",
+      "title_zh": "基于大模型的搜索算法研究与应用-阿里星/T-Star",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907720116",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-12",
+      "freshness_basis": "更新于 2026-11-12",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-搜索算法",
+      "responsibilities_summary_zh": "研究大模型检索、生成式排序、Search Agent和AI搜应用。",
+      "requirements_summary_zh": "计算机或人工智能硕博，熟悉机器学习、搜索及PyTorch。",
+      "nearest_existing_job_ids": [
+        "search-algorithm",
+        "llm-app"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199909780001",
+      "source_posting_id": "199909780001",
+      "title_zh": "多模态生成理解基础模型 - 阿里星",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199909780001",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-28",
+      "freshness_basis": "更新于 2026-09-28",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-多模态基础模型",
+      "responsibilities_summary_zh": "研发统一生成理解的多模态基础模型并推进强化学习落地。",
+      "requirements_summary_zh": "具备多模态训练、Agentic RL或扩散模型工程经验。",
+      "nearest_existing_job_ids": [
+        "multimodal",
+        "llm-training"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199909800001",
+      "source_posting_id": "199909800001",
+      "title_zh": "多模态音视频理解与生成研究与应用 - 阿里星",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199909800001",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-28",
+      "freshness_basis": "更新于 2026-09-28",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-音视频算法",
+      "responsibilities_summary_zh": "建设音视频理解生成模型、数据与评测体系并探索产品应用。",
+      "requirements_summary_zh": "计算机视觉、语音或人工智能相关，熟悉Python/C++及大规模模型研发。",
+      "nearest_existing_job_ids": [
+        "multimodal",
+        "aigc-video"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199909500009",
+      "source_posting_id": "199909500009",
+      "title_zh": "视频世界模型研发与应用-阿里星",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199909500009",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-16",
+      "freshness_basis": "更新于 2026-09-16",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-世界模型",
+      "responsibilities_summary_zh": "研发可交互视频世界模型、流式生成和3D/4D融合。",
+      "requirements_summary_zh": "计算机视觉或机器人相关硕士，熟悉3D、生成模型与SLAM等。",
+      "nearest_existing_job_ids": [
+        "world-model",
+        "aigc-video"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199909680004",
+      "source_posting_id": "199909680004",
+      "title_zh": "算法工程师-虚拟细胞建模",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199909680004",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-14",
+      "freshness_basis": "更新于 2026-09-14",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-AI for Science",
+      "responsibilities_summary_zh": "开发虚拟细胞基础模型、扰动响应预测和多模态组学建模。",
+      "requirements_summary_zh": "计算生物或生物信息学博士，熟悉PyTorch、单细胞组学与基础模型。",
+      "nearest_existing_job_ids": [],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199908580004",
+      "source_posting_id": "199908580004",
+      "title_zh": "AI产品经理-智能体",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199908580004",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-07",
+      "freshness_basis": "更新于 2026-09-07",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "杭州",
+      "category_hint": "产品类-AI Agent",
+      "responsibilities_summary_zh": "设计人机协作Agent产品，建立用户反馈和指标迭代闭环。",
+      "requirements_summary_zh": "计算机或人工智能等优先，理解AI技术，具备SQL/Python或开发能力。",
+      "nearest_existing_job_ids": [
+        "ai-agent-product",
+        "agent-platform-product"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907720103",
+      "source_posting_id": "199907720103",
+      "title_zh": "智能体运行时安全评测与防御关键技术研究-阿里星",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907720103",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-02",
+      "freshness_basis": "更新于 2026-09-02",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "杭州",
+      "category_hint": "技术类-Agent安全",
+      "responsibilities_summary_zh": "构建Agent运行时安全评测、轨迹分析和防御SDK。",
+      "requirements_summary_zh": "安全或人工智能相关硕士，熟悉Python/C++及Agent行为评测或沙箱。",
+      "nearest_existing_job_ids": [
+        "llm-security",
+        "ai-agent-test"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907780039",
+      "source_posting_id": "199907780039",
+      "title_zh": "云基础设施规划与交付数据工程师",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907780039",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-01",
+      "freshness_basis": "更新于 2026-09-01",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "杭州",
+      "category_hint": "技术类-云数据",
+      "responsibilities_summary_zh": "挖掘IDC容量与供需数据，支持资源规划、治理和交付策略。",
+      "requirements_summary_zh": "信息、统计或数据相关硕士，了解云基础设施并擅长数据分析。",
+      "nearest_existing_job_ids": [
+        "cloud-sre",
+        "data-analysis"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907680002",
+      "source_posting_id": "199907680002",
+      "title_zh": "AI产品经理-超级智能体",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907680002",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-28",
+      "freshness_basis": "更新于 2026-08-28",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/广州/杭州",
+      "category_hint": "产品类-AI",
+      "responsibilities_summary_zh": "参与千问产品规划、模型迭代、行业策略和评估体系。",
+      "requirements_summary_zh": "本科，深度使用大模型产品，具备创造力、逻辑和沟通能力。",
+      "nearest_existing_job_ids": [
+        "ai-agent-product",
+        "ai-product"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199909260001",
+      "source_posting_id": "199909260001",
+      "title_zh": "风险策略分析师",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199909260001",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-28",
+      "freshness_basis": "更新于 2026-08-28",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "杭州",
+      "category_hint": "风险管理类-风控策略",
+      "responsibilities_summary_zh": "建设国际站风控规则、模型和指标体系，治理账号与内容风险。",
+      "requirements_summary_zh": "计算机、数学或统计硕士，熟练Python/R/SQL，有风险策略经验优先。",
+      "nearest_existing_job_ids": [
+        "risk-control",
+        "pricing-strategy"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907620008",
+      "source_posting_id": "199907620008",
+      "title_zh": "安全领域基础大模型构建与应用-阿里星",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907620008",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-26",
+      "freshness_basis": "更新于 2026-08-26",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-安全大模型",
+      "responsibilities_summary_zh": "构建安全领域大模型、训练数据并嵌入安全产品。",
+      "requirements_summary_zh": "安全或人工智能相关硕士，熟悉Transformer、模型训练及安全细分领域。",
+      "nearest_existing_job_ids": [
+        "llm-security",
+        "data-security"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199909080003",
+      "source_posting_id": "199909080003",
+      "title_zh": "算法工程师-AI药物结构",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199909080003",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-24",
+      "freshness_basis": "更新于 2026-08-24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京/杭州",
+      "category_hint": "技术类-AI药物",
+      "responsibilities_summary_zh": "研发蛋白质结构预测、生成式蛋白设计和分子对接模型。",
+      "requirements_summary_zh": "计算生物或化学博士，熟悉PyTorch、Transformer和蛋白科学。",
+      "nearest_existing_job_ids": [
+        "molecule-generation"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907740016",
+      "source_posting_id": "199907740016",
+      "title_zh": "AI Infra研发工程师-广告引擎",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907740016",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-24",
+      "freshness_basis": "更新于 2026-08-24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "技术类-AI Infra",
+      "responsibilities_summary_zh": "优化广告大模型训练推理框架、异构算力和云原生平台。",
+      "requirements_summary_zh": "计算机相关本科，熟悉C/C++/Python、CUDA和AI编译器。",
+      "nearest_existing_job_ids": [
+        "ai-infra",
+        "ads-algorithm"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    },
+    {
+      "candidate_id": "alibaba-199907820009",
+      "source_posting_id": "199907820009",
+      "title_zh": "AI引擎研发工程师-C/C++",
+      "publisher": "阿里巴巴集团",
+      "source_domain": "campus-talent.alibaba.com",
+      "source_url": "https://campus-talent.alibaba.com/campus/position/199907820009",
+      "source_page_url": "https://campus-talent.alibaba.com/campus/position?batchId=100000760001",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-24",
+      "freshness_basis": "更新于 2026-08-24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "技术类-AI引擎",
+      "responsibilities_summary_zh": "用C/C++与Agent技术改造商业系统，优化异构算力和推理性能。",
+      "requirements_summary_zh": "计算机相关，熟悉C/C++/Python、CUDA、AI编译器与分布式系统。",
+      "nearest_existing_job_ids": [
+        "inference-serving",
+        "gpu-operator-opt"
+      ],
+      "limitations": [
+        "职责与要求来自官网公开职位搜索接口完整字段；更新日由 modifyTime 按 Asia/Shanghai 换算，详情页未另行打开。"
+      ]
+    }
+  ]
+}

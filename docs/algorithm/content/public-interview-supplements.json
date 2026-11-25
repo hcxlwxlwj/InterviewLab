@@ -20,6 +20,13 @@
     "public-interview-candidates.csv": "543a8469faf99af1eebedcfdffa39ea356d09290bb276af7b44caf535e30b3e9",
     "public-interview-sources.csv": "82290491959e2c11fbd0b362a4ff5f6164c21d824fe4681332c0c55aa2a26868"
   },
+  "input_sha256_note": "input_sha256记录本题库构建时的输入快照；jobs.json在后续内容合并后变化，sources.csv在补充访问复核后变化，均保留历史哈希以便追溯。",
+  "current_sha256": {
+    "jobs.json": "68b89158420a80e106bd9cc11d15a70f28e74c10c687cd643fca197b62d5e8bb",
+    "job-classification.csv": "90fa3d78db58fe06ddd913e142bd9f096f2f6004c0a0d2923ad2ba3ad9a7b655",
+    "public-interview-candidates.csv": "f67f7c236a66cfebd9bfe360700e71764e45d197f47aa27abaae64706c2098f0",
+    "public-interview-sources.csv": "971a9f973072ea853a2042093c3d3896ff3f4ba8b1eaf7e061a214af676a170e"
+  },
   "preservation": {
     "published_job_count": 1269,
     "published_question_count": 10148,
@@ -28,8 +35,8 @@
   },
   "mapping_policy": [
     "候选题按一级大类与岗位族映射到一个代表岗位，不复制到同族全部岗位。",
-    "eligible_job_ids仅表示可复用范围，不代表这些岗位已经加载或发布候选题。",
-    "runtime_enabled为false，候选题不进入已发布岗位主问题、检索提纲或面试流程。",
+    "eligible_job_ids仅表示可复用范围，不代表候选题被复制进这些岗位的主问题列表。",
+    "runtime_enabled为true时，候选题只在独立补充层参与检索与准备材料，不写入岗位主问题、不生成岗位提纲，也不改变原题配比。",
     "只有真人审核将human_approved与release_eligible同时改为true后，才可另行设计受控启用流程。",
     "48道题作为独立补充层运行，不并入主题库，也不改变原有代表岗位的题型配比。",
     "补充题保留本地来源ID、URL与匿名化限制；仅加入同岗位族的新增岗位适用范围。",

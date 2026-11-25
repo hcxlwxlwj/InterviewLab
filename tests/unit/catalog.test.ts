@@ -9,7 +9,12 @@ import {
   localKnowledgeRetriever,
   searchJobs,
 } from '@interviewlab/backend/content';
-import { createJobCatalog, knowledgeEntries } from '@interviewlab/core';
+import {
+  createJobCatalog,
+  knowledgeEntries,
+  questionInterviewTypes,
+  type KnowledgeQuestion,
+} from '@interviewlab/core';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
@@ -283,6 +288,35 @@ test('structured interview knowledge combines active main and applicable supplem
     knowledge.questions.some((item) => item.id === 'public-interview-fe-c001' && item.difficulty === '进阶'),
   );
   assert.ok(knowledge.sources.some((source) => question.source_refs.includes(source.id)));
+  assert.ok(
+    knowledge.questions.slice(0, 8).some((item) => item.id.startsWith('public-interview-')),
+  );
+
+  const technical = await structuredInterviewKnowledge.read({
+    job: 'ai-product',
+    career_stage: 'internship',
+    interview_type: 'technical_qa',
+    difficulty: '基础',
+    duration_minutes: 10,
+    interviewer_style: '标准',
+    interaction_mode: 'text_fallback',
+  });
+  assert.equal(technical.questions.length, 0);
+  const frontendTechnical = await structuredInterviewKnowledge.read({
+    job: 'frontend',
+    career_stage: 'internship',
+    interview_type: 'technical_qa',
+    difficulty: '基础',
+    duration_minutes: 10,
+    interviewer_style: '标准',
+    interaction_mode: 'text_fallback',
+  });
+  assert.ok(frontendTechnical.questions.length);
+  assert.ok(
+    frontendTechnical.questions.every((item) =>
+      questionInterviewTypes(item as KnowledgeQuestion).includes('technical_qa'),
+    ),
+  );
 
   const advancedOnlyJob = getJob('ecommerce-llm-train')!;
   const fallback = await structuredInterviewKnowledge.read({
@@ -338,6 +372,15 @@ test('structured retrieval filters role, stage, topic and supported difficulty w
   assert.equal(
     (await localKnowledgeRetriever.retrieve({ job_id: 'ai-product', difficulty: '挑战' })).items
       .length,
+    0,
+  );
+  assert.equal(
+    (
+      await localKnowledgeRetriever.retrieve({
+        job_id: 'ai-product',
+        interview_type: 'technical_qa',
+      })
+    ).items.length,
     0,
   );
   await assert.rejects(() => localKnowledgeRetriever.retrieve({ job_id: 'retired-or-unknown' }));

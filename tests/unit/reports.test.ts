@@ -331,7 +331,10 @@ test('frontend report references cover catalog questions without guessing unknow
     '../../code/backend/src/modules/interviews/frontend-reference'
   );
   const state = fixture().state;
-  const knowledge = await structuredInterviewKnowledge.read(state.view.configuration);
+  const knowledge = await structuredInterviewKnowledge.read({
+    ...state.view.configuration,
+    interview_type: 'technical_qa',
+  });
   const mainQuestions = knowledge.questions.filter((question) => question.id.startsWith('frontend-q'));
   assert.equal(mainQuestions.length, 8);
   for (const question of mainQuestions) {
@@ -354,7 +357,10 @@ test('report analysis sends frozen professional reference to the model', async (
     '../../code/backend/src/modules/interviews/knowledge'
   );
   const { state, turn, evaluation } = fixture();
-  const knowledge = await structuredInterviewKnowledge.read(state.view.configuration);
+  const knowledge = await structuredInterviewKnowledge.read({
+    ...state.view.configuration,
+    interview_type: 'technical_qa',
+  });
   turn.knowledge_question_id = knowledge.questions[0].id;
   turn.topic = knowledge.questions[0].topic;
   let received: unknown;

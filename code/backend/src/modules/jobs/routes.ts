@@ -27,8 +27,8 @@ const sourceSchema = z.object({
   acquired_at: z.string(),
   reviewed_at: z.string(),
   notes: z.string(),
-  published_at: z.string().optional(),
-  freshness_date: z.string().optional(),
+  published_at: z.string().nullable().optional(),
+  freshness_date: z.string().nullable().optional(),
   evidence_grade: z.enum(['A', 'B', 'C', 'D']).optional(),
 }) satisfies z.ZodType<ContentSource>;
 const questionSchema = z.object({

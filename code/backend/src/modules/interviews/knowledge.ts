@@ -17,11 +17,15 @@ export const structuredInterviewKnowledge: InterviewKnowledgeProvider = {
     const mainQuestions = result.items.some((question) => question.difficulty === '基础')
       ? result.items.filter((question) => question.difficulty === '基础')
       : result.items;
+    const ratedMainQuestions =
+      config.job === 'frontend' ? mainQuestions.map(withFrontendReportReference) : mainQuestions;
+    const supplementPriority = Math.min(result.supplemental_questions.length, 2);
+    // Keep supplemental evidence inside the eight-item preparation budget without displacing the main six.
     const questions = [
-      ...(config.job === 'frontend'
-        ? mainQuestions.map(withFrontendReportReference)
-        : mainQuestions),
-      ...result.supplemental_questions,
+      ...ratedMainQuestions.slice(0, 6),
+      ...result.supplemental_questions.slice(0, supplementPriority),
+      ...ratedMainQuestions.slice(6),
+      ...result.supplemental_questions.slice(supplementPriority),
     ];
     const supplementVersion = PUBLIC_INTERVIEW_SUPPLEMENTS.questions.reduce(
       (version, question) => Math.max(version, question.version),

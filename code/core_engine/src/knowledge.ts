@@ -127,7 +127,8 @@ export function createJobCatalog(
             isActiveQuestion(q) &&
             (!query.stage || q.stages.includes(query.stage)) &&
             (!query.topic || q.topic === query.topic) &&
-            (!query.difficulty || q.difficulty === query.difficulty),
+            (!query.difficulty || q.difficulty === query.difficulty) &&
+            (!query.interview_type || questionInterviewTypes(q).includes(query.interview_type)),
         ),
         supplemental_questions: supplementalQuestions,
         sources: CONTENT_SOURCES.filter((source) => sourceRefs.has(source.id)),

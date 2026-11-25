@@ -2,7 +2,7 @@
   "taxonomy_version": "role-taxonomy-v2",
   "status": "pending_review",
   "created_at": "2026-11-25",
-  "coverage_target": 1000,
+  "coverage_target": 1269,
   "primary_class_rule": "每个岗位必须有且只有一个一级大类；业务场景、行业、阶段和技术栈作为标签，不膨胀成新岗位。",
   "preservation_rule": "保留现有1000个岗位的ID、标题、版本和发布状态，本文件只新增分类元数据。",
   "classes": [

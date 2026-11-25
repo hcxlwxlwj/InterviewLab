@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildApp } from '../../code/backend/src/server/app';
+import { JOBS } from '../../code/backend/src/content/index';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 import { requireIdentity, requireSameOrigin } from '../../code/backend/src/foundation/auth';
 import { inputDigest } from '../../code/backend/src/foundation/idempotency';
@@ -79,6 +80,19 @@ test('published catalog has stable opaque cursors, filters and embedded sources'
   assert.ok(
     detail.sources.every((source: { id: string }) => detail.source_refs.includes(source.id)),
   );
+  const latestJobs = JOBS.filter((job) => job.id.startsWith('latest-role-'));
+  assert.equal(latestJobs.length, 269);
+  for (const job of latestJobs) {
+    const response = await app.inject(`/api/v1/job-templates/${job.id}`);
+    assert.equal(response.statusCode, 200, job.id);
+    const latest = response.json();
+    assert.ok(latest.sources.length > 0);
+    assert.ok(
+      latest.sources.some(
+        (source: { freshness_date?: string | null }) => source.freshness_date === null,
+      ),
+    );
+  }
   assert.ok((await app.inject('/api/v1/job-categories')).json().items.length > 0);
   assert.equal((await app.inject('/api/v1/job-templates/not-published')).statusCode, 404);
   assert.equal(

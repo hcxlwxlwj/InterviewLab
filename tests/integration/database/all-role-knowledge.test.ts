@@ -139,8 +139,10 @@ test(
                   )
                 ).rowCount,
               );
-              if (type === 'hr')
-                assert.ok(['job_profile', 'interview_method'].includes(chunk.kind!));
+              if (type === 'hr') {
+                if (chunk.kind === 'question') assert.ok(chunk.types.includes('hr'));
+                else assert.ok(['job_profile', 'interview_method'].includes(chunk.kind!));
+              }
             }
           }
         }

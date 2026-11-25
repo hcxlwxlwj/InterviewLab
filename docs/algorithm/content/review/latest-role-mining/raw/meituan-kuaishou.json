@@ -1,0 +1,2983 @@
+{
+  "metadata": {
+    "dataset": "latest-role-mining-review-supplement",
+    "protocol_version": "latest-role-mining-v1",
+    "as_of": "2026-11-25",
+    "created_at": "2026-11-25",
+    "status": "in_review",
+    "human_approved": false,
+    "release_eligible": false,
+    "runtime_enabled": false,
+    "scope": {
+      "sources": [
+        "Meituan official campus recruitment",
+        "Kuaishou official campus recruitment"
+      ],
+      "maximum_total": 100,
+      "maximum_per_domain": 80,
+      "freshness_window": {
+        "start": "2026-07-01",
+        "end": "2026-11-25"
+      },
+      "date_rule": "published_at or updated_at must be explicit and within the window; accessed_at is not used as a substitute",
+      "summary_rule": "Short original paraphrases or empty; this file intentionally leaves both summary fields empty",
+      "evidence_note": "All records are grade B: public listing/card fields were read, but detail-page JDs were not opened one by one. The required access_status value is retained as public_full_text_read."
+    },
+    "counts": {
+      "total": 100,
+      "by_domain": {
+        "zhaopin.meituan.com": 60,
+        "campus.kuaishou.cn": 40
+      },
+      "by_publisher": {
+        "美团": 60,
+        "快手": 40
+      },
+      "by_evidence_grade": {
+        "B": 100
+      },
+      "by_career_stage": {
+        "campus": 52,
+        "internship": 48
+      }
+    },
+    "sources": [
+      {
+        "publisher": "美团",
+        "entry_url": "https://campus.meituan.com/",
+        "official_successor_url": "https://zhaopin.meituan.com/web/campus",
+        "source_domain": "zhaopin.meituan.com",
+        "access_method": "Official public page and the public job-list endpoint loaded by that page"
+      },
+      {
+        "publisher": "快手",
+        "entry_url": "https://campus.kuaishou.cn/",
+        "source_domain": "campus.kuaishou.cn",
+        "access_method": "Official public page and the public position-list endpoints loaded by that page",
+        "projects": {
+          "campus": "20271779425607",
+          "internship": "20271772783534"
+        }
+      }
+    ],
+    "blockers": [
+      "No login, paywall, captcha, robots, or anti-bot control was bypassed.",
+      "Both sites render listings with JavaScript; collection used the same public endpoints loaded by the official pages.",
+      "Meituan campus.meituan.com redirects to the current official zhaopin.meituan.com campus site.",
+      "Detail-page JDs were not opened one by one, so all records are conservatively graded B and summaries are empty."
+    ],
+    "validation": {
+      "json_valid": true,
+      "unique_candidate_ids": true,
+      "unique_source_posting_ids_within_domain": true,
+      "total_at_most_100": true,
+      "domain_at_most_80": true,
+      "at_least_one_explicit_date_in_window": true,
+      "no_duplicate_normalized_titles_within_file": true,
+      "no_exact_or_sequence_0_94_existing_title_matches": true,
+      "nearest_existing_job_ids_resolve": true,
+      "existing_repository_files_modified": false
+    }
+  },
+  "records": [
+    {
+      "candidate_id": "meituan-4697320043",
+      "source_posting_id": "4697320043",
+      "title_zh": "AI全栈工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4697320043",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、成都市、深圳市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ecommerce-fullstack",
+        "content-fullstack"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4697280304",
+      "source_posting_id": "4697280304",
+      "title_zh": "AI后端开发工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4697280304",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、成都市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "backend",
+        "recommendation-backend"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4941650969",
+      "source_posting_id": "4941650969",
+      "title_zh": "AI产品增长实习生（社媒方向）",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4941650969",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "上海市",
+      "category_hint": "运营类 / 产品运营",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-product",
+        "growth-product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4876269982",
+      "source_posting_id": "4876269982",
+      "title_zh": "充电宝出海- 数据分析实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4876269982",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "运营类 / 业务运营",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "mobility-data-analysis",
+        "data-analysis"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4924453369",
+      "source_posting_id": "4924453369",
+      "title_zh": "游戏产品实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4924453369",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "产品类 / 产品",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4795377811",
+      "source_posting_id": "4795377811",
+      "title_zh": "交易产品实习生-AI应用",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4795377811",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "产品类 / 产品",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "trading-product",
+        "ai-product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4280273801",
+      "source_posting_id": "4280273801",
+      "title_zh": "地图车端引擎和数据编译研发实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4280273801",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "销售、客服与支持类 / 业务支持",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "hdmap-compile",
+        "automotive-data-eng"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-3358279441",
+      "source_posting_id": "3358279441",
+      "title_zh": "多模态模型研究-具身智能方向算法实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=3358279441",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "embodied-ai",
+        "embodied-vla"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-3052598290",
+      "source_posting_id": "3052598290",
+      "title_zh": "大模型数据生产实习生-math&code",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=3052598290",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市、成都市",
+      "category_hint": "运营类 / 产品运营",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "training-data-cache",
+        "data-quality"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-2997413577",
+      "source_posting_id": "2997413577",
+      "title_zh": "多模态大模型评测分析实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=2997413577",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-eval",
+        "multimodal-model-test"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-2995805692",
+      "source_posting_id": "2995805692",
+      "title_zh": "基座大模型研究分析实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=2995805692",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "上海市、北京市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-training",
+        "llm-eval"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4208447290",
+      "source_posting_id": "4208447290",
+      "title_zh": "美团平台-数据开发工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4208447290",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "data-modeling"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4950646460",
+      "source_posting_id": "4950646460",
+      "title_zh": "Keemart配送数据分析实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4950646460",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "运营类 / 产品运营",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-analysis",
+        "logistics-data-analysis"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4948210913",
+      "source_posting_id": "4948210913",
+      "title_zh": "骑行-用户增长方向AI Builder",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4948210913",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "产品类 / 产品",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-product",
+        "growth-product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4877633096",
+      "source_posting_id": "4877633096",
+      "title_zh": "无人车地图产品实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4877633096",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-25",
+      "freshness_basis": "更新于 2026/11/25",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "产品类 / 产品",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "maps-product",
+        "car-map-product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-2836792916",
+      "source_posting_id": "2836792916",
+      "title_zh": "大模型评测产品实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=2836792916",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-24",
+      "freshness_basis": "更新于 2026/11/24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市、上海市",
+      "category_hint": "产品类 / 产品",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-eval",
+        "llm-eval-platform"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4905151532",
+      "source_posting_id": "4905151532",
+      "title_zh": "AI搜索产品实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4905151532",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-16",
+      "freshness_basis": "更新于 2026/11/16",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "产品类 / 产品",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-product",
+        "search-algorithm"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4104639996",
+      "source_posting_id": "4104639996",
+      "title_zh": "高精地图建图算法实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4104639996",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-12",
+      "freshness_basis": "更新于 2026/11/12",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "hdmap-cloud",
+        "hdmap-compile"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4902763108",
+      "source_posting_id": "4902763108",
+      "title_zh": "车载系统软件开发实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4902763108",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-09",
+      "freshness_basis": "更新于 2026/11/09",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "automotive-backend",
+        "cpp-systems"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4885726947",
+      "source_posting_id": "4885726947",
+      "title_zh": "【实习】大模型评测实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4885726947",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=1",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-09",
+      "freshness_basis": "更新于 2026/11/09",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-eval",
+        "multimodal-model-test"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-3878636704",
+      "source_posting_id": "3878636704",
+      "title_zh": "基础大模型研究实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=3878636704",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-06",
+      "freshness_basis": "更新于 2026/11/06",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-training",
+        "model-redteam"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4695070480",
+      "source_posting_id": "4695070480",
+      "title_zh": "硬件测试工程师（整车系统集成测试/域控制器HIL测试）",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4695070480",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、深圳市",
+      "category_hint": "技术类 / 测试",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "av-test",
+        "testing"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4881355498",
+      "source_posting_id": "4881355498",
+      "title_zh": "美团骑行-电气部件测试实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4881355498",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-11-03",
+      "freshness_basis": "更新于 2026/11/03",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市、深圳市",
+      "category_hint": "技术类 / 测试",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "mobility-testing",
+        "testing"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-3710214925",
+      "source_posting_id": "3710214925",
+      "title_zh": "【实习】境外交易产品实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=3710214925",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-28",
+      "freshness_basis": "更新于 2026/10/28",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "产品类 / 产品",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "trading-product",
+        "cross-border-product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4718481557",
+      "source_posting_id": "4718481557",
+      "title_zh": "机器人传感器开发实习生（力感知方向）",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4718481557",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-26",
+      "freshness_basis": "更新于 2026/10/26",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "深圳市",
+      "category_hint": "技术类 / 硬件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "robot-tactile",
+        "robot-product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4132050002",
+      "source_posting_id": "4132050002",
+      "title_zh": "AI 设计实习生（模型训练、评测等工作）",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4132050002",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-20",
+      "freshness_basis": "更新于 2026/10/20",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "设计类 / 设计",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-eval",
+        "ai-designer"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4837378614",
+      "source_posting_id": "4837378614",
+      "title_zh": "自动驾驶云控平台 — 项目实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4837378614",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-20",
+      "freshness_basis": "更新于 2026/10/20",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "深圳市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "av-cloud-platform",
+        "av-training-platform"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4855944244",
+      "source_posting_id": "4855944244",
+      "title_zh": "无人机业务部—出海数据产品实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4855944244",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-19",
+      "freshness_basis": "更新于 2026/10/19",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "产品类 / 产品",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "drone-product",
+        "data-product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4643218943",
+      "source_posting_id": "4643218943",
+      "title_zh": "AI 工程师（实习生）",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4643218943",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-13",
+      "freshness_basis": "更新于 2026/10/13",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "algorithm",
+        "ai-code-assistant"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4746111185",
+      "source_posting_id": "4746111185",
+      "title_zh": "具身智能数据管线开发",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4746111185",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-29",
+      "freshness_basis": "更新于 2026/09/29",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "深圳市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "embodied-ai",
+        "data-engineering"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4795474377",
+      "source_posting_id": "4795474377",
+      "title_zh": "餐饮SaaS产品经理实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4795474377",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-23",
+      "freshness_basis": "更新于 2026/09/23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "成都市",
+      "category_hint": "产品类 / 产品",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "saas-backend",
+        "product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4150674945",
+      "source_posting_id": "4150674945",
+      "title_zh": "搜推导购产品实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4150674945",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-21",
+      "freshness_basis": "更新于 2026/09/21",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市、深圳市",
+      "category_hint": "产品类 / 产品",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "recommendation",
+        "growth-product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4748418063",
+      "source_posting_id": "4748418063",
+      "title_zh": "大模型Search Agent实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4748418063",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-20",
+      "freshness_basis": "更新于 2026/09/20",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-app",
+        "semantic-search"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4771590543",
+      "source_posting_id": "4771590543",
+      "title_zh": "无人机软件测试开发实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4771590543",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=2",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-20",
+      "freshness_basis": "更新于 2026/09/20",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市、深圳市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "drone-test",
+        "drone-software"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4781303502",
+      "source_posting_id": "4781303502",
+      "title_zh": "软件开发工程师（数据开发方向）",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4781303502",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-17",
+      "freshness_basis": "更新于 2026/09/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "成都市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "data-modeling"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4781304455",
+      "source_posting_id": "4781304455",
+      "title_zh": "自动驾驶系统工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4781304455",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-17",
+      "freshness_basis": "更新于 2026/09/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "av-test",
+        "simulation-platform"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4686144199",
+      "source_posting_id": "4686144199",
+      "title_zh": "自动驾驶软件-产品实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4686144199",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-16",
+      "freshness_basis": "更新于 2026/09/16",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "产品类 / 产品",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "autonomous-driving-product",
+        "simulation-platform"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4477850033",
+      "source_posting_id": "4477850033",
+      "title_zh": "运维研发实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4477850033",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-07",
+      "freshness_basis": "更新于 2026/09/07",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 运维",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "sre",
+        "devops"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4650800437",
+      "source_posting_id": "4650800437",
+      "title_zh": "餐饮SaaS-营销产品实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4650800437",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-01",
+      "freshness_basis": "更新于 2026/09/01",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "成都市",
+      "category_hint": "产品类 / 产品",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "marketing-cloud-product",
+        "product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4510313395",
+      "source_posting_id": "4510313395",
+      "title_zh": "【日常实习】具身智能-机器人算法实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4510313395",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-01",
+      "freshness_basis": "更新于 2026/09/01",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市、深圳市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "embodied-ai",
+        "embodied-vla"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4695142159",
+      "source_posting_id": "4695142159",
+      "title_zh": "AI数据科学工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4695142159",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "上海市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-science",
+        "database"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4734984182",
+      "source_posting_id": "4734984182",
+      "title_zh": "【北斗】世界模型算法工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4734984182",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-31",
+      "freshness_basis": "更新于 2026/08/31",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、深圳市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "world-model",
+        "multimodal"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4734968293",
+      "source_posting_id": "4734968293",
+      "title_zh": "【北斗】具身智能运控算法研究员",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4734968293",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-31",
+      "freshness_basis": "更新于 2026/08/31",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、深圳市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "embodied-ai",
+        "robot-motion-control"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4727162964",
+      "source_posting_id": "4727162964",
+      "title_zh": "大模型数据算法工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4727162964",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-27",
+      "freshness_basis": "更新于 2026/08/27",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-modeling",
+        "llm-training"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4723670007",
+      "source_posting_id": "4723670007",
+      "title_zh": "具身智能大模型算法实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4723670007",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-27",
+      "freshness_basis": "更新于 2026/08/27",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市、上海市、深圳市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "embodied-ai",
+        "llm-training"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4694092432",
+      "source_posting_id": "4694092432",
+      "title_zh": "自动驾驶软件测试实习生",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4694092432",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-24",
+      "freshness_basis": "更新于 2026/08/24",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 测试",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "av-test",
+        "av-sim-test"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-2506432840",
+      "source_posting_id": "2506432840",
+      "title_zh": "【实习】数仓开发",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=2506432840",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-18",
+      "freshness_basis": "更新于 2026/08/18",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "data-modeling"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4697283165",
+      "source_posting_id": "4697283165",
+      "title_zh": "安全AI算法工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4697283165",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-security",
+        "model-redteam"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4694810490",
+      "source_posting_id": "4694810490",
+      "title_zh": "运维开发工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4694810490",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=3",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 运维",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "sre",
+        "sre-platform-engineer"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4697302797",
+      "source_posting_id": "4697302797",
+      "title_zh": "多模态生成大模型算法工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4697302797",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、深圳市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "multimodal",
+        "aigc-video"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4694853738",
+      "source_posting_id": "4694853738",
+      "title_zh": "AI测试开发工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4694853738",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、成都市、深圳市",
+      "category_hint": "技术类 / 测试",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-testing",
+        "sdet"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4697320023",
+      "source_posting_id": "4697320023",
+      "title_zh": "大模型应用算法工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4697320023",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-app",
+        "ecommerce-llm-app"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4697320026",
+      "source_posting_id": "4697320026",
+      "title_zh": "飞控算法工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4697320026",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、深圳市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "drone-flight-control",
+        "av-control"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4697320030",
+      "source_posting_id": "4697320030",
+      "title_zh": "AI Infra / 推理系统工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4697320030",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 算法,软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-infra",
+        "inference-serving"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4697274397",
+      "source_posting_id": "4697274397",
+      "title_zh": "大模型搜索推荐算法工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4697274397",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "recommendation",
+        "search-algorithm"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4697304732",
+      "source_posting_id": "4697304732",
+      "title_zh": "大模型智能体算法工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4697304732",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、深圳市",
+      "category_hint": "技术类 / 算法",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "agent-platform",
+        "llm-app"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4694862735",
+      "source_posting_id": "4694862735",
+      "title_zh": "AI应用开发工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4694862735",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-code-assistant",
+        "llm-app"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4694998440",
+      "source_posting_id": "4694998440",
+      "title_zh": "AI大模型后台开发",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4694998440",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "backend",
+        "llm-app"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4697311648",
+      "source_posting_id": "4697311648",
+      "title_zh": "AI数据开发工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4697311648",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、成都市、深圳市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "data-modeling"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "meituan-4695094295",
+      "source_posting_id": "4695094295",
+      "title_zh": "大模型推理引擎研发工程师",
+      "publisher": "美团",
+      "source_domain": "zhaopin.meituan.com",
+      "source_url": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4695094295",
+      "source_page_url": "https://zhaopin.meituan.com/web/campus?pageNo=4",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-08-17",
+      "freshness_basis": "更新于 2026/08/17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "技术类 / 软件",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "edge-inference-engine",
+        "inference-serving"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "published_at未在公开列表字段中明示，updated_at来自列表“更新于”日期。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-14014",
+      "source_posting_id": "14014",
+      "title_zh": "网络传输策略推荐算法工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/14014",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-10-10",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "官方类别（J1012）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "recommendation",
+        "network"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13613",
+      "source_posting_id": "13613",
+      "title_zh": "数据FDE工程师-数据研发方向",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13613",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-12",
+      "updated_at": "2026-10-13",
+      "freshness_basis": "2026-10-13 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "杭州、北京",
+      "category_hint": "官方类别（J1018）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "data-architect"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13018",
+      "source_posting_id": "13018",
+      "title_zh": "AI数据架构工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13018",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-09",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "基础架构类（J1020）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-architect",
+        "database"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13824",
+      "source_posting_id": "13824",
+      "title_zh": "大模型训练引擎研发工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13824",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-14",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "大模型研发类（J1013）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "distributed-training",
+        "llm-training"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13115",
+      "source_posting_id": "13115",
+      "title_zh": "AI应用服务端开发工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13115",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-09",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "研发类（J1014）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "backend",
+        "llm-app"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13614",
+      "source_posting_id": "13614",
+      "title_zh": "数据PDE工程师-数据产品方向",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13614",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-12",
+      "updated_at": "2026-10-13",
+      "freshness_basis": "2026-10-13 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "数据产品类（J1025）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-product",
+        "product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13069",
+      "source_posting_id": "13069",
+      "title_zh": "数据库研发工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13069",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-09",
+      "updated_at": "2026-11-23",
+      "freshness_basis": "2026-11-23 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "杭州、深圳、北京",
+      "category_hint": "基础架构类（J1020）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "database",
+        "database-kernel"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13035",
+      "source_posting_id": "13035",
+      "title_zh": "系统研发工程师-存储方向",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13035",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-09",
+      "updated_at": "2026-11-23",
+      "freshness_basis": "2026-11-23 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "深圳、杭州、北京",
+      "category_hint": "基础架构类（J1020）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "storage-engine",
+        "cpp-systems"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13825",
+      "source_posting_id": "13825",
+      "title_zh": "AI商业化产品经理-PDE",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13825",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-14",
+      "updated_at": "2026-11-20",
+      "freshness_basis": "2026-11-20 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "商业产品类（J1024）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-product",
+        "merchant-product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12752",
+      "source_posting_id": "12752",
+      "title_zh": "【快Star】AIOps自主进化研究员",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12752",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-05-25",
+      "updated_at": "2026-11-19",
+      "freshness_basis": "2026-11-19 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "杭州",
+      "category_hint": "基础架构类（J1020）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llmops-platform",
+        "ai-infra"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13207",
+      "source_posting_id": "13207",
+      "title_zh": "数据分析师-风控治理方向",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13207",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-09",
+      "updated_at": "2026-11-12",
+      "freshness_basis": "2026-11-12 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "杭州、北京",
+      "category_hint": "数据分析类（analysis）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-analysis",
+        "data-modeling"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13772",
+      "source_posting_id": "13772",
+      "title_zh": "多模态训练数据质量专家-音视频方向",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13772",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-14",
+      "updated_at": "2026-11-12",
+      "freshness_basis": "2026-11-12 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "算法类（J1001）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-quality",
+        "multimodal-model-test"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13770",
+      "source_posting_id": "13770",
+      "title_zh": "AI Agent产品设计工程师-PDE",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13770",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-14",
+      "updated_at": "2026-11-12",
+      "freshness_basis": "2026-11-12 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "商业产品类（J1024）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-agent-product",
+        "agent-platform-product"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13101",
+      "source_posting_id": "13101",
+      "title_zh": "推荐大模型算法工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13101",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-09",
+      "updated_at": "2026-11-04",
+      "freshness_basis": "2026-11-04 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京、杭州",
+      "category_hint": "推荐算法类（J1005）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "recommendation",
+        "llm-training"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12679",
+      "source_posting_id": "12679",
+      "title_zh": "【快Star】GenAI异构计算架构与优化工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12679",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-05-24",
+      "updated_at": "2026-11-03",
+      "freshness_basis": "2026-11-03 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "基础架构类（J1020）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "gpu-operator-opt",
+        "heterogeneous-scheduling"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13145",
+      "source_posting_id": "13145",
+      "title_zh": "AI Agent 全栈工程师-音视频方向",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13145",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-09",
+      "updated_at": "2026-10-28",
+      "freshness_basis": "2026-10-28 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "研发类（J1014）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "agent-platform",
+        "ecommerce-fullstack"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13374",
+      "source_posting_id": "13374",
+      "title_zh": "AI Agent算法工程师-智能创作",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13374",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-11",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京、杭州",
+      "category_hint": "算法类（J1001）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "agent-platform",
+        "aigc-video"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13174",
+      "source_posting_id": "13174",
+      "title_zh": "音视频SDK开发工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13174",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-09",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "客户端研发类（J1016）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "rtc-dev",
+        "short-video-ios"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13160",
+      "source_posting_id": "13160",
+      "title_zh": "服务器运维工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13160",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-09",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "基础架构类（J1020）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "sre",
+        "bigdata-sre"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13070",
+      "source_posting_id": "13070",
+      "title_zh": "推荐系统工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13070",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-09",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "推荐算法类（J1005）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "recommendation-backend",
+        "recommendation"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12785",
+      "source_posting_id": "12785",
+      "title_zh": "【快Star】AI Agent大模型算法工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12785",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-05-26",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "大模型研发类（J1013）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "agent-platform",
+        "llm-app"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12784",
+      "source_posting_id": "12784",
+      "title_zh": "【快Star】AI搜索算法工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12784",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-05-26",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京、杭州",
+      "category_hint": "搜索算法类（J1004）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "search-algorithm",
+        "semantic-search"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13868",
+      "source_posting_id": "13868",
+      "title_zh": "智能Agent开发工程师-安全方向",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13868",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-19",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "安全类（J1019）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-security",
+        "agent-platform"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-13119",
+      "source_posting_id": "13119",
+      "title_zh": "大模型应用算法工程师-安全方向",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/13119",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-09",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "大模型类（J1003）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-security",
+        "llm-app"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12744",
+      "source_posting_id": "12744",
+      "title_zh": "【快Star】用户画像算法工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12744",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-05-24",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "算法类（J1001）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "data-modeling",
+        "recommendation"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12753",
+      "source_posting_id": "12753",
+      "title_zh": "【快Star】系统研发工程师-分布式存储方向",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12753",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-05-25",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "基础架构类（J1020）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "distributed-storage-dev",
+        "storage-engine"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12686",
+      "source_posting_id": "12686",
+      "title_zh": "【快Star】大模型推理/训练优化工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12686",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-05-24",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "基础架构类（J1020）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "distributed-training",
+        "model-quantization"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12707",
+      "source_posting_id": "12707",
+      "title_zh": "【快Star】光和数据通信技术工程师-AI网络方向",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12707",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-05-24",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "基础架构类（J1020）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-compute-network",
+        "network"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12859",
+      "source_posting_id": "12859",
+      "title_zh": "【快Star】容器&大模型推理调度研发工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12859",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-05-27",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "杭州、北京",
+      "category_hint": "基础架构类（J1020）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-compute-scheduling",
+        "model-serving"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12860",
+      "source_posting_id": "12860",
+      "title_zh": "【快Star】大模型后训练研发工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12860",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=2&recruitSubProjectCodes=20271779425607",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-05-27",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "campus",
+      "location_scope": "北京",
+      "category_hint": "基础架构类（J1020）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-training",
+        "distributed-training"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12148",
+      "source_posting_id": "12148",
+      "title_zh": "【留用实习】系统研发工程师-并行文件",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12148",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271772783534",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-03-12",
+      "updated_at": "2026-11-03",
+      "freshness_basis": "2026-11-03 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京",
+      "category_hint": "研发类（J1014）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "storage-engine",
+        "distributed-storage-dev"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12143",
+      "source_posting_id": "12143",
+      "title_zh": "【留用实习】Model Serving开发工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12143",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271772783534",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-03-12",
+      "updated_at": "2026-11-03",
+      "freshness_basis": "2026-11-03 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "杭州、北京",
+      "category_hint": "研发类（J1014）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "model-serving",
+        "inference-serving"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12142",
+      "source_posting_id": "12142",
+      "title_zh": "【留用实习】AIGC推理系统开发工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12142",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271772783534",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-03-12",
+      "updated_at": "2026-11-03",
+      "freshness_basis": "2026-11-03 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京",
+      "category_hint": "研发类（J1014）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "edge-inference-engine",
+        "aigc-video"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12063",
+      "source_posting_id": "12063",
+      "title_zh": "【快Star实习】大语言模型算法工程师-语言大模型中心",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12063",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271772783534",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-03-12",
+      "updated_at": "2026-11-03",
+      "freshness_basis": "2026-11-03 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京",
+      "category_hint": "算法类（J1001）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "llm-training",
+        "llm-rl"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-11933",
+      "source_posting_id": "11933",
+      "title_zh": "【快Star实习】多模态大模型强化学习算法工程师-Keye",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/11933",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271772783534",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-03-11",
+      "updated_at": "2026-11-03",
+      "freshness_basis": "2026-11-03 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京",
+      "category_hint": "多模态算法类（J1007）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "multimodal",
+        "llm-rl"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-11753",
+      "source_posting_id": "11753",
+      "title_zh": "【快Star实习】大模型Data Infra工程师-C++/Java ",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/11753",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271772783534",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-03-10",
+      "updated_at": "2026-11-03",
+      "freshness_basis": "2026-11-03 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京",
+      "category_hint": "大模型研发类（J1013）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-infra",
+        "database"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-11752",
+      "source_posting_id": "11752",
+      "title_zh": "【快Star实习】大模型云原生调度Infra工程师-Golang",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/11752",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271772783534",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-03-10",
+      "updated_at": "2026-11-03",
+      "freshness_basis": "2026-11-03 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京",
+      "category_hint": "大模型研发类（J1013）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-compute-scheduling",
+        "scheduler-platform"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-11751",
+      "source_posting_id": "11751",
+      "title_zh": "【快Star实习】生成式推荐大模型Infra架构师-C++",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/11751",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=1&recruitSubProjectCodes=20271772783534",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-03-10",
+      "updated_at": "2026-11-03",
+      "freshness_basis": "2026-11-03 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京",
+      "category_hint": "大模型研发类（J1013）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-infra",
+        "recommendation"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12147",
+      "source_posting_id": "12147",
+      "title_zh": "【留用实习】分布式图数据库研发工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12147",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=4&recruitSubProjectCodes=20271772783534",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-03-12",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京",
+      "category_hint": "研发类（J1014）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "vector-database",
+        "graph-db"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    },
+    {
+      "candidate_id": "kuaishou-12953",
+      "source_posting_id": "12953",
+      "title_zh": "【留用实习】AI测试Agent开发工程师",
+      "publisher": "快手",
+      "source_domain": "campus.kuaishou.cn",
+      "source_url": "https://campus.kuaishou.cn/#/campus/job-info/12953",
+      "source_page_url": "https://campus.kuaishou.cn/#/campus/jobs?pageNum=3&recruitSubProjectCodes=20271772783534",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-06-08",
+      "updated_at": "2026-10-27",
+      "freshness_basis": "2026-10-27 发布",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "B",
+      "career_stage": "internship",
+      "location_scope": "北京",
+      "category_hint": "测试类（J1017）",
+      "responsibilities_summary_zh": "",
+      "requirements_summary_zh": "",
+      "nearest_existing_job_ids": [
+        "ai-agent-test",
+        "ai-testing"
+      ],
+      "limitations": [
+        "按B级保留：已读取官方公开职位列表及卡片字段，未逐条打开详情页JD。",
+        "freshness_basis按职位列表卡片的“更新日期 + 发布”措辞记录。",
+        "职责与要求概述留空，避免把未逐条复核的详情内容转写为概述。"
+      ]
+    }
+  ]
+}

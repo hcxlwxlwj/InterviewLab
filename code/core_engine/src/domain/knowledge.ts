@@ -22,8 +22,8 @@ export interface ContentSource {
   acquired_at: string;
   reviewed_at: string;
   notes: string;
-  published_at?: string;
-  freshness_date?: string;
+  published_at?: string | null;
+  freshness_date?: string | null;
   evidence_grade?: 'A' | 'B' | 'C' | 'D';
 }
 

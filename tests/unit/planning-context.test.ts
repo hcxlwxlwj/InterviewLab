@@ -5,12 +5,17 @@ import {
   type InterviewConfig,
   type InterviewKnowledge,
 } from '@interviewlab/core';
-import { JOBS, getJob } from '../../code/backend/src/content/index';
+import {
+  JOBS,
+  PUBLIC_INTERVIEW_SUPPLEMENTS,
+  getJob,
+} from '../../code/backend/src/content/index';
 import {
   buildCatalog,
   planningRoleContext,
   PROFILE_GOALS,
 } from '../../code/backend/src/modules/knowledge/catalog';
+import { structuredInterviewKnowledge } from '../../code/backend/src/modules/interviews/knowledge';
 import { createWorkflowModels } from '../../code/backend/src/modules/interviews/workflow-models';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 
@@ -100,6 +105,36 @@ test('planning separates business tasks and HR arrangements from technical quest
         if (options.length)
           assert.ok(plan.goals.some((g) => (options as readonly string[]).includes(g.goal)));
   }
+});
+
+test('the preparation budget includes applicable supplemental questions', async () => {
+  const cfg = {
+    ...configuration,
+    job: 'frontend',
+    interview_type: 'mixed' as const,
+  };
+  const retrieved = await structuredInterviewKnowledge.read(cfg);
+  const supplementIds = new Set(PUBLIC_INTERVIEW_SUPPLEMENTS.questions.map((question) => question.id));
+  const supplement = retrieved.questions
+    .slice(0, 8)
+    .find((question) => supplementIds.has(question.id));
+  assert.ok(supplement);
+  let supplied: { input: ReturnType<typeof JSON.parse> } | undefined;
+  const models = createWorkflowModels(loadConfig({ LLM_API_KEY: 'test' }), async (_url, init) => {
+    const body = JSON.parse(String(init?.body));
+    supplied = { input: JSON.parse(body.messages[1].content).input };
+    return response({
+      goals: [{ goal: PROFILE_GOALS.mixed[0], focus: '了解岗位相关依据', evidence_indices: [] }],
+      limitations: [],
+    });
+  });
+  await models.prepare(cfg, retrieved, undefined, new AbortController().signal);
+  assert.ok(supplied);
+  assert.ok(
+    supplied.input.question_materials.some(
+      (material: { id: string }) => material.id === supplement.id,
+    ),
+  );
 });
 
 test('business work judgement can retrieve professional foundations without inheriting code-exam questions or HR specialist material', () => {

@@ -1,0 +1,1085 @@
+{
+  "metadata": {
+    "dataset": "latest-role-mining-review-supplement",
+    "protocol_version": "latest-role-mining-v1",
+    "as_of": "2026-11-25",
+    "created_at": "2026-11-25",
+    "status": "in_review",
+    "human_approved": false,
+    "release_eligible": false,
+    "runtime_enabled": false,
+    "scope": {
+      "sources": [
+        "JD.com official campus recruitment",
+        "PDD Holdings official campus recruitment",
+        "360 official campus recruitment"
+      ],
+      "maximum_total": 60,
+      "maximum_per_domain": 40,
+      "freshness_window": {
+        "start": "2026-07-01",
+        "end": "2026-11-25"
+      },
+      "date_rule": "published_at or updated_at must be explicit and within the window; accessed_at is not used as a substitute",
+      "summary_rule": "Grade A records contain short original Chinese paraphrases of the full public JD.",
+      "evidence_note": "All retained records are grade A. JD full text came from the public position-list response; 360 full text was verified through the public GetJobAdInfo detail endpoint.",
+      "deduplication_policy": "Removed obvious generic-title synonyms of existing published jobs, same-source repeated titles, and a 360 campus listing whose requirements called for 1-3 years of experience. No record was added to reach a quota."
+    },
+    "counts": {
+      "total": 35,
+      "by_domain": {
+        "campus.jd.com": 26,
+        "careers.pinduoduo.com": 0,
+        "360campus.zhiye.com": 9
+      },
+      "by_publisher": {
+        "京东集团": 26,
+        "360集团": 9
+      },
+      "by_evidence_grade": {
+        "A": 35,
+        "B": 0
+      },
+      "by_career_stage": {
+        "campus": 34,
+        "internship": 1
+      }
+    },
+    "sources": [
+      {
+        "publisher": "京东集团",
+        "entry_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+        "source_domain": "campus.jd.com",
+        "access_method": "Official public React page and its public position-list endpoint; publishId used as source_posting_id.",
+        "public_endpoint": "https://campus.jd.com/api/wx/position/page?type=present"
+      },
+      {
+        "publisher": "拼多多",
+        "entry_url": "https://careers.pinduoduo.com/campus",
+        "source_domain": "careers.pinduoduo.com",
+        "access_method": "Official public pages and embedded route configuration read; list and category endpoints returned error_code 40003.",
+        "records_retained": 0
+      },
+      {
+        "publisher": "360集团",
+        "entry_url": "https://360campus.zhiye.com/",
+        "source_domain": "360campus.zhiye.com",
+        "access_method": "Official public campus list and public GetJobAdInfo detail endpoint; JobAdId used as source_posting_id and public Id used in detail URLs.",
+        "public_endpoints": [
+          "https://360campus.zhiye.com/api/Jobad/GetJobAdPageList",
+          "https://360campus.zhiye.com/api/JobAd/GetJobAdInfo"
+        ]
+      }
+    ],
+    "blockers": [
+      {
+        "source_domain": "careers.pinduoduo.com",
+        "url": "https://careers.pinduoduo.com/api/careers/recruit/position/list",
+        "status": "blocked",
+        "reason": "公开职位列表接口返回error_code=40003；公开分类接口同样返回40003。未生成风控参数、未绕过验证码、登录或反爬控制。",
+        "records_retained": 0
+      },
+      "360列表PostDate为0001-01-01，因此未将其作为发布日期；仅使用公开详情接口中明确的ChangeDate作为updated_at。",
+      "京东公开列表publishTime为毫秒时间戳，记录中按Asia/Shanghai转换为日期并保留原始字段值于freshness_basis。"
+    ],
+    "validation": {
+      "json_valid": true,
+      "unique_candidate_ids": true,
+      "unique_source_posting_ids_within_domain": true,
+      "total_at_most_60": true,
+      "domain_at_most_40": true,
+      "at_least_one_explicit_date_in_window": true,
+      "accessed_at_fixed": true,
+      "no_duplicate_normalized_titles_within_file": true,
+      "no_exact_or_sequence_0_94_existing_title_matches": true,
+      "nearest_existing_job_ids_resolve": true,
+      "existing_repository_files_modified": false
+    }
+  },
+  "records": [
+    {
+      "candidate_id": "jd-9468",
+      "source_posting_id": "9468",
+      "title_zh": "技术产品经理",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9468",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-11-17",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1794888849000；北京时间 2026-11-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、成都市、深圳市、上海市",
+      "category_hint": "产品类",
+      "responsibilities_summary_zh": "负责B端、C端技术产品规划与AI产品全流程设计，搭建效果评估体系并推动研发、测试和上线。",
+      "requirements_summary_zh": "2026-10-01至2027-09-30毕业，本科及以上；计算机、AI、统计、心理或交互背景优先，需产品基本功、AI工具与沟通能力。",
+      "nearest_existing_job_ids": [
+        "ai-product",
+        "platform-product"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9088",
+      "source_posting_id": "9088",
+      "title_zh": "数据应用工程师",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9088",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814548000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "数据与算法类",
+      "responsibilities_summary_zh": "建设数仓ETL、实时离线及数据服务能力，开展业务域建模、数据挖掘和产品应用。",
+      "requirements_summary_zh": "本科及以上；熟悉SQL、Python及可视化，了解机器学习，具备业务理解、沟通与AI辅助分析能力。",
+      "nearest_existing_job_ids": [
+        "data-analysis",
+        "data-engineering"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9108",
+      "source_posting_id": "9108",
+      "title_zh": "后端开发工程师",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9108",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814564000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、天津市、成都市、上海市、苏州市、西安市、深圳市、三亚市",
+      "category_hint": "软件开发类",
+      "responsibilities_summary_zh": "参与核心后端系统设计、开发与高可用建设，协同前端、产品、算法和测试推进业务迭代。",
+      "requirements_summary_zh": "本科及以上；掌握C/C++/Java/Go之一，具备数据结构、操作系统和网络基础，有分布式或大数据经验优先。",
+      "nearest_existing_job_ids": [
+        "backend",
+        "golang",
+        "python"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9102",
+      "source_posting_id": "9102",
+      "title_zh": "硬件测试工程师",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9102",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814549000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "硬件类",
+      "responsibilities_summary_zh": "制定硬件测试与质量流程，开展可靠性、EMC等测试、问题闭环和供应商质量跟踪。",
+      "requirements_summary_zh": "本科及以上；熟悉质量体系、可靠性测试及常用测试仪器，具备动手、沟通和AI辅助测试能力。",
+      "nearest_existing_job_ids": [
+        "hardware-reliability-test",
+        "testing"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9103",
+      "source_posting_id": "9103",
+      "title_zh": "嵌入式技术工程师",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9103",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814564000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、深圳市",
+      "category_hint": "硬件类",
+      "responsibilities_summary_zh": "负责嵌入式硬件与软件架构、系统移植调试、版本维护以及样机测试问题定位。",
+      "requirements_summary_zh": "电子、自动化、通信或计算机本科及以上；熟悉ARM/MCU、接口与PCB设计工具，掌握C/C++等语言。",
+      "nearest_existing_job_ids": [
+        "embedded",
+        "industrial-embedded"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9210",
+      "source_posting_id": "9210",
+      "title_zh": "技术方向-AI Infra",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9210",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-04",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1785809797000；北京时间 2026-08-04",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "管理培训生",
+      "responsibilities_summary_zh": "通过半年集训轮岗建立业务与技术全流程视角，后续定岗至AI Infra相关算法岗位。",
+      "requirements_summary_zh": "计算机、AI、电子等本硕；精通至少一门开发语言，理解系统与分布式原理及深度学习框架，有AI Infra成果优先。",
+      "nearest_existing_job_ids": [
+        "ai-infra"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9061",
+      "source_posting_id": "9061",
+      "title_zh": "创意设计师",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9061",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814516000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、深圳市",
+      "category_hint": "设计类",
+      "responsibilities_summary_zh": "围绕品牌与营销场景开展创意概念、视觉物料、VI/IP及素材库设计，并探索AI创意工具。",
+      "requirements_summary_zh": "美术设计相关本科及以上；需审美与视觉表现能力、PDF作品集及AI创意工具实践。",
+      "nearest_existing_job_ids": [
+        "ad-creative-designer",
+        "brand-visual"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9090",
+      "source_posting_id": "9090",
+      "title_zh": "算法工程师-语言大模型",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9090",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814548000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、深圳市",
+      "category_hint": "数据与算法类",
+      "responsibilities_summary_zh": "研发NLP与语言大模型算法，覆盖语义理解、智能对话、文本生成和搜索推荐等业务场景。",
+      "requirements_summary_zh": "计算机、AI等本科及以上；掌握NLP基础与Java/C++/Python，熟悉深度学习框架，有大模型项目优先。",
+      "nearest_existing_job_ids": [
+        "nlp",
+        "llm-training"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9087",
+      "source_posting_id": "9087",
+      "title_zh": "技术运维工程师",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9087",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814548000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "技术支持类",
+      "responsibilities_summary_zh": "维护大规模系统稳定性，建设运维工具，参与架构性能优化并提供技术支持。",
+      "requirements_summary_zh": "本科及以上；熟悉计算机网络与Linux/Unix，具备钻研、排障和AI辅助运维能力。",
+      "nearest_existing_job_ids": [
+        "sre"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9083",
+      "source_posting_id": "9083",
+      "title_zh": "安全工程师",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9083",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814548000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市、深圳市",
+      "category_hint": "安全技术类",
+      "responsibilities_summary_zh": "开展安全风险评估、事件响应取证及安全体系建设，探索AI辅助威胁检测与处置。",
+      "requirements_summary_zh": "本科及以上；熟悉漏洞挖掘与攻防，掌握开发、数据库、操作系统和网络基础。",
+      "nearest_existing_job_ids": [
+        "security"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9099",
+      "source_posting_id": "9099",
+      "title_zh": "算法工程师-搜索/推荐/广告",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9099",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814549000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "数据与算法类",
+      "responsibilities_summary_zh": "优化搜广推全链路召回、排序、预估与投放策略，探索大模型和强化学习落地。",
+      "requirements_summary_zh": "计算机、AI等本科及以上；精通Python/C++/Java及机器学习模型，理解搜广推业务，有竞赛或成果优先。",
+      "nearest_existing_job_ids": [
+        "recommendation",
+        "ads-algorithm",
+        "search-algorithm"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9098",
+      "source_posting_id": "9098",
+      "title_zh": "算法工程师-语音/音频大模型",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9098",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814549000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "数据与算法类",
+      "responsibilities_summary_zh": "研究语音识别、合成、声纹及口语理解算法，推动语音大模型在业务中落地。",
+      "requirements_summary_zh": "数学、计算机等本科及以上；熟练Python/C++，具备机器学习和语音项目经验，顶会论文优先。",
+      "nearest_existing_job_ids": [
+        "speech",
+        "speech-synthesis"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9094",
+      "source_posting_id": "9094",
+      "title_zh": "算法工程师-视觉算法与数据交付",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9094",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814549000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "深圳市、北京市",
+      "category_hint": "数据与算法类",
+      "responsibilities_summary_zh": "研发计算机视觉与图形学算法，覆盖三维建模、VR/AR、数字孪生及数据交付。",
+      "requirements_summary_zh": "计算机、AI等本科及以上；熟悉图形学、机器学习及Java/C++/Python，有AI与图形学项目优先。",
+      "nearest_existing_job_ids": [
+        "cv",
+        "neural-rendering",
+        "3d-reconstruction"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9100",
+      "source_posting_id": "9100",
+      "title_zh": "算法工程师-自动驾驶",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9100",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814549000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "数据与算法类",
+      "responsibilities_summary_zh": "研发自动驾驶感知、定位、决策规划与仿真算法，服务无人物流场景。",
+      "requirements_summary_zh": "计算机、AI等本科及以上；熟悉自动驾驶技术，掌握编程与深度学习基础，有相关项目优先。",
+      "nearest_existing_job_ids": [
+        "ad-perception",
+        "av-planning",
+        "e2e-autonomous-driving"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9110",
+      "source_posting_id": "9110",
+      "title_zh": "移动端开发工程师",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9110",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814565000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "软件开发类",
+      "responsibilities_summary_zh": "负责iOS/Android应用开发迭代、前后端联调、架构优化与性能提升。",
+      "requirements_summary_zh": "本科及以上；具备数据结构与算法基础，掌握C/C++/Java/Objective/Swift之一，有移动端经验优先。",
+      "nearest_existing_job_ids": [
+        "android",
+        "ios"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9203",
+      "source_posting_id": "9203",
+      "title_zh": "技术方向-大语言模型",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9203",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-04",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1785809766000；北京时间 2026-08-04",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "管理培训生",
+      "responsibilities_summary_zh": "完成半年集训与业务、技术轮岗，后续定岗至大语言模型相关算法岗位。",
+      "requirements_summary_zh": "计算机、AI等本硕；掌握大模型理论与NLP、生成应用，有顶会、开源或竞赛成果优先。",
+      "nearest_existing_job_ids": [
+        "llm-training",
+        "llm-app"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9201",
+      "source_posting_id": "9201",
+      "title_zh": "技术方向-多模态大模型",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9201",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-04",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1785809751000；北京时间 2026-08-04",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "管理培训生",
+      "responsibilities_summary_zh": "完成半年集训与业务、技术轮岗，后续定岗至多模态大模型相关算法岗位。",
+      "requirements_summary_zh": "计算机、AI等本硕；掌握编程、分布式计算与深度学习框架，熟悉图像、视频或语音多模态技术。",
+      "nearest_existing_job_ids": [
+        "multimodal"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9199",
+      "source_posting_id": "9199",
+      "title_zh": "技术方向-机器学习/深度学习",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9199",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-04",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1785809736000；北京时间 2026-08-04",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "管理培训生",
+      "responsibilities_summary_zh": "完成半年集训与业务、技术轮岗，后续定岗至机器学习或深度学习相关算法岗位。",
+      "requirements_summary_zh": "计算机、AI等本硕；精通深度学习与Python/C++/Java，熟悉Transformer等架构及主流框架。",
+      "nearest_existing_job_ids": [
+        "algorithm"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9197",
+      "source_posting_id": "9197",
+      "title_zh": "技术方向-全栈开发",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9197",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-04",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1785809708000；北京时间 2026-08-04",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "管理培训生",
+      "responsibilities_summary_zh": "完成半年集训与业务、技术轮岗，后续可定岗至Agent、后端或前端等技术岗位。",
+      "requirements_summary_zh": "计算机、软件等本硕；具备前后端全栈能力与计算机基础，熟悉AI编程助手和Agent应用。",
+      "nearest_existing_job_ids": [
+        "fullstack"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9195",
+      "source_posting_id": "9195",
+      "title_zh": "技术方向-运筹大模型",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9195",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-04",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1785809688000；北京时间 2026-08-04",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "管理培训生",
+      "responsibilities_summary_zh": "完成半年集训与业务、技术轮岗，后续定岗至运筹优化与大模型结合的相关算法岗位。",
+      "requirements_summary_zh": "运筹、工业工程、计算机等本硕；掌握编程与数据库，理解大模型和运筹优化，有智能决策项目优先。",
+      "nearest_existing_job_ids": [
+        "operations-research",
+        "llm-app"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9191",
+      "source_posting_id": "9191",
+      "title_zh": "技术方向-数据开发",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9191",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-04",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1785809666000；北京时间 2026-08-04",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "管理培训生",
+      "responsibilities_summary_zh": "完成半年集训与业务、技术轮岗，后续定岗至数据开发或软件开发类岗位。",
+      "requirements_summary_zh": "计算机、数据科学等本硕；熟悉SQL、Java/Python/C++及Hadoop、Flink或数据湖。",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "data-warehouse"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9189",
+      "source_posting_id": "9189",
+      "title_zh": "技术方向-安全开发",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9189",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-04",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1785809635000；北京时间 2026-08-04",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "管理培训生",
+      "responsibilities_summary_zh": "完成半年集训与业务、技术轮岗，后续定岗至安全开发或软件开发类岗位。",
+      "requirements_summary_zh": "计算机、网络安全等本硕；具备漏洞挖掘攻防能力，掌握编程与系统、网络基础。",
+      "nearest_existing_job_ids": [
+        "security",
+        "security-platform-backend"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9207",
+      "source_posting_id": "9207",
+      "title_zh": "技术方向-具身智能与机器人开发",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9207",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-04",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1785809780000；北京时间 2026-08-04",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "管理培训生",
+      "responsibilities_summary_zh": "完成半年集训与业务轮岗，后续定岗至具身智能、机器人或物流自动化硬件开发岗位。",
+      "requirements_summary_zh": "计算机、AI、机器人等本硕；具备VLA、强化学习与控制或嵌入式与机器人系统能力。",
+      "nearest_existing_job_ids": [
+        "embodied-ai",
+        "robotics",
+        "embodied-vla"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9281",
+      "source_posting_id": "9281",
+      "title_zh": "技术支持工程师",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9281",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-08-17",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1786938172000；北京时间 2026-08-17",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、成都市",
+      "category_hint": "运维支持类",
+      "responsibilities_summary_zh": "按流程处理一线技术支持、客户问题分类反馈与服务记录。",
+      "requirements_summary_zh": "2026-10-01至2027-09-30毕业，大专及以上，计算机优先；需沟通抗压能力并接受7×24倒班。",
+      "nearest_existing_job_ids": [
+        "sre",
+        "solutions"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。",
+        "该岗位接受大专及以上学历并要求7×24倒班，与多数本科校招岗位不同。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9071",
+      "source_posting_id": "9071",
+      "title_zh": "商业分析",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9071",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814534000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "分析类",
+      "responsibilities_summary_zh": "分析行业竞对与经营数据，支持管理决策、运营优化和创新模式研究。",
+      "requirements_summary_zh": "统计、数学、经济等本科及以上；掌握SQL、Python/R及可视化，具备逻辑分析和AI工具实践。",
+      "nearest_existing_job_ids": [
+        "data-analysis",
+        "product-analytics"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "jd-9080",
+      "source_posting_id": "9080",
+      "title_zh": "物流产品服务",
+      "publisher": "京东集团",
+      "source_domain": "campus.jd.com",
+      "source_url": "https://campus.jd.com/#/details?id=9080",
+      "source_page_url": "https://campus.jd.com/home#/jobs?to=present&type=present",
+      "accessed_at": "2026-11-25",
+      "published_at": "2026-07-23",
+      "updated_at": null,
+      "freshness_basis": "公开职位列表字段 publishTime=1784814534000；北京时间 2026-07-23",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市、上海市",
+      "category_hint": "物流产品类",
+      "responsibilities_summary_zh": "为外部客户设计物流产品定制方案，支持项目交付、售后风险识别与标准化复制。",
+      "requirements_summary_zh": "物流、经管等本科及以上；理解电商物流，具备逻辑、沟通、执行和AI辅助方案能力。",
+      "nearest_existing_job_ids": [
+        "solutions",
+        "logistics-backend",
+        "supply-chain-product"
+      ],
+      "limitations": [
+        "职责与要求来自官方公开职位列表返回的完整字段；source_url为对应公开详情路由。",
+        "published_at由列表publishTime转换为北京时间日期，未使用访问日替代。"
+      ]
+    },
+    {
+      "candidate_id": "360-351623606",
+      "source_posting_id": "351623606",
+      "title_zh": "27秋-助理安全研究员（漏洞挖掘与利用）（北京）-4938(J12498)",
+      "publisher": "360集团",
+      "source_domain": "360campus.zhiye.com",
+      "source_url": "https://360campus.zhiye.com/campus/detail?jobAdId=604d84fe-a71b-4011-b237-b7217b36a034",
+      "source_page_url": "https://360campus.zhiye.com/campus/jobs",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-10-28T14:32:44",
+      "freshness_basis": "公开职位详情字段 ChangeDate=\"2026-10-28T14:32:44\"；PostDate=\"0001-01-01T00:00:00\"未作为有效发布日期",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "安全类",
+      "responsibilities_summary_zh": "研究Web、二进制和系统漏洞，利用逆向、模糊测试及LLM自动化提升漏洞发现与验证能力。",
+      "requirements_summary_zh": "计算机、安全本科及以上；掌握C/C++/Python、汇编和逆向工具，有CTF、CVE或研究成果优先。",
+      "nearest_existing_job_ids": [
+        "security",
+        "llm-security"
+      ],
+      "limitations": [
+        "职责与要求已通过官方公开详情接口GetJobAdInfo读取；列表PostDate为0001-01-01，未作为有效发布日期。",
+        "updated_at使用公开ChangeDate；详情URL使用公开Id，source_posting_id使用JobAdId。"
+      ]
+    },
+    {
+      "candidate_id": "360-351613824",
+      "source_posting_id": "351613824",
+      "title_zh": "27秋-安全方向-AI大模型算法工程师（北京）-5093(J12477)",
+      "publisher": "360集团",
+      "source_domain": "360campus.zhiye.com",
+      "source_url": "https://360campus.zhiye.com/campus/detail?jobAdId=fb968ca0-e3cd-45cd-a659-8403c413f219",
+      "source_page_url": "https://360campus.zhiye.com/campus/jobs",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-15T15:59:54",
+      "freshness_basis": "公开职位详情字段 ChangeDate=\"2026-09-15T15:59:54\"；PostDate=\"0001-01-01T00:00:00\"未作为有效发布日期",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "算法类",
+      "responsibilities_summary_zh": "构建面向Web与二进制漏洞检测的大模型工具，优化微调与提示策略并建立误报漏报评估体系。",
+      "requirements_summary_zh": "计算机、AI、安全博士；熟悉深度学习、大模型和Agent系统，有代码分析工具研发经历。",
+      "nearest_existing_job_ids": [
+        "llm-security",
+        "llm-training"
+      ],
+      "limitations": [
+        "职责与要求已通过官方公开详情接口GetJobAdInfo读取；列表PostDate为0001-01-01，未作为有效发布日期。",
+        "updated_at使用公开ChangeDate；详情URL使用公开Id，source_posting_id使用JobAdId。"
+      ]
+    },
+    {
+      "candidate_id": "360-351611257",
+      "source_posting_id": "351611257",
+      "title_zh": "27秋-智能化漏洞挖掘研究员（北京）-5390(J12462)",
+      "publisher": "360集团",
+      "source_domain": "360campus.zhiye.com",
+      "source_url": "https://360campus.zhiye.com/campus/detail?jobAdId=50c5846f-48fe-46a8-a881-e538ead16821",
+      "source_page_url": "https://360campus.zhiye.com/campus/jobs",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-08T20:33:23",
+      "freshness_basis": "公开职位详情字段 ChangeDate=\"2026-09-08T20:33:23\"；PostDate=\"0001-01-01T00:00:00\"未作为有效发布日期",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "安全类",
+      "responsibilities_summary_zh": "研究AI驱动的Web/API漏洞挖掘、代码审计与告警分析，开发自动化安全工具并推动整改。",
+      "requirements_summary_zh": "计算机、安全等本科及以上；了解常见Web漏洞，掌握Python/Java/Go之一及大模型或智能体基础。",
+      "nearest_existing_job_ids": [
+        "security",
+        "llm-security"
+      ],
+      "limitations": [
+        "职责与要求已通过官方公开详情接口GetJobAdInfo读取；列表PostDate为0001-01-01，未作为有效发布日期。",
+        "updated_at使用公开ChangeDate；详情URL使用公开Id，source_posting_id使用JobAdId。"
+      ]
+    },
+    {
+      "candidate_id": "360-351611230",
+      "source_posting_id": "351611230",
+      "title_zh": "27秋-视觉算法工程师-AIGC（北京）-5391(J12463)",
+      "publisher": "360集团",
+      "source_domain": "360campus.zhiye.com",
+      "source_url": "https://360campus.zhiye.com/campus/detail?jobAdId=f9f9490f-f2c9-4b69-8d16-eba8a2891919",
+      "source_page_url": "https://360campus.zhiye.com/campus/jobs",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-08T20:29:53",
+      "freshness_basis": "公开职位详情字段 ChangeDate=\"2026-09-08T20:29:53\"；PostDate=\"0001-01-01T00:00:00\"未作为有效发布日期",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "internship",
+      "location_scope": "北京市",
+      "category_hint": "算法类",
+      "responsibilities_summary_zh": "参与图像和视频AIGC算法研究，探索可控生成编辑与模型蒸馏加速。",
+      "requirements_summary_zh": "硕士在读，可实习3个月以上且每周至少4天；了解扩散模型，有SD/SDXL/Wan微调经验优先。",
+      "nearest_existing_job_ids": [
+        "aigc-image",
+        "aigc-video"
+      ],
+      "limitations": [
+        "职责与要求已通过官方公开详情接口GetJobAdInfo读取；列表PostDate为0001-01-01，未作为有效发布日期。",
+        "updated_at使用公开ChangeDate；详情URL使用公开Id，source_posting_id使用JobAdId。",
+        "职位虽在校园招聘项目中，但正文明确要求硕士在读并保证长期实习，career_stage记为internship。"
+      ]
+    },
+    {
+      "candidate_id": "360-351611213",
+      "source_posting_id": "351611213",
+      "title_zh": "27秋-大数据开发初级工程师（北京）-5351(J12448)",
+      "publisher": "360集团",
+      "source_domain": "360campus.zhiye.com",
+      "source_url": "https://360campus.zhiye.com/campus/detail?jobAdId=5bdefaa7-f620-436a-884f-ac41264fd5ca",
+      "source_page_url": "https://360campus.zhiye.com/campus/jobs",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-08T20:28:41",
+      "freshness_basis": "公开职位详情字段 ChangeDate=\"2026-09-08T20:28:41\"；PostDate=\"0001-01-01T00:00:00\"未作为有效发布日期",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "开发类",
+      "responsibilities_summary_zh": "建设商业化离线与实时数仓及数据平台，探索AI Native数据开发、问答和SQL优化。",
+      "requirements_summary_zh": "计算机、数学等本科及以上；熟悉Hive、Spark、Flink、Doris，精通Java或Go，了解RAG/Agent优先。",
+      "nearest_existing_job_ids": [
+        "data-engineering",
+        "data-warehouse"
+      ],
+      "limitations": [
+        "职责与要求已通过官方公开详情接口GetJobAdInfo读取；列表PostDate为0001-01-01，未作为有效发布日期。",
+        "updated_at使用公开ChangeDate；详情URL使用公开Id，source_posting_id使用JobAdId。"
+      ]
+    },
+    {
+      "candidate_id": "360-351611208",
+      "source_posting_id": "351611208",
+      "title_zh": "27秋-AI应用开发工程师（北京）-5387(J12457)",
+      "publisher": "360集团",
+      "source_domain": "360campus.zhiye.com",
+      "source_url": "https://360campus.zhiye.com/campus/detail?jobAdId=ee3845e9-d55c-4aec-8302-99854c955e70",
+      "source_page_url": "https://360campus.zhiye.com/campus/jobs",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-08T20:28:41",
+      "freshness_basis": "公开职位详情字段 ChangeDate=\"2026-09-08T20:28:41\"；PostDate=\"0001-01-01T00:00:00\"未作为有效发布日期",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "开发类",
+      "responsibilities_summary_zh": "落地AI Coding工具链与研发流程，沉淀Prompt、Spec、Skill、Agent等团队资产并建设安全治理。",
+      "requirements_summary_zh": "具备扎实软件工程基础，熟悉前后端、工程化或DevOps至少两个方向，有AI Coding实战与方法论沉淀能力。",
+      "nearest_existing_job_ids": [
+        "ai-code-assistant",
+        "llm-app"
+      ],
+      "limitations": [
+        "职责与要求已通过官方公开详情接口GetJobAdInfo读取；列表PostDate为0001-01-01，未作为有效发布日期。",
+        "updated_at使用公开ChangeDate；详情URL使用公开Id，source_posting_id使用JobAdId。",
+        "正文未明确毕业年份；按官方校园招聘项目收录。"
+      ]
+    },
+    {
+      "candidate_id": "360-351611207",
+      "source_posting_id": "351611207",
+      "title_zh": "27秋-AI应用开发工程师（AIOps）（北京）-5389(J12461)",
+      "publisher": "360集团",
+      "source_domain": "360campus.zhiye.com",
+      "source_url": "https://360campus.zhiye.com/campus/detail?jobAdId=0ecbb8ba-328a-4e3b-b12c-4beff3b9b31b",
+      "source_page_url": "https://360campus.zhiye.com/campus/jobs",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-08T20:28:41",
+      "freshness_basis": "公开职位详情字段 ChangeDate=\"2026-09-08T20:28:41\"；PostDate=\"0001-01-01T00:00:00\"未作为有效发布日期",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "开发类",
+      "responsibilities_summary_zh": "开发AIOps智能问答、故障诊断和日志分析应用，构建RAG/Agent并对接AD与邮件系统。",
+      "requirements_summary_zh": "计算机等本科及以上；熟练Python Web框架、Linux、MySQL/Redis，了解LangChain/LlamaIndex与Vue。",
+      "nearest_existing_job_ids": [
+        "llm-app",
+        "sre",
+        "ai-code-assistant"
+      ],
+      "limitations": [
+        "职责与要求已通过官方公开详情接口GetJobAdInfo读取；列表PostDate为0001-01-01，未作为有效发布日期。",
+        "updated_at使用公开ChangeDate；详情URL使用公开Id，source_posting_id使用JobAdId。"
+      ]
+    },
+    {
+      "candidate_id": "360-351611203",
+      "source_posting_id": "351611203",
+      "title_zh": "27秋-大数据平台研发工程师（北京）-5396(J12468)",
+      "publisher": "360集团",
+      "source_domain": "360campus.zhiye.com",
+      "source_url": "https://360campus.zhiye.com/campus/detail?jobAdId=97c6314c-425d-4e4d-8b85-5e1f7c6d842c",
+      "source_page_url": "https://360campus.zhiye.com/campus/jobs",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-08T20:28:41",
+      "freshness_basis": "公开职位详情字段 ChangeDate=\"2026-09-08T20:28:41\"；PostDate=\"0001-01-01T00:00:00\"未作为有效发布日期",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "开发类",
+      "responsibilities_summary_zh": "研发云数仓内核与平台服务，开发Spring Boot接口并对接湖仓、查询和计算引擎。",
+      "requirements_summary_zh": "计算机、大数据本科或研究生；扎实Java、Spring Boot、JDBC，熟悉MySQL/PostgreSQL及一种湖仓或计算引擎。",
+      "nearest_existing_job_ids": [
+        "data-warehouse",
+        "cloud-console-backend"
+      ],
+      "limitations": [
+        "职责与要求已通过官方公开详情接口GetJobAdInfo读取；列表PostDate为0001-01-01，未作为有效发布日期。",
+        "updated_at使用公开ChangeDate；详情URL使用公开Id，source_posting_id使用JobAdId。"
+      ]
+    },
+    {
+      "candidate_id": "360-351611202",
+      "source_posting_id": "351611202",
+      "title_zh": "27秋-全栈开发工程师（存储方向）（北京）-5397(J12469)",
+      "publisher": "360集团",
+      "source_domain": "360campus.zhiye.com",
+      "source_url": "https://360campus.zhiye.com/campus/detail?jobAdId=23541856-2070-4419-88ed-96af7287c9af",
+      "source_page_url": "https://360campus.zhiye.com/campus/jobs",
+      "accessed_at": "2026-11-25",
+      "published_at": null,
+      "updated_at": "2026-09-08T20:28:41",
+      "freshness_basis": "公开职位详情字段 ChangeDate=\"2026-09-08T20:28:41\"；PostDate=\"0001-01-01T00:00:00\"未作为有效发布日期",
+      "access_status": "public_full_text_read",
+      "evidence_grade": "A",
+      "career_stage": "campus",
+      "location_scope": "北京市",
+      "category_hint": "开发类",
+      "responsibilities_summary_zh": "参与分布式存储、文件/块/对象存储研发，优化性能可靠性并跟进开源与AI Coding实践。",
+      "requirements_summary_zh": "计算机、软件本科及以上；掌握C/C++/Go/Python/Java之一，了解Linux、分布式一致性与存储协议。",
+      "nearest_existing_job_ids": [
+        "distributed-storage-dev",
+        "storage-engine"
+      ],
+      "limitations": [
+        "职责与要求已通过官方公开详情接口GetJobAdInfo读取；列表PostDate为0001-01-01，未作为有效发布日期。",
+        "updated_at使用公开ChangeDate；详情URL使用公开Id，source_posting_id使用JobAdId。"
+      ]
+    }
+  ]
+}

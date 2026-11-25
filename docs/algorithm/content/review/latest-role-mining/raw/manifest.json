@@ -1,0 +1,15 @@
+{
+  "schema_version": "latest-role-raw-manifest-v1",
+  "as_of": "2026-11-25",
+  "status": "in_review",
+  "human_approved": false,
+  "files": [
+    "meituan-kuaishou.json",
+    "university-game-hardware.json",
+    "tencent-netease.json",
+    "baidu-bytedance.json",
+    "redbook-bilibili.json",
+    "xiaomi-huawei-alibaba.json",
+    "jd-pdd-360.json"
+  ]
+}
