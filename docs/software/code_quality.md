@@ -252,4 +252,8 @@ node "$scanRoot/node_modules/jscpd/bin/jscpd" code --pattern '**/*.{ts,tsx,js}' 
 
 修复后重新运行 `npm run check`，边界、类型、内容检查和普通测试 311/311 全部通过，0 失败、0 跳过；文档 59 份、508 个本地链接通过。此处 311 项由独立提交的 304 项加主分支新增加的 7 项组成，不包含原工作区 9 项改动。内容检查实际统计为 1269 个已发布岗位、10148 道活跃主问题和 1962 个来源。
 
-本次集成仅修正统计字段，未更改岗位内容及校验断言。此前 ESLint/重复检测结果仍对应附件中的原采样快照；本次未重新计算全项目质量指标或覆盖率。云端检查的最终结果以 PR 中对应提交的 Actions 记录为准。
+首轮集成修复仅更正统计字段，未更改岗位内容及校验断言。此前 ESLint/重复检测结果仍对应附件中的原采样快照；本次未重新计算全项目质量指标或覆盖率。云端检查的最终结果以 PR 中对应提交的 Actions 记录为准。
+
+上述修复推送后，`03a41dd` 的 push 和 pull_request 应用检查均通过，包含生产构建；文档检查也通过。随后[数据库检查日志](https://github.com/hcxlwxlwj/InterviewLab/actions/runs/45633817945/job/139273804101)暴露第二项集成差距：87 项中 86 项通过，全岗位知识检索测试仍断言 HR 结果只能是 `job_profile` 或 `interview_method`。新目录已有明确适用于 HR 的问题，例如 `public-interview-fe-c003` 的类型为 `hr/mixed`，HR 检索返回 `question` 符合当前合同。
+
+在新建专用 `interviewlab_test_pr54_*` 数据库中先复现旧断言失败，再更新 `tests/integration/database/all-role-knowledge.test.ts`：HR 可返回问题，但每条结果的数据库 binding 必须同时匹配发布版本、片段、岗位、招聘阶段和面试类型；返回 DTO 的 `types` 也必须包含当前类型，并显式禁止 `evaluation_reference`。该调整加强适用边界，不改生产检索逻辑。修复后全量数据库测试 87/87、进程测试 4/4 通过，0 失败、0 跳过，后端生产构建通过。

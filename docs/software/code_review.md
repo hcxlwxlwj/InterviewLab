@@ -11,11 +11,11 @@
 |  :----  |  :----------:  |  :----  |
 | 模块名 | InterviewLab 软件工程规范检查与整改 | 涵盖首次课件对照、需求与管理文档、测试证据、代码扫描、缺陷修复、职责重构和复扫。全过程见附录 A，全部改动清单见 [质量报告](code_quality.md)。 |
 | 审查人员 | Codex 辅助检查、整改和复审 | 团队人工复核人及签署日期待实际填写。当前 GitHub 同伴审批状态未重新核查。 |
-| 版本 | 1.4，全过程及 CI 集成复验版 | 前期提交为 `44dce33`、`ce88b1c`；2026-11-25 整改以 `d300e8b` 和原有工作区补丁为基线，整改与报告以 `5bfb56d` 提交；随后合入主分支 `2205b2e` 并修正内容检查统计字段，详见附录 D。 |
+| 版本 | 1.4，全过程及 CI 集成复验版 | 前期提交为 `44dce33`、`ce88b1c`；2026-11-25 整改以 `d300e8b` 和原有工作区补丁为基线，整改与报告以 `5bfb56d` 提交；随后合入主分支 `2205b2e`，以 `03a41dd` 修正内容检查统计字段，再补齐 HR 检索类型合同回归，详见附录 D。 |
 | 日期 | 2026-11-15 至 2026-11-25 | 首次课件核查、11 月 16 日规格整理及提交、11 月 25 日扫描与整改均分阶段记录。 |
 | 程序设计语言 | TypeScript、TSX、JavaScript；Markdown | Fastify 后端、React / Next.js 前端、共享领域规则；规范和报告用 Markdown 记录。 |
 | 作者 | Git 记录账号 hcxlwxlwj、Rita1212；Codex 辅助整改与报告编制 | 沟通和风险计划的有效修订在首次检查前已存在，用户确认后纳入提交。实际组员姓名及人工评审记录由团队登记。 |
-| 文件数 | 累计 41 个改动或证据文件；源码及检查脚本审查 16 个文件 | 累计为 17 份文档、13 份整改源码、1 份 CI 检查脚本、5 份新增测试、5 份扫描附件。审查范围另含 2 个既有合同文件。主分支同步带入的变更不计为本轮原创整改；原有 9 项工作区改动列为输入基线，详见附录 A、D。 |
+| 文件数 | 累计 42 个改动或证据文件；源码及检查脚本审查 16 个文件 | 累计为 17 份文档、13 份整改源码、1 份 CI 检查脚本、5 份新增及 1 份更新的测试、5 份扫描附件。审查范围另含 2 个既有合同文件。主分支同步带入的变更不计为本轮原创整改；原有 9 项工作区改动列为输入基线，详见附录 A、D。 |
 
 # 2.自动检查
 
@@ -121,6 +121,7 @@
 | docs/mgmt/COLLABORATION.md；docs/mgmt/team_plan.md | 5；11–15 | U4 书面集成分支流程与实际提交路径、人员安排待确认 | [Major][SM-D03] 文档规定先集成 develop，近期 PR 实际进入 main。保留差异和待团队确认项，未替团队决定流程或填写负责人。【未关闭】 |
 | code/frontend/features/live-interview/analysis-state.ts 及本轮新增文件 | 1 | G1 新增整改文件和证据的版本归档 | [交付跟踪] 前期两次文档提交已推送；本轮整改源码、测试、完整报告和扫描附件按用户要求同批归档，提交号以 Git 历史为准。【本次提交关闭】 |
 | .github/scripts/check-content.ts | 376 | I1 PR 合并结果中岗位数组误用集合计数属性 | [Major][类型错误] 最新主分支同步后的 publishedJobs 是数组，使用 size 导致 TS2339。先复现失败，再改为 length；独立隔离树 npm run check 通过，311 项测试及文档检查通过。【已修复，云端结果见 PR #54】 |
+| tests/integration/database/all-role-knowledge.test.ts | 134–146 | I2 新增 HR 问题的类型合同与旧检索断言不一致 | [Major][测试合同] 旧断言禁止 HR 检索 question，新目录已有显式 hr binding 的问题。先在独立专用库复现，再允许 HR 问题，同时加强 release、岗位、阶段、类型、返回 DTO 类型及禁用评价参考的断言；生产检索未改。【全量数据库 87/87 通过】 |
 # 6.跟踪调查
 
 ## 评审结论
@@ -187,6 +188,7 @@ P01 的 PDF 为本地《SWIEP软件工程》课件，源文件位于课程资料
 | 7 份新增源码 | 同一前端目录中的 `analysis-state.ts`、`entry-request.ts`、`presentation-request.ts`、`use-question-presentation.ts`、`use-prepared-devices.ts`、`interview-notices.tsx`、`interview-presentation.ts` |
 | 2 份核对的既有合同源码 | `code/frontend/features/live-interview/start-request.ts`、`code/frontend/lib/api/http.ts`，复用其开始恢复和统一传输合同 |
 | 5 份新增测试 | `tests/unit/analysis-state.test.ts` 3 项、`entry-request.test.ts` 4 项、`presentation-request.test.ts` 5 项、`interview-notices.test.ts` 3 项、`interview-presentation.test.ts` 3 项，共 18 项 |
+| 1 份既有数据库测试更新 | `tests/integration/database/all-role-knowledge.test.ts`，修正 HR 问题合同，并加强发布版本、岗位、阶段、类型及评价参考隔离断言 |
 | 5 份扫描附件 | `quality/2026-11-25/` 下的 `baseline-workspace.patch`、`eslint.config.mjs`、`scan.json`、`scan-report.html`、`scan-report.png` |
 
 已有测试在源码整改前后实际运行。18 项新增回归在整改实现过程中补充并验证，未保留先于实现的新增用例失败运行记录。
@@ -227,5 +229,7 @@ P01 的 PDF 为本地《SWIEP软件工程》课件，源文件位于课程资料
 | 云端集成失败 | 分支 push 检查已通过；PR 检查验证 `5bfb56d` 与更新后的 `2205b2e` 合并结果 `55620a2` | [application 日志](https://github.com/hcxlwxlwj/InterviewLab/actions/runs/45633138412/job/139271399599)在 `.github/scripts/check-content.ts:376` 报 TS2339：数组无 `size` |
 | 同步并复现 | 在隔离工作树合入 `origin/main`，原工作区未提交改动保留；先运行 `npm run typecheck` | 复现同一 TS2339，确认实际失败位置 |
 | 最小修复及回归 | 数组计数改为 `publishedJobs.length`；重新运行 `npm run check` | 311/311 普通测试、0 失败、0 跳过；边界、类型、内容、文档检查通过。新主分支比原独立提交增加 7 项用例，数量与工作区历史的 311 项分别归档 |
+| 应用通过后继续核查数据库 | `03a41dd` 的 push/pull_request 应用及文档检查均通过；[后端日志](https://github.com/hcxlwxlwj/InterviewLab/actions/runs/45633817945/job/139273804101)显示数据库 86/87 | 唯一失败为全岗位检索测试仍禁止 HR 返回 question；当前明确适用 HR 的问题符合目录 binding 合同 |
+| HR 检索合同复验 | 新建专用 `interviewlab_test_pr54_*` 数据库先复现失败；更新类型白名单并加强版本、岗位、阶段、类型及评价参考隔离断言 | 全量数据库 87/87、进程测试 4/4、0 失败、0 跳过；后端生产构建通过；生产检索逻辑保持当前合同 |
 
 本次修复未添加依赖、未调整工作流或跳过断言。全量静态质量复扫、完整覆盖率及真实设备/人工验收未在此轮追加，原记录的版本范围继续有效。云端最终状态以 PR 对应提交的 Actions 为准。

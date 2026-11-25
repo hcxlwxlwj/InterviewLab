@@ -134,13 +134,15 @@ test(
               assert.ok(
                 (
                   await pool.query(
-                    'SELECT 1 FROM knowledge_v2_bindings WHERE release=$1 AND chunk_id=$2 AND job=$3',
-                    [k.content_version, chunk.id, job.id],
+                    'SELECT 1 FROM knowledge_v2_bindings WHERE release=$1 AND chunk_id=$2 AND job=$3 AND $4=ANY(stages) AND $5=ANY(types)',
+                    [k.content_version, chunk.id, job.id, c.career_stage, type],
                   )
                 ).rowCount,
               );
+              assert.ok(chunk.types?.includes(type));
+              assert.notEqual(chunk.kind, 'evaluation_reference');
               if (type === 'hr')
-                assert.ok(['job_profile', 'interview_method'].includes(chunk.kind!));
+                assert.ok(['job_profile', 'interview_method', 'question'].includes(chunk.kind!));
             }
           }
         }
