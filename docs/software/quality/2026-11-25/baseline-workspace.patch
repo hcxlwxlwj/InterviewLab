@@ -1,0 +1,155 @@
+diff --git a/code/frontend/features/live-interview/setup-state.ts b/code/frontend/features/live-interview/setup-state.ts
+index 165e72f..34ccae6 100644
+--- a/code/frontend/features/live-interview/setup-state.ts
++++ b/code/frontend/features/live-interview/setup-state.ts
+@@ -1,4 +1,32 @@
+-import type { InterviewConfig, JobTemplate } from '@interviewlab/core';
++import type {
++  InterviewConfig,
++  JobTemplate,
++  PersonalMaterial,
++  PersonalSettings,
++} from '@interviewlab/core';
++
++export function applyInterviewDefaults(
++  configuration: InterviewConfig,
++  settings: PersonalSettings,
++  materials: PersonalMaterial[],
++  preserved: ReadonlySet<keyof InterviewConfig>,
++): InterviewConfig {
++  const resume = materials.find(
++    (material) =>
++      material.id === settings.default_resume_id &&
++      material.kind === 'resume' &&
++      material.confirmed,
++  );
++  return {
++    ...configuration,
++    ...(!preserved.has('interviewer_style') && settings.interviewer_style
++      ? { interviewer_style: settings.interviewer_style }
++      : {}),
++    ...(!preserved.has('resume_ref') && resume
++      ? { resume_ref: { id: resume.id, version: resume.version } }
++      : {}),
++  };
++}
+
+ /** Keep the current stage when supported; otherwise use the selected template's stage. */
+ export function selectInterviewJob(
+diff --git a/code/frontend/features/live-interview/setup.tsx b/code/frontend/features/live-interview/setup.tsx
+index 2e690ca..308af8c 100644
+--- a/code/frontend/features/live-interview/setup.tsx
++++ b/code/frontend/features/live-interview/setup.tsx
+@@ -5,14 +5,14 @@ import { Choices, InterviewSetupPage } from '../../components/interview-setup';
+ import { Button } from '../../components/ui/button';
+ import { apiRequest } from '../../lib/api/http';
+ import type { PersonalMaterial, PersonalSettings, JobTemplate } from '@interviewlab/core';
+-import { useCallback, useState, useEffect } from 'react';
++import { useCallback, useState, useEffect, useRef } from 'react';
+ import { useSearchParams } from 'next/navigation';
+ import { LIVE_TYPE_LABELS, mainQuestionLimit, type InterviewConfig } from '@interviewlab/core';
+ import { interviewsApi } from '../../lib/api/interviews';
+ import { jobsApi } from '../../lib/api/jobs';
+ import { Loading } from '../../components/shared';
+ import { CommandNotice, ErrorNotice, SessionGate, useLiveCommand, useLiveResource } from './common';
+-import { selectInterviewJob } from './setup-state';
++import { applyInterviewDefaults, selectInterviewJob } from './setup-state';
+ import { useInterviewFlow } from './flow-provider';
+ import { PreparationScreen } from './preparation';
+
+@@ -59,23 +59,28 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
+         initialJob,
+       ),
+   );
++  const preservedDefaults = useRef(
++    new Set<keyof InterviewConfig>(flow.configuration ? ['resume_ref', 'interviewer_style'] : []),
++  );
+   const [materials, setMaterials] = useState<PersonalMaterial[]>([]);
+   const [materialError, setMaterialError] = useState('');
+   useEffect(() => {
++    const controller = new AbortController();
+     Promise.all([
+-      apiRequest<PersonalMaterial[]>('/materials'),
+-      apiRequest<PersonalSettings>('/me/settings'),
++      apiRequest<PersonalMaterial[]>('/materials', { signal: controller.signal }),
++      apiRequest<PersonalSettings>('/me/settings', { signal: controller.signal }),
+     ])
+       .then(([m, p]) => {
++        if (controller.signal.aborted) return;
+         setMaterials(m.filter((x) => x.kind === 'resume' && x.confirmed));
+-        const selected = m.find((x) => x.id === p.default_resume_id && x.confirmed);
+-        setConfig((c) => ({
+-          ...c,
+-          interviewer_style: p.interviewer_style ?? c.interviewer_style,
+-          ...(selected ? { resume_ref: { id: selected.id, version: selected.version } } : {}),
+-        }));
++        const preserved = new Set(preservedDefaults.current);
++        setConfig((c) => applyInterviewDefaults(c, p, m, preserved));
+       })
+-      .catch(() => setMaterialError('简历暂时无法加载，可不带简历继续通用面试。'));
++      .catch(() => {
++        if (!controller.signal.aborted)
++          setMaterialError('简历暂时无法加载，可不带简历继续通用面试。');
++      });
++    return () => controller.abort();
+   }, []);
+   const loadProfiles = useCallback(
+     (signal: AbortSignal) => interviewsApi.profiles(config.job, config.career_stage, signal),
+@@ -83,8 +88,10 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
+   );
+   const profiles = useLiveResource(loadProfiles, () => false);
+   const command = useLiveCommand();
+-  const change = <K extends keyof InterviewConfig>(key: K, value: InterviewConfig[K]) =>
++  const change = <K extends keyof InterviewConfig>(key: K, value: InterviewConfig[K]) => {
++    preservedDefaults.current.add(key);
+     setConfig((c) => ({ ...c, [key]: value }));
++  };
+   const selected = jobs.find((j) => j.id === config.job);
+   if (flow.phase !== 'idle' && flow.phase !== 'running') return <PreparationScreen />;
+   return (
+@@ -92,6 +99,8 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
+       className="setup-grid"
+       onSubmit={(e) => {
+         e.preventDefault();
++        preservedDefaults.current.add('resume_ref');
++        preservedDefaults.current.add('interviewer_style');
+         void flow.begin(config);
+       }}
+     >
+@@ -221,10 +230,7 @@ function ConfigurationForm({ jobs, initialJob }: { jobs: JobTemplate[]; initialJ
+             value={config.resume_ref?.id ?? ''}
+             onChange={(e) => {
+               const m = materials.find((x) => x.id === e.target.value);
+-              setConfig((c) => ({
+-                ...c,
+-                resume_ref: m ? { id: m.id, version: m.version } : undefined,
+-              }));
++              change('resume_ref', m ? { id: m.id, version: m.version } : undefined);
+             }}
+           >
+             <option value="">不使用简历，进行通用面试</option>
+diff --git a/code/frontend/lib/api/interviews.ts b/code/frontend/lib/api/interviews.ts
+index afe008e..cb45205 100644
+--- a/code/frontend/lib/api/interviews.ts
++++ b/code/frontend/lib/api/interviews.ts
+@@ -15,8 +15,18 @@ export const interviewsApi = {
+       `/interview-profiles?job=${encodeURIComponent(job)}&career_stage=${encodeURIComponent(stage)}`,
+       { signal },
+     ),
+-  jobs: (signal?: AbortSignal) =>
+-    apiRequest<PageResult<JobTemplate>>('/job-templates?limit=50', { signal }),
++  async jobs(signal?: AbortSignal): Promise<PageResult<JobTemplate>> {
++    const items: JobTemplate[] = [];
++    let cursor: string | null = null;
++    do {
++      const query = new URLSearchParams({ limit: '50' });
++      if (cursor) query.set('cursor', cursor);
++      const page = await apiRequest<PageResult<JobTemplate>>(`/job-templates?${query}`, { signal });
++      items.push(...page.items);
++      cursor = page.next_cursor;
++    } while (cursor);
++    return { items, next_cursor: null };
++  },
+   list: (query = '', signal?: AbortSignal) =>
+     apiRequest<PageResult<Interview>>(`/interviews${query}`, { signal }),
+   read: (id: string, signal?: AbortSignal) =>
