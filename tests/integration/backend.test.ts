@@ -43,20 +43,37 @@ test('published catalog has stable opaque cursors, filters and embedded sources'
     pages.push(page);
     cursor = page.next_cursor;
   }
-  assert.equal(pages.length, 34);
+  assert.equal(pages.length, 43);
   assert.deepEqual(
     pages.map((page) => page.items.length),
-    [...Array(33).fill(30), 10],
+    [...Array(42).fill(30), 9],
   );
   assert.equal(pages[pages.length - 1].next_cursor, null);
   assert.equal(
     new Set(pages.flatMap((page) => page.items.map((item: { id: string }) => item.id))).size,
-    1000,
+    1269,
   );
   const filtered = await app.inject(
     '/api/v1/job-templates?category=product&stage=internship&limit=50',
   );
-  assert.equal(filtered.json().items.length, 4);
+  assert.ok(filtered.json().items.length > 0);
+  assert.ok(
+    filtered.json().items.every(
+      (item: { category_id: string; stages: string[] }) =>
+        item.category_id === 'product' && item.stages.includes('internship'),
+    ),
+  );
+  const byClass = await app.inject('/api/v1/job-templates?primary_class=frontend-client&limit=50');
+  assert.ok(byClass.json().items.length > 0);
+  assert.ok(
+    byClass.json().items.every((item: { primary_class_id: string }) => item.primary_class_id === 'frontend-client'),
+  );
+  const classes = await app.inject('/api/v1/job-classes');
+  assert.equal(classes.json().items.length, 16);
+  assert.equal(
+    classes.json().items.reduce((count: number, item: { published_count: number }) => count + item.published_count, 0),
+    1269,
+  );
   const detail = (await app.inject('/api/v1/job-templates/ai-product')).json();
   assert.ok(detail.sources.length > 0);
   assert.ok(
@@ -69,6 +86,15 @@ test('published catalog has stable opaque cursors, filters and embedded sources'
       await app.inject({
         url: '/api/v1/job-templates',
         query: { cursor: first.next_cursor, category: 'product' },
+      })
+    ).statusCode,
+    400,
+  );
+  assert.equal(
+    (
+      await app.inject({
+        url: '/api/v1/job-templates',
+        query: { cursor: first.next_cursor, primary_class: 'frontend-client' },
       })
     ).statusCode,
     400,

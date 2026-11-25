@@ -1,8 +1,8 @@
-import type { KnowledgeQuestion } from '@interviewlab/core';
+import type { RuntimeKnowledgeQuestion } from '@interviewlab/core';
 import { frontendReportReference as reference } from '../../content/index';
 
 /** Explicit topic matching avoids attaching unrelated professional authority to a question. */
-export function withFrontendReportReference(question: KnowledgeQuestion): KnowledgeQuestion {
+export function withFrontendReportReference(question: RuntimeKnowledgeQuestion): RuntimeKnowledgeQuestion {
   const cards = reference.cards.filter((card) =>
     card.topics.some((topic) => question.topic.toLowerCase().includes(topic.toLowerCase())),
   );

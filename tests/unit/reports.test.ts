@@ -332,8 +332,9 @@ test('frontend report references cover catalog questions without guessing unknow
   );
   const state = fixture().state;
   const knowledge = await structuredInterviewKnowledge.read(state.view.configuration);
-  assert.equal(knowledge.questions.length, 8);
-  for (const question of knowledge.questions) {
+  const mainQuestions = knowledge.questions.filter((question) => question.id.startsWith('frontend-q'));
+  assert.equal(mainQuestions.length, 8);
+  for (const question of mainQuestions) {
     assert.equal(question.report_reference?.version, 'frontend-report-reference-v1');
     assert.equal(question.report_reference?.review_state, 'draft');
     assert.ok(question.report_reference?.cards.length);

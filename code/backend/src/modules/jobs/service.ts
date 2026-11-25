@@ -7,6 +7,7 @@ const cursorSchema = z.object({ after: z.string(), fingerprint: z.string() });
 export function createJobsService(repository: CatalogRepository) {
   return {
     categories: () => repository.categories(),
+    jobClasses: () => repository.jobClasses(),
     list(query: JobSearchQuery & { limit: number; cursor?: string }): PageResult<JobTemplate> {
       const items = [...repository.search(query)].sort((a, b) => a.id.localeCompare(b.id, 'en'));
       const fingerprint = createHash('sha256')
@@ -14,6 +15,7 @@ export function createJobsService(repository: CatalogRepository) {
           JSON.stringify({
             search: query.search ?? '',
             category: query.category ?? '',
+            primary_class: query.primary_class ?? '',
             stage: query.stage ?? '',
             items: items.map((item) => [item.id, item.version]),
           }),

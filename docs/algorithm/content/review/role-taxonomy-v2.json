@@ -1,0 +1,244 @@
+{
+  "taxonomy_version": "role-taxonomy-v2",
+  "status": "pending_review",
+  "created_at": "2026-11-25",
+  "coverage_target": 1000,
+  "primary_class_rule": "每个岗位必须有且只有一个一级大类；业务场景、行业、阶段和技术栈作为标签，不膨胀成新岗位。",
+  "preservation_rule": "保留现有1000个岗位的ID、标题、版本和发布状态，本文件只新增分类元数据。",
+  "classes": [
+    {
+      "id": "frontend-client",
+      "title": "前端与客户端开发",
+      "description": "负责浏览器、移动端、桌面端和跨端应用的用户界面与客户端工程实现。",
+      "include": ["Web前端", "Android", "iOS", "鸿蒙应用", "跨端", "桌面客户端", "小程序", "客户端渲染与性能"],
+      "exclude": ["游戏客户端归入游戏研发", "交互与视觉设计归入设计与用户研究", "通用服务端接口归入后端与服务端开发"],
+      "role_families": [
+        { "id": "web_frontend", "title": "Web前端" },
+        { "id": "mobile_client", "title": "移动客户端" },
+        { "id": "desktop_client", "title": "桌面客户端" },
+        { "id": "cross_platform", "title": "跨端应用" }
+      ]
+    },
+    {
+      "id": "backend-service",
+      "title": "后端与服务端开发",
+      "description": "负责业务服务、API、交易、中间件、微服务和领域系统的服务端实现。",
+      "include": ["Java/Python/Go后端", "业务系统后端", "支付与交易服务", "搜索与广告服务", "微服务与中间件"],
+      "exclude": ["数据管道与数仓归入数据工程", "数据库内核归入数据库与存储", "游戏服务端归入游戏研发", "大模型服务归入大模型应用与Agent工程"],
+      "role_families": [
+        { "id": "general_backend", "title": "通用后端" },
+        { "id": "business_backend", "title": "业务系统后端" },
+        { "id": "middleware_service", "title": "中间件与平台服务" },
+        { "id": "realtime_service", "title": "实时通信与流媒体服务" }
+      ]
+    },
+    {
+      "id": "fullstack-system",
+      "title": "全栈与系统软件开发",
+      "description": "负责端到端产品交付、系统软件、编译器运行时、操作系统及通用开发工具。",
+      "include": ["全栈开发", "编译器与运行时", "操作系统与系统软件", "音视频编解码", "容器运行时", "通用开发工具", "低代码与通用平台"],
+      "exclude": ["嵌入式内核、BSP和驱动归入嵌入式与机器人", "业务后端归入后端与服务端开发", "云原生交付归入云原生与DevOps"],
+      "role_families": [
+        { "id": "fullstack", "title": "全栈开发" },
+        { "id": "system_software", "title": "系统软件" },
+        { "id": "compiler_runtime", "title": "编译器与运行时" },
+        { "id": "developer_tools", "title": "开发工具与通用平台" }
+      ]
+    },
+    {
+      "id": "quality-testing",
+      "title": "测试与质量工程",
+      "description": "负责测试设计、测试开发、自动化、性能、安全、合规和专项质量保障。",
+      "include": ["软件测试", "SDET", "性能测试", "安全测试", "AI测试", "AI合规", "专项评测", "固件验证", "质量工程"],
+      "exclude": ["网络安全建设归入基础设施、SRE与安全", "SRE稳定性归入基础设施、SRE与安全", "游戏研发归入游戏研发"],
+      "role_families": [
+        { "id": "test_engineering", "title": "软件测试" },
+        { "id": "test_development", "title": "测试开发" },
+        { "id": "performance_security_test", "title": "性能与安全测试" },
+        { "id": "specialized_quality", "title": "专项与合规测试" }
+      ]
+    },
+    {
+      "id": "data-analysis",
+      "title": "数据分析与商业分析",
+      "description": "通过SQL、统计、实验、可视化和业务解释支持决策。",
+      "include": ["数据分析师", "商业分析", "增长分析", "BI分析", "数据科学", "数据挖掘"],
+      "exclude": ["数据管道、调度和数仓建设归入数据工程", "数据库引擎与存储归入数据库与存储", "机器学习建模归入AI算法与模型训练"],
+      "role_families": [
+        { "id": "business_analysis", "title": "业务数据分析" },
+        { "id": "growth_analysis", "title": "增长与运营分析" },
+        { "id": "bi_analysis", "title": "BI与报表分析" },
+        { "id": "data_science", "title": "数据科学与挖掘" }
+      ]
+    },
+    {
+      "id": "data-engineering",
+      "title": "数据工程与数据平台",
+      "description": "负责数据采集、同步、实时计算、数仓、数据治理、质量和数据平台。",
+      "include": ["ETL/ELT", "实时计算", "数据仓库", "湖仓", "数据采集与标注", "数据治理", "数据质量", "元数据与血缘", "数据平台"],
+      "exclude": ["数据库内核、OLAP引擎和存储系统归入数据库与存储", "分析决策归入数据分析", "数据产品经理归入产品管理"],
+      "role_families": [
+        { "id": "data_engineering", "title": "数据开发与集成" },
+        { "id": "realtime_computing", "title": "实时计算" },
+        { "id": "data_warehouse", "title": "数据仓库与湖仓" },
+        { "id": "data_governance_platform", "title": "数据治理与平台" }
+      ]
+    },
+    {
+      "id": "database-storage",
+      "title": "数据库与存储工程",
+      "description": "负责数据库、查询引擎、存储系统、缓存、检索内核及数据基础设施。",
+      "include": ["数据库工程师/DBA", "OLAP/时序/图数据库", "分布式存储", "对象存储", "缓存与检索内核", "数据中间件"],
+      "exclude": ["存储固件、驱动和BSP归入嵌入式与机器人", "业务后端使用SQL归入后端与服务端开发", "数据仓库建模归入数据工程"],
+      "role_families": [
+        { "id": "database_engineering", "title": "数据库工程" },
+        { "id": "olap_database", "title": "分析型数据库" },
+        { "id": "storage_system", "title": "存储系统" },
+        { "id": "data_middleware", "title": "缓存、检索与数据中间件" }
+      ]
+    },
+    {
+      "id": "llm-agent-application",
+      "title": "大模型应用与Agent工程",
+      "description": "负责大模型应用、RAG、Agent、提示工程、模型服务、LLM评测与LLMOps。",
+      "include": ["大模型应用", "RAG", "Agent应用与平台", "提示工程", "模型服务与推理", "LLM评测", "LLM安全", "LLMOps"],
+      "exclude": ["预训练、微调和强化学习归入AI算法与模型训练", "传统CV/NLP/推荐算法归入AI算法与模型训练", "AI产品经理归入产品管理"],
+      "role_families": [
+        { "id": "llm_application", "title": "大模型应用" },
+        { "id": "rag_search", "title": "RAG与检索增强" },
+        { "id": "agent_platform", "title": "Agent应用与平台" },
+        { "id": "llm_serving_eval_ops", "title": "模型服务、评测与LLMOps" }
+      ]
+    },
+    {
+      "id": "ai-algorithm-training",
+      "title": "AI算法与模型训练",
+      "description": "负责机器学习、深度学习、CV、NLP、语音、推荐、强化学习及模型训练微调。",
+      "include": ["机器学习", "CV/NLP/语音", "推荐与搜索算法", "强化学习", "多模态与生成算法", "具身智能模型算法", "预训练与微调"],
+      "exclude": ["大模型应用集成与RAG归入大模型应用与Agent工程", "机器人导航与具身智能软件归入嵌入式与机器人", "AI产品归入产品管理"],
+      "role_families": [
+        { "id": "machine_learning", "title": "机器学习与通用算法" },
+        { "id": "cv_nlp_speech", "title": "视觉、语言与语音" },
+        { "id": "recommendation_search", "title": "推荐与搜索算法" },
+        { "id": "generative_reinforcement", "title": "生成、多模态与强化学习" },
+        { "id": "model_training", "title": "模型训练与微调" }
+      ]
+    },
+    {
+      "id": "product-management",
+      "title": "产品管理",
+      "description": "负责用户需求、产品方案、优先级、指标、行业产品和AI产品的全生命周期。",
+      "include": ["产品经理", "AI产品", "数据产品", "平台/B端产品", "增长产品", "行业产品"],
+      "exclude": ["解决方案与售前归入解决方案与售前技术", "用户研究专职归入设计与用户研究", "技术实现归入对应工程大类"],
+      "role_families": [
+        { "id": "general_product", "title": "通用产品" },
+        { "id": "ai_data_product", "title": "AI与数据产品" },
+        { "id": "platform_product", "title": "平台与B端产品" },
+        { "id": "domain_product", "title": "行业与领域产品" }
+      ]
+    },
+    {
+      "id": "cloud-devops",
+      "title": "云原生与DevOps",
+      "description": "负责容器、Kubernetes、CI/CD、交付、Serverless和研发效能。",
+      "include": ["云原生", "DevOps", "容器平台", "CI/CD", "Serverless", "研发效能", "交付平台"],
+      "exclude": ["SRE、稳定性、告警与故障归入基础设施、SRE与安全", "网络与安全归入基础设施、SRE与安全", "存储系统归入数据库与存储"],
+      "role_families": [
+        { "id": "cloud_native", "title": "云原生与容器" },
+        { "id": "devops_delivery", "title": "DevOps与交付" },
+        { "id": "developer_efficiency", "title": "研发效能" },
+        { "id": "serverless_compute", "title": "Serverless与弹性计算" }
+      ]
+    },
+    {
+      "id": "infra-sre-security",
+      "title": "基础设施、SRE与安全",
+      "description": "负责生产稳定性、运维、可观测性、网络、安全、边缘和通用基础设施。",
+      "include": ["SRE", "运维", "稳定性", "可观测性", "网络工程", "网络安全", "边缘计算", "GPU与智算基础设施", "大数据SRE"],
+      "exclude": ["安全测试归入测试与质量工程", "数据安全治理归入数据工程", "存储引擎归入数据库与存储", "DevOps交付归入云原生与DevOps"],
+      "role_families": [
+        { "id": "sre_stability", "title": "SRE与稳定性" },
+        { "id": "observability", "title": "可观测性" },
+        { "id": "network", "title": "网络工程" },
+        { "id": "security", "title": "网络安全" },
+        { "id": "edge_infrastructure", "title": "边缘与通用基础设施" }
+      ]
+    },
+    {
+      "id": "embedded-robotics",
+      "title": "嵌入式、机器人与汽车工程",
+      "description": "负责嵌入式软件、固件、驱动、芯片软件、车载基础软件、自动驾驶软件、无人机和机器人系统。",
+      "include": ["嵌入式", "RTOS", "BSP/驱动", "固件", "芯片软件", "车载MCU/AUTOSAR", "汽车电子与控制", "自动驾驶软件", "自动驾驶规划与控制", "无人机", "机器人软件与导航"],
+      "exclude": ["机器人交互设计归入设计与用户研究", "机器人云平台归入基础设施", "纯感知与生成算法归入AI算法与模型训练", "存储固件仍归入本类"],
+      "role_families": [
+        { "id": "embedded_software", "title": "嵌入式软件" },
+        { "id": "firmware_driver", "title": "固件、BSP与驱动" },
+        { "id": "chip_automotive_software", "title": "芯片与车载基础软件" },
+        { "id": "automotive_software", "title": "汽车与自动驾驶软件" },
+        { "id": "robotics_software", "title": "机器人与无人机系统" }
+      ]
+    },
+    {
+      "id": "game-development",
+      "title": "游戏研发",
+      "description": "覆盖游戏客户端、服务端、引擎、渲染、技术美术、AI、策划、音频与运营开发。",
+      "include": ["游戏客户端/服务端", "游戏引擎", "图形渲染", "技术美术", "游戏AI", "数值/关卡/叙事", "游戏音频", "游戏运营开发"],
+      "exclude": ["游戏测试归入测试与质量工程", "游戏数据开发归入数据工程", "游戏SRE归入基础设施、SRE与安全", "游戏UI设计归入设计与用户研究"],
+      "role_families": [
+        { "id": "game_client", "title": "游戏客户端" },
+        { "id": "game_server", "title": "游戏服务端" },
+        { "id": "game_engine_rendering", "title": "引擎、渲染与技术美术" },
+        { "id": "game_ai_design", "title": "游戏AI与策划" },
+        { "id": "game_audio_operations", "title": "音频、本地化与运营开发" }
+      ]
+    },
+    {
+      "id": "design-research",
+      "title": "设计与用户研究",
+      "description": "负责UX、交互、视觉、用户研究、内容设计、设计系统、动效与无障碍。",
+      "include": ["UX/交互", "视觉设计", "用户研究", "内容设计", "设计系统", "动效", "无障碍", "HMI与游戏UI"],
+      "exclude": ["关卡、叙事和游戏音频归入游戏研发", "产品需求决策归入产品管理", "解决方案归入解决方案与售前技术"],
+      "role_families": [
+        { "id": "ux_interaction", "title": "UX与交互设计" },
+        { "id": "visual_design", "title": "视觉与品牌设计" },
+        { "id": "user_research", "title": "用户研究" },
+        { "id": "content_motion_design_system", "title": "内容、动效与设计系统" }
+      ]
+    },
+    {
+      "id": "solutions-presales",
+      "title": "解决方案与售前技术",
+      "description": "负责需求调研、方案架构、选型、POC、售前支持和解决方案交付。",
+      "include": ["解决方案工程师/架构师", "售前", "技术咨询", "POC", "方案选型与交付"],
+      "exclude": ["产品经理归入产品管理", "纯后端或云平台研发归入对应工程大类", "实施运维归入基础设施、SRE与安全"],
+      "role_families": [
+        { "id": "solutions_engineering", "title": "解决方案工程" },
+        { "id": "presales_consulting", "title": "售前与技术咨询" },
+        { "id": "poc_delivery", "title": "POC与方案交付" }
+      ]
+    }
+  ],
+  "boundary_examples": [
+    { "example": "电商大模型应用算法工程师", "primary_class_id": "llm-agent-application", "reason": "标题含算法，但工作对象是大模型应用集成；电商仅作为行业标签" },
+    { "example": "Agent平台产品经理", "primary_class_id": "product-management", "reason": "工作内容是产品需求与方案，不是Agent系统实现" },
+    { "example": "车载语音识别算法工程师", "primary_class_id": "ai-algorithm-training", "reason": "属于语音算法；车载作为行业场景标签" },
+    { "example": "机器人视觉抓取算法工程师", "primary_class_id": "ai-algorithm-training", "reason": "属于视觉与抓取算法；机器人作为行业场景标签" },
+    { "example": "机器人SLAM算法工程师", "primary_class_id": "embedded-robotics", "reason": "属于机器人导航、定位与建图系统软件" },
+    { "example": "具身智能VLA算法工程师", "primary_class_id": "ai-algorithm-training", "reason": "属于具身智能模型与算法，不是机器人系统软件" },
+    { "example": "模型量化工程师", "primary_class_id": "llm-agent-application", "reason": "属于模型压缩、推理优化与模型服务" },
+    { "example": "AI合规工程师", "primary_class_id": "quality-testing", "reason": "属于风险评估、审计证据与合规保障" },
+    { "example": "自动驾驶标注平台工程师", "primary_class_id": "data-engineering", "reason": "属于数据标注与数据平台建设；自动驾驶作为行业标签" },
+    { "example": "自动驾驶评测平台工程师", "primary_class_id": "quality-testing", "reason": "属于专项测试与质量工程；自动驾驶作为行业标签" },
+    { "example": "游戏数据开发工程师", "primary_class_id": "data-engineering", "reason": "属于数据管道与平台建设；游戏作为行业标签" },
+    { "example": "支付安全测试工程师", "primary_class_id": "quality-testing", "reason": "属于安全测试；支付作为行业标签" },
+    { "example": "支付网络安全工程师", "primary_class_id": "infra-sre-security", "reason": "属于网络安全建设，不是测试验证" }
+  ],
+  "classification_policy": {
+    "primary_class_count": 1,
+    "secondary_tags_allowed": true,
+    "confidence_scale": "0到1，综合岗位类别、标题、ID、标签和主题的规则匹配强度",
+    "review_threshold": 0.8,
+    "ambiguity_rule": "第一候选与第二候选分差小于0.75，或第二候选分数不低于第一候选的75%时进入歧义清单",
+    "default_behavior": "不删除、不退役、不隐藏任何岗位；无法明确分类时保留最佳候选并标记人工复核"
+  }
+}

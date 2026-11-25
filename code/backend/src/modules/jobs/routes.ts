@@ -1,7 +1,7 @@
 import {registerBookmarks} from './bookmarks';
 import type {Database} from '../../database/connection';
 import { z } from 'zod';
-import type { JobTemplate, ContentSource } from '@interviewlab/core';
+import type { JobTemplate, ContentSource, KnowledgeQuestion } from '@interviewlab/core';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 import type { BackendModule } from '../contracts';
 import type { JobsService } from './service';
@@ -9,17 +9,27 @@ import { errorSchema, pageSchema } from '../../foundation/schemas';
 
 const strings = z.array(z.string());
 const stageSchema = z.enum(['internship', 'campus']);
+const interviewTypeSchema = z.enum([
+  'technical_qa',
+  'business_scenario',
+  'project_deep_dive',
+  'hr',
+  'mixed',
+]);
 const sourceSchema = z.object({
   id: z.string(),
   title: z.string(),
   url: z.string(),
   publisher: z.string(),
-  kind: z.enum(['recruitment', 'official_documentation', 'course_feedback']),
+  kind: z.enum(['recruitment', 'official_documentation', 'course_feedback', 'public_interview']),
   usage: z.literal('reference_only'),
   verification: z.enum(['page_read', 'search_index']),
   acquired_at: z.string(),
   reviewed_at: z.string(),
   notes: z.string(),
+  published_at: z.string().optional(),
+  freshness_date: z.string().optional(),
+  evidence_grade: z.enum(['A', 'B', 'C', 'D']).optional(),
 }) satisfies z.ZodType<ContentSource>;
 const questionSchema = z.object({
   id: z.string(),
@@ -33,7 +43,16 @@ const questionSchema = z.object({
   source_refs: strings,
   origin: z.literal('platform_authored'),
   version: z.number().int().positive(),
-});
+  question_type: z
+    .enum(['technical', 'business_scenario', 'behavioral', 'project', 'hr'])
+    .optional(),
+  competencies: strings.optional(),
+  interview_types: z.array(interviewTypeSchema).optional(),
+  status: z.enum(['active', 'merged']).optional(),
+  merged_into: z.string().optional(),
+  original_text: z.string().optional(),
+  review_action: z.enum(['keep', 'rewrite', 'merge', 'adapted_from_audited_question']).optional(),
+}) satisfies z.ZodType<KnowledgeQuestion>;
 export const jobSchema = z.object({
   id: z.string(),
   slug: z.string(),
@@ -44,7 +63,7 @@ export const jobSchema = z.object({
   tags: strings,
   version: z.number().int().positive(),
   status: z.enum(['draft', 'reviewed', 'published', 'retired']),
-  authorship: z.literal('platform_original'),
+  authorship: z.enum(['platform_original', 'public_source_original']),
   review_method: z.string(),
   stages: z.array(stageSchema),
   responsibilities: strings,
@@ -58,7 +77,19 @@ export const jobSchema = z.object({
   review_due_at: z.string(),
   code_relevant: z.boolean(),
   jd_note: z.string(),
+  primary_class_id: z.string().optional(),
+  role_family_id: z.string().optional(),
+  scenario_tags: strings.optional(),
 }) satisfies z.ZodType<JobTemplate>;
+const jobClassSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  include: strings,
+  exclude: strings,
+  role_families: z.array(z.object({ id: z.string(), title: z.string() })),
+  published_count: z.number().int().nonnegative(),
+});
 
 export function jobsModule(service: JobsService, database?:Database): BackendModule {
   return {
@@ -77,6 +108,16 @@ export function jobsModule(service: JobsService, database?:Database): BackendMod
         async () => ({ items: service.categories(), next_cursor: null }),
       );
       app.get(
+        '/job-classes',
+        {
+          schema: {
+            tags: ['jobs'],
+            response: { 200: pageSchema(jobClassSchema) },
+          },
+        },
+        async () => ({ items: service.jobClasses(), next_cursor: null }),
+      );
+      app.get(
         '/job-templates',
         {
           schema: {
@@ -84,6 +125,7 @@ export function jobsModule(service: JobsService, database?:Database): BackendMod
             querystring: z.object({
               search: z.string().trim().max(200).optional(),
               category: z.string().max(100).optional(),
+              primary_class: z.string().max(100).optional(),
               stage: stageSchema.optional(),
               limit: z.coerce.number().int().min(1).max(50).default(20),
               cursor: z.string().min(1).max(2000).optional(),
