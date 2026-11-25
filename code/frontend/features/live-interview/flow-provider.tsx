@@ -5,13 +5,10 @@ import { useRouter } from 'next/navigation';
 import type { Interview, InterviewConfig } from '@interviewlab/core';
 import { useSession } from '../../components/session-provider';
 import { startPreparedInterview, type StartRequest } from './start-request';
+import { runInterviewEntry, type EntryRequest } from './entry-request';
 import { interviewsApi } from '../../lib/api/interviews';
 import { useInterviewVoice } from './voice/use-voice';
-import {
-  prepareVoiceDevices,
-  releaseVoiceDevices,
-  type PreparedVoiceDevices,
-} from './voice/devices';
+import { usePreparedInterviewDevices } from './use-prepared-devices';
 
 type Phase = 'idle' | 'devices' | 'creating' | 'preparing' | 'connecting' | 'running' | 'error';
 interface FlowState {
@@ -47,9 +44,8 @@ export function InterviewFlowProvider({ children }: { children: ReactNode }) {
   const current = useRef(state);
   const binding = useRef<Binding | null>(null);
   const [draft, setDraft] = useState('');
-  const devices = useRef<PreparedVoiceDevices | null>(null);
-  const deviceWork = useRef<Promise<PreparedVoiceDevices> | null>(null);
-  const enterWork = useRef<Promise<Interview> | null>(null);
+  const enterWork = useRef<EntryRequest<Interview> | null>(null);
+  const enteredInterview = useRef<string | null>(null);
   const createWork = useRef<Promise<void> | null>(null);
   const creation = useRef<{ config: InterviewConfig; key: string } | null>(null);
   const startRequest = useRef<StartRequest | null>(null);
@@ -84,18 +80,18 @@ export function InterviewFlowProvider({ children }: { children: ReactNode }) {
   });
   const voiceRef = useRef(voice);
   voiceRef.current = voice;
-  function clearDevices() {
-    voiceRef.current.stop();
-    current.current.camera?.getTracks().forEach((track) => track.stop());
-    if (devices.current) releaseVoiceDevices(devices.current);
-    devices.current = null;
-    deviceWork.current = null;
-    update({ camera: null, deviceReady: false });
-  }
+  const { devices, clearDevices, prepareDevices } = usePreparedInterviewDevices({
+    current,
+    epoch,
+    alive,
+    voice: voiceRef,
+    update,
+  });
   function release() {
     epoch.current++;
     clearDevices();
     enterWork.current = null;
+    enteredInterview.current = null;
     update({ camera: null, deviceReady: false });
   }
   useEffect(() => {
@@ -117,39 +113,6 @@ export function InterviewFlowProvider({ children }: { children: ReactNode }) {
     }
   }, [owner]);
 
-  function prepareDevices(config: InterviewConfig): Promise<PreparedVoiceDevices | null> {
-    if (config.interaction_mode === 'text_fallback' || current.current.textMode) {
-      update({ deviceReady: true });
-      return Promise.resolve(null);
-    }
-    if (
-      devices.current?.context.state !== 'closed' &&
-      devices.current?.media.getAudioTracks().some((t) => t.readyState !== 'ended')
-    )
-      return Promise.resolve(devices.current);
-    if (deviceWork.current) return deviceWork.current;
-    const generation = epoch.current;
-    // This call starts AudioContext.resume in the original submit/retry gesture.
-    const work = prepareVoiceDevices(config.interaction_mode === 'realtime_video').then(
-      (result) => {
-        if (generation !== epoch.current || !alive.current) {
-          releaseVoiceDevices(result);
-          throw new Error('本次准备已取消。');
-        }
-        result.camera?.getVideoTracks().forEach((t) => {
-          t.enabled = false;
-        });
-        devices.current = result;
-        update({ camera: result.camera });
-        return result;
-      },
-    );
-    deviceWork.current = work;
-    void work.catch(() => {
-      if (deviceWork.current === work) deviceWork.current = null;
-    });
-    return work;
-  }
   async function prepareSession(view: Interview) {
     const generation = epoch.current;
     const prepared = await prepareDevices(view.configuration);
@@ -172,11 +135,26 @@ export function InterviewFlowProvider({ children }: { children: ReactNode }) {
     if (abandoned.current.has(view.id)) throw new Error('本次准备已取消。');
     if (current.current.view?.id === view.id && current.current.view.version > view.version)
       view = current.current.view;
-    if (enterWork.current) return enterWork.current;
-    if (current.current.phase === 'running' && current.current.view?.id === view.id)
+    return runInterviewEntry(view.id, enterWork, () => enterSession(view), {
+      activeId: enteredInterview.current ?? current.current.view?.id,
+      cancel: () => {
+        binding.current = null;
+        startRequest.current = null;
+        release();
+        setDraft('');
+        update({ textMode: false });
+      },
+    });
+  }
+  async function enterSession(view: Interview): Promise<Interview> {
+    if (
+      current.current.phase === 'running' &&
+      enteredInterview.current === view.id &&
+      current.current.view?.id === view.id
+    )
       return current.current.view;
     const generation = epoch.current;
-    const work = (async () => {
+    try {
       accept(view);
       update({ error: '', phase: 'preparing' });
       if (!['ready', 'in_progress'].includes(view.status))
@@ -195,11 +173,8 @@ export function InterviewFlowProvider({ children }: { children: ReactNode }) {
         t.enabled = true;
       });
       update({ phase: 'running' });
+      enteredInterview.current = view.id;
       return current.current.view!;
-    })();
-    enterWork.current = work;
-    try {
-      return await work;
     } catch (error) {
       if (generation === epoch.current) {
         clearDevices();
@@ -211,8 +186,6 @@ export function InterviewFlowProvider({ children }: { children: ReactNode }) {
         });
       }
       throw error;
-    } finally {
-      if (enterWork.current === work) enterWork.current = null;
     }
   }
   function begin(config: InterviewConfig): Promise<void> {

@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { INTERVIEW_MAX_ANSWER, LIVE_TYPE_LABELS, type Interview } from '@interviewlab/core';
+import { INTERVIEW_MAX_ANSWER, type Interview } from '@interviewlab/core';
 import { useRouter } from 'next/navigation';
 import { interviewsApi } from '../../lib/api/interviews';
 import { useSession } from '../../components/session-provider';
@@ -15,15 +15,10 @@ import { PreparationScreen } from './preparation';
 import { TransitionScreen } from './transition-screen';
 import { VoiceControls } from './voice/controls';
 import { VideoInterviewWorkspace } from '../video-interview/room';
+import { useQuestionPresentation } from './use-question-presentation';
+import { interviewPresentation } from './interview-presentation';
+import { InterviewProgressNotice, InterviewGenerationNotice } from './interview-notices';
 
-const STAGES = {
-  introduction: '自我介绍',
-  experience: '经历交流',
-  technical: '专业交流',
-  business: '业务交流',
-  behavioral: '动机与协作',
-  closing: '面试收尾',
-};
 function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: boolean }) {
   const flow = useInterviewFlow();
   const router = useRouter();
@@ -45,9 +40,9 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
   const [finish, setFinish] = useState(false);
   const restoreVoice = useRef<(() => void) | null>(null);
   const [now, setNow] = useState(Date.now());
-  const acknowledged = useRef(new Set<string>());
   const deadlineChecked = useRef(false);
   const v = resource.value;
+  const presentation = useQuestionPresentation(v);
   const turn = v?.turns.at(-1);
   const terminal = v?.status === 'completed' || v?.status === 'failed';
   const userId = account.status === 'signed_in' ? account.session.user.id : '';
@@ -77,21 +72,6 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
       void resource.refresh();
     }
   }, [now, v?.deadline_at, terminal, resource.refresh]);
-  useEffect(() => {
-    if (
-      !v ||
-      v.status !== 'in_progress' ||
-      !turn ||
-      turn.answer_status !== 'waiting' ||
-      turn.presented_at ||
-      acknowledged.current.has(turn.id)
-    )
-      return;
-    acknowledged.current.add(turn.id);
-    void interviewsApi
-      .command(id, `turns/${turn.id}/presented`, { version: v.version }, crypto.randomUUID())
-      .catch(() => {});
-  }, [id, v, turn]);
   function setText(text: string) {
     setDraft({ key: draftKey, text });
     try {
@@ -195,29 +175,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
     v.generation_status !== 'pending' &&
     !command.blocked;
   const targetReached = v.target_at && now >= Date.parse(v.target_at);
-  const turns = v.turns.map((t) => ({
-    id: t.id,
-    text: t.text,
-    label: t.stage
-      ? STAGES[t.stage]
-      : `主问题 ${t.main_question_index}${t.follow_up_index ? ` · 追问 ${t.follow_up_index}` : ''}`,
-    acknowledgement: t.acknowledgement,
-    status: t.answer_status,
-    answer: t.answer_text,
-    inputMode: t.input_mode,
-  }));
-  const seconds = v.started_at
-    ? Math.min(
-        (Math.max(10, v.configuration.duration_minutes) + 2) * 60,
-        Math.max(
-          0,
-          Math.floor(
-            ((terminal && v.ended_at ? Date.parse(v.ended_at) : now) - Date.parse(v.started_at)) /
-              1000,
-          ),
-        ),
-      )
-    : 0;
+  const workspace = interviewPresentation(v, now, stream.preview);
   const submit = () => {
     if (voice.active) {
       voice.commit();
@@ -235,7 +193,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
       );
     else act(`turns/${turn!.id}/answer`, { text }, { turnId: turn!.id, text, key: draftKey });
   };
-  const participation = v.participation;
+
   return (
     <>
       <Workspace
@@ -243,48 +201,13 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
         initialCamera={flow.camera}
         onCameraChange={flow.setCamera}
         jobTitle={v.job_title}
-        typeLabel={
-          v.parent_interview_id ? '单题重练' : LIVE_TYPE_LABELS[v.configuration.interview_type]
-        }
+        typeLabel={workspace.typeLabel}
         interviewerLabel="AI 面试官"
-        interviewerStatus={
-          v.status === 'paused'
-            ? '面试已暂停'
-            : terminal
-              ? '本场交流已结束'
-              : v.generation_status === 'pending'
-                ? stream.preview
-                  ? '正在提问…'
-                  : '正在结合你的回答…'
-                : waiting
-                  ? '等待你的回答'
-                  : v.generation_status === 'failed'
-                    ? '生成失败，可重试'
-                    : '准备开始'
-        }
-        seconds={seconds}
+        interviewerStatus={workspace.interviewerStatus}
+        seconds={workspace.seconds}
         durationMinutes={v.configuration.duration_minutes}
-        turns={turns}
-        current={
-          stream.preview
-            ? {
-                id: 'generation-preview',
-                text: stream.preview.text,
-                label: '面试官正在提问',
-                acknowledgement: stream.preview.acknowledgement,
-                status: 'waiting',
-                answer: null,
-              }
-            : terminal && participation?.level === 'ended'
-              ? {
-                  id: 'participation-ended',
-                  text: '本场面试已结束。',
-                  label: '结束说明',
-                  status: 'answered',
-                  answer: null,
-                }
-              : turns.at(-1)
-        }
+        turns={workspace.turns}
+        current={workspace.current}
         draft={text}
         maxAnswer={INTERVIEW_MAX_ANSWER}
         canAnswer={Boolean(canAnswer)}
@@ -295,9 +218,7 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
         }
         paused={v.status === 'paused'}
         ended={Boolean(terminal)}
-        saveLabel={
-          v.turns.some((t) => t.answer_status === 'answered') ? '回答已保存' : '提交后保存'
-        }
+        saveLabel={workspace.saveLabel}
         draftHint={
           storageError ||
           (terminal && text
@@ -317,70 +238,24 @@ function InterviewBody({ id, videoRoom = false }: { id: string; videoRoom?: bool
         notice={
           <>
             <ErrorNotice message={resource.error} retry={() => void resource.refresh()} />
+            <ErrorNotice message={presentation.error} retry={presentation.retry} />
             <CommandNotice command={command} refresh={() => void resource.refresh()} />
-            {continuation && (
-              <p className="notice" role="status">
-                旧问题生成已被你的补充打断。可继续补充回答，或{' '}
-                <button
-                  className="text-link"
-                  disabled={command.blocked || voice.active}
-                  onClick={() => act('voice/continue', { turn_id: turn!.id, text: '' })}
-                >
-                  按已保存的回答继续提问
-                </button>
-                。
-              </p>
-            )}
-            {participation && (
-              <p className="notice" role="status">
-                {participation.message}
-              </p>
-            )}
-            {v.retry_goal && <p className="notice">单题重练目标：{v.retry_goal}</p>}
-            {targetReached && !terminal && (
-              <p className="notice" role="status">
-                已到目标时长，请完成当前回答后收尾。
-                {Math.max(10, v.configuration.duration_minutes) + 2}{' '}
-                分钟后会自动封存，暂停和断线仍计时。
-              </p>
-            )}
+            <InterviewProgressNotice
+              view={v}
+              continuation={Boolean(continuation)}
+              targetReached={Boolean(targetReached)}
+              canContinue={!command.blocked && !voice.active}
+              onContinue={() => act('voice/continue', { turn_id: turn!.id, text: '' })}
+            />
           </>
         }
         conversationNotice={
-          <>
-            {stream.preview && (
-              <div className="message message-interviewer" aria-live="polite">
-                <p>{stream.preview.acknowledgement}</p>
-                <p>{stream.preview.text}</p>
-                <small>生成中，完成后即可回答</small>
-              </div>
-            )}
-            {v.generation_status === 'pending' && !stream.preview && (
-              <p className="notice" role="status">
-                回答已保存，面试官正在结合你的陈述思考…
-              </p>
-            )}
-            {v.generation_status === 'failed' && (
-              <div className="notice" role="status">
-                <span>生成暂时失败，已保存的回答仍保留。</span>
-                <Button
-                  size="sm"
-                  disabled={command.blocked}
-                  onClick={() => act('generation/retry', { fallback: false })}
-                >
-                  重试生成
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={command.blocked}
-                  onClick={() => act('generation/retry', { fallback: true })}
-                >
-                  {waiting ? '保留原题继续作答' : '使用通用流程题继续'}
-                </Button>
-              </div>
-            )}
-          </>
+          <InterviewGenerationNotice
+            view={v}
+            preview={stream.preview}
+            blocked={command.blocked}
+            onRetry={(fallback) => act('generation/retry', { fallback })}
+          />
         }
         interviewerNote={
           <>
