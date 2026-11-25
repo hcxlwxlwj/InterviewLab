@@ -9,7 +9,7 @@ import type {
   InterviewQuestion,
   InterviewTurn,
 } from '@interviewlab/core';
-import { FEEDBACK_DIMENSIONS, FEEDBACK_TEMPLATE_VERSION } from '@interviewlab/core';
+import { FEEDBACK_DIMENSIONS, FEEDBACK_TEMPLATE_VERSION, mainQuestionLimit } from '@interviewlab/core';
 import { loadConfig } from '../../../code/backend/src/foundation/config';
 import { createDatabase, type Database } from '../../../code/backend/src/database/connection';
 import { migrateDatabase } from '../../../code/backend/src/database/migrate';
@@ -744,7 +744,8 @@ test('skipping every conversational question terminates within the main-question
   agent.evaluate = async () => {
     throw new Error('empty answers must not be evaluated');
   };
-  for (let step = 0; step < 6; step++) {
+  const budget = mainQuestionLimit(configuration.duration_minutes);
+  for (let step = 0; step < budget; step++) {
     v = await runtime.interviews.action(
       identity,
       v.id,
@@ -756,7 +757,7 @@ test('skipping every conversational question terminates within the main-question
     v = await runtime.interviews.read(identity, v.id);
   }
   assert.equal(v.status, 'completed');
-  assert.equal(v.turns.length, 6);
+  assert.equal(v.turns.length, budget);
   assert.equal((await runtime.reports.get(identity, v.id)).evaluations.length, 0);
 });
 test('history pagination stays isolated and malformed typed cursors return input errors', async () => {
