@@ -116,7 +116,10 @@ test('new interviews start at ten minutes and long sessions retain their time an
       limit,
     );
   }
-  assert.equal(nextQuestionPosition([turn('问题', '回答', 6)], false, 20)?.main_question_index, 7);
+  assert.equal(mainQuestionLimit(10), 10);
+  assert.equal(mainQuestionLimit(20), 14);
+  assert.equal(mainQuestionLimit(30), 18);
+  assert.equal(nextQuestionPosition([turn('问题', '回答', 13)], false, 20)?.main_question_index, 14);
   assert.equal(interviewDeadline(started, 5) - Date.parse(started), 12 * 60000);
 });
 
@@ -166,13 +169,13 @@ test('mixed interviews reserve business and HR topics before the main-question b
     duration_minutes: 10,
   });
   state.view.target_at = new Date(Date.now() + 590000).toISOString();
-  state.view.turns = [turn('你如何理解这个任务？', '先明确目标。', 4)];
+  state.view.turns = [turn('你如何理解这个任务？', '先明确目标。', 7)];
   assert.deepEqual(interviewPacing(state.view, null).preferred_goals, [
     'business',
     'tradeoffs',
     'verification',
   ]);
-  state.view.turns = [turn('你会如何取舍？', '先保证任务完成。', 5)];
+  state.view.turns = [turn('你会如何取舍？', '先保证任务完成。', 8)];
   assert.ok(interviewPacing(state.view, null).preferred_goals.includes('availability'));
 });
 

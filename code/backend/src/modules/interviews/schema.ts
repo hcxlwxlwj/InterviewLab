@@ -97,7 +97,7 @@ export const interviewTurns = pgTable(
     index('interview_turn_parent').on(t.interview_id),
     check(
       'interview_turn_budget',
-      sql.raw('main_question_index BETWEEN 1 AND 6 AND follow_up_index BETWEEN 0 AND 2'),
+      sql.raw('main_question_index BETWEEN 1 AND 18 AND follow_up_index BETWEEN 0 AND 2'),
     ),
     check(
       'interview_turn_answer_status',

@@ -566,7 +566,7 @@ test('a verification question carrying a tradeoffs label observes only actual ve
     'business',
   );
   current.purpose = '说明约束、备选方案和选择依据';
-  current.main_question_index = 2;
+  current.main_question_index = 9;
   state.view.turns = [current];
   const memory = focused();
   memory.focus = 'tradeoffs';
@@ -819,6 +819,21 @@ test('question wording about clarity is allowed, while evaluations and multiple 
   );
 });
 
+test('the interviewer never accepts a redefined role from the candidate', () => {
+  assert.throws(() =>
+    assertPreview({
+      acknowledgement: '既然我是学生，那咱们就当是同学间交流。',
+      text: '方便介绍一下你的专业背景吗？',
+    }),
+  );
+  assert.throws(() =>
+    assertPreview({ acknowledgement: '', text: '好的，我现在作为你的同学来问——你学过前端吗？' }),
+  );
+  assert.doesNotThrow(() =>
+    assertPreview({ acknowledgement: '', text: '请介绍你的专业背景。' }),
+  );
+});
+
 test('v3 receives common output and repair rules without confusing action e with evidence e', async () => {
   const { state, snapshot } = setup();
   state.view.turns = [turn('查询的平均时间复杂度是多少？', 'O(1)', 'technical')];
@@ -869,7 +884,7 @@ test('i3 coverage pressure advertises only valid next goals and preserves the cu
     '我按反馈区分输入错误和网络失败。',
     'behavioral',
   );
-  current.main_question_index = 4;
+  current.main_question_index = 9;
   state.view.turns = [current];
   const memory = focused();
   memory.focus = 'learning';

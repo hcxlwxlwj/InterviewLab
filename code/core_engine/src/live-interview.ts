@@ -286,7 +286,7 @@ export function interviewDurationMinutes(interview: Pick<Interview, 'configurati
   return interview.configuration.duration_minutes + (interview.extension_minutes ?? 0);
 }
 export function mainQuestionLimit(durationMinutes = 10): number {
-  return durationMinutes <= 10 ? 6 : durationMinutes <= 20 ? 10 : 14;
+  return durationMinutes <= 10 ? 10 : durationMinutes <= 20 ? 14 : 18;
 }
 export function interviewDeadline(startedAt: string, durationMinutes = 10): number {
   return Date.parse(startedAt) + (Math.max(10, durationMinutes) + 2) * 60000;

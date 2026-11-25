@@ -177,9 +177,9 @@ test('timeout and user cancellation reach fetch and are distinguished', async ()
     clearTimeout(keepAlive);
   }
 });
-test('six main questions and two follow-ups are hard programmatic limits', () => {
+test('main-question and follow-up budgets are hard programmatic limits', () => {
   const turns: InterviewTurn[] = [];
-  for (let main = 1; main <= 6; main++)
+  for (let main = 1; main <= 10; main++)
     for (let follow = 0; follow <= 2; follow++) {
       assert.deepEqual(nextQuestionPosition(turns, follow > 0), {
         main_question_index: main,
