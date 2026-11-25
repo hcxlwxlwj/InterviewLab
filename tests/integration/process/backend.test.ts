@@ -133,19 +133,19 @@ test('built API starts without database, serves public data and releases resourc
     assert.equal((await fetch(base + '/health/ready')).status, 503);
     const items: { id: string }[] = [];
     let cursor: string | null = null;
-    for (let page = 0; page < 20; page += 1) {
+    for (let page = 0; page < 26; page += 1) {
       const suffix = cursor ? '&cursor=' + encodeURIComponent(cursor) : '';
       const payload = (await (await fetch(base + '/job-templates?limit=50' + suffix)).json()) as {
         items: { id: string }[];
         next_cursor: string | null;
       };
-      assert.equal(payload.items.length, 50);
+      assert.equal(payload.items.length, page < 25 ? 50 : 19);
       items.push(...payload.items);
       cursor = payload.next_cursor;
-      if (page < 19) assert.ok(cursor);
+      if (page < 25) assert.ok(cursor);
     }
     assert.equal(cursor, null);
-    assert.equal(new Set(items.map((item) => item.id)).size, 1000);
+    assert.equal(new Set(items.map((item) => item.id)).size, 1269);
   } catch (error) {
     throw new Error(String(error) + '\n' + output);
   } finally {

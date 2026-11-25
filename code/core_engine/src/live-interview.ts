@@ -6,7 +6,7 @@ import type {
   InterviewRetrieval,
 } from './interview-agent';
 import type { DimensionKey, SessionStatus } from './domain/interview';
-import type { ContentSource, KnowledgeQuestion } from './domain/knowledge';
+import type { ContentSource, RuntimeKnowledgeQuestion } from './domain/knowledge';
 
 /** Shared DTOs for the HTTP interview workflow. */
 export interface InterviewConfig {
@@ -23,7 +23,7 @@ export interface InterviewConfig {
 export interface InterviewKnowledge {
   agent_release?: KnowledgeRelease;
   content_version: string;
-  questions: KnowledgeQuestion[];
+  questions: RuntimeKnowledgeQuestion[];
   sources: ContentSource[];
   missing_reason: string | null;
 }

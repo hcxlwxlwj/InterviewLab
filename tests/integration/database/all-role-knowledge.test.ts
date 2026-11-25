@@ -84,14 +84,14 @@ test(
           "SELECT count(DISTINCT job)::int AS jobs FROM knowledge_v2_bindings WHERE release='all-roles-controlled-v1'",
         )
       ).rows[0];
-      assert.equal(counts.jobs, 1000);
+      assert.equal(counts.jobs, 1269);
       assert.equal(
         (
           await pool.query(
             "SELECT count(DISTINCT card_id)::int AS n FROM knowledge_v2_chunks WHERE kind='question'",
           )
         ).rows[0].n,
-        8098,
+        10294,
       );
       assert.ok(embeddingRequests < 2000, 'embedding is batched and hash deduplicated');
       assert.equal(

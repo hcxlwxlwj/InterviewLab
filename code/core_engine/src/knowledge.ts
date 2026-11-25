@@ -1,13 +1,38 @@
 import type {
-  CareerStage,
   ContentSource,
+  JobSearchQuery,
   JobTemplate,
   KnowledgeEntry,
+  KnowledgeInterviewType,
+  KnowledgeQuestion,
   KnowledgeRetriever,
+  SupplementalQuestion,
 } from './domain/knowledge';
 export function templateJd(job: JobTemplate): string {
   return `${job.title}\n\n岗位职责\n${job.responsibilities.join('\n')}\n\n基础要求\n${job.requirements.join('\n')}\n\n加分项\n${job.preferred.join('\n')}`;
 }
+export function isActiveQuestion(question: KnowledgeQuestion): boolean {
+  return question.status !== 'merged';
+}
+
+/** Every authored question remains eligible for mixed interviews; explicit types add focus. */
+export function questionInterviewTypes(
+  question: Pick<KnowledgeQuestion, 'question_type' | 'interview_types'>,
+): KnowledgeInterviewType[] {
+  const explicit = question.interview_types?.length
+    ? [...question.interview_types]
+    : question.question_type === 'technical'
+      ? ['technical_qa' as const]
+      : question.question_type === 'business_scenario'
+        ? ['business_scenario' as const]
+        : question.question_type === 'project' || question.question_type === 'behavioral'
+          ? ['project_deep_dive' as const]
+          : question.question_type === 'hr'
+            ? ['hr' as const]
+            : ['technical_qa' as const, 'project_deep_dive' as const];
+  return [...new Set<KnowledgeInterviewType>([...explicit, 'mixed'])];
+}
+
 /** Structured retrieval view of original content, never user resumes or pasted private JDs. */
 export function knowledgeEntries(job: JobTemplate): KnowledgeEntry[] {
   const common = {
@@ -26,7 +51,7 @@ export function knowledgeEntries(job: JobTemplate): KnowledgeEntry[] {
       topics: job.topics,
       source_refs: job.source_refs,
     },
-    ...job.questions.map((q) => ({
+    ...job.questions.filter(isActiveQuestion).map((q) => ({
       ...common,
       id: `${q.id}-outline-v${job.version}`,
       kind: 'preparation_outline' as const,
@@ -40,10 +65,15 @@ export function knowledgeEntries(job: JobTemplate): KnowledgeEntry[] {
 }
 
 /** Pure registry: callers supply versioned public content; no file or network access. */
-export function createJobCatalog(templates: JobTemplate[], sources: ContentSource[]) {
+export function createJobCatalog(
+  templates: JobTemplate[],
+  sources: ContentSource[],
+  supplementalQuestions: SupplementalQuestion[] = [],
+) {
   const ALL_JOB_TEMPLATES = templates;
   const JOBS = templates.filter((j) => j.status === 'published');
   const CONTENT_SOURCES = sources;
+  const SUPPLEMENTAL_QUESTIONS = supplementalQuestions.filter((question) => question.runtime_enabled);
   const aliases: Record<string, string> = {
     java: 'backend',
     'java-backend': 'backend',
@@ -55,12 +85,13 @@ export function createJobCatalog(templates: JobTemplate[], sources: ContentSourc
       (j) => j.status === 'published' && (j.id === (aliases[id] ?? id) || j.slug === id),
     );
   }
-  function searchJobs(query: { search?: string; category?: string; stage?: CareerStage } = {}) {
+  function searchJobs(query: JobSearchQuery = {}) {
     const text = query.search?.trim().toLowerCase();
     return JOBS.filter(
       (j) =>
         j.status === 'published' &&
         (!query.category || j.category_id === query.category) &&
+        (!query.primary_class || j.primary_class_id === query.primary_class) &&
         (!query.stage || j.stages.includes(query.stage)) &&
         (!text ||
           [j.title, j.description, ...j.tags, ...j.topics].join(' ').toLowerCase().includes(text)),
@@ -70,6 +101,18 @@ export function createJobCatalog(templates: JobTemplate[], sources: ContentSourc
     async retrieve(query) {
       const job = getJob(query.job_id);
       if (!job) throw new Error('岗位模板未发布或已不可用。');
+      const supplementalQuestions = SUPPLEMENTAL_QUESTIONS.filter(
+        (question) =>
+          question.eligible_job_ids.includes(job.id) &&
+          (!query.stage || question.stages.includes(query.stage)) &&
+          (!query.topic || question.topic === query.topic) &&
+          (!query.difficulty || question.difficulty === query.difficulty) &&
+          (!query.interview_type || question.interview_types.includes(query.interview_type)),
+      );
+      const sourceRefs = new Set([
+        ...job.source_refs,
+        ...supplementalQuestions.flatMap((question) => question.source_refs),
+      ]);
       return {
         template_id: job.id,
         template_version: job.version,
@@ -81,11 +124,13 @@ export function createJobCatalog(templates: JobTemplate[], sources: ContentSourc
         ),
         items: job.questions.filter(
           (q) =>
+            isActiveQuestion(q) &&
             (!query.stage || q.stages.includes(query.stage)) &&
             (!query.topic || q.topic === query.topic) &&
             (!query.difficulty || q.difficulty === query.difficulty),
         ),
-        sources: CONTENT_SOURCES.filter((s) => job.source_refs.includes(s.id)),
+        supplemental_questions: supplementalQuestions,
+        sources: CONTENT_SOURCES.filter((source) => sourceRefs.has(source.id)),
       };
     },
   };

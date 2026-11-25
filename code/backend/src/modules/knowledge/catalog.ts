@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { LIVE_TYPE_LABELS } from '@interviewlab/core';
+import { LIVE_TYPE_LABELS, isActiveQuestion, questionInterviewTypes } from '@interviewlab/core';
 import type {
   CompetencyCard,
   InterviewConfig,
@@ -14,6 +14,7 @@ import {
   templateJd,
   frontendReportReference,
   teacherAgentQuestions,
+  PUBLIC_INTERVIEW_SUPPLEMENTS,
 } from '../../content/index';
 import { ServiceError } from '../../foundation/errors';
 import { professionalFoundations as professional } from '../../content/index';
@@ -142,7 +143,7 @@ export function buildCatalog(): CatalogDocument[] {
       evidence_level: 'platform_authored',
       bindings: [binding],
     });
-    for (const q of job.questions)
+    for (const q of job.questions.filter(isActiveQuestion))
       documents.push({
         id: q.id,
         kind: 'question',
@@ -150,10 +151,39 @@ export function buildCatalog(): CatalogDocument[] {
         source_refs: q.source_refs,
         text: `${q.topic}：${q.text}\n提问目的：${q.intent}\n观察方向：${q.observation_points.join('；')}\n追问线索：${q.follow_ups.join('；')}\n平台原创提问素材，不是标准答案或已验证能力证据。`,
         bindings: [
-          { ...binding, stages: q.stages, types: ['technical_qa', 'project_deep_dive', 'mixed'] },
+          {
+            ...binding,
+            stages: q.stages,
+            types: questionInterviewTypes(q),
+            goals: q.competencies?.length ? [...q.competencies] : binding.goals,
+          },
         ],
       });
   }
+  if (PUBLIC_INTERVIEW_SUPPLEMENTS.runtime_enabled)
+    for (const question of PUBLIC_INTERVIEW_SUPPLEMENTS.questions) {
+      if (!question.runtime_enabled) continue;
+      const bindings = question.eligible_job_ids.map((jobId) => {
+        const job = getJob(jobId);
+        if (!job) throw new Error(`Supplemental question targets an unavailable role: ${jobId}`);
+        const stages = question.stages.filter((stage) => job.stages.includes(stage));
+        if (!stages.length) throw new Error(`Supplemental question has no applicable stage: ${jobId}`);
+        return {
+          job: job.id,
+          stages,
+          types: question.interview_types,
+          goals: question.competencies,
+        };
+      });
+      documents.push({
+        id: question.id,
+        kind: 'question',
+        evidence_level: 'source_summary',
+        source_refs: question.source_refs,
+        text: `${question.topic}：${question.text}\n提问目的：${question.intent}\n观察方向：${question.observation_points.join('；')}\n追问线索：${question.follow_ups.join('；')}\n来源与适用限制：${question.limitations}\n公开面经摘要，不是标准答案或已验证能力证据。`,
+        bindings,
+      });
+    }
   for (const { job, source, questions } of teacherAgentQuestions) {
     if (!getJob(job)?.stages.includes('campus'))
       throw new Error(`Teacher question set targets an unavailable campus role: ${job}`);
@@ -245,7 +275,7 @@ export function catalogManifest(documents = buildCatalog()) {
     reviewed_at: j.reviewed_at,
     review_due_at: j.review_due_at,
     source_refs: j.source_refs,
-    question_ids: j.questions.map((q) => q.id),
+    question_ids: j.questions.filter(isActiveQuestion).map((q) => q.id),
   }));
   return {
     format: CATALOG_FORMAT,

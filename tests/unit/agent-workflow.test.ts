@@ -100,15 +100,15 @@ const response = (value: unknown, finish = 'stop') =>
   );
 const signal = () => new AbortController().signal;
 
-test('all 1000 roles and 8000 original questions have applicable typed records, without cloning shared foundations', async () => {
+test('all published roles and active main questions have applicable typed records, without cloning shared foundations', async () => {
   const documents = buildCatalog(),
     manifest = catalogManifest(documents);
-  assert.equal(manifest.jobs, 1000);
-  assert.equal(manifest.lineage.length, 1000);
+  assert.equal(manifest.jobs, 1269);
+  assert.equal(manifest.lineage.length, 1269);
   assert.equal(manifest.lineage[0].review_method, JOBS[0].review_method);
   assert.equal(
     manifest.lineage.reduce((n, j) => n + j.question_ids.length, 0),
-    8000,
+    10148,
   );
   assert.ok(
     manifest.sources.some((s) => s.verification === 'search_index'),
@@ -116,7 +116,7 @@ test('all 1000 roles and 8000 original questions have applicable typed records, 
   );
   assert.ok(catalogTerms('数仓 数据约束 机器人 可用性 state effect').includes('state'));
   assert.ok(!catalogTerms('state effect').includes('副作用'));
-  assert.equal(manifest.questions, 8098);
+  assert.equal(manifest.questions, 10294);
   assert.equal(manifest.families.length, 9);
   assert.ok(manifest.coverage.every((c) => c.professional_cards >= 1));
   for (const job of JOBS) {
@@ -136,7 +136,7 @@ test('all 1000 roles and 8000 original questions have applicable typed records, 
           ),
         );
       }
-    for (const q of job.questions)
+    for (const q of job.questions.filter((question) => question.status !== 'merged'))
       assert.ok(
         applicable.some(
           ({ d, b }) =>
@@ -148,7 +148,7 @@ test('all 1000 roles and 8000 original questions have applicable typed records, 
       );
   }
   assert.equal(documents.filter((d) => d.kind === 'professional').length, 9);
-  assert.ok(documents.some((d) => d.kind === 'interview_method' && d.bindings.length === 1000));
+  assert.ok(documents.some((d) => d.kind === 'interview_method' && d.bindings.length === 1269));
   const knowledge = createAllRoleKnowledge(config);
   for (const job of JOBS)
     for (const stage of job.stages) {
