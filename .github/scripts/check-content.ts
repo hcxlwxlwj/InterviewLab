@@ -373,7 +373,7 @@ export function validateContent() {
     );
   }
   return {
-    templates: publishedJobs.size,
+    templates: publishedJobs.length,
     original_question_records: originalQuestionRecords,
     active_original_questions: activeOriginalQuestions,
     questions: activeMainQuestions,
