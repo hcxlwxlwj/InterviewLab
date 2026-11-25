@@ -1,6 +1,6 @@
 # InterviewLab 代码质量报告
 
-项目为面向高校学生的岗位模拟面试与复盘应用。本报告覆盖 2026-11-15 至 2026-11-25 的课件规范核对、版本同步、文档补齐、扫描、缺陷整改和回归复查。源码整改基线为 `d300e8b` 加本轮开始前已有的工作区改动，整改后版本以附件源码清单和 SHA-256 标识。
+项目为面向高校学生的岗位模拟面试与复盘应用。本报告覆盖 2026-11-15 至 2026-11-25 的课件规范核对、版本同步、文档补齐、扫描、缺陷整改和回归复查。源码整改基线为 `d300e8b` 加本轮开始前已有的工作区改动，整改后版本以附件源码清单和 SHA-256 标识。提交后的独立复验及 PR 合并检查修复另记于附录 E，原扫描数据保留其采样版本。
 
 教师第 171、172 页将代码质量工作规定为下列四项任务。质量报告按其任务顺序组织，评审表另按教师《Code Review 模板》逐项填写；所参考的 Code Quality Skill 的 S0–S6 对应记录见附录 A。[课程任务 171](https://bettermorn.github.io/IntelligentSWEPractice/courseware/171) · [课程任务 172](https://bettermorn.github.io/IntelligentSWEPractice/courseware/172) · [教师质量检查方法](https://github.com/bettermorn/ACMWDevHubPPT/blob/master/Methodology/CodeQualitySkill.md) · [代码评审记录](code_review.md)
 
@@ -236,3 +236,20 @@ node "$scanRoot/node_modules/jscpd/bin/jscpd" code --pattern '**/*.{ts,tsx,js}' 
 ## 附录 D. 本轮归档
 
 按用户要求，本轮 13 份整改源码、5 份新增测试、两份完整报告与 5 份扫描附件同批提交，提交号以 Git 历史为准。报告中的测试与复扫仍对应其明示的工作区输入基线。
+
+## 附录 E. PR #54 的提交复验与集成检查
+
+2026-11-25，本轮整改及报告以 `5bfb56d` 提交，推送至 `codex/all-role-agent` 并创建 [PR #54](https://github.com/hcxlwxlwj/InterviewLab/pull/54)。独立检出该提交，复用本地依赖且不包含原工作区 9 项未提交改动，`npm run check` 通过：普通测试 304/304、0 跳过，文档 59 份、508 个本地链接。这与此前包含既有改动的工作区 311 项测试属于不同输入。
+
+随后 PR 的 `application (pull_request)` 失败，而同一分支的 `application (push)` 已通过。[失败日志](https://github.com/hcxlwxlwj/InterviewLab/actions/runs/45633138412/job/139271399599)显示，GitHub 验证的是 `5bfb56d` 与最新主分支 `2205b2e` 的合并结果 `55620a2`。新增岗位目录检查中，`publishedJobs` 是 `JobTemplate[]`，返回统计却使用了 `publishedJobs.size`，触发 TS2339。
+
+在隔离工作树合入 `origin/main` 后，先运行 `npm run typecheck` 复现同一错误，再修正 `.github/scripts/check-content.ts:376`：
+
+```diff
+-    templates: publishedJobs.size,
++    templates: publishedJobs.length,
+```
+
+修复后重新运行 `npm run check`，边界、类型、内容检查和普通测试 311/311 全部通过，0 失败、0 跳过；文档 59 份、508 个本地链接通过。此处 311 项由独立提交的 304 项加主分支新增加的 7 项组成，不包含原工作区 9 项改动。内容检查实际统计为 1269 个已发布岗位、10148 道活跃主问题和 1962 个来源。
+
+本次集成仅修正统计字段，未更改岗位内容及校验断言。此前 ESLint/重复检测结果仍对应附件中的原采样快照；本次未重新计算全项目质量指标或覆盖率。云端检查的最终结果以 PR 中对应提交的 Actions 记录为准。
