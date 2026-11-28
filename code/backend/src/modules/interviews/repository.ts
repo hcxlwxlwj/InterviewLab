@@ -10,7 +10,7 @@ import type {
   InterviewTurn,
 } from '@interviewlab/core';
 import { ServiceError } from '../../foundation/errors';
-import type { interviews, interviewTurns } from './schema';
+import type { interviews, interviewTurns } from './db-schema';
 import { participationPolicy } from './participation';
 import { INTERVIEW_V3, interviewDeadline } from '@interviewlab/core';
 

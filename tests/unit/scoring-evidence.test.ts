@@ -16,10 +16,10 @@ import {
   assertEvaluation,
   assertSummary,
   reuseSingleQuestionSummary,
-} from '../../code/backend/src/modules/reports/analysis';
+} from '../../code/backend/src/modules/reports/agent/analysis';
 import { aggregateReport, emptyReport } from '../../code/backend/src/modules/reports/aggregate';
-import { createReportAgent } from '../../code/backend/src/modules/reports/agent';
-import { createModelAnalysis } from '../../code/backend/src/modules/interviews/model-analysis';
+import { createReportAgent } from '../../code/backend/src/modules/reports/agent/runtime';
+import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/model-analysis';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
 

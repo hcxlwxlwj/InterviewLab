@@ -7,15 +7,14 @@ import type {
   InterviewPreparationPlan,
   MaterialEvidence,
 } from '@interviewlab/core';
-import type { BackendConfig } from '../../foundation/config';
-import { ServiceError } from '../../foundation/errors';
+import type { BackendConfig } from '../../../../foundation/config';
+import { ServiceError } from '../../../../foundation/errors';
 import { langChainFetch } from './model';
-import { checkedGraph } from './graph';
+import { checkedGraph } from '../../../../foundation/agent/graph';
 import { interviewPolicy, FEEDBACK_INTERVIEW_GOALS } from '@interviewlab/core';
-import { COMPETENCIES, PROFILE_GOALS, planningRoleContext } from '../knowledge/catalog';
+import { COMPETENCIES, PROFILE_GOALS, planningRoleContext } from '../../../knowledge/catalog';
 
 export const RESUME_ANALYSIS_VERSION = 'resume-evidence-v2';
-export const PREPARATION_VERSION = 'interview-preparation-v3';
 const fact = z
   .object({
     kind: z.enum(['experience', 'skill', 'role', 'action', 'result']),

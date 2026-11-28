@@ -1,10 +1,10 @@
 import type { ReportRequest } from '@interviewlab/core';
-import { reportSchema, reportRequestBody } from './schemas';
+import { reportSchema, reportRequestBody } from './api-schemas';
 import { z } from 'zod';
 import type { BackendModule } from '../contracts';
 import type { LiveReportsService } from './service';
 import { idParams, privateErrors, writeHeaders } from '../interviews/routes';
-import { comparisonBody, comparisonSchema, versionBody } from '../interviews/schemas';
+import { comparisonBody, comparisonSchema, versionBody } from '../interviews/api-schemas';
 import { ServiceError } from '../../foundation/errors';
 
 export function reportsModule(service?: LiveReportsService): BackendModule {

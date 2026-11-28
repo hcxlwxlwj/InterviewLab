@@ -15,7 +15,7 @@ import {
 import {
   createReportAnalysis,
   assertEvaluation,
-} from '../../code/backend/src/modules/reports/analysis';
+} from '../../code/backend/src/modules/reports/agent/analysis';
 import { aggregateReport, emptyReport } from '../../code/backend/src/modules/reports/aggregate';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
 const snapshot: InterviewSnapshot = {

@@ -10,7 +10,7 @@ import type {
 import { getJob, teacherAgentQuestions } from '../../content/index';
 import type { BackendConfig } from '../../foundation/config';
 import { ServiceError } from '../../foundation/errors';
-import { structuredInterviewKnowledge } from '../interviews/knowledge';
+import { structuredInterviewKnowledge } from '../interviews/agent/tools/knowledge';
 import { COMPETENCIES, catalogProfile, catalogSources, catalogTerms as tokens } from './catalog';
 import { embed } from './embedding';
 

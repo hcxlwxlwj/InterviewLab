@@ -1,5 +1,5 @@
 import type { InterviewConfig } from '@interviewlab/core';
-import { ServiceError } from '../../foundation/errors';
+import { ServiceError } from '../../../../foundation/errors';
 
 /** Narrow guardrails for clear type violations; semantic quality still needs dialogue review. */
 export function assertPolicyQuestion(text: string, config: InterviewConfig) {

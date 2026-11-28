@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { FastifyInstance } from 'fastify';
 import type { ModuleContext } from '../contracts';
 import type { LiveInterviewsService } from './service';
-import { interviewConfigSchema } from './schemas';
+import { interviewConfigSchema } from './api-schemas';
 import { errorSchema } from '../../foundation/schemas';
 export function registerInterviewEvents(
   app: FastifyInstance,

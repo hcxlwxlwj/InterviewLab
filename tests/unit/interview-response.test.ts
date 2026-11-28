@@ -14,8 +14,8 @@ import { newInterviewState } from '../../code/backend/src/modules/interviews/rep
 import {
   assertPreview,
   createStreamingAgent,
-} from '../../code/backend/src/modules/interviews/streaming-agent';
-import { createModelAnalysis } from '../../code/backend/src/modules/interviews/model-analysis';
+} from '../../code/backend/src/modules/interviews/agent/runtime/streaming-agent';
+import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/model-analysis';
 import {
   assertResponseAssessment,
   responseObservation,

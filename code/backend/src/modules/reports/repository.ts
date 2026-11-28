@@ -1,6 +1,6 @@
 import type { InterviewComparison, InterviewEvaluation, InterviewReport } from '@interviewlab/core';
 import type { Executor } from '../interviews/repository';
-import type { interviewReports, reportEvaluations, interviewComparisons } from './schema';
+import type { interviewReports, reportEvaluations, interviewComparisons } from './db-schema';
 import { ServiceError } from '../../foundation/errors';
 
 export type ReportRow = typeof interviewReports.$inferSelect;

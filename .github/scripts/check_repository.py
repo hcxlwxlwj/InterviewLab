@@ -13,6 +13,8 @@ REQUIRED = (
     "docs/requirements/user_stories.md", "docs/requirements/README.md",
     "docs/algorithm/knowledge_and_agent.md", "docs/algorithm/research.md",
     "docs/algorithm/evaluation.md", "docs/software/architecture.md",
+    "docs/software/code_quality.md", "docs/software/code_review.md",
+    "docs/software/deployment.md", "tests/interviewlab_demo_user_test.md",
     "docs/software/data_and_interfaces.md", "docs/software/prototype/README.md",
     "docs/mgmt/team_plan.md", "docs/mgmt/communication_mgmt_plan.md",
     "docs/mgmt/risk_mgmt_plan.md", "docs/retrospection/2026-10-15-scope-revision.md",
@@ -37,7 +39,15 @@ def main():
         ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
         cwd=ROOT, check=True, stdout=subprocess.PIPE,
     )
-    documents = [ROOT / name for name in result.stdout.decode("utf-8").split("\0") if name.endswith(".md")]
+    deleted_result = subprocess.run(
+        ["git", "ls-files", "--deleted", "-z"],
+        cwd=ROOT, check=True, stdout=subprocess.PIPE,
+    )
+    deleted = set(deleted_result.stdout.decode("utf-8").split("\0"))
+    documents = [
+        ROOT / name for name in result.stdout.decode("utf-8").split("\0")
+        if name.endswith(".md") and name not in deleted
+    ]
     links_checked = 0
     for path in documents:
         if not path.is_file():

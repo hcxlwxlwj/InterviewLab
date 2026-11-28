@@ -3,8 +3,8 @@ import type {
   InterviewSnapshot,
   InterviewReportSummary,
 } from '@interviewlab/core';
-import { ServiceError } from '../../foundation/errors';
-import { checkedGraph } from '../interviews/graph';
+import { ServiceError } from '../../../foundation/errors';
+import { checkedGraph } from '../../../foundation/agent/graph';
 import {
   createReportAnalysis,
   assertEvaluation,

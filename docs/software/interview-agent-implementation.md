@@ -263,7 +263,7 @@ flowchart TB
   classDef default fill:#eeebff,stroke:#9873ff,color:#222;
 ```
 
-主要文件：`agent.ts` 构建唯一图运行时，`model-analysis.ts` 提供共用分析及比较；`graph.ts` 构建三节点图并记录节点耗时；`workflow-models.ts` 实现简历与准备模型；`streaming-agent.ts` 复用现有有界流式提问与记忆校验；`model.ts` 统一 LangChain 模型传输。代码位于 `code/backend/src/modules/interviews/`。
+主要文件：`modules/agent-runtime.ts` 组合面试及报告能力；`interviews/agent/runtime/interview-agent.ts` 构建面试运行时；`reports/agent/model-analysis.ts` 提供报告分析及比较；`foundation/agent/graph.ts` 构建三节点图并记录节点耗时；`workflow-models.ts` 实现简历与准备模型；`streaming-agent.ts` 负责流式提问；`model.ts` 适配 LangChain 模型传输。
 
 #### 状态与记忆
 
@@ -403,7 +403,9 @@ sequenceDiagram
 
 ### 6.4 模块划分
 
-代码在 `code/backend/src/modules/`：组合根 `interview-runtime.ts`；唯一入口 `interviews/agent.ts`；图 `graph.ts`；简历/规划 `workflow-models.ts`；流式/记忆 `streaming-agent.ts`；模型传输 `model.ts`；报告/比较 `model-analysis.ts`；生命周期与提交由 `service.ts` 及任务模块负责。材料和知识分别归属 `resumes/`、`knowledge/`。
+代码在 `code/backend/src/modules/`：业务组合根 `interview-runtime.ts`，Agent 组合入口 `agent-runtime.ts`；面试入口 `interviews/agent/runtime/interview-agent.ts`；共享有界图 `foundation/agent/graph.ts`；简历与规划模型、流式推进和模型传输位于 `interviews/agent/runtime/`；记忆位于 `interviews/agent/memory/`；问题策略位于 `interviews/agent/guardrails/`；知识检索适配位于 `interviews/agent/tools/`。报告 Agent 位于 `reports/agent/`：`runtime.ts` 编排有界图，`evaluation.ts`、`summary.ts`、`advice.ts` 分别处理逐题分析、总结和建议，`guardrails.ts` 校验评分与证据，`contracts.ts` 定义输出合同，`analysis.ts` 组合三项能力。报告汇总、任务与数据读写仍归业务模块。材料和知识分别归属 `resumes/`、`knowledge/`。
+
+五部分是现有职责的组织方式：规划由工作流和面试策略共同承担；工具目录目前包含程序调用的知识检索适配，并非模型自主调用工具的注册表；记忆用于本场上下文，不表示已实现跨会话长期记忆；护栏除问题策略外还分布在模型输出与报告证据校验中；专业知识库独立属于 `knowledge/` 模块。目录整理不代表新增能力或完成 A1–A11 用户验收。
 
 ### 6.5 工具（Tools）定义【可选】
 

@@ -12,11 +12,11 @@ import { loadConfig } from '../../../code/backend/src/foundation/config';
 import { createDatabase } from '../../../code/backend/src/database/connection';
 import { migrateDatabase } from '../../../code/backend/src/database/migrate';
 import { createInterviewRuntime } from '../../../code/backend/src/modules/interview-runtime';
-import { createInterviewAgent } from '../../../code/backend/src/modules/interviews/agent';
-import { createWorkflowModels } from '../../../code/backend/src/modules/interviews/workflow-models';
+import { createAgentRuntime } from '../../../code/backend/src/modules/agent-runtime';
+import { createWorkflowModels } from '../../../code/backend/src/modules/interviews/agent/runtime/workflow-models';
 import { simpleResume } from '../../../code/backend/src/modules/interviews/preparation';
 import { runTask, TaskDeliveryError } from '../../../code/backend/src/tasks/runner';
-import type { WorkflowModels } from '../../../code/backend/src/modules/interviews/workflow-models';
+import type { WorkflowModels } from '../../../code/backend/src/modules/interviews/agent/runtime/workflow-models';
 import { buildApp } from '../../../code/backend/src/server/app';
 
 dotenv({ quiet: true });
@@ -53,7 +53,7 @@ const materialInput = {
 };
 const runtimes: ReturnType<typeof createInterviewRuntime>[] = [];
 function runtime(overrides: Partial<WorkflowModels> = {}, runtimeConfig = config) {
-  const agent = createInterviewAgent(
+  const agent = createAgentRuntime(
     runtimeConfig,
     () => {},
     async () => {

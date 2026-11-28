@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import type {
   InterviewMemory,
   InterviewMemoryDelta,
@@ -6,42 +5,7 @@ import type {
   InterviewTurn,
 } from '@interviewlab/core';
 import { evidenceMatches } from '@interviewlab/core';
-import { ServiceError } from '../../foundation/errors';
-const evidence = z
-  .object({
-    turn_id: z.string(),
-    revision: z.number().int().positive(),
-    quote: z.string().min(1).max(300),
-  })
-  .strict();
-export const memoryDeltaSchema = z
-  .object({
-    focus: z.string().max(50),
-    intent: z.string().min(1).max(120),
-    observations: z
-      .array(
-        z
-          .object({
-            goal: z.string(),
-            state: z.enum(['needs_probe', 'covered', 'inconclusive', 'not_applicable']),
-            evidence_refs: z.array(evidence).min(1).max(2),
-            pending: z.string().max(180).nullable(),
-          })
-          .strict(),
-      )
-      .max(3),
-    claims: z
-      .array(
-        z
-          .object({
-            text: z.string().min(1).max(300),
-            evidence_refs: z.array(evidence).min(1).max(2),
-          })
-          .strict(),
-      )
-      .max(3),
-  })
-  .strict();
+import { ServiceError } from '../../../../foundation/errors';
 export function initialMemory(): InterviewMemory {
   return { version: 0, focus: null, observations: [], claims: [], asked_intents: [] };
 }

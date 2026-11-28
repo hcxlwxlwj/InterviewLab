@@ -10,8 +10,8 @@ import {
 } from '@interviewlab/core';
 import { createAllRoleKnowledge } from '../../code/backend/src/modules/knowledge/all-roles';
 import { loadConfig } from '../../code/backend/src/foundation/config';
-import { createWorkflowModels } from '../../code/backend/src/modules/interviews/workflow-models';
-import { createInterviewAgent } from '../../code/backend/src/modules/interviews/agent';
+import { createWorkflowModels } from '../../code/backend/src/modules/interviews/agent/runtime/workflow-models';
+import { createAgentRuntime } from '../../code/backend/src/modules/agent-runtime';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
 import { ServiceError } from '../../code/backend/src/foundation/errors';
 
@@ -88,7 +88,7 @@ async function main() {
       fetch,
       process.argv.includes('--debug') ? (e) => console.log(JSON.stringify(e)) : () => {},
     );
-  const graph = createInterviewAgent(
+  const graph = createAgentRuntime(
     config,
     process.argv.includes('--debug') ? (e) => console.log(JSON.stringify(e)) : () => {},
   );

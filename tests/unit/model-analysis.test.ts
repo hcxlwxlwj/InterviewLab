@@ -14,8 +14,8 @@ import {
 import {
   createModelAnalysis,
   assertEvaluation,
-  assertQuestion,
-} from '../../code/backend/src/modules/interviews/model-analysis';
+} from '../../code/backend/src/modules/reports/agent/model-analysis';
+import { assertQuestion } from '../../code/backend/src/modules/interviews/agent/guardrails/question';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 import { ServiceError } from '../../code/backend/src/foundation/errors';
 const question = {

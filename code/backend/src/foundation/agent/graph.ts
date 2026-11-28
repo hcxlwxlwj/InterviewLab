@@ -1,5 +1,5 @@
 import { Annotation, StateGraph, START, END } from '@langchain/langgraph';
-import { ServiceError } from '../../foundation/errors';
+import { ServiceError } from '../errors';
 
 /** A graph is a single bounded task execution; database task claims own durable recovery. */
 export async function checkedGraph<I, C, O>(

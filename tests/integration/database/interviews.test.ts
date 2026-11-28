@@ -19,7 +19,7 @@ import { createDatabase, type Database } from '../../../code/backend/src/databas
 import { migrateDatabase } from '../../../code/backend/src/database/migrate';
 import { buildApp } from '../../../code/backend/src/server/app';
 import { createInterviewRuntime } from '../../../code/backend/src/modules/interview-runtime';
-import type { InterviewAgent } from '../../../code/backend/src/modules/interviews/model-analysis';
+import type { InterviewAgent } from '../../../code/backend/src/modules/agent-runtime';
 import { runTask, TaskDeliveryError } from '../../../code/backend/src/tasks/runner';
 import { ServiceError } from '../../../code/backend/src/foundation/errors';
 import { inputDigest } from '../../../code/backend/src/foundation/idempotency';

@@ -12,7 +12,7 @@ import {
 } from '@interviewlab/core';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 import { ServiceError } from '../../code/backend/src/foundation/errors';
-import { createInterviewAgent } from '../../code/backend/src/modules/interviews/agent';
+import { createAgentRuntime } from '../../code/backend/src/modules/agent-runtime';
 import { createAllRoleKnowledge } from '../../code/backend/src/modules/knowledge/all-roles';
 import { planningRoleContext } from '../../code/backend/src/modules/knowledge/catalog';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
@@ -29,7 +29,7 @@ async function main() {
   });
   if (!config.LLM_API_KEY) throw new Error('Real model configuration required');
   const knowledge = createAllRoleKnowledge(config);
-  const agent = createInterviewAgent(config, (event) => {
+  const agent = createAgentRuntime(config, (event) => {
     if (process.argv.includes('--debug')) console.log(JSON.stringify(event));
   });
   const records: object[] = [];
