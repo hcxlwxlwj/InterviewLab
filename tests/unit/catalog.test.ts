@@ -22,7 +22,7 @@ import {
   catalogManifest,
   catalogSources,
 } from '../../code/backend/src/modules/knowledge/catalog';
-import { structuredInterviewKnowledge } from '../../code/backend/src/modules/interviews/knowledge';
+import { structuredInterviewKnowledge } from '../../code/backend/src/modules/interviews/agent/tools/knowledge';
 
 test('teacher questions and runtime question documents have exact catalog counts', () => {
   const documents = buildCatalog();

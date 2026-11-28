@@ -1,7 +1,7 @@
-import { withFrontendReportReference } from './frontend-reference';
+import { withFrontendReportReference } from '../../frontend-reference';
 import type { InterviewKnowledgeProvider } from '@interviewlab/core';
-import { PUBLIC_INTERVIEW_SUPPLEMENTS, getJob, localKnowledgeRetriever } from '../../content/index';
-import { ServiceError } from '../../foundation/errors';
+import { PUBLIC_INTERVIEW_SUPPLEMENTS, getJob, localKnowledgeRetriever } from '../../../../content/index';
+import { ServiceError } from '../../../../foundation/errors';
 
 /** Structured view of the same published catalog used to build the vector index. */
 export const structuredInterviewKnowledge: InterviewKnowledgeProvider = {

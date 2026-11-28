@@ -18,8 +18,8 @@ import {
 } from '../../code/backend/src/modules/interviews/experience';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
 import { currentKnowledgeFixture } from '../support/knowledge-fixture';
-import { createModelAnalysis } from '../../code/backend/src/modules/interviews/model-analysis';
-import { createStreamingAgent } from '../../code/backend/src/modules/interviews/streaming-agent';
+import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/model-analysis';
+import { createStreamingAgent } from '../../code/backend/src/modules/interviews/agent/runtime/streaming-agent';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 const knowledgeFixture = currentKnowledgeFixture();
 function interview(answers: string[]): Interview {

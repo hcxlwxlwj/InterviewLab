@@ -34,9 +34,9 @@ import {
   evaluationDigest,
   type EvaluationTask,
 } from '../../code/backend/src/modules/reports/aggregate';
-import { assertSummary, assertEvaluation } from '../../code/backend/src/modules/reports/analysis';
-import { reportSchema, reportRequestBody } from '../../code/backend/src/modules/reports/schemas';
-import { createModelAnalysis } from '../../code/backend/src/modules/interviews/model-analysis';
+import { assertSummary, assertEvaluation } from '../../code/backend/src/modules/reports/agent/analysis';
+import { reportSchema, reportRequestBody } from '../../code/backend/src/modules/reports/api-schemas';
+import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/model-analysis';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 
 const snapshot: InterviewSnapshot = {
@@ -325,7 +325,7 @@ test('dimension scores reject unrelated evidence, duplicates and unobserved dime
 
 test('frontend report references cover catalog questions without guessing unknown topics', async () => {
   const { structuredInterviewKnowledge } = await import(
-    '../../code/backend/src/modules/interviews/knowledge'
+    '../../code/backend/src/modules/interviews/agent/tools/knowledge'
   );
   const { withFrontendReportReference } = await import(
     '../../code/backend/src/modules/interviews/frontend-reference'
@@ -352,9 +352,9 @@ test('frontend report references cover catalog questions without guessing unknow
 });
 
 test('report analysis sends frozen professional reference to the model', async () => {
-  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/agent/analysis');
   const { structuredInterviewKnowledge } = await import(
-    '../../code/backend/src/modules/interviews/knowledge'
+    '../../code/backend/src/modules/interviews/agent/tools/knowledge'
   );
   const { state, turn, evaluation } = fixture();
   const knowledge = await structuredInterviewKnowledge.read({
@@ -399,7 +399,7 @@ test('report analysis sends frozen professional reference to the model', async (
 });
 
 test('summary merges repeated practice targets for one turn while retaining checked evidence and scores', async () => {
-  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/agent/analysis');
   const { evaluation } = fixture();
   const analysis = createReportAnalysis(async (_kind, schema) =>
     schema.parse({
@@ -427,7 +427,7 @@ test('summary merges repeated practice targets for one turn while retaining chec
 });
 
 test('evaluation quotes must be exact source spans, including punctuation and revision', async () => {
-  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/agent/analysis');
   const { turn, evaluation } = fixture();
   const analysis = createReportAnalysis(async (_kind, schema) => {
     assert.equal(
@@ -552,7 +552,7 @@ test('six-dimension scores include insufficient evidence at zero with the full s
 });
 
 test('template model scores resolve checked quote IDs and preserve actionable acceptance criteria', async () => {
-  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/agent/analysis');
   const { FEEDBACK_DIMENSIONS, FEEDBACK_TEMPLATE_VERSION } = await import('@interviewlab/core');
   const { evaluation, state, task } = fixture();
   const analysis = createReportAnalysis(async (_kind, schema, input) => {
@@ -618,7 +618,7 @@ test('template model scores resolve checked quote IDs and preserve actionable ac
 });
 
 test('one original answer supports multiple feedback dimensions even outside old tags and extracted findings', async () => {
-  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/agent/analysis');
   const { FEEDBACK_DIMENSIONS, FEEDBACK_TEMPLATE_VERSION } = await import('@interviewlab/core');
   const { evaluation, state } = fixture();
   const turn = state.view.turns[0];
@@ -710,7 +710,7 @@ test('six-dimensional ratings reject null, unsupported scores and invented evide
 });
 
 test('an empty model retry goal is filled locally without another model request', async () => {
-  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/agent/analysis');
   const { turn, evaluation } = fixture();
   let calls = 0;
   const analysis = createReportAnalysis(async (_kind, schema) => {
@@ -740,7 +740,7 @@ test('an empty model retry goal is filled locally without another model request'
 });
 
 test('compact summary schema rejects unknown evidence IDs after resolution', async () => {
-  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/agent/analysis');
   const { evaluation } = fixture();
   const analysis = createReportAnalysis(async (_kind, schema, input) => {
     assert.equal('dimension_evaluations' in (input as object), false);
@@ -760,7 +760,7 @@ test('compact summary schema rejects unknown evidence IDs after resolution', asy
 });
 
 test('summary links improvements from checked gap IDs even when the model copies a wrong turn ID', async () => {
-  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/agent/analysis');
   const { evaluation } = fixture();
   const analysis = createReportAnalysis(async (_kind, schema) =>
     schema.parse({
@@ -783,7 +783,7 @@ test('summary links improvements from checked gap IDs even when the model copies
 
 test('summary schema stays compact as evidence grows and rejects wrong source kinds', async () => {
   const { z } = await import('zod');
-  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/analysis');
+  const { createReportAnalysis } = await import('../../code/backend/src/modules/reports/agent/analysis');
   const { evaluation } = fixture();
   const sizes: number[] = [];
   for (const count of [1, 30]) {

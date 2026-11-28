@@ -366,7 +366,7 @@ ASR final 只表示识别分句结束，不直接等于回答完毕；结合静�
 | 私有短期记忆 | 保存关注目标、覆盖状态、已问意图及带回答 revision 的原文证据 |
 | 输入裁剪 | 当前回答、自我介绍必要摘要、证据记忆和少量检索片段；不默认发送全部历史 |
 | 长期画像 | 尚未形成完整长期用户画像服务，不将公共缓存当作私有记忆 |
-| 提示词 | 在 `interviews/workflow-models.ts`、`streaming-agent.ts`、`model-analysis.ts`、`reports/analysis.ts` 按任务维护并记录版本 |
+| 提示词 | 在 `interviews/agent/runtime/` 和 `reports/agent/` 按任务维护并记录版本 |
 
 ### 6.5 输出护栏与报告规则
 

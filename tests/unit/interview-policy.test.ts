@@ -18,11 +18,11 @@ import { newInterviewState } from '../../code/backend/src/modules/interviews/rep
 import {
   interviewConfigSchema,
   newInterviewConfigSchema,
-} from '../../code/backend/src/modules/interviews/schemas';
-import { assertPolicyQuestion } from '../../code/backend/src/modules/interviews/question-policy';
-import { createStreamingAgent } from '../../code/backend/src/modules/interviews/streaming-agent';
-import { createModelAnalysis } from '../../code/backend/src/modules/interviews/model-analysis';
-import { createReportAnalysis } from '../../code/backend/src/modules/reports/analysis';
+} from '../../code/backend/src/modules/interviews/api-schemas';
+import { assertPolicyQuestion } from '../../code/backend/src/modules/interviews/agent/guardrails/question-policy';
+import { createStreamingAgent } from '../../code/backend/src/modules/interviews/agent/runtime/streaming-agent';
+import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/model-analysis';
+import { createReportAnalysis } from '../../code/backend/src/modules/reports/agent/analysis';
 import { COMPETENCIES, catalogProfile } from '../../code/backend/src/modules/knowledge/catalog';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 import { AbilityRadar } from '../../code/frontend/features/live-interview/report-charts';

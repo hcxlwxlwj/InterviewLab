@@ -1,14 +1,14 @@
 import { createAllRoleKnowledge } from './knowledge/all-roles';
 import { createResumeAnalysis } from './resumes/analysis';
-import { createWorkflowModels, type WorkflowModels } from './interviews/workflow-models';
+import { createWorkflowModels, type WorkflowModels } from './interviews/agent/runtime/workflow-models';
 import { createInterviewPreparation } from './interviews/preparation';
-import { createInterviewAgent } from './interviews/agent';
+import { createAgentRuntime } from './agent-runtime';
 import { createMaterialsService } from './resumes/service';
 import type { InterviewKnowledgeProvider, InterviewKnowledgeRuntime } from '@interviewlab/core';
 import type { Database } from '../database/connection';
 import type { BackendConfig } from '../foundation/config';
 import { ServiceError } from '../foundation/errors';
-import type { InterviewAgent } from './interviews/model-analysis';
+import type { InterviewAgent } from './agent-runtime';
 import { createInterviewsService, type InterviewReportHooks } from './interviews/service';
 import { createReportsService } from './reports/service';
 import { interviewsModule } from './interviews/routes';
@@ -37,7 +37,7 @@ export function createInterviewRuntime(
   const materials = createMaterialsService(database, resumeAnalysis, true);
   const agent =
     options.agent ??
-    createInterviewAgent(config, options.log);
+    createAgentRuntime(config, options.log);
   const interviews = createInterviewsService(
     database,
     content,

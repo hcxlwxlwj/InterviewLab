@@ -1,28 +1,11 @@
 import { z } from 'zod';
 import {
-  RESPONSE_ACTS,
-  RESPONSE_ELIGIBILITY,
-  RESPONSE_RELEVANCE,
-  RESPONSE_SUFFICIENCY,
-  RESPONSE_CONTINUATION,
   type Interview,
   type InterviewMemory,
   type InterviewResponseAssessment,
 } from '@interviewlab/core';
 import { ServiceError } from '../../foundation/errors';
 import { replyAct } from './conversation';
-
-export const responseAssessmentSchema = z
-  .object({
-    response_eligibility: z.enum(RESPONSE_ELIGIBILITY),
-    act: z.enum(RESPONSE_ACTS),
-    relevance: z.enum(RESPONSE_RELEVANCE),
-    sufficiency: z.enum(RESPONSE_SUFFICIENCY),
-    continuation: z.enum(RESPONSE_CONTINUATION),
-    explanation: z.string().min(1).max(160),
-    communication_observed: z.boolean(),
-  })
-  .strict();
 
 /** Private realtime wire; the report/public assessment schema remains unchanged. */
 export const streamResponseStateSchema = z.string().regex(/^[agkduco][sdun][eln][01]$/);

@@ -1,7 +1,7 @@
 import { ChatOpenAI, type ChatOpenAICallOptions } from '@langchain/openai';
 import { SystemMessage, HumanMessage } from '@langchain/core/messages';
-import type { BackendConfig } from '../../foundation/config';
-import { ServiceError } from '../../foundation/errors';
+import type { BackendConfig } from '../../../../foundation/config';
+import { ServiceError } from '../../../../foundation/errors';
 
 /** LangChain transport with the existing bounded JSON/SSE contract at its boundary.
  * This lets historical validators and report schemas remain unchanged. No SDK retries. */

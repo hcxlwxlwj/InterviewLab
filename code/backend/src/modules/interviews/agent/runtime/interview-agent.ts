@@ -1,25 +1,32 @@
-import type { InterviewAgent } from './model-analysis';
-import { assertQuestion, createModelAnalysis } from './model-analysis';
+import type { InterviewTurnAgent } from './types';
+import { assertQuestion } from '../guardrails/question';
 import { createStreamingAgent } from './streaming-agent';
 import { langChainFetch } from './model';
-import { checkedGraph } from './graph';
-import type { BackendConfig } from '../../foundation/config';
-import { ServiceError } from '../../foundation/errors';
+import { checkedGraph } from '../../../../foundation/agent/graph';
+import type { BackendConfig } from '../../../../foundation/config';
+import { ServiceError } from '../../../../foundation/errors';
 
 /** The single interview runtime: LangChain transport and a bounded LangGraph turn workflow. */
 export function createInterviewAgent(
   config: BackendConfig,
   log: (entry: object) => void = () => {},
   fetcher: typeof fetch = fetch,
-): InterviewAgent {
+): InterviewTurnAgent {
   const transport = langChainFetch(config, fetcher);
-  const graphBase = createModelAnalysis(config, transport, log);
+  const graphBase = {
+    available: Boolean(config.LLM_BASE_URL && config.LLM_API_KEY && config.LLM_MODEL),
+    model: config.LLM_MODEL ?? 'unconfigured',
+  };
   const realtime = createStreamingAgent(graphBase, config, log, transport);
   return {
     ...graphBase,
     async advance(interview, snapshot, clarify, signal, repair, context) {
       if (snapshot.runtime_version !== 'graph-v1')
-        throw new ServiceError('unsupported_input', 409, '该面试使用已停用的运行时，请新建面试；原记录仍可查看');
+        throw new ServiceError(
+          'unsupported_input',
+          409,
+          '该面试使用已停用的运行时，请新建面试；原记录仍可查看',
+        );
       return checkedGraph(
         'interview_advance',
         { interview, snapshot, context },
@@ -39,7 +46,7 @@ export function createInterviewAgent(
               input.context,
             ),
           validate: (raw) => {
-            const result = raw as Awaited<ReturnType<InterviewAgent['advance']>>;
+            const result = raw as Awaited<ReturnType<InterviewTurnAgent['advance']>>;
             if (result.question) assertQuestion(result.question, snapshot, interview.turns);
             return result;
           },

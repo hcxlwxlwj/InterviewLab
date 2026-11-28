@@ -7,7 +7,7 @@ import { createDatabase } from '../../../code/backend/src/database/connection';
 import { migrateDatabase } from '../../../code/backend/src/database/migrate';
 import { createInterviewRuntime } from '../../../code/backend/src/modules/interview-runtime';
 import { runTask } from '../../../code/backend/src/tasks/runner';
-import { createInterviewAgent } from '../../../code/backend/src/modules/interviews/agent';
+import { createAgentRuntime } from '../../../code/backend/src/modules/agent-runtime';
 
 dotenv({ quiet: true });
 test('pausing cancels a running provider HTTP request; unknown worker types surface as failed generations', async () => {
@@ -24,7 +24,7 @@ test('pausing cancels a running provider HTTP request; unknown worker types surf
   const called = new Promise<void>((resolve) => {
     entered = resolve;
   });
-  const agent = createInterviewAgent(
+  const agent = createAgentRuntime(
     config,
     () => {},
     async (_url, input) =>

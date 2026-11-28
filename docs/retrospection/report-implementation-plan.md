@@ -1,7 +1,7 @@
 # 文字面试复盘报告实现方案
 
 日期：2026-10-29  
-状态：设计基线；本轮已实现范围、启动方式与验证边界见 [模块说明](README.md)。方案中的后续扩展仍未实现。  
+状态：设计基线；本轮已实现范围、启动方式与验证边界见 [模块说明](../../code/backend/src/modules/reports/README.md)。方案中的后续扩展仍未实现。
 开发分支：`feature/kwq-development`；推送后通过 PR 手动合入 `main`。
 
 ## 1. 目标与范围
@@ -233,11 +233,11 @@ POST 拟补充明确重试范围，例如缺失逐题分析或整场总结；准
 
 ## 13. 项目依据
 
-- [后端开发规则](../../../AGENTS.md)
-- [后端说明](../../../README.md)
-- [总体架构](../../../../../docs/software/architecture.md)
-- [数据与接口合同](../../../../../docs/software/data_and_interfaces.md)
-- [评测方案](../../../../../docs/algorithm/evaluation.md)
+- [后端开发规则](../../code/backend/AGENTS.md)
+- [后端说明](../../code/backend/README.md)
+- [总体架构](../software/architecture.md)
+- [数据与接口合同](../software/data_and_interfaces.md)
+- [评测方案](../algorithm/evaluation.md)
 
 实施以仓库实际代码和公共合同为准；本文件仅记录本轮计划，不覆盖既有约束或其他模块所有权。
 

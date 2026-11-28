@@ -19,11 +19,11 @@ import {
 } from '@interviewlab/core';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 import { createAllRoleKnowledge } from '../../code/backend/src/modules/knowledge/all-roles';
-import { createWorkflowModels } from '../../code/backend/src/modules/interviews/workflow-models';
-import { createInterviewAgent } from '../../code/backend/src/modules/interviews/agent';
+import { createWorkflowModels } from '../../code/backend/src/modules/interviews/agent/runtime/workflow-models';
+import { createAgentRuntime } from '../../code/backend/src/modules/agent-runtime';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
 import { ServiceError } from '../../code/backend/src/foundation/errors';
-import { assertPolicyQuestion } from '../../code/backend/src/modules/interviews/question-policy';
+import { assertPolicyQuestion } from '../../code/backend/src/modules/interviews/agent/guardrails/question-policy';
 import {
   jsonFields,
   readChatStream,
@@ -120,7 +120,7 @@ async function main() {
   };
   const knowledge = createAllRoleKnowledge(cfg),
     models = createWorkflowModels(cfg, fetch, log),
-    agent = createInterviewAgent(cfg, log, syntheticFetch);
+    agent = createAgentRuntime(cfg, log, syntheticFetch);
   const records: object[] = [];
   const terminal = interactive
     ? createInterface({ input: process.stdin, output: process.stdout })

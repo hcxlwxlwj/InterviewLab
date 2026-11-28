@@ -3,7 +3,7 @@ import type { Interview, RequestIdentity } from '@interviewlab/core';
 import type { BackendModule } from '../contracts';
 import { errorSchema, pageSchema } from '../../foundation/schemas';
 import type { LiveInterviewsService } from './service';
-import * as s from './schemas';
+import * as s from './api-schemas';
 import { registerInterviewEvents } from './events';
 import { ServiceError } from '../../foundation/errors';
 import { registerVoiceRoutes, type VoiceOptions } from './voice/routes';

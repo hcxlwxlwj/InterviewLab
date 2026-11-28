@@ -23,16 +23,16 @@ import {
   createWorkflowModels,
   materialFields,
   assertMaterialEvidence,
-} from '../../code/backend/src/modules/interviews/workflow-models';
-import { langChainFetch } from '../../code/backend/src/modules/interviews/model';
-import { createInterviewAgent } from '../../code/backend/src/modules/interviews/agent';
+} from '../../code/backend/src/modules/interviews/agent/runtime/workflow-models';
+import { langChainFetch } from '../../code/backend/src/modules/interviews/agent/runtime/model';
+import { createAgentRuntime } from '../../code/backend/src/modules/agent-runtime';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
 import { interviewInputDigest } from '../../code/backend/src/modules/interviews/service';
 
 const config = loadConfig({ LLM_API_KEY: 'synthetic-key' });
 test('retired interview snapshots never invoke a fallback model or rewrite the stored snapshot', async () => {
   let calls = 0;
-  const agent = createInterviewAgent(
+  const agent = createAgentRuntime(
     config,
     () => {},
     async () => {
@@ -288,7 +288,7 @@ test('new non-frontend turns execute the graph and retain answer revision fencin
         { headers: { 'content-type': 'text/event-stream' } },
       );
     };
-    const agent = createInterviewAgent(config, () => {}, fetcher);
+    const agent = createAgentRuntime(config, () => {}, fetcher);
     const result = await agent.advance(state.view, snapshot, false, signal(), false, {
       memory: null,
       retrieval: {
@@ -403,7 +403,7 @@ test('LangChain report and comparison preserve the legacy input, output, evidenc
         limitations: [],
       });
     };
-    const agent = createInterviewAgent(config, () => {}, fetcher);
+    const agent = createAgentRuntime(config, () => {}, fetcher);
     const snapshot = { ...pinned, ...(runtime === 'graph-v1' ? { runtime_version: runtime } : {}) };
     const evaluated = await agent.evaluate(turn, snapshot, signal(), false);
     const compared = await agent.compare(comparison, signal(), false, {

@@ -7,7 +7,7 @@ import { loadConfig } from '../../../code/backend/src/foundation/config';
 import { createDatabase, type Database } from '../../../code/backend/src/database/connection';
 import { migrateDatabase } from '../../../code/backend/src/database/migrate';
 import { createInterviewRuntime } from '../../../code/backend/src/modules/interview-runtime';
-import type { InterviewAgent } from '../../../code/backend/src/modules/interviews/model-analysis';
+import type { InterviewAgent } from '../../../code/backend/src/modules/agent-runtime';
 import { runTask } from '../../../code/backend/src/tasks/runner';
 import { interviewInputDigest } from '../../../code/backend/src/modules/interviews/service';
 import { loadInterview } from '../../../code/backend/src/modules/interviews/repository';
