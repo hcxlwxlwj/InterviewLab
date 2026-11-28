@@ -1,6 +1,11 @@
+/** 面试专业知识入口：读取已发布岗位和适用题目，保留来源与内容版本。 */
 import { withFrontendReportReference } from '../../frontend-reference';
 import type { InterviewKnowledgeProvider } from '@interviewlab/core';
-import { PUBLIC_INTERVIEW_SUPPLEMENTS, getJob, localKnowledgeRetriever } from '../../../../content/index';
+import {
+  PUBLIC_INTERVIEW_SUPPLEMENTS,
+  getJob,
+  localKnowledgeRetriever,
+} from '../../../../content/index';
 import { ServiceError } from '../../../../foundation/errors';
 
 /** Structured view of the same published catalog used to build the vector index. */

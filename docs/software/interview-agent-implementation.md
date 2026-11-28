@@ -18,18 +18,18 @@ HR未考察的维度从评分数组省略，图表不绘制；专业、业务、
 
 | 项目 | 内容 |
 | --- | --- |
-| 项目 / 版本 | InterviewLab 面试 Agent / v1.0，2026-11-05 |
+| 项目 / 版本 | InterviewLab 面试与报告 Agent / v1.1，2026-11-28 |
 | 适用实现 | 唯一运行时 `graph-v1`，文字、语音、视频共用 |
 | 组织依据 | [老师的 Web 智能体架构模板](https://github.com/bettermorn/AIAgent/blob/main/docs/architecture.md) |
 | 状态 | 当前架构及工程自查；效果和真实媒体尚未完整验收 |
 
-本文沿用原 Agent 接入文档入口，按老师模板补齐分层、状态、接口和自查，不新增重复文件。[系统架构](architecture.md)维护全系统总览；本文维护智能体架构；[动态面试](interview-agent-v3.md)维护流式协议与策略；表结构和完整接口以[数据与接口](data_and_interfaces.md)为准。旧日期试跑记录保留在附录。
+本文沿用原 Agent 接入文档入口，维护工作流、状态和接口；[Agent 组成与代码规范](agent-components.md)集中说明五部分对照、核心文件及整理边界。[系统架构](architecture.md)维护全系统总览；[动态面试](interview-agent-v3.md)维护流式协议与策略；表结构和完整接口以[数据与接口](data_and_interfaces.md)为准。旧日期试跑记录保留在附录。
 
 ## 1. 项目概述
 
 ### 1.1 背景与目标
 
-面试需要适配岗位、实际回答和候选人经历，不能机械遍历题库，也不能让模型自行假设经历或修改业务状态。当前采用程序约束下的单 Agent：模型理解内容、提出有限行动，程序提供知识、验证依据并决定是否发布。目标是让问题能够解释“为什么现在问、观察什么、依据在哪里”，让失败与恢复有明确规则。
+面试需要适配岗位、实际回答和候选人经历，不能机械遍历题库，也不能让模型自行假设经历或修改业务状态。当前面试 Agent 负责推进对话，报告 Agent 负责面后分析和建议；两者由程序提供知识、验证依据并决定是否发布。目标是让问题能够解释“为什么现在问、观察什么、依据在哪里”，让失败与恢复有明确规则。
 
 ### 1.2 核心功能清单
 
@@ -81,7 +81,7 @@ ChatECNU `ecnu-plus` 使用兼容 Chat Completions 的接口；ASR/TTS 沿用现
 | --- | --- |
 | `@langchain/core` | 1.3.4，模型消息与公共抽象 |
 | `@langchain/openai` | 1.8.0，兼容协议集成 |
-| `@langchain/langgraph` | 1.6.1，三类短工作流 |
+| `@langchain/langgraph` | 1.6.1，简历、准备、面试推进和报告阶段的有界工作流 |
 | pg-boss / Drizzle | 12.38.0 / 0.45.4，任务及事务 |
 | Zod | 以 lockfile 为准，输出与边界校验 |
 
@@ -242,7 +242,7 @@ ASR partial 只作字幕，保存回答才进入 Agent。TTS 只朗读正式问�
 
 ### 6.2 Agent 类型与编排模式
 
-当前是受业务约束的单 Agent，包含简历、规划、推进三类短工作流，不是多 Agent 自治协作或循环 ReAct 代理。`checkedGraph` 节点为 `prepare_context → model → validate`，状态为 `input/context/raw/result`；`recursionLimit=8` 是执行保护，不代表八轮模型调用。
+面试与报告是两套受业务约束的 Agent 能力，由组合根注入相应服务。简历分析、面前规划、单轮推进，以及报告逐题分析、总结、建议使用短工作流；它们没有自治协商或循环 ReAct 调度。`checkedGraph` 节点为 `prepare_context → model → validate`，状态为 `input/context/raw/result`；`recursionLimit=8` 是执行保护，不代表八轮模型调用。
 
 检索、条件策略和多项校验位于业务模块及流式推进器，不全是 LangGraph 条件边。下图表示逻辑协作，不表示框架直接控制所有动作。
 
@@ -263,7 +263,7 @@ flowchart TB
   classDef default fill:#eeebff,stroke:#9873ff,color:#222;
 ```
 
-主要文件：`modules/agent-runtime.ts` 组合面试及报告能力；`interviews/agent/runtime/interview-agent.ts` 构建面试运行时；`reports/agent/model-analysis.ts` 提供报告分析及比较；`foundation/agent/graph.ts` 构建三节点图并记录节点耗时；`workflow-models.ts` 实现简历与准备模型；`streaming-agent.ts` 负责流式提问；`model.ts` 适配 LangChain 模型传输。
+主要文件：`modules/agent-runtime.ts` 组合面试及报告能力；两个 Agent 的 `core/agent.ts` 构建执行入口，报告模型调用适配也归此处；面试 `core/planner.ts` 实现简历、准备及单轮规划，`core/tools.ts` 实现流式提问和提示词；报告 `core/tools.ts` 实现逐题评价、总结、建议和比较。共享的 `foundation/agent/graph.ts` 构建三节点图，`tools.ts` 记录工具调用脱敏轨迹，`model.ts` 提供 LangChain 模型传输。
 
 #### 状态与记忆
 
@@ -276,7 +276,7 @@ flowchart TB
 
 #### 框架分工与持久化
 
-LangChain 负责兼容模型协议、结构化 JSON、流式 chunk、AbortSignal、超时和用量；LangGraph 负责三个显式、可取消、有校验节点的工作流。没有把框架对象返回前端。使用已锁定的 `@langchain/core 1.3.4`、`@langchain/openai 1.8.0`、`@langchain/langgraph 1.6.1`，升级需要回归兼容模型。
+LangChain 负责兼容模型协议、结构化 JSON、流式 chunk、AbortSignal、超时和用量；LangGraph 负责准备上下文、执行、校验三个显式节点的短工作流。没有把框架对象返回前端。使用已锁定的 `@langchain/core 1.3.4`、`@langchain/openai 1.8.0`、`@langchain/langgraph 1.6.1`，升级需要回归兼容模型。
 
 LangGraph 不另建业务持久化层。业务表保存准备状态、冻结快照及记忆；tasks/outbox/pg-boss 保存重试、租约和恢复。任务失效重跑整条短图，不能将内存节点完成视作正式业务提交。
 
@@ -403,24 +403,33 @@ sequenceDiagram
 
 ### 6.4 模块划分
 
-代码在 `code/backend/src/modules/`：业务组合根 `interview-runtime.ts`，Agent 组合入口 `agent-runtime.ts`；面试入口 `interviews/agent/runtime/interview-agent.ts`；共享有界图 `foundation/agent/graph.ts`；简历与规划模型、流式推进和模型传输位于 `interviews/agent/runtime/`；记忆位于 `interviews/agent/memory/`；问题策略位于 `interviews/agent/guardrails/`；知识检索适配位于 `interviews/agent/tools/`。报告 Agent 位于 `reports/agent/`：`runtime.ts` 编排有界图，`evaluation.ts`、`summary.ts`、`advice.ts` 分别处理逐题分析、总结和建议，`guardrails.ts` 校验评分与证据，`contracts.ts` 定义输出合同，`analysis.ts` 组合三项能力。报告汇总、任务与数据读写仍归业务模块。材料和知识分别归属 `resumes/`、`knowledge/`。
+代码在 `code/backend/src/modules/`：业务组合根为 `interview-runtime.ts`，Agent 组合入口为 `agent-runtime.ts`。两个 Agent 分别在 `interviews/agent/`、`reports/agent/` 维护 `core/planner.ts`、`core/tools.ts`、`core/agent.ts`、`core/memory.ts`、`core/guardrails.ts` 和 `knowledge/`，各文件均位于实际调用链，带中文文件头职责注释。
 
-五部分是现有职责的组织方式：规划由工作流和面试策略共同承担；工具目录目前包含程序调用的知识检索适配，并非模型自主调用工具的注册表；记忆用于本场上下文，不表示已实现跨会话长期记忆；护栏除问题策略外还分布在模型输出与报告证据校验中；专业知识库独立属于 `knowledge/` 模块。目录整理不代表新增能力或完成 A1–A11 用户验收。
+两个 Agent 各保留五个核心文件和一个知识入口。流式执行、评分、总结是五部分内的能力：面试的提示词与流式推进融合在 `core/tools.ts`，简历分析和准备工作流融合在 `core/planner.ts`；报告的逐题评价、总结、建议与比较融合在 `core/tools.ts`，输出 schema、版本合同与证据校验融合在 `core/guardrails.ts`，模型调用及装配归 `core/agent.ts`。内部通过函数分段保留执行步骤，代码长度不形成额外模块。两个 Agent 共用 `foundation/agent/model.ts` 的模型传输。
 
-### 6.5 工具（Tools）定义【可选】
+报告汇总、任务与数据读写仍归业务模块；材料和公共知识存储分别归属 `resumes/`、`knowledge/`。两个 Agent 的 `knowledge/` 是同源知识适配，不复制公共资料或另建向量库。
 
-当前没有向模型注册可任意调用的 LangChain tools。下表为程序固定调用的能力，不能描述成模型自主选择工具。
+五部分的整理前缺口、整理后的代码位置、工作记忆边界与带注解目录见[Agent 组成与代码规范](agent-components.md)。目录整理不代表新增长期记忆或完成 A1–A11 用户验收。
 
-| 能力 | 输入 → 输出 | 权限边界 |
+### 6.5 工具（Tools）定义
+
+两个 Agent 的 `core/tools.ts` 显式注册程序调用的工具。共享封装维护名称、描述和参数名称，统一记录工具名、耗时与成功/失败状态；错误继续沿用原业务处理，不记录输入、输出、简历或回答正文。面试的 `generate_question` 由推进图调用，`retrieve_context` 在业务任务中、模型生成前调用。报告工具按逐题、总结、建议阶段调用。工具受固定工作流和服务权限约束，没有开放模型任意选择工具、执行代码或写库的能力。
+
+| 工具 | 输入 → 输出 | 权限边界 |
 | --- | --- | --- |
-| 知识检索 | 岗位、阶段、类型、版本 → 片段/不足原因 | 先过滤发布及适用范围 |
-| 分析读取 | 用户、选定版本、分析键 → 私有事实 | 归属和版本核对 |
-| 记忆更新 | 回答证据和有限动作 → 私有状态候选 | 原文、索引、状态与上限检查 |
-| 结果发布 | 候选结果、任务条件 → 正式回合 | 仅业务事务执行，模型无写库权 |
+| `retrieve_context` | 岗位、阶段、类型、版本、记忆 → 片段/不足原因 | 模型生成前执行，先过滤发布及适用范围 |
+| `generate_question` | 当前面试、冻结快照、上下文 → 候选动作、问题和记忆 | 不能直接改变状态或提交正式问题 |
+| `evaluate_answer` | 当前题组、评分视图、参考 → 逐题证据评价 | 简历不进入评分输入，引用须匹配原文及版本 |
+| `summarize_report` | 已校验评价、评分视图 → 整场总结 | 复用已校验证据，保留确定性评分规则 |
+| `suggest_practice` | 已校验评价、可选简历背景 → 练习建议 | 不修改评分，不将建议补做的任务写成已有经历 |
+
+私有分析读取、资源归属核对和结果发布仍是业务服务能力，不作为模型可选的通用工具；只有业务事务可写入正式回合。
 
 ### 6.6 记忆与上下文管理
 
 冻结计划、简历分析、当前回答及少量证据记忆避免全历史重复传输。开始后本场计划固定，适应体现在目标覆盖、经历/话题状态和下一步观察选择；不把记忆变化写成重建整份计划。材料陈述不等于外部核实事实，不能直接增加评分。
+
+报告 Agent 在 `core/memory.ts` 维护本次分析所需的证据编号目录：逐题以当前题组的原文片段绑定 turn/revision，总结以已校验逐题结论的证据绑定编号。该工作记忆随任务创建，不跨用户、跨会话积累学习画像；评分快照由 `core/planner.ts` 排除私有简历和简历分析。
 
 ### 6.7 提示词工程（Prompt Engineering）
 
@@ -447,7 +456,7 @@ sequenceDiagram
 
 框架比较见[调研](../algorithm/research.md)，下表维护实际模型适配合同。
 
-`model.ts` 用 LangChain ChatOpenAI 接入现有 `LLM_BASE_URL` 的 Chat Completions 兼容协议，保持 `ecnu-plus` 默认模型，不使用 Responses API。单轮、简历分析、准备、报告和比较统一走此传输边界。旧记录可读，不再执行旧 Agent。报告使用独立分析提示，不混入出题指令；schema、证据及评分以当前[报告模块](../../code/backend/src/modules/reports/README.md)为准。
+`foundation/agent/model.ts` 用 LangChain ChatOpenAI 接入现有 `LLM_BASE_URL` 的 Chat Completions 兼容协议，保持 `ecnu-plus` 默认模型，不使用 Responses API。单轮、简历分析、准备、报告和比较统一走此传输边界。旧记录可读，不再执行旧 Agent。报告使用独立分析提示，不混入出题指令；schema、证据及评分以当前[报告模块](../../code/backend/src/modules/reports/README.md)为准。
 
 | 项目 | 实现约束 |
 | --- | --- |
@@ -565,7 +574,7 @@ worker 注册规划、推进、逐题评估和比较处理器，面试推进、�
 | 检查项 | 结论 | 依据 / 缺口 |
 | --- | --- | --- |
 | 目标、范围、分层 | 已说明 | 本文 1—5；业务、Agent、模型、媒体及数据职责分开 |
-| 框架参与执行 | 已实现，范围有限 | `agent.ts / graph.ts / workflow-models.ts / model.ts`；短线性图，不是自治工具循环或生命周期图 |
+| 框架参与执行 | 已实现，范围有限 | 两个 Agent 的 `core/agent.ts / core/planner.ts / core/tools.ts` 及共享 `graph.ts / model.ts`；短线性图，不是自治工具循环或生命周期图 |
 | 状态与恢复 | 既定边界已实现 | 数据库任务与 Outbox，无 checkpoint，恢复重跑短图 |
 | 规划与动态行动 | 已实现，效果待评 | 观察目标、当前回答和记忆；专业深度、重复与引导性须人工评测 |
 | 证据与隐私 | 关键校验已实现 | 原文锚点、revision、归属和脱敏；不保证发现全部语义虚构或个人信息 |
@@ -586,7 +595,7 @@ worker 注册规划、推进、逐题评估和比较处理器，面试推进、�
 | 模型与报告失败 | 有限重试，保留成功分析与回答 | 沿供应商输出及校验链定位，记录失败与 P95，不先改时间 |
 | 取消/删除后迟到 | 取消信号及最终事务复核 | 延迟、续答、删除与 worker 重启回归 |
 | 麦克风及媒体故障 | 默认设备与底层采集错误处理 | 逐段实测采集、传输、识别和播放 |
-| 为框架过度设计 | 单 Agent、短图、唯一业务状态权威 | 以实际分支与恢复需求决定扩展 |
+| 为框架过度设计 | 两个 Agent 各按五部分组织、短图、唯一业务状态权威 | 以实际分支与恢复需求决定扩展 |
 
 ## 12. 项目结构与开发计划
 

@@ -7,7 +7,7 @@ import {
   feedbackObservationOutput,
   responseAssessmentOutput,
   assessedResponseOutput,
-} from './agent/analysis';
+} from './agent/core/guardrails';
 import { turnSchema } from '../interviews/api-schemas';
 const evidence = z.object({ turn_id: z.string(), revision: z.number().int(), quote: z.string() });
 const finding = z.object({ text: z.string(), evidence_refs: z.array(evidence) });

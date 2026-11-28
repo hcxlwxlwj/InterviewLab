@@ -20,7 +20,7 @@ import {
   cancelInterviewTasks,
   type InterviewState,
 } from './repository';
-import { materialFields, type WorkflowModels } from './agent/runtime/workflow-models';
+import { materialFields, type WorkflowModels } from './agent/core/planner';
 import { interviewPolicy } from '@interviewlab/core';
 import { COMPETENCIES, PROFILE_GOALS, planningRoleContext } from '../knowledge/catalog';
 

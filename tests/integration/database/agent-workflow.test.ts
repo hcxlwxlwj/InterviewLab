@@ -13,10 +13,10 @@ import { createDatabase } from '../../../code/backend/src/database/connection';
 import { migrateDatabase } from '../../../code/backend/src/database/migrate';
 import { createInterviewRuntime } from '../../../code/backend/src/modules/interview-runtime';
 import { createAgentRuntime } from '../../../code/backend/src/modules/agent-runtime';
-import { createWorkflowModels } from '../../../code/backend/src/modules/interviews/agent/runtime/workflow-models';
+import { createWorkflowModels } from '../../../code/backend/src/modules/interviews/agent/core/planner';
 import { simpleResume } from '../../../code/backend/src/modules/interviews/preparation';
 import { runTask, TaskDeliveryError } from '../../../code/backend/src/tasks/runner';
-import type { WorkflowModels } from '../../../code/backend/src/modules/interviews/agent/runtime/workflow-models';
+import type { WorkflowModels } from '../../../code/backend/src/modules/interviews/agent/core/planner';
 import { buildApp } from '../../../code/backend/src/server/app';
 
 dotenv({ quiet: true });

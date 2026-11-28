@@ -19,11 +19,11 @@ import {
 } from '@interviewlab/core';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 import { createAllRoleKnowledge } from '../../code/backend/src/modules/knowledge/all-roles';
-import { createWorkflowModels } from '../../code/backend/src/modules/interviews/agent/runtime/workflow-models';
+import { createWorkflowModels } from '../../code/backend/src/modules/interviews/agent/core/planner';
 import { createAgentRuntime } from '../../code/backend/src/modules/agent-runtime';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
 import { ServiceError } from '../../code/backend/src/foundation/errors';
-import { assertPolicyQuestion } from '../../code/backend/src/modules/interviews/agent/guardrails/question-policy';
+import { assertPolicyQuestion } from '../../code/backend/src/modules/interviews/agent/core/guardrails';
 import {
   jsonFields,
   readChatStream,

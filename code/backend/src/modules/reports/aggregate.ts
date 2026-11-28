@@ -23,7 +23,11 @@ import {
   WHOLE_INTERVIEW_SCORING_VERSION,
 } from '@interviewlab/core';
 import { inputDigest } from '../../foundation/idempotency';
-import { REPORT_PROMPT_VERSION, REPORT_SCHEMA_VERSION, SCORING_RUBRIC_VERSION } from './agent/analysis';
+import {
+  REPORT_PROMPT_VERSION,
+  REPORT_SCHEMA_VERSION,
+  SCORING_RUBRIC_VERSION,
+} from './agent/core/guardrails';
 export interface EvaluationTask {
   turn_id: string;
   task_id: string | null;

@@ -1,3 +1,4 @@
+/** 共享 LangGraph 有界工作流：编排上下文准备、模型执行和结果校验，记录节点耗时。 */
 import { Annotation, StateGraph, START, END } from '@langchain/langgraph';
 import { ServiceError } from '../errors';
 

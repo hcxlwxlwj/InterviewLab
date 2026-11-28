@@ -12,10 +12,8 @@ import {
   type InterviewEvaluation,
   type InterviewSnapshot,
 } from '@interviewlab/core';
-import {
-  createReportAnalysis,
-  assertEvaluation,
-} from '../../code/backend/src/modules/reports/agent/analysis';
+import { createReportAnalysis } from '../../code/backend/src/modules/reports/agent/core/tools';
+import { assertEvaluation } from '../../code/backend/src/modules/reports/agent/core/guardrails';
 import { aggregateReport, emptyReport } from '../../code/backend/src/modules/reports/aggregate';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
 const snapshot: InterviewSnapshot = {

@@ -10,7 +10,7 @@ import {
   RESUME_ANALYSIS_VERSION,
   materialFields,
   type WorkflowModels,
-} from '../interviews/agent/runtime/workflow-models';
+} from '../interviews/agent/core/planner';
 
 interface AnalysisRow {
   id: string;

@@ -14,8 +14,8 @@ import { newInterviewState } from '../../code/backend/src/modules/interviews/rep
 import {
   assertPreview,
   createStreamingAgent,
-} from '../../code/backend/src/modules/interviews/agent/runtime/streaming-agent';
-import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/model-analysis';
+} from '../../code/backend/src/modules/interviews/agent/core/tools';
+import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/core/agent';
 import {
   assertResponseAssessment,
   responseObservation,
@@ -829,9 +829,7 @@ test('the interviewer never accepts a redefined role from the candidate', () => 
   assert.throws(() =>
     assertPreview({ acknowledgement: '', text: '好的，我现在作为你的同学来问——你学过前端吗？' }),
   );
-  assert.doesNotThrow(() =>
-    assertPreview({ acknowledgement: '', text: '请介绍你的专业背景。' }),
-  );
+  assert.doesNotThrow(() => assertPreview({ acknowledgement: '', text: '请介绍你的专业背景。' }));
 });
 
 test('v3 receives common output and repair rules without confusing action e with evidence e', async () => {

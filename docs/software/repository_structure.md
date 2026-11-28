@@ -1,6 +1,6 @@
 # 工程目录与文件职责
 
-本页说明当前代码归属；完整清单见[项目文件树](project-file-tree.md)。运行方法见[开发指南](development.md)，系统边界见[总体架构](architecture.md)，Agent 工作流和限制见[面试智能体架构](interview-agent-implementation.md)。
+本页说明当前代码归属；完整清单见[项目文件树](project-file-tree.md)。运行方法见[开发指南](development.md)，系统边界见[总体架构](architecture.md)，Agent 五部分及带注解目录见[Agent 组成与代码规范](agent-components.md)，工作流见[面试智能体架构](interview-agent-implementation.md)。
 
 仓库沿用课程模板的 `docs/requirements`、`docs/algorithm`、`docs/software`、`docs/mgmt`、`docs/retrospection`、`code/backend`、`code/frontend`、`code/core_engine` 和 `tests`。用户测试入口是 [InterviewLab 交叉用户测试](../../tests/interviewlab_demo_user_test.md)，当前状态为待执行；目录存在不代表用户测试已经完成。
 
@@ -38,7 +38,22 @@ InterviewLab/
 
 业务模块按实际需要组织接口、服务和数据访问，不要求每个模块都创建空层。`routes.ts` 注册 HTTP 接口，`service.ts` 协调业务，`repository.ts` 实现数据访问；`db-schema.ts` 定义数据库表，`api-schemas.ts` 定义请求和响应。共享类型和纯规则放在 `core_engine`，模块通过明确的服务接口协作。
 
-`modules/agent-runtime.ts` 将面试 Agent 与报告模型分析组合，并分别注入业务服务。面试 Agent 位于 `modules/interviews/agent/`：`planner/` 组织面试目标与推进计划，`runtime/` 包含模型执行与提示词组装，`tools/` 为知识适配，`memory/` 管理面试记忆，`guardrails/` 维护提问及预览约束。报告 Agent 位于 `modules/reports/agent/`，分为逐题分析、总结、建议、合同和校验。供面试、准备和报告复用的有界工作流位于 `foundation/agent/graph.ts`；业务状态和数据提交仍由各业务服务负责。
+`modules/agent-runtime.ts` 将面试 Agent 与报告模型分析组合，并分别注入业务服务。两个 Agent 均保留以下可定位的核心文件：
+
+```text
+modules/{interviews,reports}/agent/
+├── core/
+│   ├── planner.ts       # 简历/面前规划、合法行动或报告阶段上下文
+│   ├── tools.ts         # 实现流式生成或评分、总结等能力，注册受限工具
+│   ├── agent.ts         # LangGraph 编排、模型调用及能力装配
+│   ├── memory.ts        # 管理本场记忆或本次报告的回答证据工作记忆
+│   └── guardrails.ts    # 输出结构校验及问题、评分、原文引用等业务约束
+└── knowledge/           # 各 Agent 使用公开知识或评价参考的适配入口
+```
+
+两个 Agent 各有六个源码文件，五部分直接承载实现。面试的流式执行和提示词在 `core/tools.ts`，简历分析和准备工作流在 `core/planner.ts`；报告的评分、总结、建议和比较在 `core/tools.ts`，输出结构与合同在 `core/guardrails.ts`，模型适配和装配在 `core/agent.ts`。这些是所属模块内的函数，不作为平行补丁或额外模块。工作记忆不表示跨会话长期记忆，工具也不表示模型能任意执行外部动作。
+
+供面试、准备和报告复用的有界工作流位于 `foundation/agent/graph.ts`，LangChain 模型传输统一位于 `foundation/agent/model.ts`，共享工具调用封装位于 `foundation/agent/tools.ts`。业务状态、恢复和数据提交仍由各业务服务及 tasks/outbox 负责。Agent 源码及共享入口以中文文件头注释说明职责，详见[组成对照](agent-components.md)。
 
 ## 开发与验证入口
 

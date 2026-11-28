@@ -11,15 +11,15 @@ import {
   type ScoringQuestionScope,
   type AssessedResponse,
 } from '@interviewlab/core';
+import { createReportAnalysis } from '../../code/backend/src/modules/reports/agent/core/tools';
 import {
-  createReportAnalysis,
   assertEvaluation,
   assertSummary,
-  reuseSingleQuestionSummary,
-} from '../../code/backend/src/modules/reports/agent/analysis';
+} from '../../code/backend/src/modules/reports/agent/core/guardrails';
+import { reuseSingleQuestionSummary } from '../../code/backend/src/modules/reports/agent/core/tools';
 import { aggregateReport, emptyReport } from '../../code/backend/src/modules/reports/aggregate';
-import { createReportAgent } from '../../code/backend/src/modules/reports/agent/runtime';
-import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/model-analysis';
+import { createReportAgent } from '../../code/backend/src/modules/reports/agent/core/agent';
+import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/core/agent';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
 
