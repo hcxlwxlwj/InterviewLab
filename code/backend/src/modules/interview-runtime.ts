@@ -1,8 +1,10 @@
+/** 面试业务装配：连接两个 Agent、知识库、简历、报告服务与可恢复后台任务。 */
 import { createAllRoleKnowledge } from './knowledge/all-roles';
 import { createResumeAnalysis } from './resumes/analysis';
-import { createWorkflowModels, type WorkflowModels } from './interviews/agent/runtime/workflow-models';
+import { createWorkflowModels, type WorkflowModels } from './interviews/agent/core/planner';
 import { createInterviewPreparation } from './interviews/preparation';
 import { createAgentRuntime } from './agent-runtime';
+import { createInterviewKnowledgeTools } from './interviews/agent/core/tools';
 import { createMaterialsService } from './resumes/service';
 import type { InterviewKnowledgeProvider, InterviewKnowledgeRuntime } from '@interviewlab/core';
 import type { Database } from '../database/connection';
@@ -32,6 +34,8 @@ export function createInterviewRuntime(
 ) {
   const knowledge = createAllRoleKnowledge(config);
   const content = options.knowledge ?? options.realtimeKnowledge ?? knowledge;
+  const realtimeKnowledge = options.realtimeKnowledge ?? knowledge;
+  const tools = createInterviewKnowledgeTools(realtimeKnowledge, options.log);
   const models = options.workflowModels ?? createWorkflowModels(config, fetch, options.log);
   const resumeAnalysis = createResumeAnalysis(database, config, models);
   const materials = createMaterialsService(database, resumeAnalysis, true);
@@ -47,12 +51,12 @@ export function createInterviewRuntime(
       seal: options.onFinalize ?? ((tx, state) => reports.seal(tx, state)),
       erase: (tx, owner, id) => reports.erase(tx, owner, id),
     },
-    options.realtimeKnowledge ?? {
-      ...knowledge,
-      read: (c) => knowledge.read(c),
-      profiles: (c) => knowledge.profiles(c),
-      prefetch: (c,k,m) => knowledge.prefetch(c,k,m),
-      context: (c,k,m,a,s) => knowledge.context(c,k,m,a,s),
+    {
+      enabled: realtimeKnowledge.enabled,
+      read: (c) => realtimeKnowledge.read(c),
+      profiles: (c) => realtimeKnowledge.profiles(c),
+      prefetch: (c,k,m) => realtimeKnowledge.prefetch(c,k,m),
+      context: tools.retrieve_context.invoke,
     },
     async (owner,id,version)=>{const versions=await materials.versions(owner,id);const material=versions.find(v=>v.version===version&&v.kind==='resume'&&v.confirmed);if(!material)throw new ServiceError('unsupported_input',400,'请选择本人已确认的简历版本');return material;},
     {

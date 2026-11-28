@@ -19,10 +19,10 @@ import {
   interviewConfigSchema,
   newInterviewConfigSchema,
 } from '../../code/backend/src/modules/interviews/api-schemas';
-import { assertPolicyQuestion } from '../../code/backend/src/modules/interviews/agent/guardrails/question-policy';
-import { createStreamingAgent } from '../../code/backend/src/modules/interviews/agent/runtime/streaming-agent';
-import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/model-analysis';
-import { createReportAnalysis } from '../../code/backend/src/modules/reports/agent/analysis';
+import { assertPolicyQuestion } from '../../code/backend/src/modules/interviews/agent/core/guardrails';
+import { createStreamingAgent } from '../../code/backend/src/modules/interviews/agent/core/tools';
+import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/core/agent';
+import { createReportAnalysis } from '../../code/backend/src/modules/reports/agent/core/tools';
 import { COMPETENCIES, catalogProfile } from '../../code/backend/src/modules/knowledge/catalog';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 import { AbilityRadar } from '../../code/frontend/features/live-interview/report-charts';
@@ -119,7 +119,10 @@ test('new interviews start at ten minutes and long sessions retain their time an
   assert.equal(mainQuestionLimit(10), 10);
   assert.equal(mainQuestionLimit(20), 14);
   assert.equal(mainQuestionLimit(30), 18);
-  assert.equal(nextQuestionPosition([turn('问题', '回答', 13)], false, 20)?.main_question_index, 14);
+  assert.equal(
+    nextQuestionPosition([turn('问题', '回答', 13)], false, 20)?.main_question_index,
+    14,
+  );
   assert.equal(interviewDeadline(started, 5) - Date.parse(started), 12 * 60000);
 });
 

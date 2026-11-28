@@ -11,11 +11,9 @@ import {
   type InterviewTurn,
   type InterviewComparison,
 } from '@interviewlab/core';
-import {
-  createModelAnalysis,
-  assertEvaluation,
-} from '../../code/backend/src/modules/reports/agent/model-analysis';
-import { assertQuestion } from '../../code/backend/src/modules/interviews/agent/guardrails/question';
+import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/core/agent';
+import { assertEvaluation } from '../../code/backend/src/modules/reports/agent/core/guardrails';
+import { assertQuestion } from '../../code/backend/src/modules/interviews/agent/core/guardrails';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 import { ServiceError } from '../../code/backend/src/foundation/errors';
 const question = {

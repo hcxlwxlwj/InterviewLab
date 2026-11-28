@@ -1,3 +1,4 @@
+/** 面试工作记忆：校验原文证据，合并观察、候选人陈述和已问意图；持久化由业务服务负责。 */
 import type {
   InterviewMemory,
   InterviewMemoryDelta,

@@ -1,10 +1,37 @@
-import type { InterviewTurnAgent } from './types';
-import { assertQuestion } from '../guardrails/question';
-import { createStreamingAgent } from './streaming-agent';
-import { langChainFetch } from './model';
+/** 面试 Agent 入口：以 LangChain 调用模型，用 LangGraph 编排上下文、工具执行和结果护栏。 */
+import { assertQuestion } from './guardrails';
+import { langChainFetch } from '../../../../foundation/agent/model';
+import { createInterviewTools, createStreamingAgent, type AdvanceContext } from './tools';
 import { checkedGraph } from '../../../../foundation/agent/graph';
 import type { BackendConfig } from '../../../../foundation/config';
 import { ServiceError } from '../../../../foundation/errors';
+
+import type {
+  Interview,
+  InterviewSnapshot,
+  InterviewQuestion,
+  InterviewMemory,
+  InterviewRetrieval,
+} from '@interviewlab/core';
+
+export interface InterviewTurnAgent {
+  readonly available: boolean;
+  readonly model: string;
+  advance(
+    interview: Interview,
+    snapshot: InterviewSnapshot,
+    clarify: boolean,
+    signal: AbortSignal,
+    repair: boolean,
+    context?: AdvanceContext,
+  ): Promise<{
+    action: 'follow_up' | 'next' | 'finish' | 'clarify';
+    question: InterviewQuestion | null;
+    clarification: string | null;
+    memory?: InterviewMemory;
+    retrieval?: InterviewRetrieval;
+  }>;
+}
 
 /** The single interview runtime: LangChain transport and a bounded LangGraph turn workflow. */
 export function createInterviewAgent(
@@ -18,6 +45,7 @@ export function createInterviewAgent(
     model: config.LLM_MODEL ?? 'unconfigured',
   };
   const realtime = createStreamingAgent(graphBase, config, log, transport);
+  const tools = createInterviewTools(realtime.advance, log);
   return {
     ...graphBase,
     async advance(interview, snapshot, clarify, signal, repair, context) {
@@ -37,7 +65,7 @@ export function createInterviewAgent(
             return input;
           },
           generate: (input) =>
-            realtime.advance(
+            tools.generate_question.invoke(
               input.interview,
               input.snapshot,
               clarify,

@@ -23,8 +23,8 @@ import {
   createWorkflowModels,
   materialFields,
   assertMaterialEvidence,
-} from '../../code/backend/src/modules/interviews/agent/runtime/workflow-models';
-import { langChainFetch } from '../../code/backend/src/modules/interviews/agent/runtime/model';
+} from '../../code/backend/src/modules/interviews/agent/core/planner';
+import { langChainFetch } from '../../code/backend/src/foundation/agent/model';
 import { createAgentRuntime } from '../../code/backend/src/modules/agent-runtime';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
 import { interviewInputDigest } from '../../code/backend/src/modules/interviews/service';

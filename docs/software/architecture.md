@@ -317,7 +317,7 @@ Agent 负责理解简历和回答、提出观察目标及生成内容；业务�
 | 唯一面试 Agent 入口 | 冻结输入、上下文、取消信号 → 有界图结果 | `interviews/agent.ts`、`graph.ts` |
 | LangChain 模型适配 | 模型消息、输出合同 → JSON 或既有 SSE 合同 | `interviews/model.ts` |
 | 简历事实分析 | 已确认字段版本 → 分类事实、原文定位与待澄清点 | `resumes/analysis.ts`、`interviews/workflow-models.ts` |
-| 面前规划 | 岗位、类型、难度、时长、可选分析 → 观察目标及限制 | `interviews/preparation.ts`、`workflow-models.ts` |
+| 面前规划 | 岗位、类型、难度、时长、可选分析 → 观察目标及限制 | `interviews/preparation.ts`、`interviews/agent/core/planner.ts` |
 | 动态流式提问 | 当前回答、记忆、计划、检索片段 → 动作、预览与记忆 | `interviews/streaming-agent.ts` |
 | 经历边界与记忆 | 指定回答证据、材料事实 → 背景充分性与覆盖状态 | `interviews/experience.ts`、`memory.ts` |
 | 全岗位知识服务 | 岗位、阶段、类型、目标、冻结版本 → 适用片段与来源 | `knowledge/catalog.ts`、`all-roles.ts`、`embedding.ts` |
@@ -366,7 +366,7 @@ ASR final 只表示识别分句结束，不直接等于回答完毕；结合静�
 | 私有短期记忆 | 保存关注目标、覆盖状态、已问意图及带回答 revision 的原文证据 |
 | 输入裁剪 | 当前回答、自我介绍必要摘要、证据记忆和少量检索片段；不默认发送全部历史 |
 | 长期画像 | 尚未形成完整长期用户画像服务，不将公共缓存当作私有记忆 |
-| 提示词 | 在 `interviews/agent/runtime/` 和 `reports/agent/` 按任务维护并记录版本 |
+| 提示词 | 在 `interviews/agent/core/tools.ts`、`core/planner.ts` 及 `reports/agent/core/` 按任务维护并记录版本 |
 
 ### 6.5 输出护栏与报告规则
 

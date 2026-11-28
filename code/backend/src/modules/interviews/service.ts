@@ -7,7 +7,7 @@ import {
 } from './participation';
 import { INTERVIEW_V3 } from '@interviewlab/core';
 import type { InterviewKnowledgeRuntime } from '@interviewlab/core';
-import { initialMemory } from './agent/memory/memory';
+import { initialMemory } from './agent/core/memory';
 import { createGenerationStreams } from './streams';
 import {
   setVoiceInputActivity,
@@ -38,8 +38,8 @@ import { ServiceError } from '../../foundation/errors';
 import { enqueueTask } from '../../tasks/service';
 import type { TaskHandler } from '../../tasks/runner';
 import { getJob } from '../../content/index';
-import type { InterviewTurnAgent } from './agent/runtime/types';
-import { assertQuestion } from './agent/guardrails/question';
+import type { InterviewTurnAgent } from './agent/core/agent';
+import { assertQuestion } from './agent/core/guardrails';
 import {
   completedRetryIds,
   cancelInterviewTasks,

@@ -13,9 +13,12 @@ import {
   type ReportIndicatorAssessment,
 } from '@interviewlab/core';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
-import { assertEvaluation } from '../../code/backend/src/modules/reports/agent/analysis';
+import { assertEvaluation } from '../../code/backend/src/modules/reports/agent/core/guardrails';
 import { emptyReport, aggregateReport } from '../../code/backend/src/modules/reports/aggregate';
-import { reportSchema, reportRequestBody } from '../../code/backend/src/modules/reports/api-schemas';
+import {
+  reportSchema,
+  reportRequestBody,
+} from '../../code/backend/src/modules/reports/api-schemas';
 import { reportExportHtml } from '../../code/frontend/features/live-interview/report-export';
 
 function fixture() {
@@ -223,7 +226,7 @@ test('rubric upgrade is explicit and historical reports are never silently conve
 
 test('professional indicators require a matching frozen reference and an explicit technical question', async () => {
   const { structuredInterviewKnowledge } = await import(
-    '../../code/backend/src/modules/interviews/agent/tools/knowledge'
+    '../../code/backend/src/modules/interviews/agent/knowledge/index'
   );
   const { state, turn, snapshot } = fixture();
   const knowledge = await structuredInterviewKnowledge.read(state.view.configuration);

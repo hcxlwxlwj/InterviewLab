@@ -1,7 +1,8 @@
+/** LangChain 模型传输：统一 JSON 与 SSE 调用，保留超时、取消和输出大小限制。 */
 import { ChatOpenAI, type ChatOpenAICallOptions } from '@langchain/openai';
 import { SystemMessage, HumanMessage } from '@langchain/core/messages';
-import type { BackendConfig } from '../../../../foundation/config';
-import { ServiceError } from '../../../../foundation/errors';
+import type { BackendConfig } from '../config';
+import { ServiceError } from '../errors';
 
 /** LangChain transport with the existing bounded JSON/SSE contract at its boundary.
  * This lets historical validators and report schemas remain unchanged. No SDK retries. */

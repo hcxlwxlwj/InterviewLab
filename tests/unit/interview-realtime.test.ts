@@ -4,9 +4,12 @@ import {
   jsonFields,
   readChatStream,
 } from '../../code/backend/src/modules/interviews/stream-parser';
-import { applyMemory, initialMemory } from '../../code/backend/src/modules/interviews/agent/memory/memory';
-import { createStreamingAgent } from '../../code/backend/src/modules/interviews/agent/runtime/streaming-agent';
-import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/model-analysis';
+import {
+  applyMemory,
+  initialMemory,
+} from '../../code/backend/src/modules/interviews/agent/core/memory';
+import { createStreamingAgent } from '../../code/backend/src/modules/interviews/agent/core/tools';
+import { createModelAnalysis } from '../../code/backend/src/modules/reports/agent/core/agent';
 import { newInterviewState } from '../../code/backend/src/modules/interviews/repository';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 import { currentKnowledgeFixture } from '../support/knowledge-fixture';

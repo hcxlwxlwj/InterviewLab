@@ -10,14 +10,10 @@ import { inputDigest, withIdempotency } from '../../foundation/idempotency';
 import { ServiceError } from '../../foundation/errors';
 import { enqueueTask, type TaskRow } from '../../tasks/service';
 import type { TaskHandler } from '../../tasks/runner';
-import type { ReportAnalysis } from './agent/analysis';
-import {
-  assertEvaluation,
-  assertSummary,
-  reuseSingleQuestionSummary,
-  REPORT_PROMPT_VERSION,
-  REPORT_SCHEMA_VERSION,
-} from './agent/analysis';
+import type { ReportAnalysis } from './agent/core/tools';
+import { assertEvaluation, assertSummary } from './agent/core/guardrails';
+import { reuseSingleQuestionSummary } from './agent/core/tools';
+import { REPORT_PROMPT_VERSION, REPORT_SCHEMA_VERSION } from './agent/core/guardrails';
 import { aggregateReport, emptyReport, evaluationDigest, taskSettled } from './aggregate';
 import type { InterviewState } from '../interviews/repository';
 import { interviewInputDigest, type LiveInterviewsService } from '../interviews/service';

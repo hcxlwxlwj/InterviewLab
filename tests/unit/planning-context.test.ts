@@ -15,8 +15,8 @@ import {
   planningRoleContext,
   PROFILE_GOALS,
 } from '../../code/backend/src/modules/knowledge/catalog';
-import { structuredInterviewKnowledge } from '../../code/backend/src/modules/interviews/agent/tools/knowledge';
-import { createWorkflowModels } from '../../code/backend/src/modules/interviews/agent/runtime/workflow-models';
+import { structuredInterviewKnowledge } from '../../code/backend/src/modules/interviews/agent/knowledge/index';
+import { createWorkflowModels } from '../../code/backend/src/modules/interviews/agent/core/planner';
 import { loadConfig } from '../../code/backend/src/foundation/config';
 
 const configuration: InterviewConfig = {

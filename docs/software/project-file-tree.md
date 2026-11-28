@@ -2,7 +2,7 @@
 
 基于当前工作区的 Git 跟踪文件及未忽略的新文件生成，只列出实际存在的文件。`.env`、`data/private/`、`node_modules/`、`.next/`、`dist/` 等被 Git 忽略的本地配置、私有数据和生成物不展开。历史截图、扫描结果和迁移记录保留原样。
 
-文件会随开发变化；职责说明见[工程目录](repository_structure.md)。
+文件会随开发变化；职责说明见[工程目录](repository_structure.md)，两个 Agent 的五部分及带注解目录见[Agent 组成与代码规范](agent-components.md)。
 
 ```text
 InterviewLab/
@@ -50,8 +50,8 @@ InterviewLab/
 │   │   │   └── 0013_interview_question_budget.sql
 │   │   ├── src/
 │   │   │   ├── content/
-│   │   │   │   ├── index.ts
-│   │   │   │   └── README.md
+│   │   │   │   ├── README.md
+│   │   │   │   └── index.ts
 │   │   │   ├── database/
 │   │   │   │   ├── connection.ts
 │   │   │   │   ├── migrate.ts
@@ -65,7 +65,9 @@ InterviewLab/
 │   │   │   │   └── worker.ts
 │   │   │   ├── foundation/
 │   │   │   │   ├── agent/
-│   │   │   │   │   └── graph.ts
+│   │   │   │   │   ├── graph.ts
+│   │   │   │   │   ├── model.ts
+│   │   │   │   │   └── tools.ts
 │   │   │   │   ├── auth.ts
 │   │   │   │   ├── config.ts
 │   │   │   │   ├── errors.ts
@@ -80,23 +82,14 @@ InterviewLab/
 │   │   │   │   │   └── settings.ts
 │   │   │   │   ├── interviews/
 │   │   │   │   │   ├── agent/
-│   │   │   │   │   │   ├── guardrails/
-│   │   │   │   │   │   │   ├── preview.ts
-│   │   │   │   │   │   │   ├── question-policy.ts
-│   │   │   │   │   │   │   └── question.ts
-│   │   │   │   │   │   ├── memory/
-│   │   │   │   │   │   │   └── memory.ts
-│   │   │   │   │   │   ├── planner/
-│   │   │   │   │   │   │   └── planning.ts
-│   │   │   │   │   │   ├── runtime/
-│   │   │   │   │   │   │   ├── interview-agent.ts
-│   │   │   │   │   │   │   ├── model.ts
-│   │   │   │   │   │   │   ├── prompt.ts
-│   │   │   │   │   │   │   ├── streaming-agent.ts
-│   │   │   │   │   │   │   ├── types.ts
-│   │   │   │   │   │   │   └── workflow-models.ts
-│   │   │   │   │   │   └── tools/
-│   │   │   │   │   │       └── knowledge.ts
+│   │   │   │   │   │   ├── core/
+│   │   │   │   │   │   │   ├── agent.ts
+│   │   │   │   │   │   │   ├── guardrails.ts
+│   │   │   │   │   │   │   ├── memory.ts
+│   │   │   │   │   │   │   ├── planner.ts
+│   │   │   │   │   │   │   └── tools.ts
+│   │   │   │   │   │   └── knowledge/
+│   │   │   │   │   │       └── index.ts
 │   │   │   │   │   ├── voice/
 │   │   │   │   │   │   ├── activity.ts
 │   │   │   │   │   │   ├── routes.ts
@@ -130,18 +123,18 @@ InterviewLab/
 │   │   │   │   │   └── migrate-v2.sql
 │   │   │   │   ├── reports/
 │   │   │   │   │   ├── agent/
-│   │   │   │   │   │   ├── advice.ts
-│   │   │   │   │   │   ├── analysis.ts
-│   │   │   │   │   │   ├── contracts.ts
-│   │   │   │   │   │   ├── evaluation.ts
-│   │   │   │   │   │   ├── guardrails.ts
-│   │   │   │   │   │   ├── model-analysis.ts
-│   │   │   │   │   │   ├── runtime.ts
-│   │   │   │   │   │   └── summary.ts
+│   │   │   │   │   │   ├── core/
+│   │   │   │   │   │   │   ├── agent.ts
+│   │   │   │   │   │   │   ├── guardrails.ts
+│   │   │   │   │   │   │   ├── memory.ts
+│   │   │   │   │   │   │   ├── planner.ts
+│   │   │   │   │   │   │   └── tools.ts
+│   │   │   │   │   │   └── knowledge/
+│   │   │   │   │   │       └── references.ts
+│   │   │   │   │   ├── README.md
 │   │   │   │   │   ├── aggregate.ts
 │   │   │   │   │   ├── api-schemas.ts
 │   │   │   │   │   ├── db-schema.ts
-│   │   │   │   │   ├── README.md
 │   │   │   │   │   ├── repository.ts
 │   │   │   │   │   ├── routes.ts
 │   │   │   │   │   └── service.ts
@@ -164,10 +157,10 @@ InterviewLab/
 │   │   │   │   └── worker.ts
 │   │   │   └── index.ts
 │   │   ├── AGENTS.md
+│   │   ├── README.md
 │   │   ├── compose.yaml
 │   │   ├── drizzle.config.ts
 │   │   ├── package.json
-│   │   ├── README.md
 │   │   └── tsup.config.ts
 │   ├── core_engine/
 │   │   ├── src/
@@ -190,8 +183,8 @@ InterviewLab/
 │   │   │   ├── report-rubric.ts
 │   │   │   ├── resume-template.ts
 │   │   │   └── voice.ts
-│   │   ├── package.json
-│   │   └── README.md
+│   │   ├── README.md
+│   │   └── package.json
 │   ├── frontend/
 │   │   ├── app/
 │   │   │   ├── interview/
@@ -322,19 +315,19 @@ InterviewLab/
 │   │   │   ├── avatars/
 │   │   │   │   └── interviewer-reference-sprite.png
 │   │   │   ├── fonts/
-│   │   │   │   ├── interviewlab-sans.woff2
-│   │   │   │   └── OFL.txt
+│   │   │   │   ├── OFL.txt
+│   │   │   │   └── interviewlab-sans.woff2
 │   │   │   ├── images/
 │   │   │   │   ├── interview-hero-wide.png
 │   │   │   │   └── study-desk.png
 │   │   │   └── voice-capture.worklet.js
 │   │   ├── AGENTS.md
+│   │   ├── README.md
 │   │   ├── components.json
 │   │   ├── next-env.d.ts
 │   │   ├── next.config.ts
 │   │   ├── package.json
 │   │   ├── postcss.config.mjs
-│   │   ├── README.md
 │   │   └── tsconfig.json
 │   └── README.md
 ├── docs/
@@ -368,32 +361,32 @@ InterviewLab/
 │   │   │   │   │   └── public-interview-sources.csv
 │   │   │   │   ├── job-classification.csv
 │   │   │   │   └── role-taxonomy-v2.json
+│   │   │   ├── README.md
 │   │   │   ├── categories.json
 │   │   │   ├── frontend-report-reference.json
 │   │   │   ├── jobs.json
 │   │   │   ├── latest-role-supplements.json
 │   │   │   ├── professional-foundations.json
 │   │   │   ├── public-interview-supplements.json
-│   │   │   ├── README.md
 │   │   │   ├── sources.json
 │   │   │   └── teacher-agent-questions.json
+│   │   ├── README.md
 │   │   ├── evaluation.md
 │   │   ├── frontend-scoring-standard.md
 │   │   ├── knowledge_and_agent.md
-│   │   ├── README.md
 │   │   └── research.md
 │   ├── mgmt/
 │   │   ├── COLLABORATION.md
+│   │   ├── README.md
 │   │   ├── communication_mgmt_plan.md
 │   │   ├── project_management.md
-│   │   ├── README.md
 │   │   ├── risk_mgmt_plan.md
 │   │   └── team_plan.md
 │   ├── requirements/
+│   │   ├── README.md
 │   │   ├── functional_spec.md
 │   │   ├── nonfunctional_spec.md
 │   │   ├── problem_definition.md
-│   │   ├── README.md
 │   │   └── user_stories.md
 │   ├── retrospection/
 │   │   ├── evidence/
@@ -471,11 +464,11 @@ InterviewLab/
 │   │   │   │   ├── setup-desktop.jpg
 │   │   │   │   ├── setup-mobile-v3.jpg
 │   │   │   │   └── setup-mobile.jpg
+│   │   │   ├── README.md
 │   │   │   ├── design-prompts.md
 │   │   │   ├── extension-prompts.md
 │   │   │   ├── implementation.md
-│   │   │   ├── library-expansion.md
-│   │   │   └── README.md
+│   │   │   └── library-expansion.md
 │   │   ├── quality/
 │   │   │   ├── 2026-11-25/
 │   │   │   │   ├── followup/
@@ -519,7 +512,9 @@ InterviewLab/
 │   │   │       └── 2026-11-26-v1.8/
 │   │   │           ├── code_quality.md
 │   │   │           └── code_review.md
+│   │   ├── README.md
 │   │   ├── account-management.md
+│   │   ├── agent-components.md
 │   │   ├── architecture.md
 │   │   ├── code_quality.md
 │   │   ├── code_review.md
@@ -530,7 +525,6 @@ InterviewLab/
 │   │   ├── interview-agent-v3.md
 │   │   ├── personal-materials-implementation.md
 │   │   ├── project-file-tree.md
-│   │   ├── README.md
 │   │   ├── repository_structure.md
 │   │   └── voice-interview.md
 │   └── README.md
@@ -569,6 +563,8 @@ InterviewLab/
 │   │   └── voice-provider-smoke.ts
 │   ├── unit/
 │   │   ├── account-access.test.ts
+│   │   ├── agent-structure.test.ts
+│   │   ├── agent-tools.test.ts
 │   │   ├── agent-workflow.test.ts
 │   │   ├── analysis-state.test.ts
 │   │   ├── catalog.test.ts
@@ -592,6 +588,7 @@ InterviewLab/
 │   │   ├── planning-context.test.ts
 │   │   ├── presentation-request.test.ts
 │   │   ├── question-scoring.test.ts
+│   │   ├── report-agent-components.test.ts
 │   │   ├── report-insights.test.ts
 │   │   ├── report-pages.test.ts
 │   │   ├── report-readiness.test.ts
@@ -610,17 +607,17 @@ InterviewLab/
 │   │   ├── voice-interface.test.ts
 │   │   ├── voice-session.test.ts
 │   │   └── voice.test.ts
-│   ├── interviewlab_demo_user_test.md
-│   └── README.md
+│   ├── README.md
+│   └── interviewlab_demo_user_test.md
 ├── .dockerignore
 ├── .env.example
 ├── .gitattributes
 ├── .gitignore
-├── compose.personal.yaml
 ├── Dockerfile.personal
+├── README.md
+├── compose.personal.yaml
 ├── package-lock.json
 ├── package.json
-├── README.md
 ├── start-personal.command
 └── tsconfig.json
 ```
